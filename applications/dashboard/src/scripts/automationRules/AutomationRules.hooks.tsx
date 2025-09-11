@@ -17,7 +17,7 @@ import {
     IAutomationRulesCatalog,
     IGetAutomationRuleDispatchesParams,
 } from "@dashboard/automationRules/AutomationRules.types";
-import { IGetCategoryListResponse, useCategoryList } from "@library/categoriesWidget/CategoryList.hooks";
+import { IGetCategoryListResponse, useCategoryList } from "@library/widgets/CategoriesWidget.hooks";
 import { useEffect } from "react";
 import { useTagList } from "@library/features/tags/TagsHooks";
 import { ITag } from "@library/features/tags/TagsReducer";
@@ -33,8 +33,8 @@ export function useRecipes(continiousFetch: boolean = true, escalationActionsFil
         isRefetching,
     } = useQuery<any, IApiError, IAutomationRule[]>({
         queryFn: async () => {
-            const response = await apiv2.get("/automation-rules/recipes?expand=all", {
-                params: queryParams,
+            const response = await apiv2.get("/automation-rules/recipes", {
+                params: { ...queryParams, expand: "all" },
             });
             return response.data;
         },

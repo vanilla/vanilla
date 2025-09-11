@@ -1,0 +1,41 @@
+---
+description: Used to check permissions and handle access control
+globs:
+alwaysApply: false
+---
+## Frontend
+
+In the frontend permissions should be checked in a few different ways.
+
+```tsx
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { IPermissionOptions, Permission } from "@library/features/users/Permission";
+
+const permissions = usePermissionsContext();
+
+// Checking a global permissions.
+const userHas = permissions.hasPermission("site.manage");
+
+// Checking a resource specific permission
+const permissionOptions: IPermissionOptions = {
+    mode: PermissionMode.RESOURCE_IF_JUNCTION,
+    resourceType: comment?.parentRecordType,
+    resourceID: comment?.parentRecordID ?? null,
+};
+
+const replyPermission = hasPermission("comments.add", permissionOptions);
+
+
+// Conditionally rendering a component
+
+<Permission permission="site.manage">
+    <span>I need site manage to see me</span>
+</Permission>
+```
+
+## Valid permissions
+
+Valid permissions are defined in [permissions.md](mdc:resources/generated/permissions.md)
+
+NEVER make up new permission names.
+

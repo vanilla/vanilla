@@ -4,20 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import React, { ReactNode } from "react";
-import ErrorMessages from "@library/forms/ErrorMessages";
-import { getRequiredID, IOptionalComponentID } from "@library/utility/idUtils";
-import classNames from "classnames";
-import Paragraph from "@library/layout/Paragraph";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { cx } from "@emotion/css";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { css, cx } from "@emotion/css";
-import { t } from "@vanilla/i18n";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import Paragraph from "@library/layout/Paragraph";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
+import { t } from "@vanilla/i18n";
 import { Icon, IconType } from "@vanilla/icons";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { Mixins } from "@library/styles/Mixins";
+import classNames from "classnames";
+import React, { ReactNode } from "react";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",
@@ -49,113 +46,96 @@ export interface IInputBlockProps extends IOptionalComponentID {
     tight?: boolean;
     extendErrorMessage?: boolean;
     required?: boolean;
-    tooltip?: string;
+    tooltip?: string | React.ReactNode;
     tooltipIcon?: IconType;
 }
 
-interface IState {
-    id: string;
-}
+export default function InputBlock(props: IInputBlockProps) {
+    const {
+        label,
+        errors = [],
+        baseClass = InputTextBlockBaseClass.STANDARD,
+        legend,
+        required,
+        tooltip,
+        tooltipIcon = "info",
+    } = props;
+    const OuterTag = legend ? "div" : label ? "label" : "div";
+    const role = legend ? "group" : undefined;
 
-export default class InputBlock extends React.Component<IInputBlockProps, IState> {
-    public static defaultProps = {
-        errors: [],
-        baseClass: InputTextBlockBaseClass.STANDARD,
-    };
+    const LegendOrSpanTag = legend ? "div" : "span";
 
-    public constructor(props: IInputBlockProps) {
-        super(props);
-        this.state = {
-            id: getRequiredID(props, "inputText") as string,
-        };
+    const hasLegendOrLabel = !!props.legend || !!props.label;
+
+    const classesInputBlock = inputBlockClasses.useAsHook();
+    const componentClasses = classNames(
+        baseClass === InputTextBlockBaseClass.STANDARD ? classesInputBlock.root : "",
+        props.className,
+    );
+    const hasErrors = !!errors && errors.length > 0;
+
+    const ownId = useUniqueID("inputBlock");
+    const id = props.id ?? ownId;
+    const labelID = props.labelID ?? id + "-label";
+    const errorID = id + "-errors";
+
+    let children;
+    if (typeof props.children === "function") {
+        // Type is checked, but typechecker not accepting it.
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        children = (props.children as Function)({ hasErrors, errorID: errorID, labelID: labelID });
+    } else {
+        children = props.children;
     }
 
-    public render() {
-        const { label, legend, required, tooltip, tooltipIcon = "info" } = this.props;
-        const OuterTag = legend ? "div" : label ? "label" : "div";
-        const role = legend ? "group" : undefined;
+    return (
+        <OuterTag className={componentClasses} role={role} aria-labelledby={role === "group" ? labelID : undefined}>
+            {hasLegendOrLabel && (
+                <span className={classesInputBlock.labelAndDescription}>
+                    <LegendOrSpanTag
+                        id={labelID}
+                        className={classNames(classesInputBlock.labelText, props.labelClassName)}
+                    >
+                        {required && (
+                            <span aria-label={t("required")} className={classesInputBlock.labelRequired}>
+                                *
+                            </span>
+                        )}
+                        {props.legend ?? props.label!}
 
-        const LegendOrSpanTag = legend ? "div" : "span";
-
-        const hasLegendOrLabel = !!this.props.legend || !!this.props.label;
-
-        const classesInputBlock = inputBlockClasses();
-        const componentClasses = classNames(
-            this.props.baseClass === InputTextBlockBaseClass.STANDARD ? classesInputBlock.root : "",
-            this.props.className,
-        );
-        const hasErrors = !!this.props.errors && this.props.errors.length > 0;
-
-        let children;
-        if (typeof this.props.children === "function") {
-            // Type is checked, but typechecker not accepting it.
-            // eslint-disable-next-line @typescript-eslint/ban-types
-            children = (this.props.children as Function)({ hasErrors, errorID: this.errorID, labelID: this.labelID });
-        } else {
-            children = this.props.children;
-        }
-
-        return (
-            <OuterTag
-                className={componentClasses}
-                role={role}
-                aria-labelledby={role === "group" ? this.labelID : undefined}
-            >
-                {hasLegendOrLabel && (
-                    <span className={classesInputBlock.labelAndDescription}>
-                        <LegendOrSpanTag
-                            id={this.labelID}
-                            className={classNames(classesInputBlock.labelText, this.props.labelClassName)}
-                        >
-                            {required && (
-                                <span aria-label={t("required")} className={classesInputBlock.labelRequired}>
-                                    *
-                                </span>
-                            )}
-                            {this.props.legend ?? this.props.label!}
-
-                            {tooltip && (
-                                <ToolTip label={tooltip}>
-                                    <ToolTipIcon>
-                                        <span className={classesInputBlock.tooltipIconContainer}>
-                                            <Icon className={classesInputBlock.tooltipIcon} icon={tooltipIcon} />
-                                        </span>
-                                    </ToolTipIcon>
-                                </ToolTip>
-                            )}
-                        </LegendOrSpanTag>
-                        <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
-                    </span>
-                )}
-
-                <span
-                    className={classNames(
-                        classesInputBlock.inputWrap,
-                        [classesInputBlock.fieldsetGroup],
-                        this.props.wrapClassName,
-                        { [classesInputBlock.grid]: this.props.grid },
-                        { [classesInputBlock.tight]: this.props.tight },
-                        { noMargin: this.props.noMargin },
-                    )}
-                >
-                    {children}
+                        {tooltip && (
+                            <ToolTip label={tooltip}>
+                                <ToolTipIcon>
+                                    <span className={classesInputBlock.tooltipIconContainer}>
+                                        <Icon className={classesInputBlock.tooltipIcon} icon={tooltipIcon} />
+                                    </span>
+                                </ToolTipIcon>
+                            </ToolTip>
+                        )}
+                    </LegendOrSpanTag>
+                    <Paragraph className={classesInputBlock.labelNote}>{props.labelNote}</Paragraph>
                 </span>
-                <Paragraph className={classesInputBlock.noteAfterInput}>{this.props.noteAfterInput}</Paragraph>
-                <ErrorMessages
-                    id={this.errorID}
-                    errors={this.props.errors}
-                    className={cx({ [classesInputBlock.extendErrorPadding]: this.props.extendErrorMessage })}
-                    padded
-                />
-            </OuterTag>
-        );
-    }
+            )}
 
-    private get labelID(): string {
-        return this.state.id + "-label";
-    }
-
-    private get errorID(): string {
-        return this.state.id + "-errors";
-    }
+            <span
+                className={classNames(
+                    classesInputBlock.inputWrap,
+                    [classesInputBlock.fieldsetGroup],
+                    props.wrapClassName,
+                    { [classesInputBlock.grid]: props.grid },
+                    { [classesInputBlock.tight]: props.tight },
+                    { noMargin: props.noMargin },
+                )}
+            >
+                {children}
+            </span>
+            <Paragraph className={classesInputBlock.noteAfterInput}>{props.noteAfterInput}</Paragraph>
+            <ErrorMessages
+                id={errorID}
+                errors={errors}
+                className={cx({ [classesInputBlock.extendErrorPadding]: props.extendErrorMessage })}
+                padded
+            />
+        </OuterTag>
+    );
 }

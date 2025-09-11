@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -17,13 +17,12 @@ import Notice from "@library/metas/Notice";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { t } from "@vanilla/i18n";
 import React from "react";
-import qs from "qs";
+import * as qs from "qs-esm";
 import { PermissionMode } from "@library/features/users/Permission";
 import DateTime from "@library/content/DateTime";
 import { metasClasses } from "@library/metas/Metas.styles";
 import { slugify } from "@vanilla/utils";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
-import { qnaStatus } from "./DiscussionListItem";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { getMeta } from "@library/utility/appUtils";
 import { sprintf } from "sprintf-js";
@@ -33,16 +32,26 @@ export interface IDiscussionItemMetaProps extends IDiscussion {
     discussionOptions?: IDiscussionItemOptions;
 }
 
+const QnaStatus = {
+    Unanswered: 1,
+    Answered: 2,
+    Accepted: 3,
+    Rejected: 4,
+} as const;
+
+type QnaStatus = keyof typeof QnaStatus;
+
 export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
     const { hasPermission } = usePermissionsContext();
     const {
         item: {
             metas: { display, asIcons: renderAsIcons },
         },
-    } = discussionListVariables(props.discussionOptions);
+    } = discussionListVariables.useAsHook(props.discussionOptions);
 
-    const classes = discussionListClasses(props.discussionOptions, props.inTile);
-    const variables = discussionListVariables(props.discussionOptions);
+    const classes = discussionListClasses.useAsHook(props.discussionOptions, props.inTile);
+    const variables = discussionListVariables.useAsHook(props.discussionOptions);
+    const classesMeta = metasClasses.useAsHook();
 
     const {
         pinned,
@@ -56,10 +65,11 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
         unread,
         countUnread,
         attributes,
-        tags,
+        tags: allTags,
         score,
         resolved,
         inTile,
+        muted,
     } = props;
 
     const currentUserSignedIn = useCurrentUserSignedIn();
@@ -75,19 +85,34 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
     // By default "lastUser" is "insertUser", we don't want ot display it twice if no-one has commented.
     const displayLastUser = countComments > 0 && !!lastUser && display.lastUser;
 
-    const displayQnaStatus = !!attributes?.question?.status && display.qnaStatus;
-    const getQNAClass = (status: string) => {
-        switch (status) {
-            case "unanswered":
+    const qnaStatusText = (() => {
+        switch (props.statusID) {
+            case QnaStatus.Unanswered:
+            case QnaStatus.Rejected:
+                return t("Q&A Question", "Question");
+            case QnaStatus.Answered:
+                return t("Q&A Answered", "Answered");
+            case QnaStatus.Accepted:
+                return t("Q&A Accepted", "Answered ✓");
+            default:
+                return null;
+        }
+    })();
+    const displayQnaStatus = props.type === "question" && display.qnaStatus && qnaStatusText !== null;
+
+    const qnaClass = (() => {
+        switch (props.statusID) {
+            case QnaStatus.Unanswered:
+            case QnaStatus.Rejected:
                 return classes.qnaStatusUnanswered;
-            case "answered":
+            case QnaStatus.Answered:
                 return classes.qnaStatusAnswered;
-            case "accepted":
+            case QnaStatus.Accepted:
                 return classes.qnaStatusAccepted;
             default:
                 return "";
         }
-    };
+    })();
 
     const displayViewCount = countViews > 0 && display.viewCount;
     const renderViewCountAsIcon = displayViewCount && renderAsIcons;
@@ -101,8 +126,18 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
     const displayLastCommentDate = !!dateLastComment && display.lastCommentDate;
     const renderLastCommentDateAsIcon = displayLastCommentDate && renderAsIcons;
 
+    const taggingEnabled = getMeta("tagging.enabled", false);
+    let tagsToRender = allTags;
+
+    if (allTags && !taggingEnabled) {
+        // Filter out all the "User"-type tags (this leaves the Status tags, for Ideation, etc.)
+        tagsToRender = allTags.filter((tag) => {
+            return tag.type !== "User";
+        });
+    }
+
     const shouldShowUserTags: boolean =
-        !!tags && tags.length > 0 && display.userTags && variables.userTags.maxNumber > 0;
+        !!tagsToRender && tagsToRender.length > 0 && display.userTags && variables.userTags.maxNumber > 0;
 
     const canResolve = hasPermission("staff.allow", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
     const displayResolved =
@@ -127,14 +162,10 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
 
             {pinned && <MetaTag className={classes.announcementTag}>{t("Announcement")}</MetaTag>}
 
-            {displayQnaStatus && (
-                <MetaTag className={getQNAClass(attributes.question.status)}>
-                    {t(`${qnaStatus(attributes!.question!.status!)}`)}
-                </MetaTag>
-            )}
+            {displayQnaStatus && <MetaTag className={qnaClass}>{qnaStatusText}</MetaTag>}
 
             {shouldShowUserTags &&
-                tags?.slice(0, variables.userTags.maxNumber).map((tag, i) => {
+                tagsToRender?.slice(0, variables.userTags.maxNumber).map((tag, i) => {
                     const query = qs.stringify({
                         domain: "discussions",
                         tagsOptions: [
@@ -179,7 +210,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                 <MetaItem>
                     <Translate
                         source="Started by <0/>"
-                        c0={<ProfileLink userFragment={insertUser!} className={metasClasses().metaLink} />}
+                        c0={<ProfileLink userFragment={insertUser!} className={classesMeta.metaLink} />}
                     />
                 </MetaItem>
             )}
@@ -187,7 +218,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                 <MetaItem className={cx({ [classes.fullWidth]: inTile })}>
                     <Translate
                         source="Most recent by <0/>"
-                        c0={<ProfileLink userFragment={lastUser!} className={metasClasses().metaLink} />}
+                        c0={<ProfileLink userFragment={lastUser!} className={classesMeta.metaLink} />}
                     />
                 </MetaItem>
             )}
@@ -228,6 +259,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                     {countComments}
                 </MetaIcon>
             )}
+            {muted && <MetaIcon icon="data-muted" aria-label={t("Muted")} size={"compact"} smallerThanContainer />}
         </>
     );
 }

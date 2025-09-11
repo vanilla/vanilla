@@ -1,0 +1,140 @@
+diff --git a/lib/classes/CanvasGradient.js b/lib/classes/CanvasGradient.js
+index bf055bd51ba919fec05a04cf763d05a1052bec61..1056c6c29f5f7607cfe2fad5ea5fa794deb68e8c 100644
+--- a/lib/classes/CanvasGradient.js
++++ b/lib/classes/CanvasGradient.js
+@@ -7,7 +7,7 @@ exports.default = void 0;
+ var _mooColor = require("moo-color");
+ class CanvasGradient {
+   constructor() {
+-    this.addColorStop = jest.fn(this.addColorStop.bind(this));
++    this.addColorStop = vitest.fn(this.addColorStop.bind(this));
+   }
+   addColorStop(offset, color) {
+     const numoffset = Number(offset);
+diff --git a/lib/classes/CanvasPattern.js b/lib/classes/CanvasPattern.js
+index db295316e1b1e8de7074b1f8f5b895b32808023f..9c5cd04a6330acbd09351c03d31479f66fe7393a 100644
+--- a/lib/classes/CanvasPattern.js
++++ b/lib/classes/CanvasPattern.js
+@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
+ exports.default = void 0;
+ class CanvasPattern {
+   constructor() {
+-    this.setTransform = jest.fn(this.setTransform.bind(this));
++    this.setTransform = vitest.fn(this.setTransform.bind(this));
+   }
+   setTransform(value) {
+     if (arguments.length > 0 && !(value instanceof Object)) throw new TypeError("Failed to execute 'setTransform' on 'CanvasPattern': parameter 1 ('transform') is not an object.");
+diff --git a/lib/classes/CanvasRenderingContext2D.js b/lib/classes/CanvasRenderingContext2D.js
+index e1e4b8fe31826baadbdce3f48ee2a68455de8910..cd5545de896183000706df14bf30f4c16aebe5e7 100644
+--- a/lib/classes/CanvasRenderingContext2D.js
++++ b/lib/classes/CanvasRenderingContext2D.js
+@@ -118,7 +118,7 @@ class CanvasRenderingContext2D {
+      */
+     _defineProperty(this, "_clipIndex", 1);
+     testFuncs.forEach(key => {
+-      this[key] = jest.fn(CanvasRenderingContext2D.prototype[key].bind(this));
++      this[key] = vitest.fn(CanvasRenderingContext2D.prototype[key].bind(this));
+     });
+     this._canvas = canvas;
+   }
+diff --git a/lib/classes/ImageBitmap.js b/lib/classes/ImageBitmap.js
+index a1596a76b2ea4598028f3c4a990f7cfe8b708f99..6b8d322b3a5fa74cc5e66ca8562794630d8ff4b4 100644
+--- a/lib/classes/ImageBitmap.js
++++ b/lib/classes/ImageBitmap.js
+@@ -14,7 +14,7 @@ class ImageBitmap {
+     _defineProperty(this, "_closed", false);
+     this.width = width;
+     this.height = height;
+-    this.close = jest.fn(this.close.bind(this));
++    this.close = vitest.fn(this.close.bind(this));
+   }
+   close() {
+     this.width = 0;
+diff --git a/lib/classes/Path2D.js b/lib/classes/Path2D.js
+index de67c54c069480e96a80c79c7295f0b9808e2f39..986f85ac98f8b896ced52e0ca495bb095276ebcc 100644
+--- a/lib/classes/Path2D.js
++++ b/lib/classes/Path2D.js
+@@ -19,10 +19,10 @@ class Path2D {
+     _defineProperty(this, "_stackIndex", 0);
+     _defineProperty(this, "_transformStack", [[1, 0, 0, 1, 0, 0]]);
+     borrowedFromCanvas.forEach(key => {
+-      this[key] = jest.fn(_CanvasRenderingContext2D.default.prototype[key].bind(this));
++      this[key] = vitest.fn(_CanvasRenderingContext2D.default.prototype[key].bind(this));
+     });
+     Path2DFunc.forEach(key => {
+-      this[key] = jest.fn(this[key].bind(this));
++      this[key] = vitest.fn(this[key].bind(this));
+     });
+   }
+   addPath(path) {
+diff --git a/lib/mock/createImageBitmap.js b/lib/mock/createImageBitmap.js
+index d819dac067df7b4cd42ac30840270dd24b3db2dd..465c84a86df7f7f285c8e4955f3248aacc42cb8b 100644
+--- a/lib/mock/createImageBitmap.js
++++ b/lib/mock/createImageBitmap.js
+@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", {
+ exports.default = void 0;
+ var _ImageBitmap = _interopRequireDefault(require("../classes/ImageBitmap"));
+ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+-var _default = jest.fn(function createImageBitmap(img, sx, sy, sWidth, sHeight, options) {
++var _default = vitest.fn(function createImageBitmap(img, sx, sy, sWidth, sHeight, options) {
+   var length = arguments.length;
+   return new Promise((resolve, reject) => {
+     if (length === 0) return reject(new TypeError("Failed to execute 'createImageBitmap' on 'Window': 1 argument required, but only 0 present."));
+diff --git a/lib/mock/prototype.js b/lib/mock/prototype.js
+index 7afda38777e34fcbe3b8e046525ba2060769d7f4..3aa7d62f28a251b1023ac90b7e1582de952e9943 100644
+--- a/lib/mock/prototype.js
++++ b/lib/mock/prototype.js
+@@ -17,7 +17,7 @@ function mockPrototype(win) {
+    * value of getContext. It attempts to preserve the original getContext function by storing it on
+    * the callback as a property.
+    */
+-  const getContext2D = jest.fn(function getContext2d(type) {
++  const getContext2D = vitest.fn(function getContext2d(type) {
+     if (type === '2d') {
+       /**
+        * Contexts must be idempotent. Once they are generated, they should be returned when
+@@ -40,7 +40,7 @@ function mockPrototype(win) {
+     var _win$HTMLCanvasElemen2;
+     htmlCanvasElementPrototype = win === null || win === void 0 ? void 0 : (_win$HTMLCanvasElemen2 = win.HTMLCanvasElement) === null || _win$HTMLCanvasElemen2 === void 0 ? void 0 : _win$HTMLCanvasElemen2.prototype;
+   }
+-  if (!jest.isMockFunction(htmlCanvasElementPrototype.getContext)) {
++  if (!vitest.isMockFunction(htmlCanvasElementPrototype.getContext)) {
+     getContext2D.internal = htmlCanvasElementPrototype.getContext;
+   } else {
+     getContext2D.internal = htmlCanvasElementPrototype.getContext.internal;
+@@ -51,7 +51,7 @@ function mockPrototype(win) {
+    * This function technically throws SecurityError at runtime, but it cannot be mocked, because
+    * we don't know if the canvas is tainted. These kinds of errors will be silent.
+    */
+-  const toBlobOverride = jest.fn(function toBlobOverride(callback, mimetype) {
++  const toBlobOverride = vitest.fn(function toBlobOverride(callback, mimetype) {
+     if (arguments.length < 1) throw new TypeError("Failed to execute 'toBlob' on 'HTMLCanvasElement': 1 argument required, but only 0 present.");
+     if (typeof callback !== 'function') throw new TypeError("Failed to execute 'toBlob' on 'HTMLCanvasElement': The callback provided as parameter 1 is not a function.");
+ 
+@@ -79,7 +79,7 @@ function mockPrototype(win) {
+     });
+     setTimeout(() => callback(blob), 0);
+   });
+-  if (!jest.isMockFunction(htmlCanvasElementPrototype.toBlob)) {
++  if (!vitest.isMockFunction(htmlCanvasElementPrototype.toBlob)) {
+     toBlobOverride.internal = htmlCanvasElementPrototype.toBlob;
+   } else {
+     toBlobOverride.internal = htmlCanvasElementPrototype.toBlob.internal;
+@@ -90,7 +90,7 @@ function mockPrototype(win) {
+    * This section creates a dataurl with a validated mime type. This is not actually valid, because
+    * jpeg size is variable, and so is png. TODO: Is there a better way to do this?
+    */
+-  const toDataURLOverride = jest.fn(function toDataURLOverride(type, encoderOptions) {
++  const toDataURLOverride = vitest.fn(function toDataURLOverride(type, encoderOptions) {
+     switch (type) {
+       case 'image/jpeg':
+         break;
+@@ -105,7 +105,7 @@ function mockPrototype(win) {
+      */
+     return 'data:' + type + ';base64,00';
+   });
+-  if (!jest.isMockFunction(htmlCanvasElementPrototype.toDataURL)) {
++  if (!vitest.isMockFunction(htmlCanvasElementPrototype.toDataURL)) {
+     toDataURLOverride.internal = htmlCanvasElementPrototype.toDataURL;
+   } else {
+     toDataURLOverride.internal = htmlCanvasElementPrototype.toDataURL.internal;

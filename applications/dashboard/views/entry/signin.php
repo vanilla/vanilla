@@ -19,14 +19,14 @@ echo '<div class="MainForm">';
     <ul role="presentation">
         <li role="presentation">
             <?php
-            echo $this->Form->label('Email/Username', 'Email');
-            echo $this->Form->textBox('Email', ['id' => 'Form_Email', 'autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE]);
+            echo $this->Form->label('Email/Username', 'Email', ['required' => true]);
+            echo $this->Form->textBox('Email', ['id' => 'Form_Email', 'autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => true, 'required' => true]);
             ?>
         </li>
         <li role="presentation">
             <?php
-            echo $this->Form->label('Password', 'Password');
-            echo $this->Form->input('Password', 'password', ['class' => 'InputBox Password']);
+            echo $this->Form->label('Password', 'Password', ['required' => true]);
+            echo $this->Form->input('Password', 'password', ['class' => 'InputBox Password', 'required' => true]);
             echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword', ['title' => t('Forgot your password?')]);
             ?>
         </li>

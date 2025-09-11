@@ -22,11 +22,20 @@ export class FocusWatcher {
     ) {}
 
     /**
+     * Manually trigger a focus check.
+     */
+    public static triggerFocusCheck() {
+        const event = new Event("x-check-focus", { bubbles: true, composed: true });
+        document.dispatchEvent(event);
+    }
+
+    /**
      * Register the event listeners from this class.
      */
     public start = () => {
         this.watchedNode.addEventListener("focusout", this.handleFocusOut, true);
         this.watchedNode.addEventListener("focusin", this.handleFocusIn, true);
+        document.addEventListener("x-check-focus", this.handleManualFocusEvent, true); // for when we need to check focus manually
 
         document.addEventListener("click", this.handleClick);
     };
@@ -37,8 +46,12 @@ export class FocusWatcher {
     public stop = () => {
         this.watchedNode.removeEventListener("focusout", this.handleFocusOut, true);
         this.watchedNode.removeEventListener("focusin", this.handleFocusIn, true);
-
+        document.removeEventListener("x-check-focus", this.handleManualFocusEvent, true);
         document.removeEventListener("click", this.handleClick);
+    };
+
+    private handleManualFocusEvent = () => {
+        this.checkDomTreeHasFocus(null, this.changeHandler);
     };
 
     /**
@@ -99,13 +112,16 @@ export class FocusWatcher {
      *
      * @param watchedNode - The watched node to look in.
      */
-    private checkDomTreeHasFocus(event: FocusEvent, callback: (hasFocus: boolean, newActiveElement?: Element) => void) {
+    private checkDomTreeHasFocus(
+        event: FocusEvent | null,
+        callback: (hasFocus: boolean, newActiveElement?: Element) => void,
+    ) {
         setTimeout(() => {
             const possibleTargets = [
                 // NEEDS TO COME FIRST, because safari will populate relatedTarget on focusin, and its not what we're looking for.
                 document.activeElement, // IE11, Safari.
-                event.relatedTarget as Element, // Chrome (The actual standard)
-                (event as any).explicitOriginalTarget, // Firefox
+                event?.relatedTarget as Element, // Chrome (The actual standard)
+                (event as any)?.explicitOriginalTarget, // Firefox
             ];
 
             let activeElement: HTMLElement | null = null;
@@ -141,7 +157,7 @@ export class FocusWatcher {
                     // Don't report losing focus.
                     // Someone moving focus to the body (trying to focus any non-focusable elemtent)
                     // will still clear focus though, so thing like clicking the background of a modal will clear focus.
-                    return false;
+                    return;
                 }
 
                 // We will only invalidate based on something actually getting focus.

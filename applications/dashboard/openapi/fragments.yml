@@ -1,0 +1,570 @@
+openapi: 3.0.3
+info:
+paths:
+    /fragments:
+        x-hidden: true,
+        get:
+            summary: List all fragments
+            tags:
+                - Layout
+            parameters:
+                - name: status
+                  in: query
+                  description: Filter by status
+                  required: false
+                  schema:
+                      type: string
+                      enum:
+                          - draft
+                          - active
+                          - past-revision
+                          - latest
+                - name: fragmentType
+                  in: query
+                  description: Filter by fragment type
+                  required: false
+                  schema:
+                      type: string
+                - name: sort
+                  in: query
+                  description: Sort by field
+                  required: false
+                  schema:
+                      type: string
+                      default: -dateRevisionInserted
+                      enum:
+                          - dateRevisionInserted
+                          - -dateRevisionInserted
+                - name: appliedStatus
+                  in: query
+                  description: Filter by whether or not the fragment is applied somewhere in the site.
+                  required: false
+                  schema:
+                      type: string
+                      default: all
+                      enum:
+                          - all
+                          - applied
+                          - not-applied
+            responses:
+                "200":
+                    description: List of fragments
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Fragment"
+        post:
+            summary: Create a new fragment
+            tags:
+                - Layout
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/FragmentPost"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/FragmentDetails"
+    /fragments/:fragmentUUID:
+        x-hidden: true
+        get:
+            summary: Get a fragment
+            tags:
+                - Layout
+            parameters:
+                - name: fragmentUUID
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                - name: fragmentRevisionUUID
+                  in: query
+                  description: UUID of a specific fragment revision. Cannot be used with status.
+                  required: false
+                  schema:
+                      type: string
+                - name: status
+                  in: query
+                  description: Get either the latest or active revision. Cannot be used with fragmentRevisionUUID.
+                  required: false
+                  schema:
+                      type: string
+                      enum:
+                          - active
+                          - latest
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/FragmentDetails"
+        delete:
+            summary: Delete a fragment or a fragment revision
+            tags:
+                - Layout
+            parameters:
+                - name: fragmentUUID
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                - name: fragmentRevisionUUID
+                  in: query
+                  description: UUID of a specific fragment revision. If not provided, the entire fragment will be deleted.
+                  required: false
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+        patch:
+            summary: Update a fragment.
+            description: Updates a fragment. Creates a draft if none exists or updates and existing draft.
+            tags:
+                - Layout
+            parameters:
+                - name: fragmentUUID
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/FragmentPatch"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/FragmentDetails"
+    /fragments/:fragmentUUID/commit-revision:
+        x-hidden: true
+        post:
+            summary: Commit a fragment revision
+            tags:
+                - Layout
+            parameters:
+                - name: fragmentUUID
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                fragmentRevisionUUID:
+                                    type: string
+                                    description: UUID of the fragment revision to commit
+                                commitMessage:
+                                    type: string
+                                    description: Message associated with the commit.
+                                    example: "Initial commit"
+                                commitDescription:
+                                    type: string
+                                    description: Description of the commit
+                                    example: ""
+                            required: [fragmentRevisionUUID, commitMessage]
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/FragmentDetails"
+    /fragments/:fragmentUUID/css:
+        x-hidden: true
+        get:
+            summary: Get the css for a fragment
+            tags:
+                - Layout
+            parameters:
+                - name: fragmentUUID
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                - name: fragmentRevisionUUID
+                  in: query
+                  description: UUID of a specific fragment revision. If not provided, a redirect will be issued to the active one.
+                  required: false
+                  schema:
+                      type: string
+
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        text/css:
+                            schema:
+                                type: string
+                "302":
+                    description: Redirect to the active revision of the css file
+                    headers:
+                        Location:
+                            schema:
+                                type: string
+    /fragments/:fragmentUUID/js:
+        x-hidden: true
+        get:
+            summary: Get the js for a fragment
+            tags:
+                - Layout
+            parameters:
+                - name: fragmentUUID
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                - name: fragmentRevisionUUID
+                  in: query
+                  description: UUID of a specific fragment revision. If not provided, a redirect will be issued to the active one.
+                  required: false
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/javascript:
+                            schema:
+                                type: string
+                "302":
+                    description: Redirect to the active revision of the js file
+                    headers:
+                        Location:
+                            schema:
+                                type: string
+    /fragments/:fragmentUUID/revisions:
+        x-hidden: true
+        get:
+            summary: List all revisions of a fragment
+            tags:
+                - Layout
+            parameters:
+                - name: fragmentUUID
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                - name: commitMessage
+                  in: query
+                  description: Filter by commit message
+                  required: false
+                  schema:
+                      type: string
+                - name: limit
+                  in: query
+                  description: Number of items per page
+                  required: false
+                  schema:
+                      type: integer
+                      default: 30
+                      minimum: 1
+                      maximum: 500
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+            responses:
+                "200":
+                    description: List of fragment revisions
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Fragment"
+    /fragments/disclosure-state:
+        x-hidden: true
+        get:
+            summary: Get the status of if the current user accepted the disclosure state.
+            tags:
+                - Layout
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    didAccept:
+                                        type: boolean
+                                        example: true
+        put:
+            summary: Accept the disclosure state
+            tags:
+                - Layout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                didAccept:
+                                    type: boolean
+                                    example: true
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+components:
+    schemas:
+        FragmentView:
+            type: "object"
+            description: Item listing where a fragment is applied.
+            properties:
+                "recordType":
+                    type: string
+                    description: Type of the record
+                    enum: ["layout", "theme"]
+                "recordID":
+                    type: string
+                "recordName":
+                    type: string
+                "recordUrl":
+                    type: string
+            required:
+                - recordType
+                - recordID
+                - recordName
+                - recordUrl
+        FragmentPost:
+            type: "object"
+            description: Request body to create a new fragment
+            properties:
+                name:
+                    type: string
+                    description: Name of the fragment
+                    example: "My Call to Action"
+                fragmentType:
+                    type: string
+                    description: Type of the fragment
+                    example: "CallToActionFragment"
+                js:
+                    type: string
+                    description: Transformed javascript code for the fragment
+                jsRaw:
+                    type: string
+                    description: Raw javascript code for the fragment
+                css:
+                    type: string
+                    description: Transformed css code for the fragment
+                previewData:
+                    type: array
+                    description: List of preview data for the fragment
+                    items:
+                        $ref: "#/components/schemas/FragmentPreviewData"
+                files:
+                    type: array
+                    description: List of files associated with the fragment
+                    items:
+                        $ref: "../../dashboard/openapi/media.yml#/components/schemas/MediaItem"
+                commitMessage:
+                    type: string
+                    description: Message associated with the commit.
+                    example: "Initial commit"
+                commitDescription:
+                    type: string
+                    description: Description of the commit
+                    example: ""
+            required:
+                - name
+                - fragmentType
+                - js
+                - jsRaw
+        FragmentPatch:
+            type: object
+            description: Request body to update a fragment
+            properties:
+                name:
+                    type: string
+                    description: Name of the fragment
+                    example: "My Call to Action"
+                js:
+                    type: string
+                    description: Transformed javascript code for the fragment
+                jsRaw:
+                    type: string
+                    description: Raw javascript code for the fragment
+                css:
+                    type: string
+                    description: Transformed css code for the fragment
+                previewData:
+                    type: array
+                    description: List of preview data for the fragment
+                    items:
+                        $ref: "#/components/schemas/FragmentPreviewData"
+                files:
+                    type: array
+                    description: List of files associated with the fragment
+                    items:
+                        $ref: "../../dashboard/openapi/media.yml#/components/schemas/MediaItem"
+                commitMessage:
+                    type: string
+                    description: If passed draft will be committed immediately.
+                    example: "Initial commit"
+                commitDescription:
+                    type: string
+                    description: Description of the commit
+                    example: ""
+        Fragment:
+            type: "object"
+            description: A widget fragment
+            properties:
+                "fragmentUUID":
+                    type: string
+                    description: UUID of the fragment
+                    example: "019564e4-12a3-717f-8ee6-e09435e07e57"
+                name:
+                    type: string
+                    description: Name of the fragment
+                    example: "My Call to Action"
+                fragmentType:
+                    type: string
+                    description: Type of the fragment
+                    example: "CallToActionFragment"
+                "status":
+                    type: string
+                    enum:
+                        - draft
+                        - active
+                        - past-revision
+                "isLatest":
+                    type: boolean
+                    description: Separately from the status of the fragment, this indicates whether the fragment is the latest editited revision. The "latest" revision may not be committed.
+                fragmentRevisionUUID:
+                    type: string
+                    description: UUID of the fragment revision. This is mutable for drafts but immutable for commits.
+                    example: "01956517-0dd5-731e-bd2a-1fbf9b47933e"
+                revisionInsertUserID:
+                    type: integer
+                    description: ID of the user who inserted the revision
+                    example: 9
+                dateRevisionInserted:
+                    type: string
+                    format: date-time
+                    description: Date the revision was inserted
+                    example: "2025-03-05T06:56:04+00:00"
+                "commitMessage":
+                    type: string
+                    description: Message associated with the commit
+                    example: "Added a new button"
+                "commitDescription":
+                    type: string
+                    description: Description of the commit
+                    example: ""
+                "isApplied":
+                    type: boolean
+                    description: Whether or not the fragment is applied somewhere in the site.
+                url:
+                    type: string
+                    description: URL to edit the fragment
+                jsUrl:
+                    type: string
+                    description: URL to the fragment's transformed javascript.
+                cssUrl:
+                    type: string
+                    description: URL to the fragment's transformed css.
+                "fragmentViews":
+                    type: array
+                    items:
+                        $ref: "#/components/schemas/FragmentView"
+            required:
+                - fragmentUUID
+                - name
+                - fragmentType
+                - status
+                - isLatest
+                - fragmentRevisionUUID
+                - revisionInsertUserID
+                - dateRevisionInserted
+                - commitMessage
+                - commitDescription
+                - isApplied
+                - url
+                - jsUrl
+                - cssUrl
+                - fragmentViews
+        FragmentPreviewData:
+            type: "object"
+            description: Preview data for a fragment
+            properties:
+                "previewDataUUID":
+                    type: string
+                    description: UUID of the preview data
+                    example: "01956517-0dd5-731e-bd2a-1fbf9b47933e"
+                "data":
+                    type: object
+                    description: Props that will be injected into the fragment component while previewing.
+                    example: "{'title': 'My Title'}"
+                name:
+                    type: string
+                    description: Name of the preview data in the editor.
+                description:
+                    type: string
+                    description: Description of the preview data in the editor.
+            required:
+                - previewDataUUID
+                - data
+                - name
+                - description
+        FragmentDetails:
+            allOf:
+                - $ref: "#/components/schemas/Fragment"
+                - type: "object"
+                  description: Fragment Details
+                  properties:
+                      js:
+                          type: string
+                          description: Transformed javascript code for the fragment
+                      jsRaw:
+                          type: string
+                          description: Raw javascript code for the fragment
+                      css:
+                          type: string
+                          description: Transformed css code for the fragment
+                      previewData:
+                          type: array
+                          description: List of preview data for the fragment
+                          items:
+                              $ref: "#/components/schemas/FragmentPreviewData"
+                      files:
+                          type: array
+                          description: List of files associated with the fragment
+                          items:
+                              $ref: "../../dashboard/openapi/media.yml#/components/schemas/MediaItem"
+                  required:
+                      - js
+                      - jsRaw
+                      - css
+                      - previewData
+                      - files

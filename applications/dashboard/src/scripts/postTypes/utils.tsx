@@ -20,9 +20,9 @@ const enabledPostTypes = getMeta("postTypes", originalPostTypes);
 export const formType: CreatableFieldFormType[] = [...Object.values(CreatableFieldFormType)] as const;
 export const fieldVisibility: CreatableFieldVisibility[] = [...Object.values(CreatableFieldVisibility)] as const;
 
-const TEXT_FORM_TYPES = [CreatableFieldFormType.TEXT, CreatableFieldFormType.TEXT_MULTILINE];
-const SELECT_FORM_TYPES = [CreatableFieldFormType.DROPDOWN, CreatableFieldFormType.TOKENS];
-const INCOMPATIBLE_FORM_TYPES = [
+export const TEXT_FORM_TYPES = [CreatableFieldFormType.TEXT, CreatableFieldFormType.TEXT_MULTILINE];
+export const SELECT_FORM_TYPES = [CreatableFieldFormType.DROPDOWN, CreatableFieldFormType.TOKENS];
+export const INCOMPATIBLE_FORM_TYPES = [
     CreatableFieldFormType.DATE,
     CreatableFieldFormType.NUMBER,
     CreatableFieldFormType.CHECKBOX,

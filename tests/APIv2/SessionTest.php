@@ -28,7 +28,7 @@ class SessionTest extends AbstractAPIv2Test
     use UsersAndRolesApiTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -37,7 +37,7 @@ class SessionTest extends AbstractAPIv2Test
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {

@@ -73,6 +73,11 @@ export default function ApiOverviewPage() {
                                 {t("Authentication")}
                             </a>
                         </li>
+                        <li>
+                            <a href="https://success.vanillaforums.com/kb/articles/44-rate-limits">
+                                {t("Rate Limits")}
+                            </a>
+                        </li>
                     </ul>
                 </>
             }

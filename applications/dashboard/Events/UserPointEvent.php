@@ -61,7 +61,7 @@ class UserPointEvent extends UserEvent implements TrackingEventInterface
     }
 
     /**
-     * {@inhertiDoc}
+     * {@inheritdoc}
      *
      * @return string
      */
@@ -78,7 +78,7 @@ class UserPointEvent extends UserEvent implements TrackingEventInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      *
      * @return array
      */
@@ -107,7 +107,7 @@ class UserPointEvent extends UserEvent implements TrackingEventInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function makeLogMessage(string $action, ?string $targetName, ?string $username): string
     {
@@ -122,7 +122,7 @@ class UserPointEvent extends UserEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {

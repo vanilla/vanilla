@@ -124,7 +124,7 @@ export function Inputs() {
             <br /> <br />
             <h3>Password type</h3>
             <br />
-            <InputTextBlock label={"Password"} type={"password"} inputProps={{ type: "password" }} />
+            <InputTextBlock label={"Password"} inputProps={{ type: "password" }} />
             <br /> <br />
             <h3>Multiline - textarea</h3>
             <br />

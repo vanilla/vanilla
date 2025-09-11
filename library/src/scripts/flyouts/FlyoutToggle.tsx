@@ -51,11 +51,26 @@ interface IProps {
     tag?: string;
     alwaysRender?: boolean;
     preventFocusOnVisible?: boolean; //in some cases focus will be handled through parent components, so we'll prevent the responsibility here
+    testId?: string;
+}
+
+declare global {
+    interface Window {
+        closeAllFlyouts?: () => void;
+    }
 }
 
 export default function FlyoutToggle(props: IProps) {
-    const { initialFocusElement, preventFocusOnVisible, onVisibilityChange, onClose, id, contentID, buttonType } =
-        props;
+    const {
+        initialFocusElement,
+        preventFocusOnVisible,
+        onVisibilityChange,
+        onClose,
+        id,
+        contentID,
+        buttonType,
+        testId,
+    } = props;
 
     // Focus management & visibility
     const ownButtonRef = useRef<HTMLButtonElement>(null);
@@ -171,7 +186,7 @@ export default function FlyoutToggle(props: IProps) {
         callback: closeMenuHandler,
     });
 
-    const classes = dropDownClasses();
+    const classes = dropDownClasses.useAsHook();
     const buttonClasses = cx(props.buttonClassName, {
         isOpen: isVisible,
     });
@@ -186,19 +201,22 @@ export default function FlyoutToggle(props: IProps) {
         buttonRef,
     };
 
-    const classesDropDown = !props.openAsModal ? cx("flyouts", classes.root) : null;
+    const classesDropDown = !props.openAsModal ? cx("flyouts", classes.root, props.className) : props.className;
     const Tag = (props.tag ?? `div`) as "div";
 
     const isContentVisible = !props.disabled && isVisible;
     return (
         <Tag
-            className={classNames(classesDropDown, props.className, {
+            className={classNames(classesDropDown, {
                 asModal: props.openAsModal,
             })}
             ref={controllerRef}
             onClick={handleBlockEventPropagation}
         >
             <Button
+                onFocus={(e) => {
+                    e.target.scrollIntoView({ block: "nearest", inline: "nearest" });
+                }}
                 {...props.buttonProps}
                 id={id}
                 className={buttonClasses}
@@ -210,6 +228,7 @@ export default function FlyoutToggle(props: IProps) {
                 disabled={props.disabled}
                 buttonType={buttonType}
                 buttonRef={buttonRef}
+                data-testid={testId}
             >
                 {props.name && <ScreenReaderContent>{props.name}</ScreenReaderContent>}
                 {props.buttonContents}

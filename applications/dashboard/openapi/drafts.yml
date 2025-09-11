@@ -13,6 +13,16 @@ paths:
                           - comment
                           - discussion
                       type: string
+                - description: |
+                      Filter drafts by parent record type.
+                  in: query
+                  name: parentRecordType
+                  schema:
+                      enum:
+                          - comment
+                          - discussion
+                          - category
+                      type: string
                 - description: >
                       Filter by the unique ID of the parent for a draft. Used with
                       recordType.
@@ -344,3 +354,133 @@ components:
                         - discussion
                     minLength: 1
                     type: string
+        DraftContent:
+            type: object
+            properties:
+                editUrl:
+                    description: The url to edit the draft
+                    nullable: true
+                    type: string
+                breadcrumbs:
+                    description: The breadcrumbs for the draft
+                    nullable: true
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            label:
+                                description: The label for the breadcrumb
+                                type: string
+                            url:
+                                description: The url for the breadcrumb
+                                type: string
+                permaLink:
+                    description: the permanent url to look for the content when the draft is published
+                    type: string
+        DraftSchedule:
+            type: object
+            properties:
+                dateScheduled:
+                    description: The datetime the draft has been scheduled to be published
+                    nullable: true
+                    format: date-time
+                    type: string
+                draftStatus:
+                    description: the status of the draft
+                    type: string
+                    default: draft
+                failedReason:
+                    description: Error sting that shows the failed reason to publish
+                    nullable: true
+                    type: string
+        ScheduleList:
+            type: object
+            properties:
+                dateScheduled:
+                    description: The datetime the draft has been scheduled to be published
+                    nullable: true
+                    format: date-time
+                    type: string
+                draftStatus:
+                    description: the status of the draft
+                    type: string
+                    default: draft
+                recordID:
+                    description: The permanent id for the draft
+                    nullable: true
+                    type: integer
+        DraftPostPatchSchedule:
+            type: object
+            properties:
+                attributes:
+                    description: A free-form object containing all custom data for this draft.
+                    type: object
+                parentRecordType:
+                    description: The type of record associated with this draft.
+                    minLength: 1
+                    type: string
+                parentRecordID:
+                    description: The unique ID of the intended parent to this record.
+                    nullable: true
+                    type: integer
+                recordType:
+                    description: The type of record associated with this draft.
+                    minLength: 1
+                    type: string
+                dateScheduled:
+                    description: The datetime the draft has been scheduled to be published
+                    nullable: true
+                    format: date-time
+                    type: string
+                draftStatus:
+                    description: the status of the draft
+                    type: string
+                    default: draft
+            required:
+                - recordType
+                - attributes
+                - dateScheduled
+                - draftStatus
+    parameters:
+        DraftStatus:
+            name: draftStatus
+            in: query
+            description: |
+                Filter by draft status
+            schema:
+                type: string
+                default: draft
+                enum:
+                    - draft
+                    - scheduled
+                    - deleted
+        DateScheduled:
+            name: dateScheduled
+            in: query
+            description: |
+                Filter by date scheduled
+            schema:
+                format: date-filter
+                type: string
+        Expand:
+            name: expand
+            in: query
+            description: |
+                Expand the response with additional data.
+            schema:
+                type: boolean
+        Sort:
+            name: sort
+            in: query
+            description: |
+                Sort the response by a specific field.
+            schema:
+                type: string
+                default: -dateUpdated
+                enum:
+                    - dateUpdated
+                    - dateInserted
+                    - dateScheduled
+                    - -dateUpdated
+                    - -dateInserted
+                    - -dateScheduled

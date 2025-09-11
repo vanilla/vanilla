@@ -23,7 +23,7 @@ class CookieIdentityTest extends AbstractAPIv2Test
     public $cookieIdentity;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -34,7 +34,7 @@ class CookieIdentityTest extends AbstractAPIv2Test
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testGetIdentity()
     {

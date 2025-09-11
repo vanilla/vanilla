@@ -17,7 +17,7 @@ trait InstallDataTrait
      */
     private ?InstallData $_installData = null;
 
-    public function installData(): InstallData
+    public static function installData(): InstallData
     {
         return InstallData::instance();
     }

@@ -13,11 +13,10 @@ import {
 } from "@dashboard/layout/editor/LayoutEditorSelection";
 import { LayoutEditorFixture } from "@dashboard/layout/editor/__fixtures__/LayoutEditor.fixtures";
 import { ILayoutEditorWidgetPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { spy } from "sinon";
 
 describe("LayoutEditorSelection", () => {
     it("returns a new object instead of mutating", () => {
-        const onChange = spy();
+        const onChange = vitest.fn();
         const first = new LayoutEditorSelectionState(
             LayoutEditorPath.section(0),
             LayoutEditorSelectionMode.SECTION,
@@ -27,7 +26,7 @@ describe("LayoutEditorSelection", () => {
         const third = second.setMode(LayoutEditorSelectionMode.WIDGET);
         expect(first).not.toEqual(second);
         expect(second).not.toEqual(third);
-        expect(onChange.getCalls()).toHaveLength(2);
+        expect(onChange.mock.calls).toHaveLength(2);
     });
 
     it("can backup and restore state", () => {
@@ -131,9 +130,12 @@ describe("LayoutEditorSelection", () => {
         selection.moveSelectionInDirection(LayoutEditorDirection.UP);
         selection.moveSelectionInDirection(LayoutEditorDirection.LEFT);
         selection.moveSelectionInDirection(LayoutEditorDirection.RIGHT);
-        assertSelectedWidgetID("full1");
+        assertSelectedWidgetID("titleBar");
 
         // We can move down within our section.
+        // We can move down within our section.
+        selection.moveSelectionInDirection(LayoutEditorDirection.DOWN);
+        assertSelectedWidgetID("full1");
         selection.moveSelectionInDirection(LayoutEditorDirection.DOWN);
         assertSelectedWidgetID("full2");
 

@@ -15,11 +15,11 @@ import { unknownUserFragment } from "@library/features/users/constants/userFragm
 import ContentItemClasses from "@vanilla/addon-vanilla/contentItem/ContentItem.classes";
 import { useContentItemContext } from "@vanilla/addon-vanilla/contentItem/ContentItemContext";
 
-interface IProps {
+interface IContentItemPermalinkProps {
     readOnly?: boolean;
 }
 
-export function ContentItemPermalink(props: IProps) {
+export function ContentItemPermalink(props: IContentItemPermalinkProps) {
     const toast = useToast();
     const classes = ContentItemClasses();
 
@@ -59,12 +59,7 @@ export function ContentItemPermalink(props: IProps) {
                     <Translate
                         source="Updated <0/> by <1/>"
                         c0={<DateTime timestamp={dateUpdated} />}
-                        c1={
-                            <ProfileLink
-                                className={metasClasses().metaLink}
-                                userFragment={updateUser ?? unknownUserFragment()}
-                            />
-                        }
+                        c1={<ProfileLink asMeta userFragment={updateUser ?? unknownUserFragment()} />}
                     />
                 </MetaItem>
             )}

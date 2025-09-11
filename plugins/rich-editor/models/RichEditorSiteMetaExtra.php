@@ -17,7 +17,7 @@ class RichEditorSiteMetaExtra extends SiteMetaExtra
     public const REINTERPRET_POSTS_AS_RICH = "RichEditor.Reinterpret.Enable";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getValue(): array
     {

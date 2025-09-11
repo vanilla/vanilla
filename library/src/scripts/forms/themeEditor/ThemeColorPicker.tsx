@@ -10,7 +10,7 @@ import { themeBuilderClasses } from "@library/forms/themeEditor/ThemeBuilder.sty
 import { useThemeBlock } from "@library/forms/themeEditor/ThemeBuilderBlock";
 import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderContext";
 import { colorPickerClasses } from "@library/forms/themeEditor/ThemeColorPicker.styles";
-import { ensureColorHelper } from "@library/styles/styleHelpers";
+import { ensureColorHelper, singleBorder } from "@library/styles/styleHelpers";
 import { stringIsValidColor } from "@library/styles/styleUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n/src";
@@ -21,6 +21,7 @@ import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRever
 import Pickr from "@simonwep/pickr";
 import "./ThemeColorPicker.scss";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
+import { inputVariables } from "@library/forms/inputStyles";
 
 interface IProps extends Omit<React.HTMLAttributes<HTMLInputElement>, "type" | "id" | "tabIndex"> {
     variableKey: string;
@@ -246,7 +247,11 @@ function Picker(props: { onChange: (newColor: string) => void; validColorString:
             onClick={() => {
                 createAndOpen();
             }}
-            style={{ backgroundColor: props.validColorString }}
+            style={{
+                backgroundColor: props.validColorString,
+                border: singleBorder({ color: inputVariables().border.color }),
+                borderLeft: "none",
+            }}
             title={props.validColorString}
             aria-hidden={true}
             className={classes.swatch}

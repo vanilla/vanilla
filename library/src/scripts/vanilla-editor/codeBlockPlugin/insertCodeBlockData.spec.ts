@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { createVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { createVanillaEditor } from "@library/vanilla-editor/createVanillaEditor";
 import { MyEditor, MyNode } from "@library/vanilla-editor/typescript";
 import { ELEMENT_CODE_BLOCK, ELEMENT_CODE_LINE } from "@udecode/plate-code-block";
 

@@ -6,6 +6,7 @@
 
 import CommentOptionsChangeStatus from "@QnA/components/CommentOptionsChangeStatus";
 import { QnAStatus } from "@dashboard/@types/api/comment";
+import { PermissionMode } from "@library/features/users/Permission";
 import { MetaTag } from "@library/metas/Metas";
 import { TagPreset } from "@library/metas/Tags.variables";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
@@ -23,7 +24,12 @@ addCommentOption({
     shouldRender: (comment, hasPermission) => {
         return !!(
             [QnAStatus.ACCEPTED, QnAStatus.REJECTED].includes(comment.attributes?.answer?.status) &&
-            hasPermission("curation.manage")
+            (hasPermission("curation.manage") ||
+                hasPermission("discussions.edit", {
+                    resourceType: "category",
+                    resourceID: comment.categoryID,
+                    mode: PermissionMode.RESOURCE_IF_JUNCTION,
+                }))
         );
     },
     component: CommentOptionsChangeStatus,

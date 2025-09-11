@@ -43,7 +43,7 @@ interface IProps {}
 export function PostFieldList(props: IProps) {
     const { postTypeID, isLoading, postFieldsByPostTypeID, addPostField, removePostField, reorderPostFields } =
         usePostTypeEdit();
-    const classes = postTypeSettingsClasses();
+    const classes = postTypeSettingsClasses.useAsHook();
 
     const [isEditVisible, setEditVisible] = useState(false);
     const [isReorderVisible, setReorderVisible] = useState(false);
@@ -64,21 +64,19 @@ export function PostFieldList(props: IProps) {
     }, [fieldToDelete, allPostTypesQuery.data]);
 
     const postFields = useMemo(() => {
-        return postTypeID && postFieldsByPostTypeID[postTypeID];
+        return postTypeID ? postFieldsByPostTypeID[postTypeID] : undefined;
     }, [postFieldsByPostTypeID, postTypeID]);
 
     const data = useMemo(() => {
         if (postFields && postFields.length > 0) {
-            return postFields
-                .map((postField) => ({
-                    "custom field label": postField.label,
-                    "api label": postField.postFieldID,
-                    type: postField.dataType,
-                    visibility: postField.visibility,
-                    // hidden
-                    original: postField,
-                }))
-                .sort((a, b) => (a.original.sort > b.original.sort ? 1 : -1));
+            return postFields.map((postField) => ({
+                "custom field label": postField.label,
+                "api label": postField.postFieldID,
+                type: postField.dataType,
+                visibility: postField.visibility,
+                // hidden
+                original: postField,
+            }));
         }
         return [];
     }, [postFields, postFieldsByPostTypeID]);
@@ -235,7 +233,7 @@ export function PostFieldList(props: IProps) {
                 }}
             />
             <PostFieldsReorderModal
-                postFields={postTypeID ? postFieldsByPostTypeID[postTypeID] ?? [] : []}
+                postFields={postFields ?? []}
                 isVisible={isReorderVisible}
                 onConfirm={(newOrder) => {
                     reorderPostFields(newOrder);

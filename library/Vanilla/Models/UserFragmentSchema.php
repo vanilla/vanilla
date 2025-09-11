@@ -29,13 +29,15 @@ class UserFragmentSchema extends Schema
                 "name:s", // The username of the user.
                 "title:s?", // The title of the user.
                 "url:s?", // Full URL to the user profile page.
-                "photoUrl:s", // The URL of the user's avatar picture.
+                "photoUrl:s?", // The URL of the user's avatar picture.
                 "dateLastActive:dt|n?", // Time the user was last active.
                 "banned:i?", // The banned status of the user.
                 "punished:i?", // The jailed status of the user.
                 "private:b?", // The private profile status of the user.
                 "label:s?",
+                "labelHtml:s?",
                 "profileFields:o?",
+                "canView:b?",
             ])
         );
     }
@@ -84,6 +86,7 @@ class UserFragmentSchema extends Schema
 
         // Rank label can be polluted with HTML to add some styling.
         $label = $dbRecord["Label"] ?? ($dbRecord["label"] ?? null);
+        $labelHtml = $label;
         if (isset($label)) {
             $label = strip_tags($label);
         }
@@ -99,6 +102,7 @@ class UserFragmentSchema extends Schema
             "dateLastActive" => $dbRecord["DateLastActive"] ?? ($dbRecord["dateLastActive"] ?? null),
             "title" => $dbRecord["Title"] ?? null,
             "label" => $label,
+            "labelHtml" => $labelHtml,
         ];
 
         if ($privateProfile && !$hasFullProfileViewPermission) {

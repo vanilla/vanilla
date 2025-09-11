@@ -11,7 +11,7 @@ import {
     IAutomationRuleTrigger,
     IAutomationRulesCatalog,
 } from "@dashboard/automationRules/AutomationRules.types";
-import { CategoryDisplayAs } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { CategoryDisplayAs, type ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import { CreatableFieldFormType, CreatableFieldVisibility } from "@dashboard/userProfiles/types/UserProfiles.types";
 
@@ -470,6 +470,17 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
                 required: ["triggerTimeDelay"],
             },
         },
+        timeSinceLastActiveTrigger: {
+            triggerType: "timeSinceLastActiveTrigger",
+            name: "A certain amount of time has passed since a user was last active",
+            triggerActions: ["addRemoveRoleAction"],
+            contentType: "users",
+            schema: {
+                type: "object",
+                properties: triggerDelaySchemaProperties,
+                required: ["triggerTimeDelay"],
+            },
+        },
         ideationVoteTrigger: {
             triggerType: "ideationVoteTrigger",
             name: "An idea receives a certain number of votes",
@@ -766,7 +777,7 @@ export const mockAutomationRulesCatalog: IAutomationRulesCatalog = {
         addRemoveRoleAction: {
             actionType: "addRemoveRoleAction",
             name: "Role Action Name",
-            actionTriggers: ["profileFieldTrigger"],
+            actionTriggers: ["profileFieldTrigger", "timeSinceLastActiveTrigger"],
             contentType: "users",
             schema: {
                 type: "object",
@@ -959,7 +970,7 @@ export const mockActionwithDynamicSchema = {
     },
 };
 
-export const mockCategoriesData = [
+export const mockCategoriesData: ICategory[] = [
     {
         categoryID: 1,
         name: "Mock Category 1",
@@ -969,12 +980,13 @@ export const mockCategoriesData = [
         customPermissions: false,
         isArchived: false,
         urlcode: "/",
-        displayAs: CategoryDisplayAs.DEFAULT,
+        displayAs: CategoryDisplayAs.Default,
         countCategories: 1,
         countDiscussions: 10,
         countComments: 10,
         countAllDiscussions: 10,
         countAllComments: 10,
+        countFollowers: 0,
         followed: false,
         depth: 1,
         children: [],
@@ -989,12 +1001,13 @@ export const mockCategoriesData = [
         customPermissions: false,
         isArchived: false,
         urlcode: "/",
-        displayAs: CategoryDisplayAs.DEFAULT,
+        displayAs: CategoryDisplayAs.Default,
         countCategories: 1,
         countDiscussions: 10,
         countComments: 10,
         countAllDiscussions: 10,
         countAllComments: 10,
+        countFollowers: 0,
         followed: false,
         depth: 1,
         children: [],

@@ -7,14 +7,12 @@
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { SettingsNav } from "@dashboard/components/navigation/SettingsNav";
 import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
-import { useCollisionDetector } from "@vanilla/react-utils";
 
 type IProps = Omit<React.ComponentProps<typeof AdminLayout>, "adminHamburgerContent" | "activeSectionID" | "leftPanel">;
 
 export function SettingsAdminLayout(props: IProps) {
     const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
+    const isCompact = device === TitleBarDevices.COMPACT;
 
     return (
         <AdminLayout

@@ -33,7 +33,7 @@ class PostTranslatableModel extends BaseTranslatableModel
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getContentToTranslate(int $primaryID = null, array $data = null): array
     {

@@ -13,6 +13,23 @@ paths:
                             properties:
                                 file:
                                     $ref: "#/components/schemas/UploadedFile"
+                                foreignType:
+                                    type: string
+                                    enum:
+                                        - discussion
+                                        - comment
+                                        - embed
+                                foreignID:
+                                    type: integer
+                                insertUserID:
+                                    description: The user that created the media.
+                                    type: integer
+                                    x-hidden: true
+                                dateInserted:
+                                    description: When the media was created.
+                                    format: date-time
+                                    type: string
+                                    x-hidden: true
                             required:
                                 - file
                             type: object
@@ -116,60 +133,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                properties:
-                                    dateInserted:
-                                        description: When the media item was created.
-                                        format: date-time
-                                        type: string
-                                    foreignID:
-                                        description: The ID of the table.
-                                        nullable: true
-                                        type: integer
-                                    foreignType:
-                                        description: Table the media is linked to.
-                                        minLength: 1
-                                        nullable: true
-                                        type: string
-                                    height:
-                                        description: Image height
-                                        nullable: true
-                                        type: integer
-                                    insertUserID:
-                                        description: The user that created the media item.
-                                        type: integer
-                                    mediaID:
-                                        description: The ID of the record.
-                                        type: integer
-                                    name:
-                                        description: The original filename of the upload.
-                                        minLength: 1
-                                        type: string
-                                    size:
-                                        description: File size in bytes
-                                        type: integer
-                                    type:
-                                        description: MIME type
-                                        minLength: 1
-                                        type: string
-                                    url:
-                                        description: The URL of the file.
-                                        minLength: 1
-                                        type: string
-                                    width:
-                                        description: Image width
-                                        nullable: true
-                                        type: integer
-                                required:
-                                    - mediaID
-                                    - url
-                                    - name
-                                    - type
-                                    - size
-                                    - dateInserted
-                                    - insertUserID
-                                    - foreignType
-                                    - foreignID
-                                type: object
+                                $ref: "#/components/schemas/MediaItem"
                     description: Success
             tags:
                 - Media
@@ -547,6 +511,61 @@ paths:
 
 components:
     schemas:
+        MediaItem:
+            properties:
+                dateInserted:
+                    description: When the media item was created.
+                    format: date-time
+                    type: string
+                foreignID:
+                    description: The ID of the table.
+                    nullable: true
+                    type: integer
+                foreignType:
+                    description: Table the media is linked to.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                height:
+                    description: Image height
+                    nullable: true
+                    type: integer
+                insertUserID:
+                    description: The user that created the media item.
+                    type: integer
+                mediaID:
+                    description: The ID of the record.
+                    type: integer
+                name:
+                    description: The original filename of the upload.
+                    minLength: 1
+                    type: string
+                size:
+                    description: File size in bytes
+                    type: integer
+                type:
+                    description: MIME type
+                    minLength: 1
+                    type: string
+                url:
+                    description: The URL of the file.
+                    minLength: 1
+                    type: string
+                width:
+                    description: Image width
+                    nullable: true
+                    type: integer
+            required:
+                - mediaID
+                - url
+                - name
+                - type
+                - size
+                - dateInserted
+                - insertUserID
+                - foreignType
+                - foreignID
+            type: object
         MediaItemPatch:
             properties:
                 foreignID:

@@ -1,6 +1,6 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -54,8 +54,18 @@ enum PrivacyOptions {
  */
 export function AccountSettingsImpl() {
     const classes = accountSettingsClasses();
-    const { viewingUserID, viewingUser, canEditEmails, canEditUsernames, canEditUsers, isViewingSelf } =
-        useAccountSettings();
+    const {
+        viewingUserID,
+        viewingUser,
+        canEditEmails,
+        canEditUsernames,
+        canEditUsers,
+        isViewingSelf,
+        isAnalyticsAnonymized,
+        isCurrentUserAnonymized,
+        setUserAnonymizeData,
+    } = useAccountSettings();
+
     const { patchUser, patchStatus } = usePatchUser(viewingUserID);
     const toast = useToast();
 
@@ -71,6 +81,8 @@ export function AccountSettingsImpl() {
     const [emailConfirmed, setEmailConfirmed] = useState<IUser["emailConfirmed"] | null>(null);
     const [showEmail, setShowEmail] = useState<IUser["showEmail"]>(false);
     const [showProfile, setShowProfile] = useState<IUser["private"]>(false);
+    const [analyticsAnonymized, setAnalyticsAnonymized] = useState<boolean>(isCurrentUserAnonymized ?? false);
+
     const [suggestAnswers, setSuggestAnswers] = useState<IUser["suggestAnswers"]>(true);
 
     const [editType, setEditType] = useState<AccountSettingType | null>(null);
@@ -79,6 +91,12 @@ export function AccountSettingsImpl() {
     const aiSuggestionsEnabled = getMeta("answerSuggestionsEnabled", false);
     const aiAssistant = getMeta("aiAssistant", { name: "AI Suggestion Assistant" });
     const [suggestedAnswersErrors, setSuggestedAnswersErrors] = useState<IError[] | null>(null);
+
+    useEffect(() => {
+        if (isCurrentUserAnonymized !== undefined) {
+            setAnalyticsAnonymized(isCurrentUserAnonymized);
+        }
+    }, [isCurrentUserAnonymized]);
 
     const handleEditClick = (type: AccountSettingType) => {
         setEditType(type);
@@ -132,6 +150,34 @@ export function AccountSettingsImpl() {
                     body: <>{t("An error occurred updating your privacy setting.")}</>,
                 });
             });
+
+        toastMessage &&
+            toast.addToast({
+                autoDismiss: true,
+                body: <>{t(toastMessage)}</>,
+            });
+    };
+
+    const toggleUserAnonymizeData = async (value: boolean) => {
+        // Optimistically update the checkbox state
+        setAnalyticsAnonymized(value);
+
+        const toastMessage =
+            setUserAnonymizeData &&
+            (await setUserAnonymizeData(value)
+                .then((data) => {
+                    if (data === true) {
+                        return "Your analytics data will now be anonymized.";
+                    } else {
+                        return "Your analytics data will no longer be anonymized.";
+                    }
+                })
+                .catch((error) => {
+                    toast.addToast({
+                        dismissible: true,
+                        body: <>{t("An error occurred updating your privacy setting.")}</>,
+                    });
+                }));
 
         toastMessage &&
             toast.addToast({
@@ -287,6 +333,19 @@ export function AccountSettingsImpl() {
                 onChange={(event) => togglePrivacy(PrivacyOptions.EMAIL, event.target.checked)}
                 className={classes.fitWidth}
             />
+
+            {!isAnalyticsAnonymized && (
+                <CheckBox
+                    id="analytics-anonymize"
+                    label={t("Anonymize my analytics data")}
+                    labelBold={false}
+                    checked={analyticsAnonymized}
+                    disabled={patchStatus === LoadStatus.LOADING}
+                    onChange={(event) => toggleUserAnonymizeData(event.target.checked)}
+                    className={classes.fitWidth}
+                />
+            )}
+
             <AccountSettingsModal
                 key={editType} // Force a remount when this changes to clear out form state.
                 editType={editType}

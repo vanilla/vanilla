@@ -124,7 +124,7 @@ export const numberedPagerVariables = useThemeCache((overrides?: IOverrides, for
         nextPage: makeThemeVars(
             "nextPage",
             Variables.button({
-                name: ButtonTypes.OUTLINE,
+                name: ButtonTypes.STANDARD,
                 ...nextPageButtonHoverOptions,
                 sizing: {
                     minHeight: 36,

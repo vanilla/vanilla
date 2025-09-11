@@ -5,15 +5,17 @@
  */
 
 import { css, cx } from "@emotion/css";
+import { inputVariables } from "@library/forms/inputStyles";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { ColorVar } from "@library/styles/CssVar";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { useThemeCache } from "@library/styles/themeCache";
 
-export const dashboardFormGroupClasses = useThemeCache((compact?: boolean) => {
+export const dashboardFormGroupClasses = useThemeCache(() => {
     const mediaQueries = oneColumnVariables().mediaQueries();
     const globalVars = globalVariables();
     const formGroup = css({
@@ -106,7 +108,7 @@ export const dashboardFormGroupClasses = useThemeCache((compact?: boolean) => {
 
             "& textarea, & input": {
                 fontSize: 13,
-                borderColor: ColorsUtils.colorOut(globalVars.border.color),
+                borderColor: ColorsUtils.colorOut(inputVariables().border.color),
                 "&:focus, &:hover, &:active, &.focus-visible": {
                     borderColor: ColorsUtils.colorOut(globalVars.elementaryColors.primary),
                 },
@@ -206,7 +208,7 @@ export const dashboardFormGroupClasses = useThemeCache((compact?: boolean) => {
         display: "block",
         fontSize: 12,
         lineHeight: 1.4,
-        color: ColorsUtils.colorOut(metasVariables().font.color),
+        color: ColorsUtils.varOverride(ColorVar.Meta, metasVariables().font.color),
         marginTop: 4,
     });
 

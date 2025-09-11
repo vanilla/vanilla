@@ -23,17 +23,6 @@ export const followedContentClasses = useThemeCache(() => {
         paddingTop: 16,
     });
 
-    const tabsPanel = css({
-        "& > div[role='tabpanel']": {
-            paddingLeft: 0,
-            paddingRight: 0,
-        },
-    });
-
-    const tabList = css({
-        marginLeft: -12,
-    });
-
     const subtitle = css({
         color: ColorsUtils.colorOut(globalVars.mainColors.fgHeading),
         ...Mixins.font({
@@ -83,8 +72,6 @@ export const followedContentClasses = useThemeCache(() => {
         root,
         section,
         tabsContent,
-        tabsPanel,
-        tabList,
         subtitle,
         sortByAndPager,
         pager,

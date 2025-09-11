@@ -31,6 +31,7 @@ export const pageErrorMessageClasses = () => {
             ...globalVars.fontSizeAndWeightVars("large"),
             align: "center",
         }),
+        textWrap: "balance",
         marginTop: styleUnit(12),
     });
 
@@ -48,6 +49,7 @@ export const pageErrorMessageClasses = () => {
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("large"),
         }),
+        textWrap: "balance",
     });
 
     const trace = css({
@@ -58,18 +60,16 @@ export const pageErrorMessageClasses = () => {
         },
     });
 
-    const errorIcon = style("icon", {
-        ...{
-            "&&": {
-                display: "block",
-                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
-                height: styleUnit(85),
-                width: styleUnit(85),
-                ...Mixins.margin({
-                    bottom: 12,
-                    horizontal: "auto",
-                }),
-            },
+    const errorIcon = css({
+        "&&": {
+            display: "block",
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+            height: styleUnit(85),
+            width: styleUnit(85),
+            ...Mixins.margin({
+                bottom: 12,
+                horizontal: "auto",
+            }),
         },
     });
 

@@ -72,7 +72,7 @@ class FsThemeProvider implements ThemeProviderInterface
     /**
      * @inheritdoc
      */
-    public function getThemeRevisions($themeKey): array
+    public function getThemeRevisions($themeKey, int $limit = 100, int $offset = 0): array
     {
         return [$this->getTheme($themeKey)];
     }
@@ -117,7 +117,7 @@ class FsThemeProvider implements ThemeProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAllThemes(): array
     {

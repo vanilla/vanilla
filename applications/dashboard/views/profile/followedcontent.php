@@ -4,8 +4,7 @@
 
 use Vanilla\Web\TwigStaticRenderer;
 
+// FIXME: This is coupled to groups. What about KBs?
 echo TwigStaticRenderer::renderReactModule("FollowedContent", [
     "userID" => $this->data("userID"),
-    "renderAdditionalFollowedContent" =>
-        Gdn::config("Feature.GroupsFollowing.Enabled") && Gdn::config("EnabledApplications.Groups") === "groups",
 ]);

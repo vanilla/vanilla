@@ -52,6 +52,7 @@ class EventStructureModel
             ->column("dateLastComment", "datetime", true)
             ->column("lastCommentID", "int", true)
             ->column("lastCommentUserID", "int", true)
+            ->column("publishedSilently", "tinyint", 0)
             ->set();
 
         $structure

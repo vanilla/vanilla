@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { getMeta } from "@library/utility/appUtils";
 import CategoryFollowDropDown from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import React from "react";
@@ -15,12 +15,13 @@ export function CategoryFollowWidgetPreview(props: IProps) {
     const { borderRadius, buttonColor, textColor, alignment = "end" } = props;
     const emailEnabled = getMeta("emails.digest", false);
     return (
-        <Widget>
+        <LayoutWidget>
             <CategoryFollowDropDown
                 // Required
                 userID={-10}
-                categoryID={-10}
-                categoryName={"General"}
+                // categoryID={-10}
+                recordID={-10}
+                name={"General"}
                 emailDigestEnabled={emailEnabled}
                 notificationPreferences={{} as any}
                 // For preview
@@ -31,6 +32,6 @@ export function CategoryFollowWidgetPreview(props: IProps) {
                 textColor={textColor}
                 alignment={alignment}
             />
-        </Widget>
+        </LayoutWidget>
     );
 }

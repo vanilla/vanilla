@@ -498,25 +498,7 @@ class UserSearchType extends AbstractSearchType
                 case [ProfileFieldModel::DATA_TYPE_NUMBER, ProfileFieldModel::FORM_TYPE_NUMBER]:
                 case [ProfileFieldModel::DATA_TYPE_NUMBER_MUL, ProfileFieldModel::FORM_TYPE_TOKENS]:
                     /** @var $value RangeExpression */
-                    foreach ($value->getValues() as $op => $val) {
-                        switch ($op) {
-                            case "=":
-                                $query->setFilter("profileFields.$apiName", is_array($val) ? $val : [$val]);
-                                break;
-                            case "<":
-                                $query->setFilterRange("profileFields.$apiName", null, $val, true, false);
-                                break;
-                            case ">":
-                                $query->setFilterRange("profileFields.$apiName", $val, null, true, false);
-                                break;
-                            case "<=":
-                                $query->setFilterRange("profileFields.$apiName", null, $val, false, false);
-                                break;
-                            case ">=":
-                                $query->setFilterRange("profileFields.$apiName", $val, null, false, false);
-                                break;
-                        }
-                    }
+                    $query->setRangeExpressionFilter("profileFields.$apiName", $value);
                     break;
                 case [ProfileFieldModel::DATA_TYPE_TEXT, ProfileFieldModel::FORM_TYPE_DROPDOWN]:
                 case [ProfileFieldModel::DATA_TYPE_STRING_MUL, ProfileFieldModel::FORM_TYPE_TOKENS]:

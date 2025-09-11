@@ -14,6 +14,7 @@ use RoleModel;
 use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Scheduler\LongRunnerAction;
 use VanillaTests\ExpectedNotification;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\NotificationsApiTestTrait;
 use VanillaTests\SchedulerTestTrait;
 use VanillaTests\SiteTestCase;
@@ -24,6 +25,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class PermissionNotificationGeneratorTest extends SiteTestCase
 {
+    use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
     use NotificationsApiTestTrait;
     use SchedulerTestTrait;
@@ -174,5 +176,80 @@ class PermissionNotificationGeneratorTest extends SiteTestCase
 
         $this->assertUserHasNotificationsLike($user3, [$notification]);
         $this->assertUserHasEmailsLike($user3, \ActivityModel::SENT_OK, [$notification]);
+    }
+
+    /**
+     * Test that the notification generator does not send notifications to users who have muted the discussion when the
+     * activity in question involves a discussion.
+     *
+     * @return void
+     */
+    public function testUsersWhoHaveMutedDiscussionsAreExcluded(): void
+    {
+        $discussion = $this->createDiscussion();
+        $comment = $this->createComment([
+            "discussionID" => $discussion["discussionID"],
+            "body" => "This has an @mention!",
+        ]);
+
+        $userNormal = $this->createUser(
+            notificationPreferences: [
+                "Mention" => ["Popup" => true, "email" => true],
+            ]
+        );
+
+        $userMute = $this->createUser(
+            notificationPreferences: [
+                "Mention" => ["Popup" => true, "email" => true],
+            ]
+        );
+
+        $this->runWithUser(function () use ($discussion) {
+            $this->api()->put("discussions/{$discussion["discussionID"]}/mute", [
+                "muted" => true,
+            ]);
+        }, $userMute);
+
+        $activity = [
+            "ActivityType" => "Default",
+            "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
+            "ActivityUserID" => 1,
+            "HeadlineFormat" => "The whole world must learn our peaceful ways...BY FORCE",
+            "PluralHeadlineFormat" => null,
+            "RecordType" => "comment",
+            "RecordID" => $comment["commentID"],
+            "Data" => [
+                "Reason" => "test",
+            ],
+        ];
+
+        $action = new LongRunnerAction(PermissionNotificationGenerator::class, "notificationGenerator", [
+            $activity,
+            "session.valid",
+            "Mention",
+            0,
+            null,
+            null,
+            false,
+            [],
+            $discussion["discussionID"],
+        ]);
+
+        $this->clearUserNotifications($userNormal);
+        $this->clearUserNotifications($userMute);
+
+        $this->getLongRunner()->runImmediately($action);
+
+        $notification = new ExpectedNotification(
+            "Default",
+            ["The whole world must learn our peaceful ways...BY FORCE"],
+            "test"
+        );
+
+        $this->assertUserHasNotificationsLike($userNormal, [$notification]);
+        $this->assertUserHasEmailsLike($userNormal, \ActivityModel::SENT_OK, [$notification]);
+
+        $this->assertUserHasNoNotifications($userMute);
+        $this->assertUserHasNoEmails($userMute);
     }
 }

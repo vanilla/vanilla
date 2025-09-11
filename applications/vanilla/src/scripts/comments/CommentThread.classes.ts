@@ -38,11 +38,8 @@ export const commentThreadClasses = useThemeCache(() => {
         verticalAlign: "middle",
     });
 
-    const resolved = css({
+    const metaIconContainer = css({
         marginInlineStart: 12,
-        "& svg": {
-            verticalAlign: "middle",
-        },
     });
 
     const reportsTag = css({
@@ -72,12 +69,14 @@ export const commentThreadClasses = useThemeCache(() => {
     const topPager = css({
         paddingTop: 0,
         paddingBottom: 0,
+        flex: 1,
     });
 
     const trendingTooltip = css({
         display: "flex",
         flexDirection: "column",
         gap: 4,
+        flex: 1,
         ...codeMixin(),
     });
 
@@ -91,7 +90,7 @@ export const commentThreadClasses = useThemeCache(() => {
         title,
         containerWithTopBottomBorder,
         closedTag,
-        resolved,
+        metaIconContainer,
         reportsTag,
         sortPagerRow,
         topPagerWrapper,

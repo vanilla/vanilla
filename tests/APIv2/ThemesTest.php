@@ -76,7 +76,14 @@ class ThemesTest extends AbstractAPIv2Test
             [
                 "asset-test-no-parent",
                 "variables.json",
-                trim(file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/variables.json")),
+                json_encode(
+                    json_decode(
+                        trim(file_get_contents("{$fixturesDir}/themes/asset-test-no-parent/assets/variables.json")),
+                        JSON_PRETTY_PRINT
+                    ) + [
+                        "globalFragmentImpls" => [],
+                    ]
+                ),
                 "application/json",
             ],
         ];
@@ -130,7 +137,9 @@ class ThemesTest extends AbstractAPIv2Test
                 "variables",
                 [
                     "type" => "json",
-                    "data" => json_decode(file_get_contents("$assetRoot/variables.json"), true),
+                    "data" => json_decode(file_get_contents("$assetRoot/variables.json"), true) + [
+                        "globalFragmentImpls" => [],
+                    ],
                     "content-type" => "application/json",
                 ],
             ],

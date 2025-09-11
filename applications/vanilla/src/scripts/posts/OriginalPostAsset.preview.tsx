@@ -5,12 +5,12 @@
  */
 
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import OriginalPostAsset from "@vanilla/addon-vanilla/posts/OriginalPostAsset";
 import React from "react";
-import set from "lodash/set";
+import set from "lodash-es/set";
 
 interface IProps extends Omit<React.ComponentProps<typeof OriginalPostAsset>, "comments" | "discussion"> {}
 
@@ -40,7 +40,7 @@ export function OriginalPostAssetPreview(props: IProps) {
     }
 
     return (
-        <Widget>
+        <LayoutWidget>
             <QueryClientProvider client={queryClient}>
                 <OriginalPostAsset
                     {...props}
@@ -54,6 +54,6 @@ export function OriginalPostAssetPreview(props: IProps) {
                     isPreview
                 />
             </QueryClientProvider>
-        </Widget>
+        </LayoutWidget>
     );
 }

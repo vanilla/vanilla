@@ -10,6 +10,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Container\NotFoundException;
 use Gdn;
+use RoleModel;
 use UserModel;
 use CategoryModel;
 use UsersApiController;
@@ -84,8 +85,13 @@ class UsersTest extends AbstractResourceTest
         parent::setUp();
 
         $this->configuration = static::container()->get("Config");
-        $this->configuration->set("Garden.Email.Disabled", true);
-
+        $this->configuration->set(
+            [
+                "Garden.Email.Disabled" => true,
+                "Garden.Format.Mentions" => \UsersApiController::AT_MENTION_GLOBAL,
+            ],
+            true
+        );
         /* @var PrivateCommunityMiddleware $middleware */
         $middleware = static::container()->get(PrivateCommunityMiddleware::class);
         $middleware->setIsPrivate(false);
@@ -93,7 +99,7 @@ class UsersTest extends AbstractResourceTest
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {
@@ -209,7 +215,7 @@ class UsersTest extends AbstractResourceTest
     /**
      * Overridden to execute before other custom tests that generate users that don't play well with this test.
      *
-     * @inheritDoc
+     * @inheritdoc
      * @dataProvider provideSortFields
      */
     public function testIndexSort(string $field): void
@@ -312,6 +318,7 @@ class UsersTest extends AbstractResourceTest
             "userID" => 0,
             "name" => "Guest",
             "photoUrl" => UserModel::getDefaultAvatarUrl(),
+            "profilePhotoUrl" => UserModel::getDefaultAvatarUrl(),
             "dateLastActive" => null,
             "isAdmin" => false,
             "isSysAdmin" => false,
@@ -324,6 +331,25 @@ class UsersTest extends AbstractResourceTest
             "emailConfirmed" => false,
             "profileFields" => [],
             "extended" => [],
+            "banned" => 0,
+            "bypassSpam" => false,
+            "dateInserted" => "2000-01-01T00:00:00+00:00",
+            "dateUpdated" => "2000-01-01T00:00:00+00:00",
+            "url" => "https://vanilla.test/userstest/profile/Guest",
+            "points" => 0,
+            "roles" => [
+                [
+                    "roleID" => RoleModel::GUEST_ID,
+                    "name" => "Guest",
+                ],
+            ],
+            "showEmail" => false,
+            "countDiscussions" => 0,
+            "countComments" => 0,
+            "countPosts" => 0,
+            "private" => false,
+            "countVisits" => 0,
+            "roleIDs" => [RoleModel::GUEST_ID],
         ];
         $actual = $response->getBody();
 
@@ -400,6 +426,9 @@ class UsersTest extends AbstractResourceTest
                 "session.valid",
                 "settings.view",
                 "site.manage",
+                "staff.allow",
+                "tags.add",
+                "tokens.add",
                 "uploads.add",
                 "users.add",
                 "users.delete",
@@ -1211,7 +1240,7 @@ class UsersTest extends AbstractResourceTest
     protected function triggerDirtyRecords()
     {
         $this->resetTable("dirtyRecord");
-        $user = $this->createUser();
+        $user = $this->createUser(["name" => "triggerDirtyRecords"]);
         $this->givePoints($user["userID"], 10);
     }
 
@@ -2396,6 +2425,45 @@ class UsersTest extends AbstractResourceTest
             ->assertSuccess()
             ->assertCount(1, "Expected 1 user to be found")
             ->assertJsonArrayValues(["userID" => [$user2["userID"]]]);
+
+        // Now let's make sure we surface a user if their LastIPAddress is different from
+        // a previous ipAddress.
+        $this->trackUserVisit($user1, "5.6.7.9");
+
+        // This address is no longer the user's last ip address, but
+        // the user should still surface because the association is stored in the
+        // GDN_UserIP table.
+        $this->api()
+            ->get("/users", [
+                "ipAddresses" => ["5.6.7.8"],
+            ])
+            ->assertSuccess()
+            ->assertCount(1, "Expected 1 user to be found")
+            ->assertJsonArrayValues(["userID" => [$user1["userID"]]]);
+    }
+
+    /**
+     * Test searching by IP address as a query value.
+     *
+     * @return void
+     */
+    public function testIpAddressQuery(): void
+    {
+        $user1 = $this->createUser();
+
+        // The user should show up when searching either of these addresses.
+        $this->trackUserVisit($user1, "5.6.8.8");
+        $this->trackUserVisit($user1, "5.6.8.9");
+
+        $this->api()
+            ->get("/users", ["query" => "5.6.8.8"])
+            ->assertCount(1, "Expected 1 user to be found")
+            ->assertJsonArrayValues(["userID" => [$user1["userID"]]]);
+
+        $this->api()
+            ->get("/users", ["query" => "5.6.8.9"])
+            ->assertCount(1, "Expected 1 user to be found")
+            ->assertJsonArrayValues(["userID" => [$user1["userID"]]]);
     }
 
     /**
@@ -2481,6 +2549,20 @@ class UsersTest extends AbstractResourceTest
             ["number[]", "tokens", [1, 2, 3], [1, 2, 3]],
         ];
         return $r;
+    }
+
+    /**
+     * Provider for testNameValidation
+     *
+     * @return void
+     */
+    public static function providerInvalidUsernames(): array
+    {
+        return [
+            "short name" => ["on"],
+            "long name" => ["veryLong_Validname123456789"],
+            "name with spaced" => ["some name"],
+        ];
     }
 
     /**
@@ -2640,7 +2722,6 @@ class UsersTest extends AbstractResourceTest
             $expected = [
                 "userID" => $memberData["UserID"],
                 "name" => $memberData["Name"],
-                "email" => $memberData["Email"],
                 "photoUrl" => UserModel::getDefaultAvatarUrl(),
                 "countDiscussions" => 0,
                 "countComments" => 0,
@@ -2653,5 +2734,153 @@ class UsersTest extends AbstractResourceTest
             $actual = $response->getBody();
             $this->assertArraySubsetRecursive($expected, $actual);
         });
+    }
+
+    /**
+     * Make sure that users with the personalInfo.view permission are allowed to view the email through the API.
+     *
+     * @return void
+     */
+    public function testUserEmailVisibilityAllowed(): void
+    {
+        $user = $this->createUser(["showEmail" => 0]);
+
+        // Look up as an admin.
+        $admin = $this->createUser(["roleID" => [\RoleModel::ADMIN_ID]]);
+        $this->runWithUser(function () use ($user) {
+            $r = $this->api()
+                ->get("{$this->baseUrl}/{$user["userID"]}")
+                ->getBody();
+            $this->assertTrue(isset($r["email"]), "This user email should be visible to an admin.");
+        }, $admin);
+    }
+
+    /**
+     * Make sure that users without the personalInfo.view permission are not allowed to view the email through the API.
+     *
+     * @return void
+     */
+    public function testUserEmailVisibilityNotAllowed(): void
+    {
+        $user = $this->createUser(["showEmail" => 0]);
+
+        // Look up the user has a guest.
+        $this->runWithUser(function () use ($user) {
+            $r = $this->api()
+                ->get("{$this->baseUrl}/{$user["userID"]}")
+                ->getBody();
+            $this->assertFalse(isset($r["email"]), "This user email should not be visible.");
+        }, 0);
+
+        // Look up the user has a member.
+        $member = $this->createUser();
+        $this->runWithUser(function () use ($user) {
+            $r = $this->api()
+                ->get("{$this->baseUrl}/{$user["userID"]}")
+                ->getBody();
+            $this->assertFalse(isset($r["email"]), "This user email should not be visible.");
+        }, $member);
+    }
+
+    /**
+     * Test that the dateInserted and dateUpdated can be overwritten.
+     *
+     * @return void
+     */
+    public function testMigratableFields(): void
+    {
+        // Test creating a new user with arbitrary dates.
+        $this->createUser([
+            "dateInserted" => "2012-12-21",
+            "dateUpdated" => "2012-12-22",
+            "dateLastActive" => "2012-12-23",
+            "dateFirstVisit" => "2012-12-24",
+        ]);
+        $this->api->get($this->baseUrl . "/" . $this->lastUserID)->assertJsonObjectLike([
+            "dateInserted" => "2012-12-21T00:00:00+00:00",
+            "dateUpdated" => "2012-12-22T00:00:00+00:00",
+            "dateLastActive" => "2012-12-23T00:00:00+00:00",
+            "dateFirstVisit" => "2012-12-24T00:00:00+00:00",
+        ]);
+
+        // Test updating the dates.
+        $this->api
+            ->patch($this->baseUrl . "/" . $this->lastUserID, [
+                "dateInserted" => "2013-12-21",
+                "dateUpdated" => "2013-12-22",
+                "dateLastActive" => "2013-12-23",
+                "dateFirstVisit" => "2013-12-24",
+            ])
+            ->assertJsonObjectLike([
+                "dateInserted" => "2013-12-21T00:00:00+00:00",
+                "dateUpdated" => "2013-12-22T00:00:00+00:00",
+                "dateLastActive" => "2013-12-23T00:00:00+00:00",
+                "dateFirstVisit" => "2013-12-24T00:00:00+00:00",
+            ]);
+    }
+
+    /**
+     * Make sure that users without the `site.manage` permission are not able to set or edit migratable fields.
+     *
+     * @param string $method
+     * @param array $body
+     * @return void
+     * @dataProvider provideMigratablePayload
+     */
+    public function testDatePermission(string $method, array $body): void
+    {
+        $this->runWithPermissions(
+            function () use ($method, $body) {
+                if ($method === "POST") {
+                    $this->createUser($body);
+                } elseif ($method === "PATCH") {
+                    $this->createUser();
+                    $this->api->patch($this->baseUrl . "/" . $this->lastUserID, $body);
+                } else {
+                    throw new \Exception("Invalid HTTP request method.");
+                }
+            },
+            ["users.add" => true, "users.edit" => true]
+        );
+
+        $user = $this->api->get($this->baseUrl . "/" . $this->lastUserID)->getBody();
+        $this->assertNotEquals("2012-12-21T00:00:00+00:00", $user["dateInserted"]);
+        $this->assertNotEquals("2012-12-21T00:00:00+00:00", $user["dateUpdated"]);
+        $this->assertNotEquals("2012-12-21T00:00:00+00:00", $user["dateLastActive"]);
+        $this->assertNotEquals("2012-12-21T00:00:00+00:00", $user["dateFirstVisit"]);
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function provideMigratablePayload(): array
+    {
+        return [
+            ["POST", []],
+            ["POST", ["dateInserted" => "2012-12-21"]],
+            ["POST", ["dateUpdated" => "2012-12-21"]],
+            ["POST", ["dateLastActive" => "2012-12-21"]],
+            ["POST", ["dateFirstVisit" => "2012-12-21"]],
+            ["PATCH", []],
+            ["PATCH", ["dateInserted" => "2012-12-21"]],
+            ["PATCH", ["dateUpdated" => "2012-12-21"]],
+            ["PATCH", ["dateLastActive" => "2012-12-21"]],
+            ["PATCH", ["dateFirstVisit" => "2012-12-21"]],
+        ];
+    }
+
+    /**
+     * Test user name validation.
+     * @dataProvider providerInvalidUsernames
+     */
+    public function testNameValidation(string $name): void
+    {
+        $this->configuration->removeFromConfig("Garden.User.ValidationRegexPattern");
+        $this->configuration->removeFromConfig("Garden.User.ValidationRegex");
+        $this->configuration->removeFromConfig("Garden.User.ValidationLength");
+        $this->expectExceptionMessage(
+            "Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long."
+        );
+        $this->createUser(["name" => $name]);
     }
 }

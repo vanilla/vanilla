@@ -11,7 +11,7 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import { IWithPaging } from "@library/navigation/SimplePagerModel";
 import { useCommentListQuery } from "@vanilla/addon-vanilla/comments/Comments.hooks";
 import { CommentsApi } from "@vanilla/addon-vanilla/comments/CommentsApi";
-import isEqual from "lodash/isEqual";
+import isEqual from "lodash-es/isEqual";
 import React, { useState } from "react";
 import { CommentsBulkActionsProvider } from "@vanilla/addon-vanilla/comments/bulkActions/CommentsBulkActionsContext";
 import { CommentThreadAssetCommon } from "@vanilla/addon-vanilla/comments/CommentThreadAsset.common";

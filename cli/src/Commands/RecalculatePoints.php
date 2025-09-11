@@ -76,7 +76,7 @@ class RecalculatePoints extends DatabaseCommand
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
@@ -361,7 +361,7 @@ class RecalculatePoints extends DatabaseCommand
                 'Reactions',
                 0,
                 ut.RecordID AS UserID,
-                sum(ut.total * ifnull(json_extract(Attributes, '$.Points'), 0)) AS Points
+                sum(ut.total * (ifnull(cast(json_extract(Attributes, '$.Points') as unsigned integer), 0))) AS Points
             FROM
                 GDN_UserTag ut
                 JOIN GDN_ReactionType t ON t.TagID = ut.TagID

@@ -11,9 +11,9 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import { t } from "@vanilla/i18n";
 import React, { ComponentProps } from "react";
 
-interface IProps extends ComponentProps<typeof AdminEditTitleBar> {
+type IProps = ComponentProps<typeof AdminEditTitleBar> & {
     isSaving?: boolean;
-}
+};
 
 export function LayoutEditorTitleBar(props: IProps) {
     const { isSaving, actions, disableSave, ...rest } = props;

@@ -33,7 +33,7 @@ class LogDecoratorTest extends SiteTestCase
     private $log;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

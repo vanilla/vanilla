@@ -26,7 +26,7 @@ use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Widgets\SimpleTabWidgetFactory;
 use Vanilla\Widgets\TabWidgetTabService;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetService;
 
 Gdn::getContainer()
     ->rule(EmbedService::class)
@@ -47,7 +47,7 @@ Gdn::getContainer()
     ->addCall("registerSearchType", [new Reference(DiscussionSearchType::class)])
     ->addCall("registerSearchType", [new Reference(CommentSearchType::class)])
 
-    ->rule(WidgetService::class)
+    ->rule(LegacyWidgetService::class)
     ->addCall("registerWidget", [\Vanilla\Community\CategoriesModule::class])
     ->addCall("registerWidget", [\Vanilla\Community\UserSpotlightModule::class])
     ->addCall("registerWidget", [\Vanilla\Forum\Modules\DiscussionWidgetModule::class])
@@ -58,17 +58,19 @@ Gdn::getContainer()
     ->addCall("registerTabFactory", [DiscussionTabFactory::getTrendingReference()])
     ->addCall("registerTabFactory", [DiscussionTabFactory::getTopReference()])
     ->addCall("registerTabFactory", [DiscussionTabFactory::getAnnouncedReference()])
+    ->addCall("registerTabFactory", [DiscussionTabFactory::getRecentlyActiveDiscussionsReference()])
+    ->addCall("registerTabFactory", [DiscussionTabFactory::getNewestDiscussionsReference()])
     ->rule(PermissionModel::class)
     ->addCall("addJunctionModel", ["Category", new Reference(CategoryModel::class)]);
 
 if (Gdn::config("Tagging.Discussions.Enabled", false)) {
     Gdn::getContainer()
-        ->rule(WidgetService::class)
+        ->rule(LegacyWidgetService::class)
         ->addCall("registerWidget", [TagModule::class]);
 }
 
 if (FeatureFlagHelper::featureEnabled("SearchWidget")) {
     Gdn::getContainer()
-        ->rule(WidgetService::class)
+        ->rule(LegacyWidgetService::class)
         ->addCall("registerWidget", [SearchWidgetModule::class]);
 }

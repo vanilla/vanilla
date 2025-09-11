@@ -10,6 +10,7 @@ use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
+use Garden\Web\Exception\ServerException;
 use Vanilla\Database\SetLiterals\RawExpression;
 use Vanilla\Database\SetLiterals\SetLiteral;
 use Vanilla\Exception\Database\NoResultsException;
@@ -225,6 +226,10 @@ SQL;
     protected function validateOutputRows(array $rows, array $options)
     {
         $selects = $options[self::OPT_SELECT] ?? [];
+        if ($selects instanceof Schema) {
+            $selects = array_keys($selects->getField("properties"));
+        }
+
         if (is_string($selects)) {
             $selects = ArrayUtils::explodeTrim(",", $selects);
         }

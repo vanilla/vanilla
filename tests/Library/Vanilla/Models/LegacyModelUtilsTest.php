@@ -21,7 +21,7 @@ class LegacyModelUtilsTest extends BootstrapTestCase
     private $model;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -44,7 +44,7 @@ class LegacyModelUtilsTest extends BootstrapTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {

@@ -108,6 +108,14 @@ AutomationRulesPreviewRenderer.contentByTriggerType = [
         },
     },
     {
+        timeSinceLastActiveTrigger: {
+            component: AutomationRulesPreviewUsersContent,
+            queryBuilder: (apiValues: AddEditAutomationRuleParams) => {
+                return { sort: "name", dateLastActive: getDateValueForAPI(apiValues) };
+            },
+        },
+    },
+    {
         staleDiscussionTrigger: {
             component: AutomationRulesPreviewPostsContent,
             queryBuilder: (apiValues: AddEditAutomationRuleParams) => {

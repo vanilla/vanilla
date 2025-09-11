@@ -34,7 +34,7 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot
     abstract protected static function getInsertKey(): string;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $operation): bool
     {
@@ -47,7 +47,7 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot
     abstract protected function getContainerHMTLAttributes(): array;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = [])
     {
@@ -58,7 +58,7 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function render(): string
     {

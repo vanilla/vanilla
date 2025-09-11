@@ -34,7 +34,7 @@ class AkismetPremoderator implements PremoderationHandlerInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function premoderateItem(PremoderationItem $item): PremoderationResponse
     {
@@ -47,7 +47,11 @@ class AkismetPremoderator implements PremoderationHandlerInterface
 
         // This is super spam.
         if ($isSpam) {
-            return new PremoderationResponse(PremoderationResponse::SUPER_SPAM, $this->akismetUserID);
+            return new PremoderationResponse(
+                PremoderationResponse::SPAM,
+                $this->akismetUserID,
+                PremoderationResponse::PREMODERATION_SPAM_AKISMENT
+            );
         }
 
         return PremoderationResponse::valid();

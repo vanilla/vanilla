@@ -15,8 +15,8 @@ import { PostReactionIconType } from "@library/postReactions/PostReactions.types
 import { usePostReactionsContext } from "@library/postReactions/PostReactionsContext";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { Icon } from "@vanilla/icons";
-import snakeCase from "lodash/snakeCase";
-import startCase from "lodash/startCase";
+import snakeCase from "lodash-es/snakeCase";
+import startCase from "lodash-es/startCase";
 import { useEffect, useState } from "react";
 import { PostReactionTooltip } from "./PostReactionTooltip";
 import { useReactionLog } from "@library/postReactions/PostReactions.hooks";
@@ -26,8 +26,8 @@ import { useReactionLog } from "@library/postReactions/PostReactions.hooks";
  */
 export function PostReactions(props: { reactions?: IReaction[] }) {
     const { reactions } = props;
-    const classes = postReactionsClasses();
-    const tagStyles = tagClasses();
+    const classes = postReactionsClasses.useAsHook();
+    const tagStyles = tagClasses.useAsHook();
     const { toggleReaction, counts, recordType, recordID } = usePostReactionsContext();
     const { hasPermission } = usePermissionsContext();
     const reactionLog = useReactionLog({ recordType, recordID });

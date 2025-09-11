@@ -79,7 +79,7 @@ class CategoryLayoutRecordProvider implements LayoutViewRecordProviderInterface
     /**
      * Perform resolution of category layoutViewType
      *
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveLayoutQuery(LayoutQuery $query): LayoutQuery
     {
@@ -104,7 +104,7 @@ class CategoryLayoutRecordProvider implements LayoutViewRecordProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParentLayoutQuery(LayoutQuery $query): LayoutQuery
     {

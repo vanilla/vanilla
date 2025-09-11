@@ -56,12 +56,17 @@ class ReportPostTriggerTest extends SiteTestCase
         string $actionType,
         int $countReports,
         string $reportReasonID,
+        int $categoryID,
         array $triggerValue
     ): array {
         return [
             "trigger" => [
                 "type" => ReportPostTrigger::getType(),
-                "value" => ["countReports" => $countReports, "reportReasonID" => [$reportReasonID]],
+                "value" => [
+                    "countReports" => $countReports,
+                    "reportReasonID" => [$reportReasonID],
+                    "categoryID" => [$categoryID],
+                ],
             ],
             "action" => [
                 "type" => $actionType,
@@ -76,14 +81,20 @@ class ReportPostTriggerTest extends SiteTestCase
      */
     public function testAutomationRuleIsProcessedReportedPosts(): void
     {
-        $this->createCategory();
+        $category = $this->createCategory();
         $discussion = $this->createDiscussion();
 
         $this->createDiscussion();
         $comment = $this->createComment();
-        $automationRecord = $this->getAutomationRecord(CreateEscalationAction::getType(), 1, "spam", [
-            "recordIsLive" => true,
-        ]);
+        $automationRecord = $this->getAutomationRecord(
+            CreateEscalationAction::getType(),
+            1,
+            "spam",
+            $category["categoryID"],
+            [
+                "recordIsLive" => true,
+            ]
+        );
 
         $automationRule = $this->createAutomationRule($automationRecord["trigger"], $automationRecord["action"]);
 
@@ -98,7 +109,7 @@ class ReportPostTriggerTest extends SiteTestCase
             "noteBody" => "*Bold*",
         ]);
 
-        //Should create exactly two dispatch and a log
+        // Should create exactly two dispatch and a log
         $dispatches = $this->getDispatchedRules($automationRule["automationRuleID"], ["success"]);
         $this->assertCount(2, $dispatches);
         $this->assertRowsLike(
@@ -117,7 +128,71 @@ class ReportPostTriggerTest extends SiteTestCase
         $this->assertRowsLike(
             [
                 "recordType" => ["comment", "discussion"],
-                "recordID" => [$discussion["discussionID"], $comment["commentID"]],
+                "recordID" => [$comment["commentID"], $discussion["discussionID"]],
+            ],
+            $escalations
+        );
+    }
+
+    /**
+     * Test that post is processed when it is reported.  When report is done with user who does not have manage permission
+     * and does have flag.add permission, to make a report.
+     *
+     */
+    public function testAutomationRuleIsProcessedReportedPostsMember(): void
+    {
+        $this->createUserFixtures();
+        $category = $this->createCategory();
+        $discussion = $this->createDiscussion();
+
+        $this->createDiscussion();
+        $comment = $this->createComment();
+        $automationRecord = $this->getAutomationRecord(
+            CreateEscalationAction::getType(),
+            1,
+            "spam",
+            $category["categoryID"],
+            [
+                "recordIsLive" => true,
+            ]
+        );
+
+        $automationRule = $this->createAutomationRule($automationRecord["trigger"], $automationRecord["action"]);
+        $this->createRole(["name" => "FlagAddRole"], ["flag.add" => true]);
+        $this->userModel->addRoles($this->memberID, [$this->lastRoleID], false);
+        $this->runWithUser(function () use ($discussion, $comment) {
+            $this->createReport($discussion, [
+                "reportReasonIDs" => ["spam", "abuse"],
+                "noteBody" => "*Bold*",
+            ]);
+            CurrentTimeStamp::mockTime("+10 minutes");
+
+            $this->createReport($comment, [
+                "reportReasonIDs" => ["spam", "abuse"],
+                "noteBody" => "*Bold*",
+            ]);
+        }, $this->memberID);
+
+        // Should create exactly two dispatch and a log
+        $dispatches = $this->getDispatchedRules($automationRule["automationRuleID"], ["success"]);
+        $this->assertCount(2, $dispatches);
+        $this->assertRowsLike(
+            [
+                "affectedRecordType" => ["discussion", "comment"],
+                "estimatedRecordCount" => [1, 1],
+                "affectedRecordCount" => [1, 1],
+            ],
+            array_column($dispatches, "attributes")
+        );
+
+        $escalations = $this->api()
+            ->get("/escalations", ["placeRecordType" => "category", "placeRecordID" => $this->lastInsertedCategoryID])
+            ->getBody();
+        $this->assertCount(2, $escalations);
+        $this->assertRowsLike(
+            [
+                "recordType" => ["comment", "discussion"],
+                "recordID" => [$comment["commentID"], $discussion["discussionID"]],
             ],
             $escalations
         );
@@ -132,7 +207,7 @@ class ReportPostTriggerTest extends SiteTestCase
     {
         $reportReason = $this->createReportReason();
 
-        $this->createCategory();
+        $category = $this->createCategory();
         $discussion = $this->createDiscussion();
 
         $this->createReport($discussion, [
@@ -144,6 +219,7 @@ class ReportPostTriggerTest extends SiteTestCase
             CreateEscalationAction::getType(),
             1,
             $reportReason["reportReasonID"],
+            $category["categoryID"],
             [
                 "recordIsLive" => true,
             ]

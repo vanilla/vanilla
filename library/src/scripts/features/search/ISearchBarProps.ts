@@ -30,7 +30,6 @@ export interface ISearchBarProps extends IOptionalComponentID {
     hideSearchButton?: boolean;
     triggerSearchOnClear?: boolean;
     resultsRef?: React.RefObject<HTMLDivElement>;
-    handleOnKeyDown?: (event: React.KeyboardEvent) => void;
     onOpenSuggestions?: () => void;
     onCloseSuggestions?: () => void;
     buttonText?: string;

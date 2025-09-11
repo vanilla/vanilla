@@ -16,6 +16,7 @@ use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
+use TagModel;
 
 class CreatePostFormAsset extends AbstractLayoutAsset implements HydrateAwareInterface
 {
@@ -23,12 +24,12 @@ class CreatePostFormAsset extends AbstractLayoutAsset implements HydrateAwareInt
     use TwigRenderTrait;
     use HomeWidgetContainerSchemaTrait;
 
-    public function __construct(protected InternalClient $internalClient)
+    public function __construct(protected InternalClient $internalClient, protected TagModel $tagModel)
     {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -42,7 +43,7 @@ TWIG;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -50,7 +51,7 @@ TWIG;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): ?string
     {
@@ -60,7 +61,7 @@ TWIG;
     public function getProps(): ?array
     {
         $hydrateParams = $this->getHydrateParams();
-        $categorySlug = $hydrateParams["parentRecordID"] ?? null;
+        $categorySlug = $hydrateParams["parentRecordType"] === "category" ? $hydrateParams["parentRecordID"] : null;
         $categoryModel = \Gdn::getContainer()->get(\CategoryModel::class);
         $categoryID = $categoryModel->ensureCategoryID($categorySlug) ?? -1;
         $category = null;
@@ -79,11 +80,20 @@ TWIG;
             $postType = array_column($allowedPostTypes, null, "postTypeID")[$postTypeID];
         }
 
-        return ["category" => $category, "postTypeID" => $postTypeID, "postType" => $postType] + $this->props;
+        $taggingEnabled = $this->tagModel->discussionTaggingEnabled();
+        $scopedTaggingEnabled = $this->tagModel->scopedTaggingEnabled();
+
+        return [
+            "category" => $category,
+            "postTypeID" => $postTypeID,
+            "postType" => $postType,
+            "taggingEnabled" => $taggingEnabled,
+            "scopedTaggingEnabled" => $scopedTaggingEnabled,
+        ] + $this->props;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -104,7 +114,7 @@ TWIG;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -112,7 +122,7 @@ TWIG;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {

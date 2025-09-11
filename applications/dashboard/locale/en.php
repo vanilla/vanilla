@@ -216,5 +216,8 @@ $Definition["oauth2Instructions"] =
 $Definition["LogoDisclaimer"] = 'Themes made with the theme editor and some custom themes don\'t use this setting.';
 $Definition["UserMatchNeedsPassword"] =
     "You are trying to connect with a username that is already assigned to a user on this forum. If this is your account, please enter the account password.";
+$Definition["RoutesWarning"] =
+    "Each time a page is loaded, the system checks this list of routes to determine if a redirect should occur. As a result, every additional route slightly increases the time it takes to process every page request. To help maintain optimal performance, we recommend keeping your list of custom routes as lean as possible.";
+$Definition["Use Routes with Caution"] = "Use Routes with Caution";
 
 // TODO: PROVIDE TRANSLATIONS FOR ALL CONFIGURATION SETTINGS THAT ARE EDITABLE ON ADMIN FORMS (ie. Vanilla.Comments.MaxLength, etc).

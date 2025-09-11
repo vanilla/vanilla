@@ -87,7 +87,7 @@ class ValidatingCacheCacheAdapter extends CacheCacheAdapter {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function get($key, $default = null) {
         self::validateCacheKey($key);
@@ -95,7 +95,7 @@ class ValidatingCacheCacheAdapter extends CacheCacheAdapter {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getMultiple($keys, $default = null) {
         $keys = self::validateCacheKeys($keys);
@@ -103,7 +103,7 @@ class ValidatingCacheCacheAdapter extends CacheCacheAdapter {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function set($key, $value, $ttl = null) {
         self::validateCacheKey($key);
@@ -111,7 +111,7 @@ class ValidatingCacheCacheAdapter extends CacheCacheAdapter {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setMultiple($values, $ttl = null) {
         if (!(is_object($values) && $values instanceof \Traversable) && !is_array($values)) {
@@ -131,7 +131,7 @@ class ValidatingCacheCacheAdapter extends CacheCacheAdapter {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function has($key) {
         self::validateCacheKey($key);
@@ -139,7 +139,7 @@ class ValidatingCacheCacheAdapter extends CacheCacheAdapter {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function delete($key) {
         self::validateCacheKey($key);
@@ -147,7 +147,7 @@ class ValidatingCacheCacheAdapter extends CacheCacheAdapter {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function deleteMultiple($keys) {
         $keys = self::validateCacheKeys($keys);

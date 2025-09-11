@@ -11,6 +11,7 @@ use Garden\Events\ResourceEvent;
 use Garden\Events\TrackingEventInterface;
 use Psr\Log\LogLevel;
 use Vanilla\Analytics\TrackableCommunityModel;
+use Vanilla\Attributes;
 use Vanilla\Logging\LogEntry;
 use Vanilla\Logging\LoggableEventInterface;
 use Vanilla\Logging\LoggerUtils;
@@ -52,7 +53,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     public function __construct(string $action, array $payload, $sender = null)
     {
         parent::__construct($action, $payload, $sender);
-        $this->addApiParams(["expand" => "tagIDs,crawl,vectorize,roles"]);
+        $this->addApiParams(["expand" => "tagIDs,crawl,vectorize,roles,postMeta"]);
     }
 
     /**
@@ -66,7 +67,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {
@@ -114,7 +115,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTrackableCollection(): ?string
     {
@@ -175,6 +176,13 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
         // If the siteSectionID is set, we add it to the payload. We only send the first canonical one to keen.
         if (isset($this->payload["discussion"]["siteSectionIDs"])) {
             $trackingData["siteSectionID"] = $this->payload["discussion"]["siteSectionIDs"][0];
+        }
+
+        /** @var Attributes $attributes */
+        $attributes = $trackingData["attributes"];
+        $attributesValues = $attributes->getArrayCopy();
+        if (isset($attributesValues["aiGenerated"])) {
+            $trackingData["discussion"]["aiGenerated"] = $attributesValues["aiGenerated"];
         }
 
         return $trackingData;

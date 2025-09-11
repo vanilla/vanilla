@@ -22,12 +22,17 @@ import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { BannerAlignment, bannerVariables, IBannerOptions } from "@library/banner/Banner.variables";
 import { IBackground } from "@library/styles/cssUtilsTypes";
 import { twoColumnVariables } from "@library/layout/types/layout.twoColumns";
+import type { IThemeVariables } from "@library/theming/themeReducer";
 
 export const bannerClasses = useThemeCache(
-    (alternativeVariables?: ReturnType<typeof bannerVariables>, optionOverrides?: Partial<IBannerOptions>) => {
-        const vars = alternativeVariables ?? bannerVariables(optionOverrides);
-        const formElementVars = formElementsVariables();
-        const globalVars = globalVariables();
+    (
+        alternativeVariables?: ReturnType<typeof bannerVariables>,
+        optionOverrides?: Partial<IBannerOptions>,
+        forcedVars?: IThemeVariables,
+    ) => {
+        const vars = alternativeVariables ?? bannerVariables(optionOverrides, forcedVars);
+        const formElementVars = formElementsVariables(forcedVars);
+        const globalVars = globalVariables(forcedVars);
         const isCentered = vars.options.alignment === "center";
         const borderRadius =
             vars.searchBar.border.radius !== undefined ? vars.searchBar.border.radius : vars.border.radius;
@@ -192,7 +197,10 @@ export const bannerClasses = useThemeCache(
 
         const title = css({
             display: "block",
-            ...Mixins.font(vars.title.font),
+            "&&&": {
+                // we are fighting specifity with the body styles being reinjected in a different root when previeiwng a theme in layout editor.
+                ...Mixins.font(vars.title.font),
+            },
             flexGrow: 1,
             ...mediaQueries.oneColumnDown(Mixins.font(vars.title.fontMobile)),
         });
@@ -383,12 +391,6 @@ export const bannerClasses = useThemeCache(
                 backgroundColor: ColorsUtils.colorOut(vars.outerBackground.color),
                 ".searchBar": {
                     height: styleUnit(vars.searchBar.sizing.height),
-                },
-
-                // FIXME: why is this even here?
-                // Kludge for the layout editor
-                ".layoutEditorToolbarMenu": {
-                    transform: "translate(-50%, 50%)",
                 },
             },
             titleBarVars.swoop.amount > 0

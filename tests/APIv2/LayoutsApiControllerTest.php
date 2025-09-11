@@ -24,6 +24,7 @@ use VanillaTests\ExpectedAuditLog;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Layout\LayoutTestTrait;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests for api/v2/layouts endpoints
@@ -33,6 +34,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
     public static $addons = ["stubcontent"];
 
     use CommunityApiTestTrait;
+    use UsersAndRolesApiTestTrait;
     use ExpectExceptionTrait;
     use LayoutTestTrait;
     use AuditLogTestTrait;
@@ -50,16 +52,19 @@ class LayoutsApiControllerTest extends AbstractResourceTest
     protected $pk = "layoutID";
 
     /** {@inheritdoc} */
-    protected $editFields = ["name", "layout"];
+    protected $editFields = ["name", "layout", "titleBar"];
 
     /** {@inheritdoc} */
-    protected $patchFields = ["name", "layout"];
+    protected $patchFields = ["name", "layout", "titleBar"];
 
     /** {@inheritdoc} */
     protected $record = [
         "name" => "Layout",
         "layout" => [["foo" => "bar"], ["fizz" => "buzz", "flip" => ["flap", "flop"], "drip" => ["drop" => "derp"]]],
         "layoutViewType" => "home",
+        "titleBar" => [
+            '$hydrate' => "react.titleBar",
+        ],
     ];
 
     /** @var CategoryModel */
@@ -70,7 +75,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
     //region Setup / Teardown
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function configureContainerBeforeStartup(Container $container)
     {
@@ -515,6 +520,70 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $body = $response->getBody();
         $this->assertArrayHasKey("js", $body);
         $this->assertArrayHasKey("css", $body);
+    }
+
+    /**
+     * Test that we can use dynamic hydrate lookup assets.
+     *
+     * @return void
+     */
+    public function testLookupHydrateAssetWithCategoryPermission(): void
+    {
+        $category = $this->createPermissionedCategory(
+            ["name" => "My Category"],
+            [\RoleModel::ADMIN_ID, \RoleModel::MOD_ID]
+        );
+        $layoutDefinition = [
+            [
+                '$hydrate' => "react.section.1-column",
+                "children" => [
+                    [
+                        // Assets should be available.
+                        '$hydrate' => "react.asset.discussionList",
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $params = [
+            "categoryID" => $category["categoryID"],
+        ];
+
+        // Posting to the main hydrate endpoints will have the correct result.
+        $response = $this->api()->post("/layouts/hydrate", [
+            "layout" => $layoutDefinition,
+            "params" => $params,
+            "layoutViewType" => "categoryList",
+        ]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        // We can save it as a layout and render it by the ID.
+
+        $layout = $this->api()->post("/layouts", [
+            "name" => "My Layout",
+            "layout" => $layoutDefinition,
+            "layoutViewType" => "categoryList",
+        ]);
+
+        $response = $this->api()->put("/layouts/{$layout["layoutID"]}/views", [
+            [
+                "recordID" => $category["categoryID"],
+                "recordType" => "category",
+            ],
+        ]);
+        $this->runWithUser(function () use ($category, $params) {
+            $this->expectExceptionMessage("Permission Problem");
+            $response = $this->api()->get("/layouts/lookup-hydrate", [
+                "layoutViewType" => "categoryList",
+                "recordID" => $category["categoryID"],
+                "recordType" => "category",
+                "params" => $params,
+            ]);
+        }, \UserModel::GUEST_USER_ID);
+        $this->assertEquals(201, $response->getStatusCode());
     }
 
     /**

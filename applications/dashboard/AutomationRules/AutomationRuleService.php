@@ -12,6 +12,7 @@ use Exception;
 use Vanilla\AutomationRules\Actions\AutomationAction;
 use Vanilla\AutomationRules\Trigger\AutomationTrigger;
 use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
+use Webmozart\Assert\Assert;
 
 class AutomationRuleService
 {
@@ -161,5 +162,33 @@ class AutomationRuleService
             }
         }
         return $triggerTypes;
+    }
+
+    /**
+     * Run something with the system user and return the outputted value.
+     *
+     * @param callable $callback A callback to run.
+     *
+     * @return mixed The return value of the callback.
+     */
+    public function runWithSystemUser(callable $callback)
+    {
+        $session = \Gdn::session();
+        $initialUserID = $session->UserID;
+        try {
+            $systemID = \Gdn::config("Garden.SystemUserID", null);
+            Assert::notNull($systemID);
+            $session->start(
+                $systemID,
+                false, // No identity. This is only temporary.
+                false // DO NOT set any cookies.
+            );
+            $r = call_user_func($callback);
+            return $r;
+        } finally {
+            // Restore the old session.
+            // We don't want to re-increment any counters or re-issue the cookie though.
+            $session->start($initialUserID, false, false);
+        }
     }
 }

@@ -60,7 +60,7 @@ class ComposerHelper
      */
     public static function clearJSDepsCache()
     {
-        $cacheDir = realpath(__DIR__ . "/../../build/.cache");
+        $cacheDir = realpath(__DIR__ . "/../../node_modules/.vite");
 
         // Clear deps cache if it exists.
         $depsCache = $cacheDir . "/deps";
@@ -120,6 +120,13 @@ class ComposerHelper
                     " env variable is set to \"true\".\n"
             );
             return;
+        } else {
+            printf("\n============ Building JS deps ============\n");
+            printf(
+                "To disable automatic building of javascript, set the " .
+                    self::DISABLE_AUTO_BUILD .
+                    " env variable to \"true\".\n"
+            );
         }
 
         printf("\n============ Installing core node_modules ============\n");
@@ -131,8 +138,13 @@ class ComposerHelper
         }
         // Run build
         printf("\n============ Building Frontend ============\n");
+        $buildInjectablesCommand = "yarn run build:injectables 2>&1";
         $buildCommand = "node -r esbuild-register ./build/vite.buildProd.ts 2>&1";
         printf("\n============ Building frontend assets ============\n");
+
+        printf("\n$buildInjectablesCommand\n");
+        system($buildInjectablesCommand, $buildResult);
+
         printf("\n$buildCommand\n");
         system($buildCommand, $buildResult);
         if ($buildResult !== 0) {

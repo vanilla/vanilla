@@ -11,10 +11,10 @@ import { UnsubscribePageImpl } from "@library/unsubscribe/UnsubscribePage";
 import { UnsubscribeFixture } from "@library/unsubscribe/__fixtures__/Unsubscribe.Fixture";
 import { IUnsubscribeToken } from "@library/unsubscribe/unsubscribePage.types";
 import {
-    useGetUnsubscribe,
+    useUnsubscribeData,
     useSaveUnsubscribe,
     useUndoUnsubscribe,
-    usePreferenceLink,
+    useGetPreferenceLink,
 } from "@library/unsubscribe/unsubscribePageHooks";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen, waitFor } from "@testing-library/react";
@@ -88,14 +88,10 @@ describe("UnsubscribePage", () => {
             .reply(202, UnsubscribeFixture.MOCK_DIGEST_HIDE_OTHER_CONTENT_API_RESULT);
     });
 
-    describe("useGetUnsubscribe", () => {
+    describe("useUnsubscribeData", () => {
         it("Token returns no notifications as they have been processed", async () => {
-            const { result } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_PROCESSED_TOKEN), {
+            const { result } = renderHook(() => useUnsubscribeData(UnsubscribeFixture.MOCK_PROCESSED_TOKEN), {
                 wrapper: queryClientWrapper(),
-            });
-
-            await act(async () => {
-                await result.current.mutateAsync(UnsubscribeFixture.MOCK_PROCESSED_TOKEN);
             });
 
             await vi.waitFor(() => {
@@ -106,12 +102,8 @@ describe("UnsubscribePage", () => {
         });
 
         it("Token returns reason for notification is new badge", async () => {
-            const { result } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_BADGE_TOKEN), {
+            const { result } = renderHook(() => useUnsubscribeData(UnsubscribeFixture.MOCK_BADGE_TOKEN), {
                 wrapper: queryClientWrapper(),
-            });
-
-            await act(async () => {
-                await result.current.mutateAsync(UnsubscribeFixture.MOCK_BADGE_TOKEN);
             });
 
             await vi.waitFor(() => {
@@ -122,61 +114,48 @@ describe("UnsubscribePage", () => {
         });
 
         it("Token returns multiple reasons for notification", async () => {
-            const { result, waitFor } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_MULTI_TOKEN), {
+            const { result, waitFor } = renderHook(() => useUnsubscribeData(UnsubscribeFixture.MOCK_MULTI_TOKEN), {
                 wrapper: queryClientWrapper(),
             });
 
-            act(() => {
-                result.current.mutate(UnsubscribeFixture.MOCK_MULTI_TOKEN);
-            });
-
-            await waitFor(() => {
-                return result.current.isSuccess;
+            await vi.waitFor(() => {
+                expect(result.current.isSuccess).toBe(true);
             });
 
             expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_MULTI_DATA);
         });
 
         it("Token returns unfollow category data", async () => {
-            const { result, waitFor } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_UNFOLLOW_TOKEN), {
+            const { result, waitFor } = renderHook(() => useUnsubscribeData(UnsubscribeFixture.MOCK_UNFOLLOW_TOKEN), {
                 wrapper: queryClientWrapper(),
             });
 
-            act(() => {
-                result.current.mutate(UnsubscribeFixture.MOCK_UNFOLLOW_TOKEN);
-            });
-
-            await waitFor(() => {
-                return result.current.isSuccess;
+            await vi.waitFor(() => {
+                expect(result.current.isSuccess).toBe(true);
             });
 
             expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_UNFOLLOW_DATA);
         });
 
         it("Token returns email digest unsubscribe data", async () => {
-            const { result, waitFor } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_DIGEST_TOKEN), {
+            const { result, waitFor } = renderHook(() => useUnsubscribeData(UnsubscribeFixture.MOCK_DIGEST_TOKEN), {
                 wrapper: queryClientWrapper(),
             });
 
-            act(() => {
-                result.current.mutate(UnsubscribeFixture.MOCK_DIGEST_TOKEN);
-            });
-
-            await waitFor(() => {
-                return result.current.isSuccess;
+            await vi.waitFor(() => {
+                expect(result.current.isSuccess).toBe(true);
             });
 
             expect(result.current.data).toStrictEqual(UnsubscribeFixture.MOCK_DIGEST_DATA);
         });
 
         it("Token returns email digest hide category data", async () => {
-            const { result } = renderHook(() => useGetUnsubscribe(UnsubscribeFixture.MOCK_DIGEST_HIDE_CATEGORY_TOKEN), {
-                wrapper: queryClientWrapper(),
-            });
-
-            await act(async () => {
-                await result.current.mutateAsync(UnsubscribeFixture.MOCK_DIGEST_HIDE_CATEGORY_TOKEN);
-            });
+            const { result } = renderHook(
+                () => useUnsubscribeData(UnsubscribeFixture.MOCK_DIGEST_HIDE_CATEGORY_TOKEN),
+                {
+                    wrapper: queryClientWrapper(),
+                },
+            );
 
             await vi.waitFor(() => {
                 expect(result.current.isSuccess).toBe(true);
@@ -187,15 +166,11 @@ describe("UnsubscribePage", () => {
 
         it("Token returns email digest hide other content data", async () => {
             const { result } = renderHook(
-                () => useGetUnsubscribe(UnsubscribeFixture.MOCK_DIGEST_HIDE_OTHER_CONTENT_TOKEN),
+                () => useUnsubscribeData(UnsubscribeFixture.MOCK_DIGEST_HIDE_OTHER_CONTENT_TOKEN),
                 {
                     wrapper: queryClientWrapper(),
                 },
             );
-
-            await act(async () => {
-                await result.current.mutateAsync(UnsubscribeFixture.MOCK_DIGEST_HIDE_OTHER_CONTENT_TOKEN);
-            });
 
             await vi.waitFor(() => {
                 expect(result.current.isSuccess).toBe(true);
@@ -248,7 +223,7 @@ describe("UnsubscribePage", () => {
     });
 
     it("Create link to notification preferences page for current user", async () => {
-        const { result, waitFor } = renderHook(() => usePreferenceLink(), { wrapper: queryClientWrapper() });
+        const { result, waitFor } = renderHook(() => useGetPreferenceLink(), { wrapper: queryClientWrapper() });
         const link = result.current(UnsubscribeFixture.TOKEN_RESULT_TEMPLATE.user);
         await waitFor(() => {
             expect(link).toBe("/profile/preferences");
@@ -256,7 +231,7 @@ describe("UnsubscribePage", () => {
     });
 
     it("Create link to followed content page for current user", async () => {
-        const { result, waitFor } = renderHook(() => usePreferenceLink(), { wrapper: queryClientWrapper() });
+        const { result, waitFor } = renderHook(() => useGetPreferenceLink(), { wrapper: queryClientWrapper() });
         const link = result.current(UnsubscribeFixture.TOKEN_RESULT_TEMPLATE.user, true);
         await waitFor(() => {
             expect(link).toBe("/profile/followed-content");
@@ -264,7 +239,7 @@ describe("UnsubscribePage", () => {
     });
 
     it("Create link to notification preferences page for another user", async () => {
-        const { result, waitFor } = renderHook(() => usePreferenceLink(), { wrapper: queryClientWrapper() });
+        const { result, waitFor } = renderHook(() => useGetPreferenceLink(), { wrapper: queryClientWrapper() });
         const tmpUser = {
             ...UnsubscribeFixture.TOKEN_RESULT_TEMPLATE.user,
             userID: 100,
@@ -276,7 +251,7 @@ describe("UnsubscribePage", () => {
     });
 
     it("Create link to followed content page for another user", async () => {
-        const { result, waitFor } = renderHook(() => usePreferenceLink(), { wrapper: queryClientWrapper() });
+        const { result, waitFor } = renderHook(() => useGetPreferenceLink(), { wrapper: queryClientWrapper() });
         const tmpUser = {
             ...UnsubscribeFixture.TOKEN_RESULT_TEMPLATE.user,
             userID: 100,

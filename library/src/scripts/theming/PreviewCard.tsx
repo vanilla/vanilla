@@ -15,6 +15,7 @@ export interface IPreviewCardProps {
     dropdownContent?: ReactNode;
     actionButtons?: ReactNode;
     active?: boolean;
+    focusable?: boolean;
 }
 
 const PreviewCard = React.forwardRef(function PreviewCard(
@@ -34,6 +35,7 @@ const PreviewCard = React.forwardRef(function PreviewCard(
             className={cx(
                 classes.constraintContainer,
                 props.active && classes.constraintContainerActive,
+                "constraintContainer",
                 css({
                     backgroundColor: props.background,
                 }),
@@ -43,7 +45,7 @@ const PreviewCard = React.forwardRef(function PreviewCard(
                 <div
                     ref={ref}
                     className={cx(hasFocus && classes.isFocused, classes.container)}
-                    tabIndex={0}
+                    tabIndex={props.focusable ? 0 : undefined}
                     title={props.name}
                 >
                     <div className={classes.previewContainer}>

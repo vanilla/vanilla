@@ -73,12 +73,6 @@ class Gdn_ConfigurationModel
                 $nameKey = $index;
                 $default = $value;
             }
-            /*
-            if ($this->Name != 'Configuration')
-               $Name = $NameKey;
-            else
-               $Name = $this->Name.'.'.$NameKey;
-            */
 
             $this->Data[$nameKey] = $config->get($nameKey, $default);
         }

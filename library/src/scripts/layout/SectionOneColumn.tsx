@@ -31,7 +31,7 @@ export function SectionOneColumn(props: IProps) {
             className={cx(oneColumnClasses.root, widgetClasses.widgetClass, className)}
         >
             {childrenBefore}
-            <Container fullGutter narrow={isNarrow} className={oneColumnClasses.container}>
+            <Container fullGutter narrow={isNarrow} className={oneColumnClasses.container} key="middleContainer">
                 <WidgetSectionContext.Provider
                     value={{
                         widgetClass: oneColumnClasses.widgetClass,

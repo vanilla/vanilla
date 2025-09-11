@@ -72,7 +72,7 @@ trait BootstrapTrait
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUpBootstrap()
     {

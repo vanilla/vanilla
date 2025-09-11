@@ -19,7 +19,7 @@ use VanillaTests\SiteTestCase;
 class TranslateResolverTest extends SiteTestCase
 {
     /**
-     * Enable the test-fr locale.
+     * Enable the vf_fr locale.
      */
     public static function setUpBeforeClass(): void
     {

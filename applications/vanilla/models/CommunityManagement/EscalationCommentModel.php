@@ -39,7 +39,7 @@ class EscalationCommentModel extends AbstractCommentParentHandler
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordType(): string
     {
@@ -79,7 +79,7 @@ class EscalationCommentModel extends AbstractCommentParentHandler
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function hasCommentParentDeletePermissionBypass(array $commentRow): bool
     {
@@ -88,7 +88,7 @@ class EscalationCommentModel extends AbstractCommentParentHandler
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function hasCommentParentEditPermissionBypass(array $commentRow): bool
     {
@@ -181,7 +181,7 @@ class EscalationCommentModel extends AbstractCommentParentHandler
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function applyCommentQueryFiltering(Gdn_SQLDriver &$subQuery, array &$permissionWheres, array $where): void
     {
@@ -328,7 +328,7 @@ class EscalationCommentModel extends AbstractCommentParentHandler
      * Search is not currently aware of `parentRecordType` on a comment so it always uses discussion.view permission
      * instead of posts.moderate.
      *
-     * @inheritDoc
+     * @inheritdoc
      */
     public function isSearchable(): bool
     {

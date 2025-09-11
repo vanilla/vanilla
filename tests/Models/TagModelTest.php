@@ -7,12 +7,10 @@
 
 namespace VanillaTests\Models;
 
-use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use TagModel;
-use VanillaTests\APIv0\TestDispatcher;
 use Garden\EventManager;
 
 /**
@@ -23,9 +21,6 @@ class TagModelTest extends \VanillaTests\SiteTestCase
     use ModelTestTrait;
     use TestCategoryModelTrait;
     use TestDiscussionModelTrait;
-
-    /** @var int */
-    protected static $tagCount = 0;
 
     /** @var TagModel */
     private $tagModel;
@@ -414,28 +409,6 @@ class TagModelTest extends \VanillaTests\SiteTestCase
     }
 
     /**
-     * Test that the dashboard's UI shows the "Add Tag" button where/when appropriate.
-     */
-    public function testCustomTagTypesDashboardUI(): void
-    {
-        // See tagModel_types_handler() for the custom tag types.
-
-        // As an admin...
-        $this->getSession()->start($this->adminID);
-        // We set ourselves tagging permissions.
-        $this->getSession()->addPermissions(["Vanilla.Tagging.Add"]);
-
-        $html = $this->bessy()->getHtml("/settings/tagging/?type=usablecustomtype");
-        // Checks that the appropriate "Add Tag" button is there.
-        $html->assertCssSelectorExists('.header-block a.btn-primary[href*="add?type=usablecustomtype"]');
-
-        $html = $this->bessy()->getHtml("/settings/tagging/?type=unusablecustomtype");
-        // Checks that there is no "Add Tag" button.
-        $html->assertCssSelectorNotExists('.header-block a.btn-primary[href*="add"]');
-        $this->getSession()->end();
-    }
-
-    /**
      * Add Types to TagModel.
      *
      * @param TagModel $sender
@@ -458,67 +431,6 @@ class TagModelTest extends \VanillaTests\SiteTestCase
             "addtag" => false,
             "default" => false,
         ]);
-    }
-
-    /**
-     * Check that we cannot Add Tags without the "Vanilla.Tagging.Add" Permission.
-     */
-    public function testAddCustomTagTypesThroughDashboardWithputPermission(): void
-    {
-        $this->getSession()->start($this->adminID);
-
-        $this->assertContains("Garden.Community.Manage", $this->getSession()->getPermissionsArray());
-        // By default Admin permissions do not include "Vanilla.Tagging.Add" permission
-        $this->assertNotContains("Vanilla.Tagging.Add", $this->getSession()->getPermissionsArray());
-        // We set ourselves tagging permissions.
-        $this->expectExceptionMessage("You don't have permission to do that.");
-        $this->bessy()->post("/settings/tags/add?type=usablecustomtype", [
-            "FullName" => "A New Tag",
-            "Name" => "a-new-tag",
-            "Type" => "usablecustomtype",
-        ]);
-    }
-
-    /**
-     * Check if we can Add Tags of a certain type(has addtag set to true). Also, we shouldn't be able to add tags for
-     * tag types that have addtag set to false.
-     */
-    public function testAddCustomTagTypesThroughDashboard(): void
-    {
-        // See tagModel_types_handler() for the custom tag types.
-
-        // As an admin...
-        $this->getSession()->start($this->adminID);
-        // We set ourselves tagging permissions.
-        $this->getSession()->addPermissions(["Vanilla.Tagging.Add"]);
-
-        $this->bessy()->post("/settings/tags/add?type=usablecustomtype", [
-            "FullName" => "A New Tag",
-            "Name" => "a-new-tag",
-            "Type" => "usablecustomtype",
-        ]);
-
-        // Checks that the newly created "A New Tag" tag is there.
-        $html = $this->bessy()->getHtml("/settings/tagging/?type=usablecustomtype");
-        $html->assertCssSelectorTextContains(".plank-container", "A New Tag");
-
-        $html = $this->bessy()->getHtml("/settings/tagging/?type=unusablecustomtype");
-        // Checks that there is no "Add Tag" button.
-        $html->assertCssSelectorNotExists('.header-block a.btn-primary[href*="add"]');
-
-        // we try to add a new tag anyway (This should fail).
-        $this->bessy()->post(
-            "/settings/tags/add?type=unusablecustomtype",
-            ["FullName" => "Another New Tag", "Name" => "another-new-tag", "Type" => "unusablecustomtype"],
-            [TestDispatcher::OPT_THROW_FORM_ERRORS => false]
-        );
-        $this->bessy()->assertFormErrorMessage("That type does not accept manually adding new tags.");
-
-        $this->bessy()->post("/settings/tags/add?type=usablecustomtype", [
-            "FullName" => "A New Tag",
-            "Name" => "a-new-custom-tag",
-        ]);
-        $this->bessy()->assertNoFormErrors();
     }
 
     /**

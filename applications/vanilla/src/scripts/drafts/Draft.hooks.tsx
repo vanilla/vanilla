@@ -4,29 +4,21 @@
  * @license Proprietary
  */
 
-import { IApiError } from "@library/@types/api/core";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { DraftsApi } from "@vanilla/addon-vanilla/drafts/DraftsApi";
-import { IDraft } from "@vanilla/addon-vanilla/drafts/types";
-import { useLocalStorage } from "@vanilla/react-utils";
-import { logDebug, logError, RecordID } from "@vanilla/utils";
+import { RecordID, logError } from "@vanilla/utils";
 import { useEffect, useRef } from "react";
-import get from "lodash-es/get";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export function useDraftQuery(draftID: IDraft["draftID"] | undefined | null, initialData?: IDraft) {
-    return useQuery({
-        queryKey: ["draft", draftID],
-        queryFn: async () => {
-            if (!draftID) return null;
-            return DraftsApi.getEdit({ draftID });
-        },
-        initialData,
-    });
-}
+import { DraftsApi } from "@vanilla/addon-vanilla/drafts/DraftsApi";
+import { IApiError } from "@library/@types/api/core";
+import { IDraft } from "@vanilla/addon-vanilla/drafts/types";
+import { IWithPaging } from "@library/navigation/SimplePagerModel";
+import get from "lodash-es/get";
+import { useLocalStorage } from "@vanilla/react-utils";
+import { useLocation } from "react-router-dom";
 
 interface DraftPostPatchMutationArgs {
     draftID?: IDraft["draftID"];
-    body: DraftsApi.PostParams;
+    body: Omit<DraftsApi.PatchParams, "draftID">;
 }
 
 export function useDraftPostPatchMutation() {
@@ -34,22 +26,22 @@ export function useDraftPostPatchMutation() {
         mutationFn: async (mutationArgs: DraftPostPatchMutationArgs) => {
             const { draftID, body } = mutationArgs;
             if (!draftID) {
-                return DraftsApi.post(body);
+                return await DraftsApi.post(body);
             } else {
-                const response = await DraftsApi.patch({ draftID, ...body }).catch(async (error) => {
-                    logDebug("Error patching draft, retrying", error);
-                    return await DraftsApi.post(body);
-                });
-                return response;
+                return await DraftsApi.patch({ draftID, ...body });
             }
         },
     });
 }
 
 export function useDraftDeleteMutation() {
+    const queryClient = useQueryClient();
     return useMutation<any, IApiError, RecordID>({
         mutationFn: async (draftID: RecordID) => {
             return DraftsApi.delete({ draftID });
+        },
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(["draftList"]);
         },
         onError: (error) => {
             logError("Error deleting draft", error);
@@ -57,36 +49,65 @@ export function useDraftDeleteMutation() {
     });
 }
 
-export function useLocalDraft(draftID?: IDraft["draftID"] | null) {
-    const draftKey = useRef(draftID ?? window.location.pathname);
-
-    useEffect(() => {
-        draftKey.current = draftID && `${draftID}`.length > 0 ? draftID : window.location.pathname;
-    }, [draftID]);
-
+export function useLocalDraftStore() {
     // Serialized object where the key refers to the the draftID and value is IDraft
-    const [localDraftObject, setLocalDraftObject] = useLocalStorage<Record<IDraft["draftID"], DraftsApi.PostParams>>(
+    const [localDraftObject, setLocalDraftObject] = useLocalStorage<Record<IDraft["draftID"], IDraft>>(
         `draftStore`,
         {},
     );
+
+    /**
+     * Provide an object of matching key value pairs to find drafts
+     * Use dot notation to access nested values
+     */
+    const getDraftByMatchers = (matchers: Record<string, RecordID>): Array<[RecordID, IDraft]> => {
+        function getNestedValue(draft: IDraft, key: string) {
+            return get(draft, key);
+        }
+        const payload = Object.entries(localDraftObject).filter(([draftID, draft]) => {
+            return Object.keys(matchers).every((key) => {
+                return getNestedValue(draft, key) === matchers[key];
+            });
+        });
+
+        return payload as Array<[RecordID, IDraft]>;
+    };
+
+    return {
+        localDraftObject,
+        setLocalDraftObject,
+        getDraftByMatchers,
+    };
+}
+
+export function useLocalDraft(draftID?: IDraft["draftID"] | null) {
+    const { pathname } = useLocation();
+    const draftKey = useRef(draftID ?? pathname);
+
+    useEffect(() => {
+        draftKey.current = draftID && `${draftID}`.length > 0 ? draftID : pathname;
+    }, [draftID]);
+
+    const { localDraftObject, setLocalDraftObject } = useLocalDraftStore();
 
     /**
      * This function will update the draft key and move the local draft object to the new key
      */
     const updateUnsavedDraftID = (draftID: IDraft["draftID"]) => {
         if (draftKey.current === draftID) return;
+        const prevDraftKey = draftKey.current;
         if (!localDraftObject[draftID]) {
             setLocalDraftObject((prev) => {
                 let modified = { ...prev };
-                modified[draftID] = prev?.[window.location.pathname];
-                delete modified[window.location.pathname];
+                modified[draftID] = prev?.[prevDraftKey];
                 return modified;
             });
         }
         draftKey.current = draftID;
+        removeDraftAtID(prevDraftKey);
     };
 
-    const setLocalDraft = (draft: DraftsApi.PostParams) => {
+    const setLocalDraft = (draft: IDraft) => {
         setLocalDraftObject((prev) => {
             return {
                 ...prev,
@@ -105,28 +126,49 @@ export function useLocalDraft(draftID?: IDraft["draftID"] | null) {
         });
     };
 
-    /**
-     * Provide an object of matching key value pairs to find drafts
-     * Use dot notation to access nested values
-     */
-    const getDraftByMatchers = (matchers: Record<string, RecordID>): Array<[RecordID, DraftsApi.PostParams]> => {
-        function getNestedValue(draft: DraftsApi.PostParams, key: string) {
-            return get(draft, key);
-        }
-        const payload = Object.entries(localDraftObject).filter(([draftID, draft]) => {
-            return Object.keys(matchers).every((key) => {
-                return getNestedValue(draft, key) === matchers[key];
-            });
-        });
-
-        return payload as Array<[RecordID, DraftsApi.PostParams]>;
-    };
-
     return {
         localDraft: localDraftObject[draftKey.current],
         setLocalDraft,
         updateUnsavedDraftID,
         removeDraftAtID,
-        getDraftByMatchers,
     };
+}
+
+export function useDraftListQuery(queryParams: DraftsApi.GetParams) {
+    return useQuery<any, IApiError, IWithPaging<IDraft[]>>({
+        queryFn: async () => {
+            return DraftsApi.index(queryParams);
+        },
+        queryKey: ["draftList", { ...queryParams }],
+    });
+}
+
+export function useScheduleDraftMutation() {
+    const queryClient = useQueryClient();
+    return useMutation<any, IApiError, { draftID: RecordID; dateScheduled: string; publishedSilently?: boolean }>({
+        mutationFn: async (apiParams) => {
+            return DraftsApi.schedule(apiParams);
+        },
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(["draftList"]);
+        },
+        onError: (error) => {
+            logError("Error scheduling draft", error);
+        },
+    });
+}
+
+export function useCancelDraftScheduleMutation() {
+    const queryClient = useQueryClient();
+    return useMutation<any, IApiError, RecordID>({
+        mutationFn: async (draftID: RecordID) => {
+            return DraftsApi.cancelShedule({ draftID });
+        },
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(["draftList"]);
+        },
+        onError: (error) => {
+            logError("Error cancelling draft schedule", error);
+        },
+    });
 }

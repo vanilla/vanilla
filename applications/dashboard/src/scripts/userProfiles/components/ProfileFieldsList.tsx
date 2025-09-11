@@ -11,7 +11,7 @@ import ProfileFieldsListClasses from "@dashboard/userProfiles/components/Profile
 import { ProfileFieldVisibilityIcon } from "@dashboard/userProfiles/components/ProfileFieldVisibilityIcon";
 import ReorderProfileFields from "@dashboard/userProfiles/components/ReorderProfileFields";
 import { useProfileFields, usePutProfileFieldsSorts } from "@dashboard/userProfiles/state/UserProfiles.hooks";
-import { ProfileField } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileField, ProfileFieldRegistrationOptions } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { EMPTY_PROFILE_FIELD_CONFIGURATION } from "@dashboard/userProfiles/utils";
 import { cx } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
@@ -93,6 +93,7 @@ export function ProfileFieldsList(props: IProps) {
             body: <>{t(errorMessage)}</>,
         });
     }
+    const classes = ProfileFieldsListClasses();
 
     const rows = useMemo(() => {
         if (!profileFieldsLoaded) {
@@ -131,7 +132,19 @@ export function ProfileFieldsList(props: IProps) {
                     : undefined;
                 // To create a subset and customized labels
                 return {
-                    label: field.label,
+                    label: (
+                        <span className={classes.name}>
+                            {field.registrationOptions === ProfileFieldRegistrationOptions.REQUIRED && (
+                                <span
+                                    aria-label={t("required")}
+                                    className={cx(dashboardClasses().labelRequired, classes.nameAsterix)}
+                                >
+                                    *
+                                </span>
+                            )}
+                            {field.label}
+                        </span>
+                    ),
                     "api label": field.apiName,
                     type: field.formType,
                     visibility: (
@@ -162,8 +175,6 @@ export function ProfileFieldsList(props: IProps) {
         return null;
     }, [onEdit, onDelete, profileFields.data]);
 
-    const classes = ProfileFieldsListClasses();
-
     return (
         <ErrorBoundary>
             <section className={classes.root}>
@@ -193,6 +204,7 @@ export function ProfileFieldsList(props: IProps) {
                 <div className={cx(dashboardClasses().extendRow, classes.scrollTable)}>
                     {rows && (
                         <Table
+                            truncateCells={false}
                             headerClassNames={classes.dashboardHeaderStyles}
                             rowClassNames={cx(classes.extendTableRows, classes.highlightLabels)}
                             data={rows}

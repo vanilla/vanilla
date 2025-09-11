@@ -1917,14 +1917,14 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             $data = removeKeysFromNestedArray($data, $remove);
         }
 
-        if (debug() && $this->deliveryMethod() !== DELIVERY_METHOD_XML && ($Trace = trace())) {
-            // Clear passwords from the trace.
-            array_walk_recursive($Trace, function (&$value, $key) {
-                if (in_array(strtolower($key), ["password"])) {
-                    $value = "***";
-                }
-            });
-            $data["Trace"] = $Trace;
+        if (debug() && $this->deliveryMethod() !== DELIVERY_METHOD_XML) {
+            // AIDEV-NOTE: Sanitize debug information to prevent sensitive data disclosure when debug mode is enabled
+            if ($Trace = trace()) {
+                $data["Trace"] = self::sanitizeSensitiveData($Trace);
+            }
+            if (isset($data["Exception"])) {
+                $data["Exception"] = self::sanitizeSensitiveData($data["Exception"]);
+            }
         }
 
         // Make sure the database connection is closed before exiting.
@@ -2002,6 +2002,58 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         }
         $this->setData("seoReactContent", $innerContent);
         $this->render("react", "", "core");
+    }
+
+    /**
+     * Sanitize sensitive data from debug output.
+     *
+     * @param mixed $data The data to sanitize.
+     * @return mixed Returns a copy of the data with sensitive values masked.
+     * @internal Exposed for usage in tests
+     */
+    public static function sanitizeSensitiveData($data)
+    {
+        // Handle null and empty cases
+        if ($data === null) {
+            return [];
+        }
+
+        // Convert the entire data structure to arrays to handle nested objects safely
+        $sanitizedData = json_decode(json_encode($data), true);
+
+        // Array of keys to sanitize during debug and trace output
+        $sensitiveFields = [
+            "password",
+            "hashmethod",
+            "transientkey",
+            "accesstoken",
+            "refreshtoken",
+            "sessionid",
+            "cookie",
+            "insertipaddress",
+            "updateipaddress",
+            "lastipaddress",
+            "allipaddresses",
+            "fingerprint",
+            "email",
+        ];
+
+        $sanitizeRecursive = function (&$data) use (&$sanitizeRecursive, $sensitiveFields) {
+            if (!is_array($data)) {
+                return;
+            }
+
+            foreach ($data as $key => &$value) {
+                if (in_array(strtolower($key), $sensitiveFields)) {
+                    $value = "*******";
+                } elseif (is_array($value)) {
+                    $sanitizeRecursive($value);
+                }
+            }
+        };
+
+        $sanitizeRecursive($sanitizedData);
+        return $sanitizedData;
     }
 
     /**
@@ -2134,20 +2186,14 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
 
         if (debug()) {
             if ($trace = trace()) {
-                // Clear passwords from the trace.
-                array_walk_recursive($trace, function (&$value, $key) {
-                    if (in_array(strtolower($key), ["password"])) {
-                        $value = "***";
-                    }
-                });
-                $data["Trace"] = $trace;
+                $data["Trace"] = self::sanitizeSensitiveData($trace);
             }
 
             if (!is_a($ex, "Gdn_UserException")) {
                 $data["StackTrace"] = DebugUtils::stackTraceString($ex->getTrace());
             }
 
-            $data["Data"] = $this->Data;
+            $data["Data"] = self::sanitizeSensitiveData($this->Data);
         }
 
         // Try cleaning out any notices or errors.
@@ -2206,7 +2252,9 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
                 $cssAnchors = LegacyAssetModel::getAnchors();
                 $assetProvider = \Gdn::getContainer()->get(ViteAssetProvider::class);
-                $inlineScript = $assetProvider->getBootstrapInlineScript();
+                $inlineScript = $assetProvider->getBootstrapInlineScript(
+                    $this->MasterView === "admin" ? "admin" : "forum"
+                );
                 $isMinificationEnabled = Gdn::config("minify.scripts", true);
                 if ($isMinificationEnabled) {
                     $jsMinifier = new MatthiasMullie\Minify\JS($inlineScript);
@@ -2512,11 +2560,18 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             $themeProvider->setForcedThemeKey("theme-dashboard");
         }
 
-        $this->registerReduxActionProvider($themeProvider);
+        $this->registerPreloader($themeProvider);
         $themeScript = $themeProvider->getThemeScript();
         if ($themeScript !== null) {
             $this->Head->addScript($themeScript->getWebPath(), "text/javascript", true, [
                 "static" => $themeScript->isStatic(),
+            ]);
+        }
+
+        foreach ($themeProvider->getPreloadFragmentScriptUrls() as $preloadFragmentScriptUrl) {
+            $this->Head->addTag("link", [
+                "rel" => "modulepreload",
+                "href" => $preloadFragmentScriptUrl,
             ]);
         }
     }
@@ -2548,6 +2603,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         // Noscript stylesheet
         $noScriptStyleAsset = \Gdn::getContainer()->get(NoScriptStylesAsset::class);
         $this->Head->addTag("noscript", [], "<link rel='stylesheet' href='{$noScriptStyleAsset->getWebPath()}'>");
+
+        // Locale debugging script
+        $scriptContents = \Gdn::locale()->getMissingTranslationsScriptContents();
+        $this->Head->addScript("", "module", false, ["content" => $scriptContents]);
     }
 
     /**
@@ -2557,7 +2616,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     {
         if ($this->MasterView === "admin") {
             $dashboardProvider = \Gdn::getContainer()->get(DashboardPreloadProvider::class);
-            $this->registerReduxActionProvider($dashboardProvider);
+            $this->registerPreloader($dashboardProvider);
         }
     }
 

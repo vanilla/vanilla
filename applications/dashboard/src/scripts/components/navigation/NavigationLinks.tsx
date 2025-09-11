@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Button from "@library/forms/Button";
 import useNavigationManagerStyles from "./NavigationLinks.styles";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -23,87 +23,45 @@ import {
 import { moveItemOnTree, mutateTreeItem, mutateTreeEvery, removeItemFromTree } from "@library/tree/utils";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { uuidv4 } from "@vanilla/utils";
-import ModalConfirm from "@library/modal/ModalConfirm";
-import Translate from "@library/content/Translate";
-import { INavigationLinkItemHandle, NavigationLinkItem } from "@dashboard/components/navigation/NavigationLinkItem";
+import { NavigationLinkItem } from "@dashboard/components/navigation/NavigationLinkItem";
 import { Icon } from "@vanilla/icons";
-
-function makeNewLink() {
-    const newLinkId = uuidv4();
-    return {
-        id: newLinkId,
-        children: [],
-        data: {
-            id: newLinkId,
-            children: [],
-            name: "",
-            url: "",
-            isCustom: true,
-        },
-    };
-}
-
-interface IDeleteModalProps {
-    isVisible?: boolean;
-    item?: ITreeItem<INavigationVariableItem>;
-    onConfirm(item: ITreeItem<INavigationVariableItem>): void;
-    onCancel(item: ITreeItem<INavigationVariableItem>): void;
-}
-
-function DeleteConfirmModal({ item, isVisible, onCancel, onConfirm }: IDeleteModalProps) {
-    const label = item?.data.name;
-    const url = item?.data.url;
-    return (
-        <ModalConfirm
-            isVisible={Boolean(isVisible)}
-            title={(<Translate source={'Delete "<0/>"'} c0={label} />) as unknown as string}
-            onCancel={() => onCancel(item!)}
-            onConfirm={() => onConfirm(item!)}
-        >
-            <Translate
-                source={'Are you sure you want to delete <0/> "<1/>" ?'}
-                c0={label}
-                c1={
-                    <strong>
-                        <em>{url}</em>
-                    </strong>
-                }
-            />
-        </ModalConfirm>
-    );
-}
+import { Row } from "@library/layout/Row";
+import { FramedModal } from "@library/modal/FramedModal";
+import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
+import { SchemaFormBuilder } from "@library/json-schema-forms";
+import { roleLookUp } from "@dashboard/moderation/communityManagmentUtils";
+import { buildUrl } from "@library/utility/appUtils";
 
 interface IProps {
     treeData: ITreeData<INavigationVariableItem>;
-    onStartEditing(): void;
-    onStopEditing(): void;
     onChangeTreeData(treeData: ITreeData<INavigationVariableItem>): void;
     isNestingEnabled?: boolean;
 }
 
+type EditingState =
+    | false
+    | {
+          type: "add";
+          parentID: ItemID;
+      }
+    | {
+          type: "edit";
+          itemID: ItemID;
+      };
+
 export default function NavigationLinks(props: IProps) {
-    const { treeData, onChangeTreeData, onStartEditing, onStopEditing } = props;
-    const treeItemsRef = useRef<Record<ItemID, INavigationLinkItemHandle>>({});
+    const { treeData, onChangeTreeData } = props;
     const containerRef = useRef<HTMLDivElement>(null);
     const layout = useSection();
     const classes = useNavigationManagerStyles();
 
-    const [editingID, setEditingID] = useState<ItemID | undefined>();
-    const [editOnceID, setEditOnceID] = useState<ItemID | undefined>();
-    const [deleteID, setDeleteID] = useState<ItemID | undefined>();
-
-    const isEditing = editingID !== undefined;
-
-    useEffect(() => {
-        if (editOnceID !== undefined) {
-            treeItemsRef.current[editOnceID]?.edit();
-        }
-    }, [editOnceID]);
+    const [editState, setEditState] = useState<EditingState>(false);
+    const isEditing = editState !== false;
 
     function deleteItem(itemID: ItemID) {
         const item = treeData.items[itemID];
         if (item.data.isCustom) {
-            setDeleteID(itemID);
+            permanentlyDeleteItem(itemID);
         } else {
             onChangeTreeData(
                 mutateTreeItem(treeData, itemID, {
@@ -114,12 +72,12 @@ export default function NavigationLinks(props: IProps) {
         }
     }
 
-    function showItem(itemID: ItemID) {
+    function setItemVisibility(itemID: ItemID, isHidden: boolean) {
         const item = treeData.items[itemID];
         onChangeTreeData(
             mutateTreeItem(treeData, itemID, {
                 isExpanded: true,
-                data: { ...item.data, isHidden: false },
+                data: { ...item.data, isHidden },
             }),
         );
     }
@@ -140,26 +98,12 @@ export default function NavigationLinks(props: IProps) {
         onChangeTreeData(mutateTreeEvery(treeData, { isExpanded: true }));
     }
 
-    function startEditing(itemID: ItemID) {
-        setEditingID(itemID);
-        onStartEditing();
-    }
-
-    function stopEditing(itemID: ItemID) {
-        const item = treeData.items[itemID];
-        if (item.data.name === "" && item.data.url === "") {
-            permanentlyDeleteItem(itemID);
-        }
-        setEditingID(undefined);
-        onStopEditing();
-    }
-
     function getSelectedItemID() {
         const selectedItem = containerRef.current?.querySelector<HTMLElement>("*[data-rbd-draggable-id]:focus-within");
         return selectedItem?.dataset.rbdDraggableId;
     }
 
-    function getDropParentID() {
+    function getSelectParentID() {
         const selectedID = getSelectedItemID();
         if (!selectedID) {
             return undefined;
@@ -168,23 +112,20 @@ export default function NavigationLinks(props: IProps) {
         return selectedItemParent?.id;
     }
 
-    function newLink() {
-        const dropParentID = getDropParentID() || treeData.rootId;
-        const dropParent = treeData.items[dropParentID];
-        const newLink = makeNewLink();
+    function addNewLink(newLink: ITreeItem<INavigationVariableItem>, parentID: ItemID) {
+        const parent = treeData.items[parentID]!;
         let newTreeData = {
             rootId: treeData.rootId,
             items: {
                 ...treeData.items,
-                [dropParentID]: {
-                    ...dropParent,
-                    children: [...dropParent.children, newLink.id],
+                [parentID]: {
+                    ...parent,
+                    children: [...parent.children, newLink.id],
                 },
                 [newLink.id]: newLink,
             },
         };
         onChangeTreeData(newTreeData);
-        setEditOnceID(newLink.id);
     }
 
     function onSave(itemID: ItemID, data: INavigationVariableItem) {
@@ -196,19 +137,21 @@ export default function NavigationLinks(props: IProps) {
         const { id } = item;
         return (
             <NavigationLinkItem
-                ref={(ref) => (treeItemsRef.current[id] = ref!)}
                 item={item}
                 depth={depth}
                 provided={provided}
                 snapshot={snapshot}
-                disabled={isEditing && editingID !== id}
                 onDelete={() => deleteItem(id)}
-                onShow={() => showItem(id)}
-                onSave={(data) => onSave(id, data)}
+                onShow={() => setItemVisibility(id, false)}
+                onHide={() => setItemVisibility(id, true)}
                 onExpand={() => expandItem(id)}
                 onCollapse={() => collapseItem(id)}
-                onStartEditing={() => startEditing(id)}
-                onStopEditing={() => stopEditing(id)}
+                onEdit={() =>
+                    setEditState({
+                        type: "edit",
+                        itemID: id,
+                    })
+                }
             />
         );
     }
@@ -255,29 +198,38 @@ export default function NavigationLinks(props: IProps) {
         onChangeTreeData(result.tree);
     }
 
-    function onConfirmDelete() {
-        permanentlyDeleteItem(deleteID!);
-        setDeleteID(undefined);
-    }
-
-    function onCancelDelete() {
-        setDeleteID(undefined);
-    }
-
     return (
         <>
-            <DeleteConfirmModal
-                isVisible={deleteID !== undefined}
-                item={deleteID ? treeData.items[deleteID] : undefined}
-                onConfirm={onConfirmDelete}
-                onCancel={onCancelDelete}
-            />
+            {editState !== false &&
+                (editState.type === "add" ? (
+                    <AddEditForm
+                        initialValue={null}
+                        onCancel={() => {
+                            setEditState(false);
+                        }}
+                        onSave={(value) => {
+                            addNewLink({ id: value.id, children: [], data: value }, editState.parentID);
+                            setEditState(false);
+                        }}
+                    />
+                ) : (
+                    <AddEditForm
+                        initialValue={treeData.items[editState.itemID].data}
+                        onCancel={() => {
+                            setEditState(false);
+                        }}
+                        onSave={(value) => {
+                            onSave(editState.itemID, value);
+                            setEditState(false);
+                        }}
+                    />
+                ))}
 
             <div className={classes.toolbar}>
                 {props.isNestingEnabled ? (
-                    <>
+                    <Row gap={24}>
                         <Button
-                            buttonType={ButtonTypes.CUSTOM}
+                            buttonType={ButtonTypes.TEXT}
                             className={classes.expandColapseButton}
                             onClick={expandAll}
                             ariaLabel={t("Expand All")}
@@ -286,7 +238,7 @@ export default function NavigationLinks(props: IProps) {
                             {!layout.isCompact && <span>{t("Expand All")}</span>}
                         </Button>
                         <Button
-                            buttonType={ButtonTypes.CUSTOM}
+                            buttonType={ButtonTypes.TEXT}
                             className={classes.expandColapseButton}
                             onClick={collapseAll}
                             ariaLabel={t("Collapse All")}
@@ -294,18 +246,23 @@ export default function NavigationLinks(props: IProps) {
                             <Icon icon="collapse-all" />
                             {!layout.isCompact && <span>{t("Collapse All")}</span>}
                         </Button>
-                    </>
+                    </Row>
                 ) : (
                     ""
                 )}
                 <div className={classes.spacer} />
 
                 <Button
-                    buttonType={ButtonTypes.CUSTOM}
+                    buttonType={ButtonTypes.TEXT}
                     className={classes.newLinkButton}
                     ariaLabel={t("New Link")}
                     disabled={isEditing}
-                    onClick={newLink}
+                    onClick={() => {
+                        setEditState({
+                            type: "add",
+                            parentID: getSelectParentID() ?? treeData.rootId,
+                        });
+                    }}
                 >
                     <PlusCircleIcon />
                     {!layout.isCompact && <span>{t("New Link")}</span>}
@@ -324,5 +281,55 @@ export default function NavigationLinks(props: IProps) {
                 />
             </div>
         </>
+    );
+}
+
+function AddEditForm(props: {
+    initialValue: INavigationVariableItem | null;
+    onSave: (value: INavigationVariableItem) => void;
+    onCancel: () => void;
+}) {
+    const [value, setValue] = useState<INavigationVariableItem>(
+        props.initialValue ?? {
+            name: "",
+            url: "",
+            id: uuidv4(),
+            isCustom: true,
+        },
+    );
+
+    return (
+        <FramedModal
+            onClose={props.onCancel}
+            title={props.initialValue ? t("Add Link") : t("Edit Link")}
+            onFormSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                props.onSave({ ...value, url: buildUrl(value.url) });
+            }}
+            footer={
+                <Button buttonType={"textPrimary"} type="submit">
+                    {props.initialValue ? t("Add Link") : t("Update Link")}
+                </Button>
+            }
+        >
+            <DashboardSchemaForm
+                forceVerticalLabels={true}
+                instance={value}
+                onChange={setValue}
+                schema={SchemaFormBuilder.create()
+                    .textBox("name", t("Label"), t("Enter the text to be displayed."))
+                    .required()
+                    .textBox(
+                        "url",
+                        t("URL"),
+                        t("Enter a full URL for external pages or a path for pages on this site."),
+                    )
+                    .required()
+                    .selectLookup("roleIDs", t("Permissions"), t("Choose who can see this link."), roleLookUp, true)
+                    .withControlParams({ placeholder: t("All Roles") })
+                    .getSchema()}
+            />
+        </FramedModal>
     );
 }

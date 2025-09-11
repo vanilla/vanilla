@@ -10,7 +10,7 @@ import { createMentionPlugin as createPlateMentionPlugin, MentionPlugin, withMen
 import { MentionElement } from "@library/vanilla-editor/plugins/mentionPlugin/MentionElement";
 import { deserializeMentionHtml } from "@library/vanilla-editor/plugins/mentionPlugin/deserializeMentionHtml";
 import { TComboboxItemWithData } from "@udecode/plate-combobox";
-import { insertMentionData } from "@library/vanilla-editor/plugins/mentionPlugin/insertMentionData";
+import insertDataCustom from "@library/vanilla-editor/insertDataCustom";
 
 export const ELEMENT_MENTION = "@";
 
@@ -36,7 +36,7 @@ export function createMentionPlugin() {
         },
         withOverrides: (editor, { options }) => {
             // custom handler for pasting data
-            editor.insertData = (data) => insertMentionData(editor, data);
+            editor.insertData = (data) => insertDataCustom(editor, data);
 
             // add the custom overrides to the pre-existing plugin overrides
             return withMention<MyValue, MyEditor>(editor, { options } as any);

@@ -1,0 +1,78 @@
+openapi: 3.1.0
+info:
+paths:
+    /posts:
+        get:
+            parameters:
+                - description: Specify a range or CSV of included role IDs.
+                  in: query
+                  name: roleIDs
+                  required: true
+                  schema:
+                      $ref: "#/components/schemas/RangeExpression"
+                - description: |
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      default: 1
+                      maximum: 50
+                      minimum: 1
+                - name: limit
+                  in: query
+                  description: Desired number of items per page.
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 100
+                      minimum: 1
+                - name: sort
+                  in: query
+                  description: |
+                      Sort the results according to a specified field.
+                  schema:
+                      type: string
+                      enum:
+                          - score
+                          - dateInserted
+                          - dateLastComment
+                          - "-score"
+                          - "-dateInserted"
+                          - "-dateLastComment"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                type: array
+                                items:
+                                    oneOf:
+                                        - $ref: "#/components/schemas/Discussion"
+                                        - $ref: "#/components/schemas/Comment"
+                    description: "Success"
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+            tags:
+                - Posts
+            summary: Get a list of posts.
+components:
+    schemas:
+        postDiscussion:
+            properties:
+                $ref: "#/components/schemas/Discussion/properties"
+                recordType:
+                    type: string
+                    enum:
+                        - discussion
+        postComment:
+            properties:
+                $ref: "#/components/schemas/Comment/properties"
+                recordType:
+                    type: string
+                    enum:
+                        - comment

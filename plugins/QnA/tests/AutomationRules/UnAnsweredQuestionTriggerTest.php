@@ -152,7 +152,6 @@ class UnAnsweredQuestionTriggerTest extends SiteTestCase
                 "unit" => "day",
             ],
             "categoryID" => [$masterCategory["categoryID"]],
-            "includeSubcategories" => false,
         ];
 
         $unAnsweredQuestionTrigger = new UnAnsweredQuestionTrigger();

@@ -21,7 +21,7 @@ class BootstrapTestCase extends VanillaTestCase
     use BootstrapTrait, SetupTraitsTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function setUpBeforeClass(): void
     {
@@ -39,7 +39,7 @@ class BootstrapTestCase extends VanillaTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -48,7 +48,7 @@ class BootstrapTestCase extends VanillaTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {
@@ -57,7 +57,7 @@ class BootstrapTestCase extends VanillaTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function tearDownAfterClass(): void
     {

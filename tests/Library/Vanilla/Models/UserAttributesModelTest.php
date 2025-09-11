@@ -21,7 +21,7 @@ class UserAttributesModelTest extends SiteTestCase
     private $model;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function getAddons(): array
     {
@@ -29,7 +29,7 @@ class UserAttributesModelTest extends SiteTestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

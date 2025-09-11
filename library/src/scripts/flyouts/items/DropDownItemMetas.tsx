@@ -17,13 +17,7 @@ interface IProps {
 /**
  * Implements meta type of item for DropDownMenu
  */
-export default class DropDownItemMetas extends React.Component<IProps> {
-    public render() {
-        const classes = dropDownClasses();
-        return (
-            <DropDownItem className={classNames(classes.metaItems, this.props.className)}>
-                {this.props.children}
-            </DropDownItem>
-        );
-    }
+export default function DropDownItemMetas(props: IProps) {
+    const classes = dropDownClasses.useAsHook();
+    return <DropDownItem className={classNames(classes.metaItems, props.className)}>{props.children}</DropDownItem>;
 }

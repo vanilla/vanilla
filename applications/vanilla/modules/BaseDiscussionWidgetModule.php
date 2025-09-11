@@ -1,41 +1,40 @@
 <?php
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Community;
 
 use CategoryModel;
-use DiscussionsApiController;
 use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
-use Gdn;
 use Gdn_Session;
 use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Widgets\DiscussionsWidgetSchemaTrait;
 use Vanilla\Http\InternalClient;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
+use Vanilla\Widgets\Fragments\PostItemFragmentMeta;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\LimitableWidgetInterface;
 use Vanilla\Widgets\WidgetSchemaTrait;
+use Vanilla\Widgets\DynamicContainerSchemaOptions;
 
 /**
  * Class AbstractRecordTypeModule
  *
  * @package Vanilla\Community
  */
-class BaseDiscussionWidgetModule extends AbstractReactModule implements LimitableWidgetInterface, HydrateAwareInterface
+class BaseDiscussionWidgetModule extends LegacyReactModule implements LimitableWidgetInterface, HydrateAwareInterface
 {
     use HomeWidgetContainerSchemaTrait;
     use WidgetSchemaTrait;
@@ -102,6 +101,14 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     }
 
     /**
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [PostItemFragmentMeta::class];
+    }
+
+    /**
      * Get props for component
      *
      * @param array|null $params
@@ -133,7 +140,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
             try {
                 $this->discussions = $this->api->get("/discussions", $apiParams)->asData();
             } catch (Exception $e) {
-                if (!$e->getMessage() == "Permission Problem") {
+                if ($e->getMessage() !== "Permission Problem") {
                     throw $e;
                 }
                 // A user might not have permission to see this.
@@ -159,6 +166,12 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
             "containerOptions" => $params["containerOptions"] ?? $this->getContainerOptions(),
             "discussionOptions" => $params["discussionOptions"] ?? $this->getDiscussionOptions(),
         ];
+
+        // this will happen only for widgets, assets will have this parameter in their props
+        $fragmentImpls = $this->{"\$fragmentImpls"} ?? null;
+        if ($fragmentImpls) {
+            $props["\$fragmentImpls"] = $fragmentImpls;
+        }
 
         return $props;
     }
@@ -304,7 +317,19 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
      */
     public static function getBaseApiSchema(): Schema
     {
-        $apiSchema = new Schema([
+        $apiSchema = self::featuredImageSchema();
+
+        return $apiSchema
+            ->setDescription("Configure API options")
+            ->setField("x-control", SchemaForm::section(new FormOptions("Display Options")));
+    }
+
+    /**
+     * @return Schema
+     */
+    public static function featuredImageSchema(): Schema
+    {
+        return new Schema([
             "type" => "object",
             "default" => new \stdClass(),
             "properties" => [
@@ -343,10 +368,6 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
             ],
             "required" => [],
         ]);
-
-        return $apiSchema
-            ->setDescription("Configure API options")
-            ->setField("x-control", SchemaForm::section(new FormOptions("Display Options")));
     }
 
     /**
@@ -366,7 +387,15 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
      */
     public static function getWidgetName(): string
     {
-        return "Discussions List";
+        return "Post List";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
     }
 
     ///
@@ -479,11 +508,11 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
-        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["discussions"]));
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["discussions"] ?? []));
         return $result;
     }
 
@@ -495,7 +524,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     public static function getFilterTypeSchemaExtraOptions(): array
     {
         // We may have a provided `layoutViewType`, or not.
-        $layoutViewType = Gdn::request()->get("layoutViewType", false);
+        $layoutViewType = DynamicContainerSchemaOptions::instance()->getLayoutViewType();
         switch ($layoutViewType) {
             case "home":
                 $filterTypeSchemaExtraOptions = [

@@ -23,12 +23,13 @@ class DiscussionsWidgetTest extends SiteTestCase
     use LayoutTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
         parent::setUp();
         $this->resetTable("Discussion");
+        self::setConfig("Tagging.Discussions.Enabled", true);
     }
 
     /**

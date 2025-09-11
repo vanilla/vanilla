@@ -388,6 +388,17 @@ class ActivityController extends Gdn_Controller
 
             if ($userID != Gdn::session()->UserID) {
                 // This is a wall post.
+
+                // Make sure the user is allowed to post on this user's wall.
+                $user = Gdn::getContainer()
+                    ->get(UserModel::class)
+                    ->getID($userID, DATASET_TYPE_ARRAY);
+                $isPrivate = (bool) $user["Attributes"]["Private"] ?? 0;
+                if ($isPrivate) {
+                    $this->permission("personalInfo.view");
+                } else {
+                    $this->permission("profiles.view");
+                }
                 $activity = [
                     "ActivityType" => "WallPost",
                     "ActivityUserID" => $userID,

@@ -28,7 +28,7 @@ class DynamicContainerSchemaOptions
     }
 
     /** @var string|null */
-    private string|null $layoutViewType;
+    private string|null $layoutViewType = null;
 
     /**
      * @return DynamicContainerSchemaOptions

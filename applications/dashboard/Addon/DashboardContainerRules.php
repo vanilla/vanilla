@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -37,6 +37,7 @@ use Vanilla\Dashboard\Activity\EscalationActivity;
 use Vanilla\Dashboard\Activity\MyEscalationActivity;
 use Vanilla\Dashboard\Activity\ParticipateCommentActivity;
 use Vanilla\Dashboard\Activity\ReportActivity;
+use Vanilla\Dashboard\Activity\ScheduledPostFailedActivity;
 use Vanilla\Dashboard\Activity\WallCommentActivity;
 use Vanilla\Dashboard\AuthenticatorTypeService;
 use Vanilla\Dashboard\Controllers\Api\SiteTotalsFilterOpenApi;
@@ -51,6 +52,7 @@ use Vanilla\Dashboard\Events\AiSuggestionAccessEvent;
 use Vanilla\Dashboard\Events\ConfigurationChangeEvent;
 use Vanilla\Dashboard\Events\DashboardAccessEvent;
 use Vanilla\Dashboard\Events\DashboardApiAccessEvent;
+use Vanilla\Dashboard\Events\DiscussionPostTypeChangeEvent;
 use Vanilla\Dashboard\Events\ExportAccessEvent;
 use Vanilla\Dashboard\Events\LayoutApplyEvent;
 use Vanilla\Dashboard\Events\PasswordResetCompletedEvent;
@@ -67,12 +69,15 @@ use Vanilla\Dashboard\Layout\View\LegacyProfileLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacyRegistrationLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacySigninLayoutView;
 use Vanilla\Dashboard\Models\ActivityService;
+use Vanilla\Dashboard\Models\ExternalServiceTracker;
 use Vanilla\Dashboard\Models\AiSuggestionSourceMeta;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\AttachmentMeta;
 use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Dashboard\Models\CategoryAiSuggestionSource;
+use Vanilla\Dashboard\Models\ModerationMeta;
 use Vanilla\Dashboard\Models\ModerationMessagesFilterOpenApi;
+use Vanilla\Dashboard\Models\NexusAiConversationClient;
 use Vanilla\Dashboard\Models\ProfileFieldsOpenApi;
 use Vanilla\Dashboard\Models\RolesExpander;
 use Vanilla\Dashboard\Models\SsoUsersExpander;
@@ -80,18 +85,23 @@ use Vanilla\Dashboard\Models\SuggestedContentMeta;
 use Vanilla\Dashboard\Models\UsersExpander;
 use Vanilla\Dashboard\Models\UserSiteTotalProvider;
 use Vanilla\Dashboard\UserLeaderService;
+use Vanilla\Models\CustomPageSiteMetaExtra;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
 use Vanilla\Logging\AuditLogService;
+use Vanilla\Logging\LogDecorator;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
+use Vanilla\OpenAI\OpenAIClient;
 use Vanilla\OpenAPIBuilder;
 use Vanilla\Premoderation\SuperSpamAuditLog;
 use Vanilla\SamlSSO\Events\JsConnectAuditEvent;
 use Vanilla\SamlSSO\Events\OAuth2AuditEvent;
 use Vanilla\Dashboard\Events\SsoStringAuditEvent;
 use Vanilla\Web\APIExpandMiddleware;
+use VanillaStaffPageController;
+use UserModel;
 
 /**
  * Container rules for the dashboard.
@@ -109,7 +119,8 @@ class DashboardContainerRules extends AddonContainerRules
                 "/settings/layout" => LayoutSettingsPageController::class,
                 "/appearance" => AppearancePageController::class,
                 "/home/leaving" => LeavingController::class,
-                "/settings/developer/profiles" => DeveloperProfilesPageController::class,
+                "/settings/vanilla-staff/profiles" => DeveloperProfilesPageController::class,
+                "/settings/vanilla-staff" => VanillaStaffPageController::class,
             ],
             null,
             -1
@@ -129,6 +140,7 @@ class DashboardContainerRules extends AddonContainerRules
 
         $container
             ->rule(ActivityService::class)
+            ->addCall("registerActivity", [ScheduledPostFailedActivity::class])
             ->addCall("registerActivity", [DiscussionCommentActivity::class])
             ->addCall("registerActivity", [ActivityCommentActivity::class])
             ->addCall("registerActivity", [WallCommentActivity::class])
@@ -179,7 +191,8 @@ class DashboardContainerRules extends AddonContainerRules
         $container
             ->rule(OpenAPIBuilder::class)
             ->addCall("addFilter", [new Reference(ModerationMessagesFilterOpenApi::class)])
-            ->addCall("addFilter", [new Reference(NotificationPreferencesFilterOpenApi::class)]);
+            ->addCall("addFilter", [new Reference(NotificationPreferencesFilterOpenApi::class)])
+            ->addCall("addFilter", [new Reference(DraftSchedulingOpenApi::class)]);
 
         $container->rule(OpenAPIBuilder::class)->addCall("addFilter", [new Reference(AuthenticatorTypeService::class)]);
 
@@ -189,7 +202,12 @@ class DashboardContainerRules extends AddonContainerRules
 
         $container
             ->rule(SpoofMiddleware::class)
-            ->setConstructorArgs([new Reference(Gdn_Session::class), new Reference("@smart-id-middleware")]);
+            ->setConstructorArgs([
+                new Reference(Gdn_Session::class),
+                new Reference("@smart-id-middleware"),
+                new Reference(LogDecorator::class),
+                new Reference(UserModel::class),
+            ]);
 
         $container->rule(Dispatcher::class)->addCall("addMiddleware", [new Reference(SpoofMiddleware::class)]);
 
@@ -226,6 +244,7 @@ class DashboardContainerRules extends AddonContainerRules
                     AiSuggestionAccessEvent::class,
                     SuperSpamAuditLog::class,
                     SsoStringAuditEvent::class,
+                    DiscussionPostTypeChangeEvent::class,
                 ],
             ]);
 
@@ -236,6 +255,14 @@ class DashboardContainerRules extends AddonContainerRules
             ->rule(AiSuggestionSourceService::class)
             ->addCall("registerSuggestionSource", [new Reference(CategoryAiSuggestionSource::class)]);
         $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(AiSuggestionSourceMeta::class)]);
+        $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(ModerationMeta::class)]);
         $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(SuggestedContentMeta::class)]);
+        $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(CustomPageSiteMetaExtra::class)]);
+
+        $container
+            ->rule(ExternalServiceTracker::class)
+            ->setShared(true)
+            ->addCall("registerService", [new Reference(OpenAIClient::class)])
+            ->addCall("registerService", [new Reference(NexusAiConversationClient::class)]);
     }
 }

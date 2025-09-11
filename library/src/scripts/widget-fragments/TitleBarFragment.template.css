@@ -1,0 +1,163 @@
+:root {
+    interpolate-size: allow-keywords;
+}
+.titleBarFragment__root {
+    --titleBarFragmentHeight: 48px;
+    --nav-color: var(--vnla-primary-color);
+    --text-color: var(--vnla-primary-contrast-color);
+    --mega-menu-background-color: var(--vnla-background-color);
+    --mega-menu-foreground-color: var(--vnla-foreground-color);
+    --space: 16px;
+
+    background-color: var(--nav-color);
+    height: var(--titleBarFragmentHeight);
+    position: sticky;
+    top: 0;
+    z-index: 1050;
+    container: titleBarContainer / inline-size;
+
+    & .titleBarFragment__gutters {
+        height: var(--titleBarFragmentHeight);
+    }
+
+    & .titleBarFragment__container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space);
+        height: var(--titleBarFragmentHeight);
+
+        & .titleBarFragment__logo {
+            & a,
+            & a:hover,
+            & a:focus,
+            & a:active,
+            & a:focus-visible {
+                color: var(--text-color);
+            }
+
+            @container titleBarContainer (width < 806px) {
+                margin: 0 auto;
+
+                &.search-open {
+                    display: none;
+                }
+            }
+        }
+
+        & .titleBarFragment__navigation {
+            display: flex;
+            & .titleBarFragment__navigation_list {
+                display: flex;
+                flex-direction: row;
+                flex-shrink: 0;
+            }
+
+            & .titleBarFragment__navigation_submenu {
+                background: var(--mega-menu-background-color);
+                position: absolute;
+                top: 100%;
+                width: 100vw;
+                overflow: hidden;
+                transform: translateX(calc(var(--offset, 0px) * -1));
+                padding-inline-start: var(--offset, 0px);
+                box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+
+                & a {
+                    color: var(--mega-menu-foreground-color);
+                }
+
+                & .titleBarFragment__navigation_list {
+                    flex-direction: column;
+                }
+            }
+
+            & .titleBarFragment__navigation_mobile,
+            & .titleBarFragment__navigation_mobile:focus,
+            & .titleBarFragment__navigation_mobile:active,
+            & .titleBarFragment__navigation_mobile:focus-visible {
+                color: var(--text-color);
+            }
+
+            @container titleBarContainer (width < 806px) {
+                order: -1;
+            }
+        }
+
+        & .titleBarFragment__search {
+            color: var(--text-color);
+            margin-inline-end: calc(var(--space) * -1);
+            width: auto;
+            transition: width 130ms ease-in-out;
+
+            &.active {
+                width: 500px;
+                @container titleBarContainer (width < 806px) {
+                    margin-inline-start: auto;
+                }
+            }
+
+            & .titleBarFragment__search_button {
+                margin-bottom: -3px;
+            }
+
+            @container titleBarContainer (width > 806px) {
+                margin-inline-start: auto;
+            }
+        }
+
+        & .titleBarFragment__user {
+            display: flex;
+            align-items: center;
+        }
+
+        & .titleBarFragment__subcommunity-picker {
+            color: var(--text-color);
+        }
+    }
+}
+
+.titleBarFragment__navigation_item {
+    & a {
+        display: inline-flex;
+        min-height: 36px;
+        padding: 0 8px;
+        margin: 3px 0;
+        color: var(--text-color);
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0);
+        text-decoration: none;
+
+        &:hover,
+        &:focus,
+        &:active,
+        &:focus-visible {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+    }
+}
+
+.titleBarFragment__skip-navigation {
+    position: absolute;
+    background-color: var(--nav-color);
+    color: var(--text-color);
+    border: 0;
+    border-radius: 6px;
+    clip: rect(0 0 0 0);
+    height: 0;
+    width: 0;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    &:focus,
+    &:active {
+        clip: auto;
+        height: 38px;
+        width: 144px;
+    }
+}

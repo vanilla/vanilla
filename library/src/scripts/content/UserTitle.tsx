@@ -9,16 +9,16 @@ import { userLabelClasses } from "@library/content/UserLabel.classes";
 import { t } from "@vanilla/i18n";
 import { ReactElement } from "react";
 
-interface IProps {
+interface IUserTitleProps {
     user: IUserFragment;
     showOPTag?: boolean;
 }
 
-export function UserTitle(props: IProps): JSX.Element | null {
+export function UserTitle(props: IUserTitleProps): JSX.Element | null {
     const { user, showOPTag } = props;
     const classes = userLabelClasses();
 
-    const { label, title } = user ?? {};
+    const { labelHtml, title } = user ?? {};
 
     let mainContent: ReactElement | null = null;
 
@@ -27,9 +27,9 @@ export function UserTitle(props: IProps): JSX.Element | null {
     } else if (title) {
         // Title can be input by the user.
         mainContent = <div className={classes.rankLabel}>{title}</div>;
-    } else if (label) {
+    } else if (labelHtml) {
         // Labels (from rank label) are sanitized server side.
-        mainContent = <div className={classes.rankLabel} dangerouslySetInnerHTML={{ __html: label }} />;
+        mainContent = <div className={classes.rankLabel} dangerouslySetInnerHTML={{ __html: labelHtml }} />;
     }
 
     return showOPTag ? (

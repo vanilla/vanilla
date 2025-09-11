@@ -5,9 +5,11 @@
  */
 
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { IPageHeadingBoxOptions, pageHeadingBoxVariables } from "@library/layout/PageHeadingBox.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { ColorVar } from "@library/styles/CssVar";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { getPixelNumber } from "@library/styles/styleUtils";
@@ -33,7 +35,7 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
         ...Mixins.margin({
             bottom: globalVars.spacer.headingBox,
         }),
-        color: `var(--fg-contrast-color, inherit)`,
+        color: ColorsUtils.varOverride(ColorVar.Foreground, "inherit"),
     });
     const titleWrap = css(
         {
@@ -56,6 +58,7 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
         {
             width: "100%",
             ...Mixins.font(vars.subtitle.font),
+            color: ColorsUtils.varOverride(ColorVar.Foreground, vars.subtitle.font.color),
             ...Mixins.margin({
                 bottom: getPixelNumber(globalVars.spacer.headingItem) * 1.5,
             }),
@@ -68,6 +71,7 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
         textAlign: "right",
         paddingLeft: vars.font.letterSpacing,
         ...Mixins.font(vars.count),
+        color: ColorsUtils.varOverride(ColorVar.Foreground, vars.subtitle.font.color),
     });
 
     return {

@@ -9,6 +9,7 @@ namespace Vanilla\Cli\Docker;
 
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
+use Vanilla\Cli\Commands\DockerCommand;
 use Vanilla\Cli\Utils\ScriptLoggerTrait;
 
 /**
@@ -18,26 +19,18 @@ class HostValidator
 {
     use ScriptLoggerTrait;
 
-    const EXPECTED_HOSTS = [
-        // Internal services
-        "database" => "127.0.0.1",
-        "memcached" => "127.0.0.1",
-        "queue.vanilla.local" => "127.0.0.1",
-        "advanced-embed.vanilla.local" => "127.0.0.1",
-        "dev.vanilla.local" => "127.0.0.1",
-        "embed.vanilla.local" => "127.0.0.1",
-        "modern-embed.vanilla.local" => "127.0.0.1",
-        "modern-embed-hub.vanilla.local" => "127.0.0.1",
-        "vanilla.local" => "127.0.0.1",
-        "sso.vanilla.local" => "127.0.0.1",
-        "e2e-tests.vanilla.local" => "127.0.0.1",
-        "webpack.vanilla.local" => "127.0.0.1",
-        "logs.vanilla.local" => "127.0.0.1",
-        "kibana.vanilla.local" => "127.0.0.1",
-        "imgproxy.vanilla.local" => "127.0.0.1",
-        "search.vanilla.local" => "127.0.0.1",
-        "elastic.vanilla.local" => "127.0.0.1",
-        "mail.vanilla.local" => "127.0.0.1",
+    const HARDCODED_HOSTNAMES = [
+        // Legacy
+        "database",
+
+        // Not dedicated services yet.
+        "memcached",
+        "advanced-embed.vanilla.local",
+        "embed.vanilla.local",
+        "modern-embed.vanilla.local",
+        "modern-embed-hub.vanilla.local",
+        "sso.vanilla.local",
+        "e2e-tests.vanilla.local",
     ];
 
     const CERTS = [
@@ -45,6 +38,22 @@ class HostValidator
         "vanilla.local" => PATH_ROOT . "/docker/images/nginx/certs/vanilla.local.crt",
         "*.vanilla.local" => PATH_ROOT . "/docker/images/nginx/certs/wildcard.vanilla.local.crt",
     ];
+
+    /**
+     * Get expected hostnames that should be in the hosts file.
+     *
+     * @return array
+     */
+    public static function getExpectedHostnames(): array
+    {
+        $hostnames = self::HARDCODED_HOSTNAMES;
+
+        foreach (DockerCommand::allServiceInstances() as $service) {
+            $hostnames = array_merge($hostnames, $service->descriptor->getHostnames());
+        }
+        $hostnames = array_unique($hostnames);
+        return $hostnames;
+    }
 
     /**
      * Ensure that our SSL certs are installed.
@@ -132,24 +141,26 @@ class HostValidator
     {
         $this->logger()->title("Validating /etc/hosts.");
 
-        $missing = [];
+        $hostsFile = file_get_contents("/etc/hosts");
+        $newHostLines = [];
 
-        foreach (self::EXPECTED_HOSTS as $HOST => $IP) {
-            $actualIP = gethostbyname($HOST);
-            if ($actualIP === $IP) {
-                $this->logger()->info("{$HOST} - <green>Success</green>");
-            } else {
-                $this->logger()->info("{$HOST} - <red>Not found</red> - Resolved to <yellow>$actualIP</yellow>");
-                $missing[$HOST] = $IP;
+        $loopbackIPs = ["127.0.0.1", "::1"];
+        foreach (self::getExpectedHostnames() as $expectedHostname) {
+            foreach ($loopbackIPs as $IP) {
+                $expectedLine = "$IP $expectedHostname # Added by vnla docker";
+                $hasMatch = str_contains($hostsFile, $expectedLine);
+
+                if (!$hasMatch) {
+                    $this->logger()->info("{$expectedHostname} -> {$IP} - <red>Not found</red>");
+                    $newHostLines[] = $expectedLine;
+                } else {
+                    $this->logger()->debug("{$expectedHostname} -> {$IP} - <green>Success</green>");
+                }
             }
         }
 
-        if (!empty($missing)) {
+        if (!empty($newHostLines)) {
             $this->logger()->info("");
-            $newHostLines = [];
-            foreach ($missing as $host => $ip) {
-                $newHostLines[] = "$ip $host # Added by vnla docker";
-            }
 
             $newHostLines = implode("\n", $newHostLines);
             $this->logger()->info("<yellow>The following will be added to your hosts file</yellow>\n$newHostLines");
@@ -165,7 +176,7 @@ class HostValidator
      *
      * @param string $toAppend
      */
-    private function appendHosts(string $toAppend)
+    private function appendHosts(string $toAppend): void
     {
         if (!file_exists("/etc/hosts")) {
             throw new \Exception("Could not find /etc/hosts file");

@@ -15,14 +15,14 @@ import {
 import { useAutomationRulesCatalog, useGetAdditionalData } from "@dashboard/automationRules/AutomationRules.hooks";
 import { useRoles } from "@dashboard/roles/roleHooks";
 import { IRole } from "@dashboard/roles/roleTypes";
-import { useCategoryList } from "@library/categoriesWidget/CategoryList.hooks";
+import { useCategoryList } from "@library/widgets/CategoriesWidget.hooks";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { useTagList } from "@library/features/tags/TagsHooks";
 import { ICollection } from "@library/featuredCollections/Collections.variables";
 import { useCollectionList } from "@library/featuredCollections/collectionsHooks";
 import { useStatusOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
-import { IGroupOption } from "@library/forms/select/Tokens.loadable";
+import { IGroupOption } from "@library/forms/select/Tokens.types";
 import { t } from "@vanilla/i18n";
 import { useGetUsers } from "@dashboard/users/userManagement/UserManagement.hooks";
 import { IUser } from "@library/@types/api/users";

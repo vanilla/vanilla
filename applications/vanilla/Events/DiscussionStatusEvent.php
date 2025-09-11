@@ -44,7 +44,7 @@ class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterf
     //region Methods
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {
@@ -62,6 +62,14 @@ class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterf
         $log = new LogEntry(LogLevel::INFO, LoggerUtils::resourceEventLogMessage($this), $context);
 
         return $log;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseAction(): string
+    {
+        return ResourceEvent::ACTION_UPDATE;
     }
 
     /**

@@ -46,7 +46,7 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testPost($record = null, array $extra = []): array
     {
@@ -93,7 +93,7 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testGetEdit($record = null)
     {
@@ -544,7 +544,7 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function generateIndexRows(): array
     {

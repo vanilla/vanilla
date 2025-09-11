@@ -7,7 +7,6 @@ import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { MemoryRouter } from "react-router";
-import { BannerContextProvider } from "@library/banner/BannerContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import TitleBar from "@library/headers/TitleBar";
 import { sampleImages } from "@library/embeddedContent/storybook/attachments/sampleAttachmentImages";
@@ -58,17 +57,10 @@ const TitleBarLogoTests = (props: { title?: string; onlyLogo?: boolean }) => {
     const content = [...squareRatio, ...tallRatio, ...wideRatio].map((testCase, index) => {
         return (
             <MemoryRouter key={index}>
-                <BannerContextProvider>
-                    <TitleBarDeviceProvider>
-                        <StoryHeading>{`${capitalizeFirstLetter(testCase.type)} ${testCase.ratio} logo`}</StoryHeading>
-                        <TitleBar
-                            useMobileBackButton={false}
-                            isFixed={false}
-                            overwriteLogo={testCase.src}
-                            onlyLogo={props.onlyLogo}
-                        />
-                    </TitleBarDeviceProvider>
-                </BannerContextProvider>
+                <TitleBarDeviceProvider>
+                    <StoryHeading>{`${capitalizeFirstLetter(testCase.type)} ${testCase.ratio} logo`}</StoryHeading>
+                    <TitleBar isFixed={false} overwriteLogo={testCase.src} onlyLogo={props.onlyLogo} />
+                </TitleBarDeviceProvider>
             </MemoryRouter>
         );
     });

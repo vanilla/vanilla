@@ -15,7 +15,7 @@ class LegacyEmojiImage extends AbstractNode
     const TYPE_KEY = "legacy_emoji_image";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -26,7 +26,7 @@ class LegacyEmojiImage extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -34,7 +34,7 @@ class LegacyEmojiImage extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

@@ -11,6 +11,7 @@ use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Dashboard\Scope\Schema\ScopeSchema;
 use Vanilla\Models\LegacyModelUtils;
 use Vanilla\Exception\PermissionException;
 
@@ -19,17 +20,13 @@ use Vanilla\Exception\PermissionException;
  */
 class TagsApiController extends AbstractApiController
 {
-    /** @var TagModel */
-    private TagModel $tagModel;
-
     /**
      * TagsApiController constructor.
      *
      * @param TagModel $tagModel
      */
-    public function __construct(TagModel $tagModel)
+    public function __construct(private TagModel $tagModel)
     {
-        $this->tagModel = $tagModel;
     }
 
     /**
@@ -52,7 +49,11 @@ class TagsApiController extends AbstractApiController
                 "urlCode:s?",
                 "parentTagID:i|null?",
                 "countDiscussions:i",
+                "dateInserted:dt?",
             ]);
+            if (TagModel::scopedTaggingEnabled()) {
+                ScopeSchema::applyOutputSchema($schema);
+            }
         }
 
         return $schema;
@@ -62,7 +63,7 @@ class TagsApiController extends AbstractApiController
      * Get tags from a query string.
      *
      * @param array $query
-     * @return array
+     * @return Data
      * @throws ValidationException
      * @throws HttpException
      * @throws PermissionException
@@ -70,7 +71,9 @@ class TagsApiController extends AbstractApiController
     public function index(array $query)
     {
         $this->permission();
-        $in = $this->schema([
+
+        // Build schema based on whether scoped tagging is enabled
+        $in = Schema::parse([
             "query:s?",
             "tagID:a?" => [
                 "items" => [
@@ -100,15 +103,18 @@ class TagsApiController extends AbstractApiController
                 "minimum" => 1,
                 "default" => \TagModel::LIMIT_DEFAULT,
             ],
-
             "sort:s?" => [
-                "enum" => ApiUtils::sortEnum("countDiscussions", "tagID", "name"),
+                "enum" => ApiUtils::sortEnum("countDiscussions", "tagID", "name", "dateInserted"),
             ],
             "excludeNoCountDiscussion:b?" => [
                 "description" => "Filter tags with no discussion counts",
                 "default" => false,
             ],
         ]);
+
+        if (TagModel::scopedTaggingEnabled()) {
+            ScopeSchema::applyFilterSchema($in);
+        }
 
         $query = $in->validate($query);
 
@@ -139,12 +145,19 @@ class TagsApiController extends AbstractApiController
         $out = $this->schema([":a?" => $this->fullSchema()], "out");
         $options["extraFields"] = true;
 
+        if (TagModel::scopedTaggingEnabled()) {
+            // Add scope filtering options
+            $options["scope"] = $query["scope"] ?? [];
+            $options["scopeType"] = $query["scopeType"] ?? null;
+        }
+
         $tags = [];
         $searchTerm = $query["query"] ?? "";
         $tags = $this->tagModel->search($searchTerm, true, $query["parentID"] ?? [], $query["type"], $options);
 
         $allowedTypes = $query["type"] === ["tag"] ? [] : $query["type"];
         $tags = $this->normalizeTags($tags, $allowedTypes);
+        $tags = $this->tagModel->joinScopes($tags, "tagID");
         $tags = $out->validate($tags);
 
         // urlCode was renamed to urlcode. For the sake of backwards-compatibility, temporarily kludge in the old casing.
@@ -153,7 +166,9 @@ class TagsApiController extends AbstractApiController
             return $tag;
         }, $tags);
 
-        return $tags;
+        $total = $this->tagModel->searchCount($options + $query);
+        $paging = ApiUtils::numberedPagerInfo($total, "/api/v2/tags", $query, $in);
+        return new Data($tags, \Garden\Web\Pagination::tryCursorPagination($paging, $query, $tags, "tagID"));
     }
 
     /**
@@ -210,7 +225,15 @@ class TagsApiController extends AbstractApiController
         // Don't allow overwriting existing tags.
         $duplicateTags = $this->tagModel->getWhere(["Name" => $normalizedBody["Name"]])->resultArray();
         if (!empty($duplicateTags)) {
-            throw new ClientException("A tag with this name already exists.", 409);
+            throw new ClientException(
+                "A tag with this name already exists. Tags must be unique — please choose a different name.",
+                409
+            );
+        }
+
+        // Include scope data in the data to save
+        if (isset($validatedBody["scope"])) {
+            $normalizedBody["scope"] = $validatedBody["scope"];
         }
 
         $tagID = $this->tagModel->save($normalizedBody);
@@ -263,6 +286,11 @@ class TagsApiController extends AbstractApiController
         $validatedBody["tagID"] = $id;
 
         $normalizedBody = $this->tagModel->normalizeInput([$validatedBody])[0];
+
+        // Include scope data in the data to save
+        if (isset($validatedBody["scope"])) {
+            $normalizedBody["scope"] = $validatedBody["scope"];
+        }
 
         $tagID = $this->tagModel->save($normalizedBody);
         if ($tagID) {
@@ -330,6 +358,7 @@ class TagsApiController extends AbstractApiController
             $tag["tagID"] = $tag["id"] ?? -1;
             $tag["type"] = stringIsNullOrEmpty($tag["type"]) ? "User" : $tag["type"];
             $tag["url"] = \Gdn::request()->url("/discussions/tagged/{$tag["urlCode"]}", true);
+
             $result[] = $tag;
         }
         return $result;
@@ -349,6 +378,11 @@ class TagsApiController extends AbstractApiController
         $tagFromDB = $this->tagModel->getTagsByIDs([$tagID])[0];
         // Return type with the value of an empty string as null.
         $tagFromDB["Type"] = $tagFromDB["Type"] === "" ? null : $tagFromDB["Type"];
+
+        // Add scope information using joinScopes
+        $tags = $this->tagModel->joinScopes([$tagFromDB]);
+        $tagFromDB = $tags[0];
+
         $normalizedTag = $this->tagModel->normalizeOutput([$tagFromDB])[0];
         $validatedTag = $out->validate($normalizedTag);
         return $validatedTag;

@@ -32,7 +32,7 @@ trait DiscussionsWidgetSchemaTrait
      * @return Schema
      */
     public static function optionsSchema(
-        string $fieldName = "discussionOptions",
+        string|null $fieldName = "discussionOptions",
         array $allowedProperties = null,
         string $placeholder = null
     ): Schema {
@@ -49,6 +49,10 @@ trait DiscussionsWidgetSchemaTrait
 
         if ($allowedProperties) {
             $schema = Schema::parse($allowedProperties)->add($schema);
+        }
+
+        if ($fieldName === null) {
+            return $schema;
         }
 
         return Schema::parse([

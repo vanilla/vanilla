@@ -40,7 +40,7 @@ class LockService extends LockFactory
 
     /**
      * Overridden to apply a custom prefix.
-     * @inheritDoc
+     * @inheritdoc
      */
     public function createLock(string $resource, ?float $ttl = 300.0, bool $autoRelease = true): LockInterface
     {

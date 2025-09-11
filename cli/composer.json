@@ -17,7 +17,8 @@
     "require": {
         "symfony/process": "*",
         "symfony/console": "^5.4",
-        "chrome-php/chrome": "^1.11"
+        "chrome-php/chrome": "^1.11",
+        "ext-readline": "*"
     },
     "autoload": {
         "psr-4": {

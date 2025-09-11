@@ -38,7 +38,7 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
     private $config;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -70,7 +70,7 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
         ]);
 
         $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
-        $this->userModel->savePreference($notifyUser["UserID"], [
+        $this->userNotificationPreferencesModel->save($notifyUser["UserID"], [
             "Email.DiscussionComment" => "1",
         ]);
 
@@ -113,7 +113,7 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
         $notifyUserID = 2;
 
         $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
-        $this->userModel->savePreference($notifyUser["UserID"], [
+        $this->userNotificationPreferencesModel->save($notifyUser["UserID"], [
             "Email.DigestEnabled" => "1",
         ]);
 
@@ -367,6 +367,107 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
         }, $notifyUserID);
         $bookmarkComment = val("Email.BookmarkComment", $notifyUser, null);
         $this->assertEquals("1", $bookmarkComment);
+    }
+
+    /**
+     * Test muting a post via the unsubscribe endpoints using a token. This tests the following
+     * endpoints: POST /unsubscribe/{token}, POST /unsubscribe/resubscribe/{token}, PATCH /unsubscribe/{token}.
+     *
+     * @return void
+     */
+    public function testMuteDiscussionUsingToken(): void
+    {
+        $activityUserID = 1;
+        $notifyUserID = 2;
+        $category = $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $this->createComment();
+        $this->runWithUser(function () use ($category, $notifyUserID) {
+            $url = "/categories/{$category["categoryID"]}/preferences/{$notifyUserID}";
+            $this->api()->patch($url, [
+                \CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW => true,
+                \CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_APP => true,
+                \CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => true,
+                \CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_APP => true,
+                \CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL => true,
+            ]);
+        }, $notifyUserID);
+        $activity = $this->activityModel->save([
+            "ActivityType" => "DiscussionComment",
+            "ActivityUserID" => $activityUserID,
+            "ParentRecordID" => $discussion["discussionID"],
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_PENDING,
+            "NotifyUserID" => $notifyUserID,
+            "Data" => ["Reason" => "DiscussionComment"],
+        ]);
+
+        $activity = $this->activityModel->getID($activity["ActivityID"], DATASET_TYPE_ARRAY);
+
+        $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        $this->userModel->savePreference($notifyUser["UserID"], [
+            "Email.DiscussionComment" => "1",
+        ]);
+
+        $unsubscribeLink = $this->activityModel->getMuteLink($activity, $notifyUser, "text");
+
+        $link = explode("/unsubscribe/", $unsubscribeLink);
+        $token = $link[1];
+
+        $this->api()
+            ->post("{$this->baseUrl}/$token}")
+            ->assertSuccess()
+            ->assertJsonObjectLike([
+                "mute" => [
+                    "discussionID" => $discussion["discussionID"],
+                    "userID" => $notifyUserID,
+                    "mute" => true,
+                ],
+            ]);
+
+        // Ensure the post is actually muted.
+        $this->api()
+            ->get("/discussions/muted")
+            ->assertSuccess()
+            ->assertJsonArrayContains(["discussionID" => $discussion["discussionID"]]);
+
+        // Now undo the muting using the token.
+        $this->api
+            ->post("{$this->baseUrl}/resubscribe/$token}")
+            ->assertSuccess()
+            ->assertJsonObjectLike([
+                "mute" => [
+                    "discussionID" => $discussion["discussionID"],
+                    "userID" => $notifyUserID,
+                    "mute" => false,
+                ],
+            ]);
+
+        // The discussion should no longer be muted for the user, so they shouldn't have any muted discussions.
+        $this->api()
+            ->get("/discussions/muted")
+            ->assertSuccess()
+            ->assertEmptyJsonArray();
+
+        // Now try to mute the discussion using the PATCH /unsubscribe endpoint.
+        $this->api()
+            ->patch("{$this->baseUrl}/$token}", ["mute" => true])
+            ->assertSuccess()
+            ->assertJsonObjectLike([
+                "mute" => [
+                    "discussionID" => $discussion["discussionID"],
+                    "userID" => $notifyUserID,
+                    "mute" => true,
+                ],
+            ]);
+
+        // Ensure the post is actually muted.
+        $this->api()
+            ->get("/discussions/muted")
+            ->assertSuccess()
+            ->assertJsonArrayContains(["discussionID" => $discussion["discussionID"]]);
     }
 
     /**

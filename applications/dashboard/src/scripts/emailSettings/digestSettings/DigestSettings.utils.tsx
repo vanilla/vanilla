@@ -13,7 +13,7 @@ import {
     RecurrenceFrequency,
     RecurrenceSetPosition,
 } from "@dashboard/emailSettings/EmailSettings.types";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { EMPTY_RICH2_BODY } from "@library/vanilla-editor/utils/emptyRich2";
 import { t } from "@vanilla/i18n";
 import { JSONSchemaType } from "@vanilla/json-schema-forms";
@@ -147,7 +147,7 @@ export function getDigestSettingsSchemas(additionalSettings?: IEmailDigestAdditi
                     },
                     {
                         keyword: "required",
-                        message: t("Required field."),
+                        message: t("Required field"),
                     },
                 ],
                 "x-control": {
@@ -231,7 +231,7 @@ export function getDigestSettingsSchemas(additionalSettings?: IEmailDigestAdditi
                 errorMessage: [
                     {
                         keyword: "required",
-                        message: t("Required field."),
+                        message: t("Required field"),
                     },
                     {
                         keyword: "maxLength",

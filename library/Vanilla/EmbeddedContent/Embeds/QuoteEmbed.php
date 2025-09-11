@@ -166,7 +166,7 @@ class QuoteEmbed extends AbstractEmbed
     /**
      * Override quote embeds to not be cacheable.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isCacheable(): bool
     {

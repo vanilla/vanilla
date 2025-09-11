@@ -12,7 +12,7 @@ use Vanilla\Community\Events\ExternalNavigationEvent;
 class ExternalNavigationEventProvider implements EventProviderInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEvent(array $body): object
     {
@@ -21,7 +21,7 @@ class ExternalNavigationEventProvider implements EventProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canHandleRequest(array $body): bool
     {

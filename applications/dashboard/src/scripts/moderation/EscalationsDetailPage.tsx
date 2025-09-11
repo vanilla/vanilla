@@ -30,6 +30,7 @@ import { cx } from "@emotion/css";
 import apiv2 from "@library/apiv2";
 import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
 import { ReadableIntegrationContextProvider } from "@library/features/discussions/integrations/Integrations.context";
+import { MentionsProvider } from "@library/features/users/suggestion/MentionsContext";
 import { AutoWidthInput } from "@library/forms/AutoWidthInput";
 import { autoWidthInputClasses } from "@library/forms/AutoWidthInput.classes";
 import Button from "@library/forms/Button";
@@ -104,7 +105,7 @@ function EscalationsDetailPageImpl(props: IImplProps) {
             <ModerationAdminLayout
                 title={
                     <div className={classes.titleLayout}>
-                        <BackLink className={classes.backlink} />
+                        <BackLink className={classes.backlink} fallbackUrl="/dashboard/content/escalations" />
                         {escalation && escalation.name.length > 0 && (
                             <div className={classes.editableTitleLayout}>
                                 <AutoWidthInput
@@ -151,7 +152,7 @@ function EscalationsDetailPageImpl(props: IImplProps) {
                         <PostRevisionPicker postRevisionOptions={postRevisions} />
 
                         <label className={classes.assigneeDropdown}>
-                            <span>{t("Assignee: ")}</span>
+                            <span>{t("Assignee")}: </span>
                             {escalation && (
                                 <EscalationAssignee
                                     escalation={escalation}
@@ -268,7 +269,9 @@ function EscalationsDetailPageImpl(props: IImplProps) {
                                             <div>
                                                 <DashboardFormSubheading>{t("Add a comment")}</DashboardFormSubheading>
                                                 <div className={classes.commentsWrapper}>
-                                                    <EscalationCommentEditor escalationID={escalationID} />
+                                                    <MentionsProvider recordType={"escalation"} recordID={escalationID}>
+                                                        <EscalationCommentEditor escalationID={escalationID} />
+                                                    </MentionsProvider>
                                                 </div>
                                             </div>
                                         </>

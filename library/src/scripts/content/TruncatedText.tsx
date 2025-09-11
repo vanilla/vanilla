@@ -7,7 +7,7 @@
 import { cx } from "@emotion/css";
 import { truncatedTextClasses } from "@library/content/TruncatedText.styles";
 import { useMeasure } from "@vanilla/react-utils";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 interface IProps {
     tag?: string;
@@ -29,11 +29,11 @@ const TruncatedText = React.memo(function TruncatedText(_props: IProps) {
     // This state is used to track the number of lines to display.
     // Its values should match https://www.w3.org/TR/css-overflow-3/#propdef--webkit-line-clamp
     const [linesToClamp, setLinesToClamp] = useState<number | "none">(props.lines || "none");
-    const classes = truncatedTextClasses({ lineClamp: linesToClamp });
+    const classes = truncatedTextClasses.useAsHook({ lineClamp: linesToClamp });
 
     const measure = useMeasure(ref);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (props.useMaxHeight) {
             setLinesToClamp(() => calculateLinesToClamp(ref.current));
         }

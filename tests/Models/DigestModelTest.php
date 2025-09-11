@@ -18,7 +18,7 @@ class DigestModelTest extends SiteTestCase
     protected DigestModel $digestModel;
 
     /**
-      @inheritDoc
+      @inheritdoc
      */
     public function setUp(): void
     {

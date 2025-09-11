@@ -10,21 +10,23 @@ import { Variables } from "@library/styles/Variables";
 import { Mixins } from "@library/styles/Mixins";
 import { PageBoxDepthContextProvider, usePageBoxContext } from "@library/layout/PageBox.context";
 import { stableObjectHash } from "@vanilla/utils";
+import { useThemeCache } from "@library/styles/themeCache";
+import { useWithThemeContext } from "@library/theming/ThemeOverrideContext";
 
-interface IProps extends React.HTMLAttributes<HTMLElement> {
+interface IBoxProps extends React.HTMLAttributes<HTMLElement> {
     children?: React.ReactNode;
     options?: Partial<IBoxOptions>;
     as?: ElementType;
 }
 
-export const PageBox = React.forwardRef(function Box(_props: IProps, passedRef: React.Ref<HTMLElement>) {
+export const PageBox = React.forwardRef(function Box(_props: IBoxProps, passedRef: React.Ref<HTMLElement>) {
     const { options: propOptions, as, children, ...props } = _props;
     const ownRef = useRef<HTMLElement>();
     const ref = passedRef ?? ownRef;
 
     const contextOptions = usePageBoxContext().options;
 
-    const boxClass = css(Mixins.box(Variables.box(propOptions ?? contextOptions ?? {})));
+    const boxClass = useWithThemeContext(() => css(Mixins.box(Variables.box(propOptions ?? contextOptions ?? {}))));
     const Component = (as as "div") ?? "div";
 
     return (

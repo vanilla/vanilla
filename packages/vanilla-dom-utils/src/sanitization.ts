@@ -10,10 +10,22 @@
  *
  * @returns Escaped HTML.
  */
-export function escapeHTML(str: string): string {
+export function escapeHTML(str: string): VanillaSanitizedHtml {
     const div = document.createElement("div");
     div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
+    return blessStringAsSanitizedHtml(div.innerHTML);
+}
+
+export type VanillaSanitizedHtml = "VANILLA_SANITIZED_HTML_*";
+
+/**
+ * Cast some string content as trusted HTML. Only use on content that has been sanitized on the server by Htmlawed or on the frontend by dompurify.
+ *
+ * @param content
+ * @returns
+ */
+export function blessStringAsSanitizedHtml(content: string): VanillaSanitizedHtml {
+    return content as VanillaSanitizedHtml;
 }
 
 /**

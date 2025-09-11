@@ -14,7 +14,7 @@ use Vanilla\Utility\HtmlUtils;
 class Text extends AbstractLeafNode implements TextFragmentInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $node): bool
     {
@@ -22,7 +22,7 @@ class Text extends AbstractLeafNode implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderTextContent(): string
     {
@@ -30,7 +30,7 @@ class Text extends AbstractLeafNode implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderHtmlContent(): string
     {
@@ -68,7 +68,7 @@ class Text extends AbstractLeafNode implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFragmentType(): string
     {
@@ -76,7 +76,7 @@ class Text extends AbstractLeafNode implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getInnerContent(): string
     {
@@ -84,7 +84,7 @@ class Text extends AbstractLeafNode implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setInnerContent(string $text)
     {
@@ -92,7 +92,7 @@ class Text extends AbstractLeafNode implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

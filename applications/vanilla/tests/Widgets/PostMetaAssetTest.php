@@ -26,7 +26,10 @@ class PostMetaAssetTest extends SiteTestCase
     public function testHydratePostMetaAsset()
     {
         $this->runWithConfig(
-            [FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES) => true],
+            [
+                FeatureFlagHelper::featureConfigKey(PostTypeModel::FEATURE_POST_TYPES) => true,
+            ],
+
             function () {
                 // Create a post type and some post fields
                 $postType = $this->createPostType();

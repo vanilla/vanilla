@@ -19,7 +19,7 @@ import { MemoryRouter } from "react-router";
 
 export function AISuggestions() {
     const postTypesMap = getMeta("postTypesMap", []);
-    const dependenciesEnabled = Object.values(postTypesMap).includes("question");
+    const dependenciesEnabled = !!Object.values(postTypesMap).find((postType) => postType?.["baseType"] === "question");
     const { data: settings, error } = useAISuggestionsSettings();
     const sections = settings ? getSettingsSchemaSections(settings) : undefined;
     const title = t("AI Suggested Answers");

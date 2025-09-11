@@ -14,10 +14,27 @@ use Vanilla\Cli\Commands\DockerCommand;
  */
 class VanillaNginxService extends AbstractService
 {
-    const SERVICE_NAME = "nginx";
+    const SERVICE_ID = "nginx";
+
+    protected bool $needsNginxReload = false;
 
     /**
-     * @inheritDoc
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(
+            new ServiceDescriptor(
+                serviceID: self::SERVICE_ID,
+                label: "Nginx",
+                containerName: "nginx",
+                url: "https://nginx.vanilla.local/health"
+            )
+        );
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getEnv(): array
     {
@@ -25,37 +42,5 @@ class VanillaNginxService extends AbstractService
             "COMPOSE_FILE" => "./docker-compose.nginx.yml",
             "COMPOSE_IGNORE_ORPHANS" => true,
         ];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getName(): string
-    {
-        return "Vanilla Nginx";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTargetDirectory(): string
-    {
-        return DockerCommand::VNLA_DOCKER_CWD;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getHostname(): string
-    {
-        return "*.vanilla.local";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getVanillaConfigDefaults(): array
-    {
-        return [];
     }
 }

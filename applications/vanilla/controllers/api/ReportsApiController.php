@@ -17,8 +17,10 @@ use Garden\Web\Exception\ServerException;
 use Gdn;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Events\SpamEvent;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Addon\ReportPostTriggerHandler;
 use Vanilla\Forum\Models\CommunityManagement\CommunityManagementNotificationGenerator;
@@ -29,6 +31,7 @@ use Vanilla\Forum\Models\CommunityManagement\TriageModel;
 use Vanilla\Models\FormatSchema;
 use Vanilla\Models\Model;
 use Vanilla\Schema\RangeExpression;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\SchemaUtils;
 
 /**
@@ -88,6 +91,14 @@ class ReportsApiController extends \AbstractApiController
             "verifyRecordUser:b" => [
                 "default" => false,
             ],
+            "premoderatedRecord?" => Schema::parse([
+                "name?",
+                "body",
+                "format:s" => [
+                    "enum" => ["rich2"],
+                    "default" => "rich2",
+                ],
+            ]),
         ]);
         $body = $in->validate($body);
 
@@ -102,13 +113,12 @@ class ReportsApiController extends \AbstractApiController
             );
         }
 
-        if (!$report["recordIsLive"] || $isPending) {
-            if ($isPending) {
-                // We are using the premoderation model to create the record for the first time.
-                $this->reportModel->saveRecordFromPremoderation($reportID);
-            } else {
-                $this->communityManagementRecordModel->restoreRecord($recordType, $recordID);
-            }
+        if ($isPending) {
+            // We are using the premoderation model to create the record for the first time.
+            $premoderatedRecord = $this->checkPremoderatedRecord($reportID, $body["premoderatedRecord"] ?? null);
+            $this->reportModel->saveRecordFromPremoderation($reportID, $premoderatedRecord);
+        } elseif (!$report["recordIsLive"]) {
+            $this->communityManagementRecordModel->restoreRecord($recordType, $recordID);
         }
 
         // Update our status
@@ -190,13 +200,13 @@ class ReportsApiController extends \AbstractApiController
     {
         $this->permission("flag.add");
 
-        $availableReasonIDs = $this->reportReasonModel->getPermissionAvailableReasonIDs();
+        $includeSystemReason = ((bool) ($body["automation"] ?? false));
+        $availableReasonIDs = $this->reportReasonModel->getPermissionAvailableReasonIDs($includeSystemReason);
         if (empty($availableReasonIDs)) {
             throw new ClientException("No report reasons available.", 403);
         }
 
-        $includeSystemReason = $body["automation"] ?? false;
-        $in = $this->postSchema((bool) $includeSystemReason);
+        $in = $this->postSchema($includeSystemReason);
 
         $body = $in->validate($body);
         $record = $this->communityManagementRecordModel->getRecord($body["recordType"], $body["recordID"]);
@@ -228,10 +238,6 @@ class ReportsApiController extends \AbstractApiController
             "reportReasonIDs" => $body["reportReasonIDs"] ?? [],
         ]);
 
-        if (Gdn::config("Feature.AutomationRules.Enabled")) {
-            $reportPostTriggerHandler = \Gdn::getContainer()->get(ReportPostTriggerHandler::class);
-            $reportPostTriggerHandler->handleUserEvent($reportID);
-        }
         return $this->getReport($reportID, checkPermissions: false);
     }
 
@@ -449,5 +455,43 @@ class ReportsApiController extends \AbstractApiController
         $paging = ApiUtils::numberedPagerInfo($countReports, "/api/v2/reports", $query, $in);
 
         return new Data($results, ["paging" => $paging]);
+    }
+
+    /**
+     * Check if the user has the permission to update premoderated content for approval.
+     * AIDEV-NOTE: The premoderatedRecord body field must always be in "rich2" format regardless of original format
+     *
+     * @param int $reportID
+     * @param array|null $premoderatedRecord
+     * @return array|null
+     */
+    private function checkPremoderatedRecord(int $reportID, ?array $premoderatedRecord): ?array
+    {
+        if (!isset($premoderatedRecord)) {
+            return null;
+        }
+
+        // AIDEV-NOTE: Validate that the passed premoderatedRecord format is always "rich2"
+        if (strtolower($premoderatedRecord["format"] ?? "") !== strtolower(Rich2Format::FORMAT_KEY)) {
+            throw new ClientException("Premoderated record body must be formatted in rich2.");
+        }
+
+        // Fetch report for permission checking
+        $report = $this->reportModel->selectSingle(["reportID" => $reportID]);
+
+        $permString = match ($report["recordType"]) {
+            "discussion" => "discussions.edit",
+            "comment" => "comments.edit",
+            default => null,
+        };
+
+        if (!isset($permString)) {
+            throw new ClientException("Unexpected record type.");
+        }
+
+        $categoryID = $report["placeRecordType"] === "category" ? $report["placeRecordID"] : null;
+        $this->permission($permString, $categoryID);
+
+        return ApiUtils::convertInputKeys($premoderatedRecord);
     }
 }

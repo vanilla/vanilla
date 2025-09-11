@@ -77,11 +77,17 @@
     }
   },
   {
-    "type": "p",
+    "type": "rich_embed_inline",
+    "dataSourceType": "url",
+    "url": "https://example.com/",
     "children": [
       {
-        "text": ""
+        "text": "https://example.com/"
       }
-    ]
+    ],
+    "error": {
+      "message": "Site 'example.com' did not respond successfully."
+    }
+
   }
 ]

@@ -8,6 +8,7 @@
 namespace Vanilla\Dashboard\Models;
 
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Forum\Models\CommunityManagement\ReportModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
@@ -36,7 +37,7 @@ class PremoderationTest extends SiteTestCase
     use DatabaseTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -57,6 +58,12 @@ class PremoderationTest extends SiteTestCase
     public function testBasic(): void
     {
         $moderationUser = $this->createUser(["name" => "MyAutoMod"]);
+
+        $notifyUser = $this->createUser(
+            ["name" => "MyAutoMod1", "roleID" => \RoleModel::MOD_ID],
+            ["Admin" => 1],
+            ["report" => ["popup" => true, "email" => true]]
+        );
         $this->mockPremoderationResponse(
             new PremoderationResponse(PremoderationResponse::SPAM, $moderationUser["userID"])
         );
@@ -78,6 +85,9 @@ class PremoderationTest extends SiteTestCase
             $premodDiscussion,
             $expectedFields + ["reasons.0.reportReasonID" => ReportReasonModel::INITIAL_REASON_SPAM_AUTOMATION]
         );
+
+        $notification = $this->assertNotification($notifyUser["userID"], ["t.Name" => "Report"]);
+        $this->assertSame(url("/dashboard/content/reports", true), $notification["Url"]);
     }
 
     /**
@@ -285,7 +295,13 @@ class PremoderationTest extends SiteTestCase
         $member = $this->createUserWithCategoryPermissions($cat);
 
         // Member creates a post and gets premoderated
-        $this->mockPremoderationResponse(new PremoderationResponse(PremoderationResponse::SPAM, null));
+        $this->mockPremoderationResponse(
+            new PremoderationResponse(
+                PremoderationResponse::SPAM,
+                null,
+                PremoderationResponse::PREMODERATION_SPAM_STOP_FORUM_SPAM
+            )
+        );
         $discussion = $this->createDiscussion([
             "name" => "comment parent",
         ]);
@@ -297,6 +313,14 @@ class PremoderationTest extends SiteTestCase
         }, $member);
 
         $this->assertEquals(202, $this->lastCommunityResponse->getStatusCode());
+        $response = $this->lastCommunityResponse->getBody();
+        $this->assertSame("Your comment will appear after it is approved.", $response["message"]);
+        $this->assertArrayHasKey("premoderationReasons", $response);
+        $this->assertCount(1, $response["premoderationReasons"]);
+        $this->assertSame(
+            PremoderationResponse::PREMODERATION_SPAM_STOP_FORUM_SPAM,
+            $response["premoderationReasons"][0]["premoderationType"]
+        );
         $report = $this->assertReportForRecord($comment);
 
         // Now we approve it
@@ -316,6 +340,13 @@ class PremoderationTest extends SiteTestCase
             ]);
         }, $member);
         $this->assertEquals(202, $response->getStatusCode());
+        $this->assertSame("Your comment will appear after it is approved.", $response["message"]);
+        $this->assertArrayHasKey("premoderationReasons", $response);
+        $this->assertCount(1, $response["premoderationReasons"]);
+        $this->assertSame(
+            PremoderationResponse::PREMODERATION_SPAM_STOP_FORUM_SPAM,
+            $response["premoderationReasons"][0]["premoderationType"]
+        );
         $report2ID = $response->getBody()["reportID"];
         $response = $this->runWithUser(function () use ($commentID) {
             return $this->api()->patch("/comments/{$commentID}", [
@@ -323,6 +354,13 @@ class PremoderationTest extends SiteTestCase
             ]);
         }, $member);
         $this->assertEquals(202, $response->getStatusCode());
+        $this->assertSame("Your comment will appear after it is approved.", $response["message"]);
+        $this->assertArrayHasKey("premoderationReasons", $response);
+        $this->assertCount(1, $response["premoderationReasons"]);
+        $this->assertSame(
+            PremoderationResponse::PREMODERATION_SPAM_STOP_FORUM_SPAM,
+            $response["premoderationReasons"][0]["premoderationType"]
+        );
         $report3ID = $response->getBody()["reportID"];
 
         $reports = $this->api()
@@ -378,10 +416,24 @@ class PremoderationTest extends SiteTestCase
             });
         }, $cat2Mod);
 
-        $this->mockPremoderationResponse(new PremoderationResponse(PremoderationResponse::APPROVAL_REQUIRED, null));
+        $this->mockPremoderationResponse(
+            new PremoderationResponse(
+                PremoderationResponse::APPROVAL_REQUIRED,
+                null,
+                PremoderationResponse::PREMODERATION_CATEGORY
+            )
+        );
         $result = $this->runWithUser(function () use ($cat1) {
             return $this->createDiscussion(["categoryID" => $cat1["categoryID"]]);
         }, $cat2Mod);
+        $response = $this->lastCommunityResponse->getBody();
+        $this->assertSame("Your post will appear after it is approved.", $response["message"]);
+        $this->assertArrayHasKey("premoderationReasons", $response);
+        $this->assertCount(1, $response["premoderationReasons"]);
+        $this->assertSame(
+            PremoderationResponse::PREMODERATION_CATEGORY,
+            $response["premoderationReasons"][0]["premoderationType"]
+        );
         $this->assertEquals(
             202,
             $this->lastCommunityResponse->getStatusCode(),
@@ -407,7 +459,14 @@ class PremoderationTest extends SiteTestCase
             return $this->createDiscussion();
         }, $memberNeedsApproval);
         $this->assertEquals(202, $this->lastCommunityResponse->getStatusCode());
-
+        $response = $this->lastCommunityResponse->getBody();
+        $this->assertSame("Your post will appear after it is approved.", $response["message"]);
+        $this->assertArrayHasKey("premoderationReasons", $response);
+        $this->assertCount(1, $response["premoderationReasons"]);
+        $this->assertSame(
+            PremoderationResponse::PREMODERATION_ROLE,
+            $response["premoderationReasons"][0]["premoderationType"]
+        );
         // Now let's verify the user
         $this->api()->patch("/reports/{$post["reportID"]}/approve-record", ["verifyRecordUser" => true]);
 
@@ -442,7 +501,14 @@ class PremoderationTest extends SiteTestCase
             $this->createDiscussion();
         }, $member);
         $this->assertEquals(202, $this->lastCommunityResponse->getStatusCode());
-
+        $response = $this->lastCommunityResponse->getBody();
+        $this->assertSame("Your post will appear after it is approved.", $response["message"]);
+        $this->assertArrayHasKey("premoderationReasons", $response);
+        $this->assertCount(1, $response["premoderationReasons"]);
+        $this->assertSame(
+            PremoderationResponse::PREMODERATION_CATEGORY,
+            $response["premoderationReasons"][0]["premoderationType"]
+        );
         // Not for comments though.
         $discussion = $this->createDiscussion();
         $this->runWithUser(function () use ($discussion) {
@@ -452,14 +518,15 @@ class PremoderationTest extends SiteTestCase
     }
 
     /**
-     * Test that keyword based moderation works.
+     * Test that keyword based moderation works for unverified users but bypasses verified users.
      */
     public function testKeywordApprovalRequirement(): void
     {
-        $member = $this->createUser(
+        // Test that unverified users get keyword moderation
+        $unverifiedMember = $this->createUser(
             [],
             [
-                "Verified" => true,
+                "Verified" => false,
             ]
         );
 
@@ -469,13 +536,65 @@ class PremoderationTest extends SiteTestCase
 
         $this->runWithUser(function () {
             $this->createDiscussion(["name" => "very naughty"]);
-        }, $member);
+        }, $unverifiedMember);
         $this->assertEquals(202, $this->lastCommunityResponse->getStatusCode());
 
         $this->runWithUser(function () {
             $this->createDiscussion(["body" => "ugly"]);
-        }, $member);
+        }, $unverifiedMember);
         $this->assertEquals(202, $this->lastCommunityResponse->getStatusCode());
+
+        // Test that verified users bypass keyword moderation
+        $verifiedMember = $this->createUser(
+            [],
+            [
+                "Verified" => true,
+            ]
+        );
+
+        $this->runWithUser(function () {
+            $this->createDiscussion(["name" => "very naughty"]);
+        }, $verifiedMember);
+        $this->assertEquals(201, $this->lastCommunityResponse->getStatusCode());
+
+        $this->runWithUser(function () {
+            $this->createDiscussion(["body" => "ugly"]);
+        }, $verifiedMember);
+        $this->assertEquals(201, $this->lastCommunityResponse->getStatusCode());
+    }
+
+    /**
+     * Test that admin users and users with moderation permissions bypass keyword moderation.
+     */
+    public function testKeywordModerationBypasses(): void
+    {
+        $this->setConfigs([
+            ApprovalPremoderator::CONF_PREMODERATED_KEYWORDS => "naughty;ugly",
+        ]);
+
+        // Test that admin users bypass keyword moderation
+        $adminUser = $this->createUser(["roleID" => [\RoleModel::ADMIN_ID]]);
+        $this->runWithUser(function () {
+            $this->createDiscussion(["name" => "very naughty"]);
+        }, $adminUser);
+        $this->assertEquals(201, $this->lastCommunityResponse->getStatusCode());
+
+        $this->runWithUser(function () {
+            $this->createDiscussion(["body" => "ugly"]);
+        }, $adminUser);
+        $this->assertEquals(201, $this->lastCommunityResponse->getStatusCode());
+
+        // Test that users with Garden.Moderation.Manage permission bypass keyword moderation
+        $moderatorUser = $this->createUser(["roleID" => \RoleModel::MOD_ID]);
+        $this->runWithUser(function () {
+            $this->createDiscussion(["name" => "very naughty"]);
+        }, $moderatorUser);
+        $this->assertEquals(201, $this->lastCommunityResponse->getStatusCode());
+
+        $this->runWithUser(function () {
+            $this->createDiscussion(["body" => "ugly"]);
+        }, $moderatorUser);
+        $this->assertEquals(201, $this->lastCommunityResponse->getStatusCode());
     }
 
     /**
@@ -489,7 +608,13 @@ class PremoderationTest extends SiteTestCase
 
         $comment = $this->createComment();
         $member = $this->createUser();
-        $this->mockPremoderationResponse(new PremoderationResponse(PremoderationResponse::SPAM, null));
+        $this->mockPremoderationResponse(
+            new PremoderationResponse(
+                PremoderationResponse::SPAM,
+                null,
+                PremoderationResponse::PREMODERATION_SPAM_STOP_FORUM_SPAM
+            )
+        );
         $this->runWithUser(function () use ($discussion, $comment) {
             $response = $this->bessy()
                 ->post("/post/comment/?discussionid={$discussion["discussionID"]}", [
@@ -502,6 +627,44 @@ class PremoderationTest extends SiteTestCase
                 ->getInformMessages();
             $this->assertSame("Your comment will appear after it is approved.", $response[0]["Message"]);
         }, $member);
+    }
+
+    /**
+     * Test sending optional update content to premoderated post for approval.
+     *
+     * @return void
+     */
+    public function testApproveWithOptionalRecordUpdate()
+    {
+        $this->createCategory();
+        $member = $this->createUser();
+        $this->mockPremoderationResponse(new PremoderationResponse(PremoderationResponse::APPROVAL_REQUIRED, null));
+
+        CurrentTimeStamp::mockTime(time());
+        $premodItem = $this->runWithUser(function () {
+            return $this->createDiscussion([
+                "name" => "My name",
+                "body" => "[{\"type\":\"p\",\"children\":[{\"text\":\"banana\"}]}]",
+                "format" => Rich2Format::FORMAT_KEY,
+            ]);
+        }, $member);
+        $report = $this->assertReportForRecord($premodItem);
+
+        CurrentTimeStamp::mockTime(time());
+
+        $report = $this->api()
+            ->patch("/reports/{$report["reportID"]}/approve-record", [
+                "premoderatedRecord" => [
+                    "name" => "what is your favorite fruit?",
+                    "body" => "[{\"type\":\"p\",\"children\":[{\"text\":\"pineapple\"}]}]",
+                    "format" => "rich2",
+                ],
+            ])
+            ->getBody();
+
+        $this->api()
+            ->get("/discussions/{$report["recordID"]}")
+            ->assertJsonObjectLike(["name" => "what is your favorite fruit?", "body" => "<p>pineapple</p>"]);
     }
 
     /**

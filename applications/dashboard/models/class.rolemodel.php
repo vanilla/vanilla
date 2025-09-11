@@ -872,7 +872,7 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function insert($fields)
     {
@@ -882,7 +882,7 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function update($fields, $where = false, $limit = false)
     {
@@ -1159,7 +1159,7 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function fetchFragments(array $ids, array $options = []): array
     {

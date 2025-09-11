@@ -19,7 +19,7 @@ export const mockedCategories = [
         customPermissions: false,
         isArchived: false,
         urlcode: "mocked-category",
-        displayAs: CategoryDisplayAs.DISCUSSIONS,
+        displayAs: CategoryDisplayAs.Discussions,
         countCategories: 0,
         countDiscussions: 10,
         countComments: 20,

@@ -13,8 +13,9 @@ import { mountPortal } from "@vanilla/react-utils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { MODAL_CONTAINER_ID, PAGE_CONTAINER_ID } from "@library/modal/mountModal";
 import { ModalContext } from "@library/modal/Modal.context";
+import { isVisible } from "@testing-library/user-event/dist/cjs/utils/index.js";
 
-interface IProps {
+interface IModalProps {
     id?: string;
     className?: string;
     exitHandler?: (event?: React.SyntheticEvent<any>) => void;
@@ -51,10 +52,13 @@ interface IState {
  * - Prevents scrolling of the body.
  * - Focuses the first focusable element in the Modal.
  */
-export default class ModalLoadable extends React.Component<IProps, IState> {
-    public static stack: ModalLoadable[] = [];
-    private closeFocusElement: HTMLElement | null = null;
+export default class Modal extends React.Component<IModalProps, IState> {
+    public static stack: Modal[] = [];
     private selfRef = React.createRef<HTMLDivElement>();
+
+    public static defaultProps = {
+        isVisible: true,
+    };
 
     public state: IState = {
         wasDestroyed: !this.props.isVisible,
@@ -78,7 +82,7 @@ export default class ModalLoadable extends React.Component<IProps, IState> {
                     scrollable={this.props.scrollable}
                     onKeyDown={this.handleTabbing}
                     onModalClick={this.handleModalClick}
-                    onOverlayClick={this.handleScrimClick}
+                    onExit={this.onExit}
                     description={this.props.description}
                     size={this.props.size}
                     modalRef={this.selfRef}
@@ -88,6 +92,8 @@ export default class ModalLoadable extends React.Component<IProps, IState> {
                     onKeyPress={this.props.onKeyPress}
                     realRootID={this.state.realRootID}
                     isFixHeight={this.props.isFixHeight}
+                    elementToFocusOnExit={this.props.elementToFocusOnExit}
+                    noFocusOnExit={this.props.noFocusOnExit}
                 >
                     <ModalContext.Provider value={{ isInModal: true }}>{this.props.children}</ModalContext.Provider>
                 </ModalView>
@@ -128,27 +134,14 @@ A modal was mounted, but the page container could not be found.
 Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it can be hidden to screenreaders.
             `);
         }
-        document.addEventListener("keydown", this.handleDocumentEscapePress);
-    }
-
-    /**
-     * Handle unmount.
-     */
-    public componentWillUnmount() {
-        document.removeEventListener("keydown", this.handleDocumentEscapePress);
-        if (!this.props.noFocusOnExit) {
-            // We were destroyed so we should focus back to the last element.
-            this.closeFocusElement?.focus();
-        }
     }
 
     public onMountIn = () => {
         const pageContainer = this.getPageContainer();
-        this.setCloseFocusElement();
         this.focusInitialElement();
-        pageContainer && pageContainer.setAttribute("aria-hidden", true);
+        pageContainer && pageContainer.setAttribute("aria-hidden", "true");
 
-        ModalLoadable.stack.push(this);
+        Modal.stack.push(this);
     };
 
     public handleDestroyed = () => {
@@ -160,31 +153,21 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
 
         const pageContainer = this.getPageContainer();
         // Set aria-hidden on page and reenable scrolling if we're removing the last modal
-        ModalLoadable.stack.pop();
-        if (ModalLoadable.stack.length === 0) {
+        Modal.stack.pop();
+        if (Modal.stack.length === 0) {
             pageContainer && pageContainer.removeAttribute("aria-hidden");
         } else {
-            pageContainer && pageContainer.setAttribute("aria-hidden", true);
+            pageContainer && pageContainer.setAttribute("aria-hidden", "true");
         }
     };
 
-    public componentDidUpdate(prevProps: IProps, prevState: IState) {
-        if (this.props.elementToFocusOnExit !== prevProps.elementToFocusOnExit) {
-            this.setCloseFocusElement();
-        }
-
+    public componentDidUpdate(prevProps: IModalProps, prevState: IState) {
         if (prevState.wasDestroyed && !this.state.wasDestroyed) {
             this.onMountIn();
         }
 
         if (!prevProps.isVisible && this.props.isVisible) {
             this.setState({ wasDestroyed: false });
-            this.setCloseFocusElement();
-        }
-
-        if (prevProps.isVisible && !this.props.isVisible && !this.props.noFocusOnExit) {
-            // We were destroyed so we should focus back to the last element.
-            this.closeFocusElement?.focus();
         }
     }
 
@@ -203,27 +186,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
     }
 
     /**
-     * Set focus on element to target when we close the modal
-     */
-    private setCloseFocusElement() {
-        // if we need to rerender the component, we don't want to include a bad value in the focus history
-        if (this.props.elementToFocusOnExit) {
-            this.closeFocusElement = this.props.elementToFocusOnExit;
-        } else {
-            // Get the last focused element
-            this.closeFocusElement = document.activeElement as HTMLElement;
-        }
-
-        if (debug() && (!this.closeFocusElement || this.closeFocusElement === document.documentElement)) {
-            const message = `
-Dev Mode Error: Could not detect an element to focus on <Modal /> close.
-
-It seems auto-detection isn't working, so you'll need to specify the "elementToFocusOnExit" props.`;
-            throw new Error(message);
-        }
-    }
-
-    /**
      * Handle tab keyboard presses.
      */
     private handleTabbing = (event: React.KeyboardEvent) => {
@@ -233,30 +195,6 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
             this.handleShiftTab(event);
         } else if (!event.shiftKey && event.keyCode === tabKey) {
             this.handleTab(event);
-        }
-    };
-
-    /**
-     * Handle escape press and close the top modal.
-     *
-     * This listener is added to the document in the event a non-focusable element inside the modal is clicked.
-     * In that case focus will be on the document.
-     *
-     * Because of this we have to be smarter and call only the top modal's escape handler.
-     */
-    private handleDocumentEscapePress = (event: React.SyntheticEvent | KeyboardEvent) => {
-        const escKey = 27;
-
-        if ("keyCode" in event && event.keyCode === escKey) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (ModalLoadable.stack.length === 1 && this.props.isWholePage) {
-                return;
-            } else {
-                if (this.props.exitHandler && this.props.isVisible) {
-                    this.props.exitHandler(event as any);
-                }
-            }
         }
     };
 
@@ -271,7 +209,7 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
     /**
      * Call the exit handler when the scrim is clicked directly.
      */
-    private handleScrimClick = (event: React.MouseEvent) => {
+    private onExit = (event: React.MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
         if (this.props.exitHandler) {

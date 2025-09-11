@@ -6,6 +6,7 @@
 
 import { ILayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
+import type { ISiteTotalApiCount } from "@library/siteTotals/SiteTotals.variables";
 import { getMeta } from "@library/utility/appUtils";
 import { t } from "@vanilla/i18n";
 import { IFormControl, JsonSchema } from "@vanilla/json-schema-forms";
@@ -26,6 +27,7 @@ export function showDisplayOptions(description: string): boolean {
         "Articles",
         "Category Articles",
         "Discussion List",
+        "Role Spotlight",
     ];
     return widgets.includes(description);
 }
@@ -229,6 +231,34 @@ export function widgetsSchemaTransformer(
      */
     if (schema.description === "Site Totals") {
         const { apiParams } = schema?.["properties"] ?? {};
+
+        if (value && !value.didFixupValues) {
+            const defaultCounts: ISiteTotalApiCount[] = apiParams.properties.counts.default ?? [];
+            const valueCounts: ISiteTotalApiCount[] = value.apiParams.counts ?? [];
+            const missingCounts = defaultCounts
+                .filter((count) => {
+                    if (!valueCounts.find((c) => c.recordType === count.recordType)) {
+                        return true;
+                    }
+                })
+                .map((count) => {
+                    return {
+                        ...count,
+                        isHidden: true,
+                    };
+                });
+
+            // Merge in missing counts into the instance (but mark them as hidden)
+            value = {
+                ...value,
+                didFixupValues: true,
+                apiParams: {
+                    ...value.apiParams,
+                    counts: [...value?.apiParams?.counts, ...missingCounts],
+                },
+            };
+        }
+
         const tempApiParams = {
             ...apiParams,
             properties: {
@@ -548,14 +578,16 @@ export function widgetsSchemaTransformer(
         ...transformedSchema,
         properties: {
             ...transformedSchema.properties,
-            $middleware: {
-                type: "object",
-                properties: middlewareSchemaProperties,
-                "x-control": {
-                    label: t("Conditions"),
-                    description: "",
+            ...(schema.description !== "Title Bar" && {
+                $middleware: {
+                    type: "object",
+                    properties: middlewareSchemaProperties,
+                    "x-control": {
+                        label: t("Conditions"),
+                        description: "",
+                    },
                 },
-            },
+            }),
         },
     };
 

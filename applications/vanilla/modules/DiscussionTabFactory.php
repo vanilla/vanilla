@@ -9,7 +9,7 @@ namespace Vanilla\Forums\Modules;
 
 use Garden\Container\Reference;
 use Vanilla\Forum\Modules\DiscussionWidgetModule;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\AbstractTabWidgetTabFactory;
 
 /**
@@ -21,6 +21,8 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory
     public const PRESET_TRENDING_DISCUSSIONS = "trending-discussions";
     public const PRESET_TOP_DISCUSSIONS = "top-discussions";
     public const PRESET_ANNOUNCEMENTS = "announcements";
+    public const PRESET_RECENTLY_ACTIVE_DISCUSSIONS = "recently-active-discussions";
+    public const PRESET_NEWEST_DISCUSSIONS = "newest-discussions";
 
     /** @var string */
     protected $presetID;
@@ -67,9 +69,9 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory
     }
 
     /**
-     * @return AbstractReactModule
+     * @return LegacyReactModule
      */
-    public function getTabModule(): AbstractReactModule
+    public function getTabModule(): LegacyReactModule
     {
         /** @var DiscussionWidgetModule $module */
         $module = parent::getTabModule();
@@ -163,6 +165,46 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory
                 "pinned" => true,
             ],
             true,
+        ]);
+    }
+
+    /**
+     * Get a reference for a factory of recently active discussion tabs.
+     *
+     * @return Reference
+     */
+    public static function getRecentlyActiveDiscussionsReference(): Reference
+    {
+        return new Reference(static::class, [
+            self::PRESET_RECENTLY_ACTIVE_DISCUSSIONS,
+            "Recently Active Discussions",
+            [
+                "type" => "discussion",
+                "excludeHiddenCategories" => true,
+                "sort" => "-dateLastComment",
+                "pinOrder" => "mixed",
+            ],
+            false,
+        ]);
+    }
+
+    /**
+     * Get a reference for a factory of newest discussion tabs.
+     *
+     * @return Reference
+     */
+    public static function getNewestDiscussionsReference(): Reference
+    {
+        return new Reference(static::class, [
+            self::PRESET_NEWEST_DISCUSSIONS,
+            "Newest Discussions",
+            [
+                "type" => "discussion",
+                "excludeHiddenCategories" => true,
+                "sort" => "-dateInserted",
+                "pinOrder" => "mixed",
+            ],
+            false,
         ]);
     }
 }

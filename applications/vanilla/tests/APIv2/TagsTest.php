@@ -37,7 +37,7 @@ class TagsTest extends AbstractResourceTest
     private const TYPE = "someType";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -437,61 +437,6 @@ class TagsTest extends AbstractResourceTest
         $tagWithTypeEmptyString = $this->api()
             ->get($this->baseUrl . "/" . $returnedTag["tagID"])
             ->getBody();
-    }
-
-    /**
-     * Test that tags with types in the Tagging.Discussions.AllowedTypes config array are editable.
-     *
-     * @throws \Garden\Container\ContainerException Container Exception.
-     * @throws \Garden\Container\NotFoundException Not Found Exception.
-     */
-    public function testCanEditAllowedTypes()
-    {
-        $config = \Gdn::getContainer()->get(\Gdn_Configuration::class);
-        $config->saveToConfig("Tagging.Discussions.AllowedTypes", ["", "allowed", "notAllowed"]);
-        $config->saveToConfig("Tagging.Discussions.Enabled", true);
-        $allowedTag = [
-            "name" => "allowed tag",
-            "type" => "allowed",
-        ];
-        $notAllowedTag = [
-            "name" => "not allowed tag",
-            "type" => "notAllowed",
-        ];
-        $returnedAllowed = $this->api()
-            ->post($this->baseUrl, $allowedTag)
-            ->getBody();
-        $returnedNotAllowed = $this->api()
-            ->post($this->baseUrl, $notAllowedTag)
-            ->getBody();
-        $tagSettingsHtml = $this->bessy()
-            ->getHtml("/settings/tagging")
-            ->getInnerHtml();
-        $this->assertStringContainsString($this->createEditLink($returnedAllowed["tagID"]), $tagSettingsHtml);
-        $this->assertStringContainsString($this->createEditLink($returnedNotAllowed["tagID"]), $tagSettingsHtml);
-
-        // Now we're going to remove the "notAllowed" tag from the allowed types, and only the 'allowed tag' should be returned.
-        $config->saveToConfig("Tagging.Discussions.AllowedTypes", ["", "allowed"]);
-        $updatedTagSettingsHtml = $this->bessy()
-            ->getHtml("/settings/tagging")
-            ->getInnerHtml();
-        $this->assertStringContainsString($this->createEditLink($returnedAllowed["tagID"]), $updatedTagSettingsHtml);
-        $this->assertStringNotContainsString(
-            $this->createEditLink($returnedNotAllowed["tagID"]),
-            $updatedTagSettingsHtml
-        );
-    }
-
-    /**
-     * Create the edit link with the appropriateTagID for the
-     *
-     * @param int $tagID
-     * @return string
-     */
-    public function createEditLink(int $tagID): string
-    {
-        $url = url("/settings/tags/edit/$tagID", true);
-        return "href=\"$url\"";
     }
 
     /**

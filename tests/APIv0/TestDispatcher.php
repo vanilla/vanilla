@@ -11,6 +11,7 @@ use Garden\Container\Container;
 use Garden\EventManager;
 use Garden\Web\ControllerDispatchedEvent;
 use Garden\Web\Data;
+use Gdn_Format;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Analytics\TrackableLegacyControllerInterface;
@@ -525,6 +526,7 @@ class TestDispatcher
      */
     private function resetStatics()
     {
+        \Gdn_Form::resetIDs();
         \Gdn_Theme::resetSection();
         if (class_exists(\CategoryModel::class, false)) {
             \CategoryModel::reset();

@@ -95,7 +95,7 @@ class CategoriesTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function triggerDirtyRecords()
     {
@@ -1362,5 +1362,43 @@ class CategoriesTest extends AbstractResourceTest
                 ->assertCount(1)
                 ->assertJsonArrayValues(["categoryID" => [$category]]);
         }, $user);
+    }
+
+    /**
+     * Test that the insertUserID, updateUserID, dateInserted, and dateUpdated can be overwritten.
+     *
+     * @return void
+     */
+    public function testMigratableFields(): void
+    {
+        $this->createUser();
+
+        $this->createCategory([
+            "dateInserted" => "2012-12-21",
+            "dateUpdated" => "2012-12-22",
+            "insertUserID" => $this->lastUserID,
+            "updateUserID" => $this->lastUserID,
+        ]);
+        $this->api->get($this->baseUrl . "/" . $this->lastInsertedCategoryID)->assertJsonObjectLike([
+            "dateInserted" => "2012-12-21T00:00:00+00:00",
+            "dateUpdated" => "2012-12-22T00:00:00+00:00",
+            "insertUserID" => $this->lastUserID,
+            "updateUserID" => $this->lastUserID,
+        ]);
+
+        $this->createUser();
+        $this->api
+            ->patch($this->baseUrl . "/" . $this->lastInsertedCategoryID, [
+                "dateInserted" => "2013-12-21",
+                "dateUpdated" => "2013-12-22",
+                "insertUserID" => $this->lastUserID,
+                "updateUserID" => $this->lastUserID,
+            ])
+            ->assertJsonObjectLike([
+                "dateInserted" => "2013-12-21T00:00:00+00:00",
+                "dateUpdated" => "2013-12-22T00:00:00+00:00",
+                "insertUserID" => $this->lastUserID,
+                "updateUserID" => $this->lastUserID,
+            ]);
     }
 }

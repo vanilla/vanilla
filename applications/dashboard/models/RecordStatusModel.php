@@ -309,6 +309,12 @@ class RecordStatusModel extends FullRecordCacheModel implements LoggerAwareInter
         if (!isset($set["isInternal"]) || $set["isInternal"] === null) {
             $set["isInternal"] = false;
         }
+
+        // Sanitize name field to prevent XSS attacks
+        if (isset($set["name"])) {
+            $set["name"] = htmlspecialchars($set["name"], ENT_QUOTES, "UTF-8");
+        }
+
         $result = parent::insert($set, $options);
         $recordType = $set["recordType"] ?? null;
         $this->updateRecordTypeStatus($result, $recordType, $set);
@@ -341,6 +347,12 @@ class RecordStatusModel extends FullRecordCacheModel implements LoggerAwareInter
         if (!isset($set["isInternal"]) || $set["isInternal"] === null) {
             $set["isInternal"] = false;
         }
+
+        // Sanitize name field to prevent XSS attacks
+        if (isset($set["name"])) {
+            $set["name"] = htmlspecialchars($set["name"], ENT_QUOTES, "UTF-8");
+        }
+
         $result = parent::update($set, $where, $options);
         $statusID = $where["statusID"] ?? null;
         $this->updateRecordTypeStatus($statusID, null, $set);

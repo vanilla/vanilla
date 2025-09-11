@@ -14,7 +14,7 @@ class CodeLine extends AbstractNode
     public bool $getChildren = false;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -22,7 +22,7 @@ class CodeLine extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -30,7 +30,7 @@ class CodeLine extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getTextEnd(): string
     {
@@ -38,7 +38,7 @@ class CodeLine extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

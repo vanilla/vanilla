@@ -134,12 +134,12 @@ class BannerImageModel
      * Like {@link self::getBannerImageSlug()} but returns the fully qualified URL.
      *
      * @param mixed $categoryID
-     * @return mixed|string|null
+     * @return string|null
      */
     public static function getBannerImageUrl(mixed $categoryID)
     {
         $slug = self::getBannerImageSlug($categoryID);
-        return $slug ? \Gdn_Upload::url($slug) : $slug;
+        return $slug ? \Gdn_Upload::url($slug) : null;
     }
 
     /**

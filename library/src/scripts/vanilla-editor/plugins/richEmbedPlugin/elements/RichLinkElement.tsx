@@ -9,7 +9,7 @@ import { setRichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbed
 import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 import { IVanillaLinkElement } from "@library/vanilla-editor/typescript";
 import { findNodePath, focusEditor, getNodeString, PlateRenderElementProps } from "@udecode/plate-common";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 
 interface IProps extends PlateRenderElementProps<any, IVanillaLinkElement> {}
 
@@ -22,9 +22,9 @@ interface IProps extends PlateRenderElementProps<any, IVanillaLinkElement> {}
 export function RichLinkElement(props: IProps) {
     const { attributes, children, nodeProps, element, editor } = props;
 
-    const { forceBasicLink } = element;
+    const { forceBasicLink, url } = element;
+
     const textContent = getNodeString(element);
-    const { url } = element;
 
     const ownPath = findNodePath(editor, element);
     useEffect(() => {

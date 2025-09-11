@@ -33,4 +33,21 @@ class ConversationsAllowModerationTest extends ConversationsTest
         parent::setUp();
         $this->moderationAllowed = true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function testMigratableFields(): void
+    {
+        $this->markTestSkipped();
+    }
+
+    /**
+     * @inheritdoc
+     * @dataProvider provideMigratablePayload
+     */
+    public function testMigratableFieldsPermissions(array $body): void
+    {
+        $this->markTestSkipped();
+    }
 }

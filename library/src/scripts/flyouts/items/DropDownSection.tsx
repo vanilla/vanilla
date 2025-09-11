@@ -11,7 +11,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
 
-interface IProps {
+interface IDropDownSectionProps {
     title: string;
     className?: string;
     level?: 2 | 3;
@@ -22,26 +22,24 @@ interface IProps {
 /**
  * Implements DropDownSection component. It add a heading to a group of elements in a DropDown menu
  */
-export default class DropDownSection extends React.Component<IProps> {
-    public render() {
-        const classes = dropDownClasses();
-        const sectionNavTitle = uniqueIDFromPrefix("sectionNavTitle");
-        return (
-            <>
-                {!this.props.noSeparator && <DropDownItemSeparator />}
-                <li className={classNames("dropDown-section", classes.section, this.props.className)}>
-                    <nav aria-describedby={sectionNavTitle}>
-                        <Heading
-                            id={sectionNavTitle}
-                            title={this.props.title}
-                            className={classNames("dropDown-sectionHeading", classes.sectionHeading)}
-                        />
-                        <ul className={classNames("dropDown-sectionContents", classes.sectionContents)}>
-                            {this.props.children}
-                        </ul>
-                    </nav>
-                </li>
-            </>
-        );
-    }
+export default function DropDownSection(props: IDropDownSectionProps) {
+    const classes = dropDownClasses.useAsHook();
+    const sectionNavTitle = uniqueIDFromPrefix("sectionNavTitle");
+    return (
+        <>
+            {!props.noSeparator && <DropDownItemSeparator />}
+            <li className={classNames("dropDown-section", classes.section, props.className)}>
+                <nav aria-describedby={sectionNavTitle}>
+                    <Heading
+                        id={sectionNavTitle}
+                        title={props.title}
+                        className={classNames("dropDown-sectionHeading", classes.sectionHeading)}
+                    />
+                    <ul className={classNames("dropDown-sectionContents", classes.sectionContents)}>
+                        {props.children}
+                    </ul>
+                </nav>
+            </li>
+        </>
+    );
 }

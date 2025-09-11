@@ -35,7 +35,7 @@ class SiteTestCase extends VanillaTestCase
     use SiteTestTrait, SetupTraitsTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function setUpBeforeClass(): void
     {
@@ -44,7 +44,7 @@ class SiteTestCase extends VanillaTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -53,7 +53,7 @@ class SiteTestCase extends VanillaTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {
@@ -75,7 +75,7 @@ class SiteTestCase extends VanillaTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function tearDownAfterClass(): void
     {

@@ -1,37 +1,29 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import { LoadStatus } from "@library/@types/api/core";
 import { IAccountModalForm, IAccountSettingFormHandle } from "@library/accountSettings/AccountSettingsModal";
-import { StatusIndicator } from "@library/accountSettings/StatusIndicator";
-import { useUsernameAvailability } from "@library/accountSettings/forms/EditUsername.hooks";
-import { useCurrentUser, usePatchUser } from "@library/features/users/userHooks";
-import InputTextBlock from "@library/forms/InputTextBlock";
+import { MutableRefObject, ReactNode, forwardRef, useEffect, useImperativeHandle, useMemo, useState } from "react";
+
 import { ApproveIcon } from "@library/icons/common";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import { ToolTip } from "@library/toolTip/ToolTip";
-import { t } from "@vanilla/i18n";
-import React, {
-    forwardRef,
-    MutableRefObject,
-    ReactNode,
-    useEffect,
-    useImperativeHandle,
-    useMemo,
-    useState,
-} from "react";
-import { editUsernameClasses } from "@library/accountSettings/forms/EditUsername.classes";
-import { Icon } from "@vanilla/icons";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { useToast } from "@library/features/toaster/ToastContext";
-import Message from "@library/messages/Message";
-import { accountSettingsClasses } from "@library/accountSettings/AccountSettings.classes";
+import { Icon } from "@vanilla/icons";
 import InputBlock from "@library/forms/InputBlock";
-import { useAccountSettings } from "@library/accountSettings/AccountSettingsContext";
+import InputTextBlock from "@library/forms/InputTextBlock";
+import Message from "@library/messages/Message";
 import PasswordInput from "@library/forms/PasswordInput";
+import { StatusIndicator } from "@library/accountSettings/StatusIndicator";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import { accountSettingsClasses } from "@library/accountSettings/AccountSettings.classes";
+import { editUsernameClasses } from "@library/accountSettings/forms/EditUsername.classes";
+import { t } from "@vanilla/i18n";
+import { useAccountSettings } from "@library/accountSettings/AccountSettingsContext";
+import { useToast } from "@library/features/toaster/ToastContext";
+import { useUserMutation } from "@library/features/users/userHooks";
+import { useUsernameAvailability } from "@library/accountSettings/forms/EditUsername.hooks";
 
 interface IProps extends IAccountModalForm {}
 
@@ -56,7 +48,7 @@ export const EditUsername = forwardRef(function UsernameEditImpl(
         // If you are editing another members information, it depends on your permissions
         return canEditUsernames;
     }, [canEditUsernames, isViewingSelf]);
-    const { patchUser, patchErrors, patchStatus } = usePatchUser(viewingUserID);
+    const userMutation = useUserMutation();
     const { addToast } = useToast();
 
     // Cache the initial username
@@ -79,27 +71,23 @@ export const EditUsername = forwardRef(function UsernameEditImpl(
         }
     }, [initialUsername]);
 
-    // Sync save status with parent modal
     useEffect(() => {
-        switch (patchStatus) {
-            case LoadStatus.LOADING:
-                setIsSaving(true);
-                break;
-            case LoadStatus.SUCCESS:
-                setIsSaving(false);
-                setIsSuccess(true);
-                addToast({
-                    autoDismiss: true,
-                    body: <>{t("Username changed successfully.")}</>,
-                });
-                break;
-
-            default:
-                setIsSaving(false);
-                setIsSuccess(false);
-                break;
+        if (userMutation.isSuccess) {
+            setIsSaving(false);
+            setIsSuccess(true);
+            addToast({
+                autoDismiss: true,
+                body: <>{t("Username changed successfully.")}</>,
+            });
         }
-    }, [patchStatus, patchErrors]);
+        if (userMutation.isError) {
+            setIsSaving(false);
+            setIsSuccess(false);
+        }
+        if (userMutation.isLoading) {
+            setIsSaving(true);
+        }
+    }, [userMutation.isSuccess, userMutation.isError, userMutation.isLoading]);
 
     // Determine if the user has touched the username form
     const isFieldDirty = useMemo(() => {
@@ -164,7 +152,7 @@ export const EditUsername = forwardRef(function UsernameEditImpl(
         ref,
         () => ({
             onSave: () => {
-                void patchUser({
+                userMutation.mutate({
                     userID: viewingUserID,
                     name: username,
                     ...(password && { passwordConfirmation: password }),
@@ -174,13 +162,15 @@ export const EditUsername = forwardRef(function UsernameEditImpl(
         [username, password, initialUsername],
     );
 
+    const fieldErrors = userMutation.error?.errors;
+
     return (
         <>
-            {patchErrors && (
+            {userMutation.isError && (
                 <Message
                     className={accountSettingsClasses().topLevelErrors}
                     type={"error"}
-                    stringContents={patchErrors.message}
+                    stringContents={userMutation.error.message}
                 />
             )}
             <InputBlock label={t("Current Username")}>
@@ -194,7 +184,7 @@ export const EditUsername = forwardRef(function UsernameEditImpl(
                     </span>
                 }
                 noteAfterInput={t("Your new username must be unique")}
-                errors={patchErrors?.errors?.username || usernameErrors}
+                errors={fieldErrors?.name || usernameErrors}
                 inputProps={{
                     required: true,
                     onChange: (event) => {
@@ -208,7 +198,7 @@ export const EditUsername = forwardRef(function UsernameEditImpl(
                 extendErrorMessage
             />
             {!skipPasswordConfirmation && (
-                <InputBlock label={t("Password")} errors={patchErrors?.errors?.password} extendErrorMessage>
+                <InputBlock label={t("Password")} errors={fieldErrors?.currentPassword} extendErrorMessage>
                     <PasswordInput
                         id={"password"}
                         onChange={(event) => setPassword(event.target.value)}

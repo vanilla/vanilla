@@ -68,7 +68,7 @@ HTML;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

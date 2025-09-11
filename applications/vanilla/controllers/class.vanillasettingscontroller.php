@@ -20,6 +20,7 @@ use Vanilla\Http\InternalClient;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
+use Garden\Schema\ValidationField;
 
 /**
  * Handles displaying the dashboard "settings" pages for Vanilla via /settings endpoint.
@@ -42,6 +43,8 @@ class VanillaSettingsController extends Gdn_Controller
 
     /** @var array An array of category records. */
     public $OtherCategories;
+
+    private $RoleArray = [];
 
     public function __construct(private PostTypeModel $postTypeModel)
     {
@@ -79,6 +82,7 @@ class VanillaSettingsController extends Gdn_Controller
         $configurationModel = new Gdn_ConfigurationModel($validation);
 
         $configurationModel->setField([
+            "Garden.Format.Mentions" => "global",
             "Vanilla.Categories.MaxDisplayDepth",
             "Garden.InputFormatter",
             "Garden.MobileInputFormatter",
@@ -87,6 +91,7 @@ class VanillaSettingsController extends Gdn_Controller
             "Garden.Html.AllowedElements",
             "Garden.EditContentTimeout",
             "Vanilla.AdminCheckboxes.Use",
+            "Vanilla.Discussion.Title.MaxLength",
             "Vanilla.Comment.MaxLength",
             "Vanilla.Comment.MinLength",
             "Garden.Format.DisableUrlEmbeds",
@@ -95,6 +100,7 @@ class VanillaSettingsController extends Gdn_Controller
             "ImageUpload.Limits.Width",
             "ImageUpload.Limits.Height",
             "Vanilla.Drafts.Autosave",
+
             self::CONFIG_KALTURA_DOMAINS => [],
         ]);
 
@@ -131,6 +137,21 @@ class VanillaSettingsController extends Gdn_Controller
                 $this->Form->addError("The highest allowed limit is 50,000 characters");
             }
 
+            if (
+                $this->Form->_FormValues["Vanilla.Discussion.Title.MaxLength"] >
+                    DiscussionModel::MAX_TITLE_LENGTH_UPPER_LIMIT ||
+                $this->Form->_FormValues["Vanilla.Discussion.Title.MaxLength"] <
+                    DiscussionModel::MAX_TITLE_LENGTH_LOWER_LIMIT
+            ) {
+                $this->Form->addError(
+                    sprintf(
+                        "The max post title length must be between %s and %s",
+                        DiscussionModel::MAX_TITLE_LENGTH_LOWER_LIMIT,
+                        DiscussionModel::MAX_TITLE_LENGTH_UPPER_LIMIT
+                    )
+                );
+            }
+
             // Define some validation rules for the fields being saved
             $configurationModel->Validation->applyRule("Garden.InputFormatter", "Required");
             $configurationModel->Validation->applyRule("Garden.MobileInputFormatter", "Required");
@@ -144,6 +165,8 @@ class VanillaSettingsController extends Gdn_Controller
             $configurationModel->Validation->applyRule("Vanilla.Comment.MaxLength", "Integer");
             $configurationModel->Validation->applyRule("ImageUpload.Limits.Width", "Integer");
             $configurationModel->Validation->applyRule("ImageUpload.Limits.Height", "Integer");
+            $configurationModel->Validation->applyRule("Vanilla.Discussion.Title.MaxLength", "Required");
+            $configurationModel->Validation->applyRule("Vanilla.Discussion.Title.MaxLength", "Integer");
 
             // Save new settings
             $saved = $this->Form->save();
@@ -752,16 +775,10 @@ class VanillaSettingsController extends Gdn_Controller
             ->getBody();
 
         // Make a list of top-level post types.
-        $nestedOptions = array_map(
-            fn($postType) => !$postType["parentPostTypeID"]
-                ? ["value" => $postType["postTypeID"], "label" => $postType["name"], "group" => $postType["name"]]
-                : [
-                    "value" => $postType["postTypeID"],
-                    "label" => $postType["name"],
-                    "group" => $this->getGroupName($postType["parentPostTypeID"], $availablePostTypes),
-                ],
-            $availablePostTypes
-        );
+        $nestedOptions = [];
+        foreach ($availablePostTypes as $postType) {
+            $nestedOptions[$postType["postTypeID"]] = $postType["name"];
+        }
 
         $categoryID = null;
         if ($this->Category) {
@@ -794,7 +811,7 @@ class VanillaSettingsController extends Gdn_Controller
                     multiple: true
                 ),
             ],
-        ])->addFilter("", function ($data, \Garden\Schema\ValidationField $field) {
+        ])->addFilter("", function ($data, ValidationField $field) use ($availablePostTypes) {
             if (!ArrayUtils::isArray($data)) {
                 return $data;
             }
@@ -804,6 +821,13 @@ class VanillaSettingsController extends Gdn_Controller
                 $data["allowedPostTypeIDs"] = [];
             }
             unset($data["hasRestrictedPostTypes"]);
+
+            // Filter out invalid allowedPostTypeIDs
+            if (isset($data["allowedPostTypeIDs"]) && is_array($data["allowedPostTypeIDs"])) {
+                $validPostTypeIDs = array_column($availablePostTypes, "postTypeID");
+                $data["allowedPostTypeIDs"] = array_intersect($data["allowedPostTypeIDs"], $validPostTypeIDs);
+            }
+
             return $data;
         });
 
@@ -816,6 +840,7 @@ class VanillaSettingsController extends Gdn_Controller
         $instance = array_merge($instance, [
             "hasRestrictedPostTypes" => false,
             "allowedPostTypeIDs" => [],
+            "allowEventCreation" => $this->Category->AllowEventCreation ?? 1,
         ]);
         if (!empty($postTypesByCategory)) {
             $instance = array_merge($instance, [

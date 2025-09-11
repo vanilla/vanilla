@@ -59,7 +59,7 @@ export function DeleteCategoryModal(props: IProps) {
         () =>
             suggestions.data?.filter(
                 (category) =>
-                    category.categoryID !== categoryID && category.displayAs === CategoryDisplayAs.DISCUSSIONS,
+                    category.categoryID !== categoryID && category.displayAs === CategoryDisplayAs.Discussions,
             ),
         [suggestions.data, categoryID],
     );

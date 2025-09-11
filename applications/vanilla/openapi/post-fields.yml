@@ -7,7 +7,7 @@ paths:
             summary: List post fields.
             parameters:
                 - name: postTypeID
-                  description: Filter by post type.
+                  description: Filter by one ore more post types.
                   in: query
                   schema:
                       type: string
@@ -342,11 +342,6 @@ components:
                 isActive:
                     description: Whether the post field is active.
                     type: boolean
-                sort:
-                    description: >
-                        The sort value used for sorting fields within a post type.
-                        Only returned when filtering a list of results by postTypeID.
-                    type: integer
                 dateInserted:
                     description: When the post field was created.
                     format: date-time
@@ -373,7 +368,6 @@ components:
                 - dropdownOptions
                 - isRequired
                 - isActive
-                - sort
                 - dateInserted
                 - dateUpdated
                 - insertUserID

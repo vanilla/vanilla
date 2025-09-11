@@ -44,8 +44,8 @@ export default function NavLinks(props: IProps) {
     const { items, NoItemsComponent } = props;
 
     const viewAll = t("View All");
-    const classes = navLinksClasses();
-    const navLinkVars = navLinksVariables();
+    const classes = navLinksClasses.useAsHook();
+    const navLinkVars = navLinksVariables.useAsHook();
     const contents =
         items.length > 0
             ? items.map((item, i) => {

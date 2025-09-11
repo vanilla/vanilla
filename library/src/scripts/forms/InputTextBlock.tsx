@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React, { InputHTMLAttributes } from "react";
-import { inputClasses } from "@library/forms/inputStyles";
 import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
-import { getRequiredID } from "@library/utility/idUtils";
-import classNames from "classnames";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { inputClasses } from "@library/forms/inputStyles";
+import { useUniqueID } from "@library/utility/idUtils";
+import classNames from "classnames";
 import { Property } from "csstype";
+import React, { InputHTMLAttributes, useEffect, useRef } from "react";
 import { TextareaAutosize } from "react-autosize-textarea/lib/TextareaAutosize";
 
 export enum InputTextBlockBaseClass {
@@ -60,146 +60,87 @@ export interface IInputTextProps extends Omit<IInputBlockProps, "children" | "le
     };
 }
 
-export default class InputTextBlock extends React.Component<IInputTextProps> {
-    public static defaultProps = {
-        disabled: false,
-        type: "text",
-        errors: [],
-        baseClass: InputTextBlockBaseClass.STANDARD,
-        legacyMode: false,
-    };
+export default function InputTextBlock(props: IInputTextProps) {
+    const ownID = useUniqueID("inputText");
+    const id = props.id ?? ownID;
 
-    private id: string;
-    private ownInputRef = React.createRef<HTMLInputElement | HTMLTextAreaElement>();
-    private get inputRef() {
-        const { inputProps = {} } = this.props;
-        return inputProps.inputRef || this.ownInputRef;
-    }
+    const classesInput = inputClasses.useAsHook();
+    const classesInputBlock = inputBlockClasses.useAsHook();
 
-    public constructor(props) {
-        super(props);
-        this.id = getRequiredID(props, "inputText");
-    }
+    const { legacyMode = false, inputProps = {}, multiLineProps = {}, ...blockProps } = props;
+    const classes = classNames(classesInputBlock.inputText, inputProps.inputClassNames, {
+        InputBox: legacyMode,
+        [classesInput.text]: !legacyMode,
+    });
 
-    public render() {
-        const classesInput = inputClasses();
-        const classesInputBlock = inputBlockClasses();
+    const ownRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+    const inputRef = inputProps.inputRef || ownRef;
 
-        const { inputProps = {}, multiLineProps = {}, ...blockProps } = this.props;
-        const classes = classNames(classesInputBlock.inputText, inputProps.inputClassNames, {
-            InputBox: this.props.legacyMode,
-            [classesInput.text]: !this.props.legacyMode,
-        });
+    const onChange = props.inputProps?.onChange;
 
-        return (
-            <InputBlock {...blockProps} className={classNames(classesInputBlock.root, this.props.className)}>
-                {(blockParams) => {
-                    const { errorID, hasErrors } = blockParams;
-                    let describedBy = inputProps["aria-describedby"];
-                    if (hasErrors) {
-                        describedBy = errorID;
-                    }
-
-                    const commonProps = {
-                        id: this.id,
-                        defaultValue: inputProps.defaultValue,
-                        value: inputProps.value,
-                        type: inputProps.type,
-                        disabled: inputProps.disabled,
-                        required: inputProps.required,
-                        placeholder: inputProps.placeholder,
-                        maxLength: inputProps.maxLength,
-                        min: inputProps.min,
-                        max: inputProps.max,
-                        step: inputProps.step,
-                        onChange: this.onChange,
-                        onFocus: this.onFocus,
-                        onBlur: this.onBlur,
-                        ref: this.inputRef as any, // Typescripts ref checking a little ridiculous. Distinction without a difference
-                        onKeyPress: inputProps.onKeyPress,
-                        "aria-invalid": hasErrors,
-                        "aria-describedby": describedBy,
-                        "aria-label": inputProps["aria-label"],
-                        inputMode: inputProps.inputmode,
-                        pattern: inputProps.pattern,
-                    };
-
-                    return !inputProps.multiline ? (
-                        <input
-                            {...(commonProps as InputHTMLAttributes<HTMLInputElement>)}
-                            className={classNames(classes, inputProps.className)}
-                            autoComplete={inputProps.autoComplete ? "on" : "off"}
-                        />
-                    ) : (
-                        <TextareaAutosize
-                            {...(commonProps as InputHTMLAttributes<HTMLTextAreaElement>)}
-                            {...multiLineProps}
-                            async
-                            className={classNames(classes, multiLineProps.className, {
-                                [classesInputBlock.multiLine(
-                                    multiLineProps.resize ? multiLineProps.resize : "none",
-                                    multiLineProps.overflow,
-                                )]: inputProps.multiline,
-                            })}
-                        />
-                    );
-                }}
-            </InputBlock>
-        );
-    }
-
-    /**
-     * Use a native change event instead of React's because of https://github.com/facebook/react/issues/1159
-     */
-    public componentDidMount() {
-        this.inputRef.current!.addEventListener("change", this.onChange);
-    }
-
-    /**
-     * Use a native change event instead of React's because of https://github.com/facebook/react/issues/1159
-     */
-    public componentWillUnmount() {
-        this.inputRef.current!.removeEventListener("change", this.onChange);
-    }
-
-    public get value(): any {
-        return this.inputRef.current ? this.inputRef.current.value : "";
-    }
-
-    public set value(value) {
-        if (this.inputRef.current) {
-            this.inputRef.current.value = value;
-        } else {
-            throw new Error("inputDom does not exist");
+    useEffect(() => {
+        // Use a native change event instead of React's because of https://github.com/facebook/react/issues/1159
+        if (onChange) {
+            inputRef.current?.addEventListener("change", onChange as any);
+            return () => {
+                inputRef.current?.removeEventListener("change", onChange as any);
+            };
         }
-    }
+    }, [onChange]);
 
-    public focus() {
-        this.inputRef.current!.focus();
-    }
+    return (
+        <InputBlock {...blockProps} className={classNames(classesInputBlock.root, props.className)}>
+            {(blockParams) => {
+                const { errorID, hasErrors } = blockParams;
+                let describedBy = inputProps["aria-describedby"];
+                if (hasErrors) {
+                    describedBy = errorID;
+                }
 
-    public select() {
-        this.inputRef.current!.select();
-    }
+                const commonProps = {
+                    id: id,
+                    defaultValue: inputProps.defaultValue,
+                    value: inputProps.value,
+                    type: inputProps.type ?? "text",
+                    disabled: inputProps.disabled ?? false,
+                    required: inputProps.required,
+                    placeholder: inputProps.placeholder,
+                    maxLength: inputProps.maxLength,
+                    min: inputProps.min,
+                    max: inputProps.max,
+                    step: inputProps.step,
+                    onChange: inputProps.onChange,
+                    onFocus: inputProps.onFocus,
+                    onBlur: inputProps.onBlur,
+                    ref: inputRef,
+                    onKeyPress: inputProps.onKeyPress,
+                    "aria-invalid": hasErrors,
+                    "aria-describedby": describedBy,
+                    "aria-label": inputProps["aria-label"],
+                    inputMode: inputProps.inputmode,
+                    pattern: inputProps.pattern,
+                };
 
-    private onChange = (event) => {
-        const { inputProps = {} } = this.props;
-        if (inputProps.onChange) {
-            inputProps.onChange(event);
-        }
-    };
-
-    private onBlur = (event) => {
-        const { inputProps = {} } = this.props;
-        if (inputProps.onBlur) {
-            inputProps.onBlur(event);
-        }
-    };
-
-    private onFocus = (event) => {
-        const { inputProps = {} } = this.props;
-        if (inputProps.onFocus) {
-            inputProps.onFocus(event);
-        }
-    };
+                return !inputProps.multiline ? (
+                    <input
+                        {...(commonProps as InputHTMLAttributes<HTMLInputElement>)}
+                        className={classNames(classes, inputProps.className)}
+                        autoComplete={inputProps.autoComplete ? "on" : "off"}
+                    />
+                ) : (
+                    <TextareaAutosize
+                        {...(commonProps as InputHTMLAttributes<HTMLTextAreaElement>)}
+                        {...multiLineProps}
+                        async
+                        className={classNames(classes, multiLineProps.className, {
+                            [classesInputBlock.multiLine(
+                                multiLineProps.resize ? multiLineProps.resize : "none",
+                                multiLineProps.overflow,
+                            )]: inputProps.multiline,
+                        })}
+                    />
+                );
+            }}
+        </InputBlock>
+    );
 }

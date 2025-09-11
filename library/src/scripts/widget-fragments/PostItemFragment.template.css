@@ -1,0 +1,191 @@
+.postItem__root {
+    /* Make our borders */
+    border-top: 1px solid var(--vnla-border-color);
+    border-bottom: 1px solid var(--vnla-border-color);
+    padding: 16px;
+
+    /* This makes our borders extend outside of our container a little bit. */
+    width: calc(100% + 32px);
+    margin-left: -16px;
+
+    background-color: var(--vnla-background-color);
+    &[data-checked="true"] {
+        background-color: var(--vnla-highlight-background-color);
+    }
+
+    & + .postItem__root {
+        border-top: none;
+    }
+
+    /* This is the container that contains the entire post item fragment. */
+    container-type: inline-size;
+}
+
+/* Item Layout */
+.postItem__layout {
+    display: grid;
+    gap: 16px;
+
+    grid-template-areas: "checkbox imageArea content actions";
+    grid-template-columns: auto auto 1fr auto;
+
+    @container (max-width: 500px) {
+        /**
+         * Reflow the layout into multiple columns
+         */
+        grid-template-areas:
+            "imageArea imageArea imageArea"
+            "checkbox      profilePhoto  actions"
+            "content       content       content";
+        grid-template-columns: auto auto auto;
+    }
+
+    /* We may not have a checkbox */
+    &:not(:has(.postItem__bulkActionCheckbox)) {
+        grid-template-areas: "imageArea content actions";
+        grid-template-columns: auto 1fr auto;
+
+        @container (max-width: 500px) {
+            grid-template-areas:
+                "imageArea imageArea imageArea"
+                "profilePhoto  .             actions"
+                "content       content       content";
+            grid-template-columns: auto 1fr auto;
+        }
+    }
+
+    @container (max-width: 500px) {
+        /* We may not have a checkbox */
+        &:not(:has(.postItem__featuredImage)) {
+            grid-template-areas:
+                "checkbox      profilePhoto  actions"
+                "content       content       content";
+            grid-template-columns: auto 1fr auto;
+        }
+
+        /* We may not have a feature image and a checkbox */
+        &:not(:has(.postItem__bulkActionCheckbox)):not(:has(.postItem__featuredImage)) {
+            grid-template-areas:
+                "profilePhoto  .             actions"
+                "content       content       content";
+            grid-template-columns: auto 1fr auto;
+        }
+    }
+}
+
+.postItem__profilePhotoLink {
+    grid-area: profilePhoto;
+}
+
+.postItem__imageArea {
+    grid-area: imageArea;
+
+    &:not(:has(.postItem__featuredImage)) {
+        @container (max-width: 500px) {
+            display: none;
+        }
+    }
+
+    .postItem__profilePhotoLink {
+        display: block;
+
+        @container (max-width: 500px) {
+            display: none;
+        }
+    }
+}
+
+/** When we have a featureImage, we hide the top-level profile photo link on desktop and use the one in the featured image container instead. */
+.postItem__mobileProfilePhotoLink {
+    grid-area: profilePhoto;
+    display: none;
+
+    @container (max-width: 500px) {
+        display: block;
+    }
+}
+
+.postItem__featuredImageContainer {
+    position: relative;
+
+    & .postItem__profilePhotoLink {
+        display: block;
+        position: absolute;
+        bottom: -6px;
+        right: -6px;
+        border-radius: 100%;
+        background-color: #fff;
+        box-shadow: 0 0 0 2px #fff;
+
+        /* Hidden on mobile */
+        @container (max-width: 500px) {
+            display: none;
+        }
+    }
+}
+
+.postItem__content {
+    grid-area: content;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.postItem__bulkActionCheckbox {
+    grid-area: checkbox;
+    flex-shrink: 0;
+}
+
+.postItem__title {
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--vnla-foreground-color);
+
+    &:hover,
+    &:focus,
+    &:active {
+        color: var(--vnla-link-color);
+    }
+}
+
+.postItem__root[data-read="true"] .postItem__title {
+    font-weight: 400;
+}
+
+.postItem__excerpt {
+    font-size: 14px;
+    display: -webkit-box;
+
+    /* Truncate to 3 lines, even beyond the excerpt generation length. */
+    -webkit-line-clamp: 3;
+    -moz-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.postItem__meta {
+}
+
+.postItem__actions {
+    grid-area: actions;
+}
+
+.postItem__actionContainer {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    align-items: center;
+}
+
+.postItem__featuredImage {
+    grid-area: featuredImage;
+    position: relative;
+    width: 140px;
+    border-radius: 4px;
+    overflow: hidden;
+
+    @container (max-width: 500px) {
+        width: 100%;
+    }
+}

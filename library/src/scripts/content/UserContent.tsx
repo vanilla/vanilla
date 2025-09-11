@@ -12,21 +12,39 @@ import { cx } from "@emotion/css";
 import { notEmpty } from "@vanilla/utils";
 import { mountAllEmbeds } from "@library/embeddedContent/embedService.mounting";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
+import { blessStringAsSanitizedHtml, type VanillaSanitizedHtml } from "@vanilla/dom-utils";
 
-interface IProps {
+type ICommonProps = {
     className?: string;
-    content: string;
+    // Only use this if the content has been sanitized by the server, otherwise just use userContentClasses().root
     ignoreHashScrolling?: boolean;
     moderateEmbeds?: boolean;
-}
+};
+
+type IServerSanitizedProps = ICommonProps & { vanillaSanitizedHtml: VanillaSanitizedHtml; children?: never };
+
+type IReactElementProps = ICommonProps & {
+    children: React.ReactNode;
+    vanillaSanitizedHtml?: never;
+};
+
+type IUserContentProps = ICommonProps & (IServerSanitizedProps | IReactElementProps);
 
 /**
  * A component for placing rendered user content.
  *
  * This will ensure that all embeds/etc are initialized.
  */
-export default function UserContent(props: IProps) {
-    let content = props.content;
+export default function UserContent(props: IUserContentProps) {
+    if (props.vanillaSanitizedHtml) {
+        return <UserContentServerContentImpl {...(props as IServerSanitizedProps)} />;
+    }
+
+    return <UserContentReactElementImpl {...(props as IReactElementProps)} />;
+}
+
+function UserContentServerContentImpl(props: IServerSanitizedProps) {
+    let content = props.vanillaSanitizedHtml;
     content = useUnsafeResponsiveTableHTML(content);
     const contentWithModerationContainers = useModerateEmbeds(content);
 
@@ -36,7 +54,7 @@ export default function UserContent(props: IProps) {
 
     useHashScrolling(content, props.ignoreHashScrolling);
 
-    const classes = userContentClasses();
+    const classes = userContentClasses.useAsHook();
 
     const { temporarilyDisabledWatching, getCalcedHashOffset } = useScrollOffset();
     const calcedOffset = getCalcedHashOffset();
@@ -44,6 +62,10 @@ export default function UserContent(props: IProps) {
     useEffect(() => {
         void mountAllEmbeds().then(() => {
             scrollToCurrentHash(calcedOffset);
+        });
+        // apply fade effect for overflowing table after mounting
+        document.querySelectorAll("table").forEach((table) => {
+            applyTableOverflowFade(table);
         });
     }, [content]);
 
@@ -55,27 +77,41 @@ export default function UserContent(props: IProps) {
     );
 }
 
+function UserContentReactElementImpl(props: IReactElementProps) {
+    const { children, className } = props;
+
+    const classes = userContentClasses.useAsHook();
+
+    return <div className={cx("userContent", classes.root, className)}>{children}</div>;
+}
+
 /**
  * WARNING!!! Only ever use this with server-parsed trusted HTML content.
  * @param html
  */
-function useUnsafeResponsiveTableHTML(html: string) {
+function useUnsafeResponsiveTableHTML(html: VanillaSanitizedHtml): VanillaSanitizedHtml {
     return useMemo(() => {
         const element = document.createElement("div");
         element.innerHTML = html;
 
         try {
-            element.querySelectorAll("table").forEach(responsifyTable);
+            element.querySelectorAll("table").forEach((table) => {
+                // if our table is edited through rich table UI, we don't do the mobile responsify
+                const shouldResponsify = !table.parentElement?.classList.contains("customized");
+                if (shouldResponsify) {
+                    responsifyTable(table);
+                }
+            });
         } catch (e) {
             console.error("Failed to responsify table", e);
-            return element.innerHTML;
+            return html;
         }
 
-        return element.innerHTML;
+        return blessStringAsSanitizedHtml(element.innerHTML);
     }, [html]);
 }
 
-function useModerateEmbeds(html: string) {
+function useModerateEmbeds(html: VanillaSanitizedHtml): VanillaSanitizedHtml {
     return useMemo(() => {
         const element = document.createElement("div");
         element.innerHTML = html;
@@ -101,7 +137,7 @@ function useModerateEmbeds(html: string) {
             outerContainer.appendChild(moderationContainer);
         });
 
-        return element.innerHTML;
+        return blessStringAsSanitizedHtml(element.innerHTML);
     }, [html]);
 }
 
@@ -146,7 +182,10 @@ export function responsifyTable(table: HTMLTableElement) {
         const cells = tr.querySelectorAll("td, th");
         cells.forEach((td, i) => {
             const mobileTh = document.createElement("th");
-            if (headLabels) {
+
+            // If we have a very large table, the page can crash, so check the length
+            // 1000 worked for https://higherlogic.atlassian.net/browse/VNLA-7722
+            if (headLabels && headLabels.length < 1000) {
                 // Apply extra labels throughout the table.
                 const label = headLabels[i] ?? "";
                 mobileTh.textContent = label;
@@ -174,5 +213,37 @@ export function responsifyTable(table: HTMLTableElement) {
 
         // move table into wrapper
         wrapper.appendChild(table);
+    }
+}
+
+export function applyTableOverflowFade(table: HTMLTableElement) {
+    const tableWrapper = table?.parentElement;
+
+    function updateFades() {
+        const scrollLeft = tableWrapper?.scrollLeft ?? 0;
+        const maxScroll = (tableWrapper?.scrollWidth ?? 0) - (tableWrapper?.clientWidth ?? 0);
+
+        if (scrollLeft > 0) {
+            tableWrapper?.classList.add("hasLeftScroll");
+        } else {
+            tableWrapper?.classList.remove("hasLeftScroll");
+        }
+
+        if (scrollLeft + 1 < maxScroll) {
+            tableWrapper?.classList.add("hasRightScroll");
+        } else {
+            tableWrapper?.classList.remove("hasRightScroll");
+        }
+
+        if (maxScroll <= 0) {
+            tableWrapper?.classList.add("noScroll");
+        } else {
+            tableWrapper?.classList.remove("noScroll");
+        }
+    }
+
+    if (tableWrapper?.classList.contains("customized")) {
+        tableWrapper.addEventListener("scroll", updateFades);
+        updateFades();
     }
 }

@@ -6,16 +6,16 @@
 
 import { INavigationItem } from "@library/@types/api/core";
 import { IActiveRecord } from "@library/navigation/SiteNavNode";
-import { siteUrl } from "@library/utility/appUtils";
+import { getRelativeUrl, siteUrl } from "@library/utility/appUtils";
 import { isNumeric, spaceshipCompare } from "@vanilla/utils";
-import qs from "qs";
+import * as qs from "qs-esm";
 import { useLocation } from "react-router";
 
 export function findMatchingPath(paths: string[], currentPath: string): string | null {
-    const currentPathUrl = new URL(siteUrl(currentPath));
+    const currentPathUrl = getRelativeUrl(new URL(siteUrl(currentPath)).href);
 
     const matchingPaths = paths.filter((path) => {
-        return currentPathUrl.pathname.startsWith(path);
+        return currentPathUrl.startsWith(path);
     });
 
     // Favor the longest matching path.

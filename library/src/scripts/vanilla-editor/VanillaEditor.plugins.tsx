@@ -6,12 +6,14 @@
 
 import { createCodeBlockEscapePlugin } from "@library/vanilla-editor/plugins/blockEscapePlugin/createCodeBlockEscapePlugin";
 import { createBlockquotePlugin } from "@library/vanilla-editor/plugins/blockquotePlugin/createBlockquotePlugin";
+import { createCalloutPlugin } from "@library/vanilla-editor/plugins/calloutPlugin/createCalloutPlugin";
 import { createMentionPlugin } from "@library/vanilla-editor/plugins/mentionPlugin/createMentionPlugin";
 import { createRichEmbedPlugin } from "@library/vanilla-editor/plugins/richEmbedPlugin/createRichEmbedPlugin";
 import { ELEMENT_RICH_EMBED_CARD } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 import { createSpoilerPlugin } from "@library/vanilla-editor/plugins/spoilerPlugin/createSpoilerPlugin";
 import { createTablePlugin } from "@library/vanilla-editor/plugins/tablePlugin/createTablePlugin";
-import { createMyPlugins, MyEditor, MyPlatePlugin, MyValue } from "@library/vanilla-editor/typescript";
+import { MyEditor, MyPlatePlugin, MyValue } from "@library/vanilla-editor/typescript";
+import { createMyPlugins } from "./getMyEditor";
 import { createVanillaEditorComponents } from "@library/vanilla-editor/VanillaEditor.components";
 import { CONFIG } from "@library/vanilla-editor/VanillaEditor.config";
 import { AutoformatPlugin, createAutoformatPlugin } from "@udecode/plate-autoformat";
@@ -34,178 +36,186 @@ import { createDeserializeCsvPlugin } from "@udecode/plate-serializer-csv";
 import { createDeserializeDocxPlugin } from "@udecode/plate-serializer-docx";
 import { createDeserializeMdPlugin } from "@udecode/plate-serializer-md";
 import { createTrailingBlockPlugin } from "@udecode/plate-trailing-block";
-import { insertCodeBlockData } from "./codeBlockPlugin/insertCodeBlockData";
+import insertDataCustom from "@library/vanilla-editor/insertDataCustom";
+import { getMeta } from "@library/utility/appUtils";
 
-export const VanillaEditorPlugins = createMyPlugins(
-    [
-        /**
-         * Basic line format.
-         *
-         * Source
-         * @link https://github.com/udecode/plate/blob/main/packages/nodes/paragraph/src/createParagraphPlugin.ts
-         */
-        createParagraphPlugin(),
+const userMentionsEnabled: boolean = getMeta("ui.userMentionsEnabled", true);
 
-        /**
-         * Blockquote handling.
-         */
-        createBlockquotePlugin(),
+let platePlugins: MyPlatePlugin[] = [
+    /**
+     * Basic line format.
+     *
+     * Source
+     * @link https://github.com/udecode/plate/blob/main/packages/nodes/paragraph/src/createParagraphPlugin.ts
+     */
+    createParagraphPlugin(),
 
-        /**
-         * Spoiler handling.
-         */
-        createSpoilerPlugin(),
+    /**
+     * Blockquote handling.
+     */
+    createBlockquotePlugin(),
 
-        /**
-         * Heading handling
-         *
-         * @todo https://higherlogic.atlassian.net/browse/VNLA-2656
-         *
-         * Source.
-         * @link https://github.com/udecode/plate/blob/main/packages/nodes/heading/src/createHeadingPlugin.ts
-         */
-        createHeadingPlugin(),
+    /**
+     * Spoiler handling.
+     */
+    createSpoilerPlugin(),
 
-        /**
-         * Link handling.
-         *
-         * @todo https://higherlogic.atlassian.net/browse/VNLA-2657
-         *
-         * Source
-         * @link https://github.com/udecode/plate/tree/main/packages/nodes/link
-         *
-         * Plate default UI source.
-         * @link https://github.com/udecode/plate/tree/main/packages/ui/nodes/link/src
-         */
-        createLinkPlugin({} as Partial<MyPlatePlugin<LinkPlugin>>),
+    /**
+     * Callout handling.
+     */
+    createCalloutPlugin(),
 
-        /**
-         * List handling (including nesting).
-         *
-         * Docs
-         * @link https://plate.udecode.io/docs/plugins/list
-         *
-         * Source
-         * @link https://github.com/udecode/plate/tree/main/packages/nodes/list/src
-         */
-        createListPlugin(
-            {},
-            {
-                [ELEMENT_UL]: {
-                    options: {
-                        validLiChildrenTypes: [ELEMENT_RICH_EMBED_CARD],
-                    },
+    /**
+     * Heading handling
+     *
+     * @todo https://higherlogic.atlassian.net/browse/VNLA-2656
+     *
+     * Source.
+     * @link https://github.com/udecode/plate/blob/main/packages/nodes/heading/src/createHeadingPlugin.ts
+     */
+    createHeadingPlugin(),
+
+    /**
+     * Link handling.
+     *
+     * @todo https://higherlogic.atlassian.net/browse/VNLA-2657
+     *
+     * Source
+     * @link https://github.com/udecode/plate/tree/main/packages/nodes/link
+     *
+     * Plate default UI source.
+     * @link https://github.com/udecode/plate/tree/main/packages/ui/nodes/link/src
+     */
+    createLinkPlugin({} as Partial<MyPlatePlugin<LinkPlugin>>),
+
+    /**
+     * List handling (including nesting).
+     *
+     * Docs
+     * @link https://plate.udecode.io/docs/plugins/list
+     *
+     * Source
+     * @link https://github.com/udecode/plate/tree/main/packages/nodes/list/src
+     */
+    createListPlugin(
+        {},
+        {
+            [ELEMENT_UL]: {
+                options: {
+                    validLiChildrenTypes: [ELEMENT_RICH_EMBED_CARD],
                 },
-                [ELEMENT_OL]: {
-                    options: {
-                        validLiChildrenTypes: [ELEMENT_RICH_EMBED_CARD],
-                    },
+            },
+            [ELEMENT_OL]: {
+                options: {
+                    validLiChildrenTypes: [ELEMENT_RICH_EMBED_CARD],
                 },
             },
-        ),
+        },
+    ),
 
-        /**
-         * Table handling
-         *
-         * @todo Table management UI.
-         *
-         * Docs
-         * @link https://github.com/udecode/plate/tree/main/packages/nodes/list/src
-         *
-         * Source
-         * @link https://github.com/udecode/plate/tree/main/packages/nodes/table/src
-         *
-         * Plate default UI source.
-         * @link https://github.com/udecode/plate/tree/main/packages/ui/nodes/table/src
-         */
-        createTablePlugin(),
+    /**
+     * Table handling
+     *
+     * @todo Table management UI.
+     *
+     * Docs
+     * @link https://github.com/udecode/plate/tree/main/packages/nodes/list/src
+     *
+     * Source
+     * @link https://github.com/udecode/plate/tree/main/packages/nodes/table/src
+     *
+     * Plate default UI source.
+     * @link https://github.com/udecode/plate/tree/main/packages/ui/nodes/table/src
+     */
+    createTablePlugin(),
 
-        /**
-         * Bring in our own embed plugin.
-         *
-         * This handles images, links, and file uploads.
-         */
-        createRichEmbedPlugin(),
+    /**
+     * Bring in our own embed plugin.
+     *
+     * This handles images, links, and file uploads.
+     */
+    createRichEmbedPlugin(),
 
-        /**
-         * Handles code blocks.
-         *
-         * @todo https://higherlogic.atlassian.net/browse/VNLA-2655
-         *
-         * Source
-         * @link https://github.com/udecode/plate/tree/main/packages/nodes/code-block
-         *
-         * Plate default UI source.
-         * @link https://github.com/udecode/plate/tree/main/packages/ui/nodes/code-block/src/CodeBlockElement
-         */
-        createCodeBlockPlugin({
-            options: {
-                syntax: true,
-                syntaxPopularFirst: true,
-            },
-            withOverrides: (editor) => {
-                editor.insertData = (data) => insertCodeBlockData(editor, data);
-                return editor;
-            },
-        }),
+    /**
+     * Handles code blocks.
+     *
+     * @todo https://higherlogic.atlassian.net/browse/VNLA-2655
+     *
+     * Source
+     * @link https://github.com/udecode/plate/tree/main/packages/nodes/code-block
+     *
+     * Plate default UI source.
+     * @link https://github.com/udecode/plate/tree/main/packages/ui/nodes/code-block/src/CodeBlockElement
+     */
+    createCodeBlockPlugin({
+        options: {
+            syntax: true,
+            syntaxPopularFirst: true,
+        },
+        withOverrides: (editor) => {
+            editor.insertData = (data) => insertDataCustom(editor, data);
+            return editor;
+        },
+    }),
 
-        createCodeBlockEscapePlugin(),
+    createCodeBlockEscapePlugin(),
 
-        /**
-         * Simple inline formats.
-         */
-        createBoldPlugin(),
-        createCodePlugin(),
-        createItalicPlugin(),
-        createStrikethroughPlugin(),
+    /**
+     * Simple inline formats.
+     */
+    createBoldPlugin(),
+    createCodePlugin(),
+    createItalicPlugin(),
+    createStrikethroughPlugin(),
 
-        /**
-         * Plugin for handling keyboard shortcuts that transform certain text into others.
-         *
-         * Docs
-         * @link https://plate.udecode.io/docs/plugins/autoformat
-         *
-         * Source
-         * @link https://github.com/udecode/plate/blob/main/packages/editor/autoformat/src/createAutoformatPlugin.ts
-         */
-        createAutoformatPlugin<AutoformatPlugin<MyValue, MyEditor>, MyValue, MyEditor>(CONFIG.autoformat),
+    /**
+     * Plugin for handling keyboard shortcuts that transform certain text into others.
+     *
+     * Docs
+     * @link https://plate.udecode.io/docs/plugins/autoformat
+     *
+     * Source
+     * @link https://github.com/udecode/plate/blob/main/packages/editor/autoformat/src/createAutoformatPlugin.ts
+     */
+    createAutoformatPlugin<AutoformatPlugin<MyValue, MyEditor>, MyValue, MyEditor>(CONFIG.autoformat),
 
-        createResetNodePlugin(CONFIG.resetBlockType),
-        createSoftBreakPlugin(CONFIG.softBreak),
+    createResetNodePlugin(CONFIG.resetBlockType),
+    createSoftBreakPlugin(CONFIG.softBreak),
 
-        /**
-         * Exit Break plugin for handling hotkeys that exit the current block.
-         *
-         * Docs
-         * @link https://plate.udecode.io/docs/plugins/exit-break
-         *
-         * Source
-         * @link https://github.com/udecode/plate/blob/main/packages/editor/break/src/exit-break/createExitBreakPlugin.ts
-         */
+    /**
+     * Exit Break plugin for handling hotkeys that exit the current block.
+     *
+     * Docs
+     * @link https://plate.udecode.io/docs/plugins/exit-break
+     *
+     * Source
+     * @link https://github.com/udecode/plate/blob/main/packages/editor/break/src/exit-break/createExitBreakPlugin.ts
+     */
 
-        createExitBreakPlugin(CONFIG.exitBreak),
+    createExitBreakPlugin(CONFIG.exitBreak),
 
-        createTrailingBlockPlugin(CONFIG.trailingBlock),
-        createSelectOnBackspacePlugin(CONFIG.selectOnBackspace),
+    createTrailingBlockPlugin(CONFIG.trailingBlock),
+    createSelectOnBackspacePlugin(CONFIG.selectOnBackspace),
 
-        // https://github.com/udecode/plate/tree/main/packages/nodes/mention
-        // https://github.com/udecode/plate/tree/main/packages/nodes/mention
-        // https://github.com/udecode/plate/tree/main/packages/ui/nodes/mention
-        createComboboxPlugin(),
+    // https://github.com/udecode/plate/tree/main/packages/nodes/mention
+    // https://github.com/udecode/plate/tree/main/packages/nodes/mention
+    // https://github.com/udecode/plate/tree/main/packages/ui/nodes/mention
+    createComboboxPlugin(),
 
-        createMentionPlugin(),
+    /**
+     * Paste support.
+     */
+    createDeserializeMdPlugin(),
+    createDeserializeCsvPlugin(),
+    createDeserializeDocxPlugin(),
+];
 
-        /**
-         * Paste support.
-         */
-        createDeserializeMdPlugin(),
-        createDeserializeCsvPlugin(),
-        createDeserializeDocxPlugin(),
-    ],
-    {
-        /**
-         * Wire up our element rendering.
-         */
-        components: createVanillaEditorComponents(),
-    },
-);
+if (userMentionsEnabled) {
+    platePlugins = platePlugins.concat([createMentionPlugin()]);
+}
+export const VanillaEditorPlugins = createMyPlugins(platePlugins, {
+    /**
+     * Wire up our element rendering.
+     */
+    components: createVanillaEditorComponents(),
+});

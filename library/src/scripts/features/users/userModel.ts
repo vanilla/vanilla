@@ -3,17 +3,15 @@
  * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
+import { LoadStatus } from "@library/@types/api/core";
 import { IUserFragment } from "@library/@types/api/users";
+import NotificationsActions from "@library/features/notifications/NotificationsActions";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
 import UserActions from "@library/features/users/UserActions";
 import produce from "immer";
-import { reducerWithInitialState } from "typescript-fsa-reducers";
-import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import NotificationsActions from "@library/features/notifications/NotificationsActions";
-import { useSelector } from "react-redux";
-import { IUsersState, IInjectableUserState, IPermissions } from "./userTypes";
 import clone from "lodash-es/clone";
+import { reducerWithInitialState } from "typescript-fsa-reducers";
+import { IUsersState } from "./userTypes";
 
 const suggestionReducer = new UserSuggestionModel().reducer;
 
@@ -53,7 +51,7 @@ export function isUserGuest(user: IUserFragment | null | undefined) {
 /**
  * Reducer for user related data.
  */
-export const usersReducer = produce(
+export const usersReducer: any = produce(
     reducerWithInitialState(clone(INITIAL_USERS_STATE))
         .case(UserActions.getMeACs.started, (state) => {
             state.current.status = LoadStatus.LOADING;
@@ -233,20 +231,3 @@ export const usersReducer = produce(
             return state;
         }),
 );
-
-export function mapUsersStoreState(state: ICoreStoreState): IInjectableUserState {
-    if (!state.users || !state.users.current) {
-        throw new Error(
-            `It seems you did not initialize the users model correctly. Could not find "users.current" in state: ${state}`,
-        );
-    }
-
-    return {
-        currentUser: state.users.current,
-    };
-}
-
-/** @deprecated  */
-export function useUsersState(): IInjectableUserState {
-    return useSelector(mapUsersStoreState);
-}

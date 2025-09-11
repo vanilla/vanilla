@@ -13,8 +13,6 @@ import {
 import {
     FAKE_WRITEABLE_INTEGRATION,
     FAKE_INTEGRATIONS_CATALOG,
-    IntegrationsTestWrapper,
-    mockApi,
 } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
 import { setMeta } from "@library/utility/appUtils";
 import { RenderResult, act, renderHook } from "@testing-library/react-hooks";
@@ -24,6 +22,10 @@ import { RenderResult as ReactRenderResult } from "@testing-library/react";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { IMe } from "@library/@types/api/users";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
+import {
+    IntegrationsTestWrapper,
+    mockApi,
+} from "@library/features/discussions/integrations/fixtures/IntegrationsSpec.fixtures";
 
 beforeEach(() => {
     setMeta(INTEGRATIONS_META_KEY, undefined);

@@ -17,7 +17,7 @@ class BaseControllerTest extends SiteTestCase
     public static $addons = ["test"];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

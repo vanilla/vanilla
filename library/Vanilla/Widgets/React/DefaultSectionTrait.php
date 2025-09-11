@@ -32,4 +32,12 @@ trait DefaultSectionTrait
             SectionTwoColumnsEven::getWidgetID(),
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [];
+    }
 }

@@ -32,6 +32,10 @@ import { usePermissionsContext } from "@library/features/users/PermissionsContex
 import { DiscussionListItemMeta } from "@library/features/discussions/DiscussionListItemMeta";
 import { useDiscussionActions } from "@library/features/discussions/DiscussionActions";
 import { useDiscussionsDispatch } from "@library/features/discussions/discussionsReducer";
+import { useFragmentImpl } from "@library/utility/FragmentImplContext";
+import type PostItemFragmentInjectable from "@vanilla/injectables/PostItemFragment";
+import { PostItemFragmentContext } from "@library/widget-fragments/PostItemFragment.context";
+import { widgetItemContentTypeToImageType } from "@library/homeWidget/WidgetItemOptions";
 
 interface IProps {
     discussion: IDiscussion;
@@ -50,8 +54,8 @@ export default function DiscussionListItem(props: IProps) {
     const { getDiscussionByIDs } = useDiscussionActions();
     const dispatch = useDiscussionsDispatch();
 
-    const classes = discussionListClasses(props.discussionOptions, props.asTile);
-    const variables = discussionListVariables(props.discussionOptions);
+    const classes = discussionListClasses.useAsHook(props.discussionOptions, props.asTile);
+    const variables = discussionListVariables.useAsHook(props.discussionOptions);
     const currentUserSignedIn = useCurrentUserSignedIn();
     const checkBoxContext = useDiscussionCheckBoxContext();
     const hasUnread = discussion.unread || (discussion.countUnread !== undefined && discussion.countUnread > 0);
@@ -79,6 +83,7 @@ export default function DiscussionListItem(props: IProps) {
     if (currentUserSignedIn && discussion.type === "idea") {
         const ideationCounterContent = (
             <DiscussionVoteCounter
+                direction={"vertical"}
                 className={cx(classes.iconAndVoteCounterWrapper(availableReactionsCount), iconClass)}
                 discussion={discussion}
             />
@@ -137,6 +142,61 @@ export default function DiscussionListItem(props: IProps) {
         return isLimitReached || isPendingAction;
     }, [checkBoxContext, isRowChecked, isPendingAction]);
 
+    const checkBox = canUseCheckboxes ? (
+        <ConditionalWrap
+            condition={isCheckboxDisabled && !!disabledNote}
+            component={ToolTip}
+            componentProps={{ label: disabledNote }}
+        >
+            {/* This span is required for the conditional tooltip */}
+            <span>
+                <CheckBox
+                    checked={isRowChecked || isPendingAction}
+                    label={`Select ${discussion.name}`}
+                    hideLabel={true}
+                    disabled={isCheckboxDisabled}
+                    onChange={(e) => {
+                        if (e.target.checked) {
+                            checkBoxContext.addCheckedDiscussionsByIDs(discussionID);
+                        } else {
+                            checkBoxContext.removeCheckedDiscussionsByIDs(discussionID);
+                        }
+                    }}
+                />
+            </span>
+        </ConditionalWrap>
+    ) : undefined;
+
+    const CustomFragmentImpl = useFragmentImpl<PostItemFragmentInjectable.Props>("PostItemFragment");
+
+    if (CustomFragmentImpl !== null) {
+        return (
+            <PostItemFragmentContext.Provider
+                value={{
+                    discussion,
+                    options: variables.item,
+                    isChecked: isRowChecked || isPendingAction,
+                    showCheckbox: canUseCheckboxes,
+                    onCheckboxChange: (isChecked) => {
+                        if (isChecked) {
+                            checkBoxContext.addCheckedDiscussionsByIDs(discussionID);
+                        } else {
+                            checkBoxContext.removeCheckedDiscussionsByIDs(discussionID);
+                        }
+                    },
+                    isCheckDisabled: isCheckboxDisabled,
+                    checkDisabledReason: disabledNote ?? undefined,
+                }}
+            >
+                <CustomFragmentImpl
+                    discussion={discussion}
+                    options={variables.item}
+                    isChecked={isRowChecked || isPendingAction}
+                />
+            </PostItemFragmentContext.Provider>
+        );
+    }
+
     return (
         <ListItem
             url={discussionUrl}
@@ -161,48 +221,7 @@ export default function DiscussionListItem(props: IProps) {
             image={discussion.image}
             asTile={props.asTile}
             disableButtonsInItems={props.disableButtonsInItems}
-            // TODO: Disable this until the feature is finished.
-            checkbox={
-                canUseCheckboxes ? (
-                    <ConditionalWrap
-                        condition={isCheckboxDisabled && !!disabledNote}
-                        component={ToolTip}
-                        componentProps={{ label: disabledNote }}
-                    >
-                        {/* This span is required for the conditional tooltip */}
-                        <span>
-                            <CheckBox
-                                checked={isRowChecked || isPendingAction}
-                                label={`Select ${discussion.name}`}
-                                hideLabel={true}
-                                disabled={isCheckboxDisabled}
-                                onChange={(e) => {
-                                    if (e.target.checked) {
-                                        checkBoxContext.addCheckedDiscussionsByIDs(discussionID);
-                                    } else {
-                                        checkBoxContext.removeCheckedDiscussionsByIDs(discussionID);
-                                    }
-                                }}
-                            />
-                        </span>
-                    </ConditionalWrap>
-                ) : undefined
-            }
-        ></ListItem>
+            checkbox={checkBox}
+        />
     );
-}
-
-export function qnaStatus(status) {
-    switch (status) {
-        case "unanswered":
-        case "rejected":
-            return "Q&A Question";
-        case "answered":
-            return "Q&A Answered";
-        case "accepted":
-            return "Q&A Accepted";
-        default:
-            const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
-            return capitalizedStatus;
-    }
 }

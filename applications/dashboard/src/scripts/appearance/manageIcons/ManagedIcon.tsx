@@ -7,7 +7,7 @@
 import { IconHexGrid } from "@dashboard/appearance/manageIcons/IconHexGrid";
 import type { ManageIconsApi } from "@dashboard/appearance/manageIcons/ManageIconsApi";
 import { useManageIconsForm } from "@dashboard/appearance/manageIcons/ManageIconsFormContext";
-import uniqueId from "lodash/uniqueId";
+import uniqueId from "lodash-es/uniqueId";
 import { memo, useMemo } from "react";
 
 interface IProps {
@@ -34,6 +34,7 @@ export const ManagedIcon = memo(function ManagedIcon(props: IProps) {
                 height: props.iconSize ?? 48,
                 width: props.iconSize ?? 48,
             }}
+            // The SVG contents were sanitized with DOMPurify already.
             dangerouslySetInnerHTML={{ __html: svgContents }}
             width={props.iconSize ?? 48}
             height={props.iconSize ?? 48}

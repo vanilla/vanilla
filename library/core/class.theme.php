@@ -10,6 +10,7 @@
  */
 
 use Vanilla\Logging\ErrorLogger;
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Site\SiteSectionModel;
 
 /**
@@ -331,9 +332,11 @@ class Gdn_Theme
                 if (!$text) {
                     $text = t("My Drafts");
                 }
-                if ($session->isValid() && $session->User->CountDrafts) {
+                $contentDraftModel = Gdn::getContainer()->get(ContentDraftModel::class);
+                $CountDrafts = $contentDraftModel->draftsWhereCountByUser();
+                if ($session->isValid() && $CountDrafts > 0) {
                     $class = trim($class . " HasCount");
-                    $text .= ' <span class="Alert">' . htmlspecialchars($session->User->CountDrafts) . "</span>";
+                    $text .= ' <span class="Alert">' . htmlspecialchars($CountDrafts) . "</span>";
                 }
                 break;
             case "discussions/bookmarked":
@@ -506,7 +509,7 @@ class Gdn_Theme
                     return "<!-- Error: Could not render module without a Gdn_Controller instance. -->";
                 }
 
-                if (is_a($name, \Vanilla\Web\JsInterpop\AbstractReactModule::class)) {
+                if (is_a($name, \Vanilla\Web\JsInterpop\LegacyReactModule::class)) {
                     $module = \Gdn::getContainer()->get($name);
                 } else {
                     $module = \Gdn::getContainer()->getArgs($name, [Gdn::controller(), ""]);
@@ -516,18 +519,19 @@ class Gdn_Theme
 
                 if ($module instanceof \Vanilla\Widgets\React\CombinedPropsWidgetInterface) {
                     $module->setProps($properties);
-                } else {
-                    // Add properties passed in from the controller.
-                    $controllerProperties = Gdn::controller()->data("_properties." . strtolower($name), []);
-                    $properties = array_merge($controllerProperties, $properties);
+                }
+                // Add properties passed in from the controller.
+                $controllerProperties = Gdn::controller()
+                    ? Gdn::controller()->data("_properties." . strtolower($name), [])
+                    : [];
+                $properties = array_merge($controllerProperties, $properties);
 
-                    foreach ($properties as $name => $value) {
-                        // Check for a setter method
-                        if (method_exists($module, $method = "set" . ucfirst($name))) {
-                            $module->$method($value);
-                        } else {
-                            $module->$name = $value;
-                        }
+                foreach ($properties as $propertyName => $value) {
+                    // Check for a setter method
+                    if (method_exists($module, $method = "set" . ucfirst($propertyName))) {
+                        $module->$method($value);
+                    } else {
+                        @$module->$propertyName = $value;
                     }
                 }
 

@@ -13,7 +13,7 @@
         "plugin:@tanstack/eslint-plugin-query/recommended"
     ],
     "parserOptions": {
-        "project": "./tsconfig.json"
+        "project": ["./tsconfig.json", "./packages/vanilla-dom-diff/tsconfig.json"]
     },
     "settings": {
         "react": {
@@ -95,6 +95,7 @@
         // Vanilla Custom
         "@vanilla/no-unconventional-imports": "error",
         "@vanilla/no-cloud-imports-in-core": "error",
+        "@vanilla/no-static-loadable-imports": "error",
 
         // Lodash
         // Ensure we always do single package lodash imports.

@@ -14,6 +14,7 @@ use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Models\KeywordSentimentModel;
 use Vanilla\Models\KeywordsModel;
 use Vanilla\Premoderation\ApprovalPremoderator;
+use Vanilla\Models\ScheduledDraftModel;
 
 if (!defined("APPLICATION")) {
     exit();
@@ -119,6 +120,7 @@ $Construct
     ->column("Featured", "tinyint", "0")
     ->column("SortFeatured", "int", "0", "index")
     ->column("AllowGroups", "tinyint", "0")
+    ->column("AllowEventCreation", "tinyint", "1")
     ->set($Explicit, $Drop);
 
 $RootCategoryInserted = false;
@@ -195,7 +197,7 @@ $Construct
     ->column("UpdateUserID", "int", true)
     ->column("FirstCommentID", "int", true)
     ->column("LastCommentID", "int", true)
-    ->column("Name", "varchar(100)", false, "fulltext")
+    ->column("Name", "varchar(" . DiscussionModel::MAX_TITLE_LENGTH_UPPER_LIMIT . ")", false, "fulltext")
     ->column("Body", "mediumtext", false, "fulltext")
     ->column("Format", "varchar(20)", true)
     ->column("Tags", "text", null)
@@ -362,6 +364,8 @@ $Construct
     ->column("Dismissed", "tinyint(1)", "0") // relates to dismissed announcements
     ->column("Bookmarked", "tinyint(1)", "0")
     ->column("Participated", "tinyint(1)", "0") // whether or not the user has participated in the discussion.
+    ->column("Muted", "tinyint(1)", "0") // whether or not the user has muted the discussion.
+    ->column("DateMuted", "datetime", null)
     ->set($Explicit, $Drop);
 
 $Construct
@@ -801,6 +805,10 @@ if (!$config->configKeyExists("Garden.Unsubscribe.Salt")) {
     $config->set("Garden.Unsubscribe.Salt", betterRandomString(32, "Aa0"));
 }
 
+// The size of the discussion name column was increased to 250 bytes,
+// but we want to maintain the original max length using a config setting.
+$config->touch("Vanilla.Discussion.Title.MaxLength", 100);
+
 DigestModel::structure($Construct);
 DigestContentModel::structure($Construct);
 UserDigestModel::structure($Construct);
@@ -813,3 +821,4 @@ GroupStructureModel::structure($Construct);
 EventStructureModel::structure($Construct);
 KeywordsModel::structure(Gdn::database());
 KeywordSentimentModel::structure(Gdn::database());
+ScheduledDraftModel::structure($Construct);

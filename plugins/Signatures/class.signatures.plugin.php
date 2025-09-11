@@ -28,6 +28,7 @@ use Twig\Cache\CacheInterface;
 use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\Formatting\FormatConfig;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Formatting\Formats\NotFoundFormat;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\FormatService;
@@ -801,7 +802,7 @@ EOT;
             return true;
         }
 
-        if (strcasecmp(Gdn::controller()->RequestMethod, "embed") == 0 && self::getHideEmbed()) {
+        if (strcasecmp(Gdn::controller()?->RequestMethod ?? "", "embed") == 0 && self::getHideEmbed()) {
             return true;
         }
 
@@ -1271,7 +1272,12 @@ EOT;
                 if ($signature === null) {
                     continue;
                 }
-                $signature = Gdn::formatService()->renderHTML($signature, $format);
+                $formatter = Gdn::formatService()->getFormatter($format);
+                if ($formatter instanceof NotFoundFormat) {
+                    continue;
+                }
+                $parsed = $formatter->parse($signature, true);
+                $signature = $formatter->renderHTML($parsed);
                 if ($stripImages) {
                     // The user has chosen to strip images form the signatures.
                     $dom = new HtmlDocument($signature);

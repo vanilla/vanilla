@@ -18,6 +18,8 @@ use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Forum\Models\PostFieldModel;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
 
@@ -97,12 +99,20 @@ class DiscussionsApiIndexSchema extends Schema
                         new StaticFormChoices($this->discussionTypesEnumValues())
                     ),
                 ],
-                "excludeHiddenCategories:b" => [
+                "postTypeID:a?" => [
+                    "description" => "Filter by one or more postTypeIDs.",
+                    "x-filter" => true,
+                    "items" => [
+                        "type" => "string",
+                    ],
+                    "style" => "form",
+                ],
+                "excludeHiddenCategories:b?" => [
                     "default" => false,
                     "description" =>
                         "Exclude discussions from categories that has the `HideAllDiscussions` option set to true.",
                 ],
-                "followed:b" => [
+                "followed:b?" => [
                     "default" => false,
                     "description" =>
                         "Only fetch discussions from followed categories. Pinned discussions are mixed in.",
@@ -204,6 +214,10 @@ class DiscussionsApiIndexSchema extends Schema
                 ],
             ])
         );
+        if (PostTypeModel::isPostTypesFeatureEnabled()) {
+            $schema = Schema::parse(["postMeta:o?" => PostFieldModel::getPostMetaFilterSchema()]);
+            $this->merge($schema);
+        }
         $this->addValidator("insertUserRoleID", function ($data, $field) {
             RoleModel::roleViewValidator($data, $field);
         });

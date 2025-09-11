@@ -15,7 +15,7 @@ class WidgetsApiTest extends AbstractAPIv2Test
     protected static $addons = ["vanilla"];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

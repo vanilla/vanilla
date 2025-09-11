@@ -14,8 +14,8 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { t } from "@library/utility/appUtils";
-import { tagDiscussionFormClasses } from "@library/features/discussions/forms/TagDiscussionForm.loadable.styles";
+import { getMeta, t } from "@library/utility/appUtils";
+import { tagDiscussionFormClasses } from "@library/features/discussions/forms/TagDiscussionForm.styles";
 import { useState } from "react";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { useMutation } from "@tanstack/react-query";
@@ -23,6 +23,7 @@ import { slugify } from "@vanilla/utils";
 import apiv2 from "@library/apiv2";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { TagPostUI } from "@library/features/discussions/forms/TagPostUI";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 export interface IProps {
     onCancel: () => void;
@@ -36,6 +37,9 @@ export interface IProps {
  */
 export default function TagDiscussionFormLoadable(props: IProps) {
     const { onCancel, discussion } = props;
+    const { hasPermission } = usePermissionsContext();
+    const scopedTaggingEnabled = getMeta("tagging.scopedTaggingEnabled", false);
+    const canCreateNewTags = hasPermission("tags.add") && !scopedTaggingEnabled;
 
     const classesFrameBody = frameBodyClasses();
     const classFrameFooter = frameFooterClasses();
@@ -98,11 +102,13 @@ export default function TagDiscussionFormLoadable(props: IProps) {
                     <FrameBody>
                         <div className={classesFrameBody.contents}>
                             <TagPostUI
-                                initialTagIDs={initialValues}
+                                initialTags={initialValues ?? []}
                                 onSelectedExistingTag={setTagsToAssign}
                                 onSelectedNewTag={setTagsToCreate}
                                 fieldErrors={tagDiscussionMutation?.error}
                                 showPopularTags
+                                canCreateNewTags={canCreateNewTags}
+                                scope={scopedTaggingEnabled ? { categoryIDs: [discussion.categoryID] } : undefined}
                             />
                         </div>
                     </FrameBody>

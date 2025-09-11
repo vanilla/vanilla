@@ -1,17 +1,23 @@
 {
     "name": "@vanilla/i18n",
-    "main": "./src/index.ts",
-    "module": "./src/index.ts",
-    "version": "3.0.1",
-    "license": "MIT",
-    "peerDependencies": {
-        "@vanilla/utils": "^3.0.1",
-        "react": "^17.0.0"
-    },
-    "devDependencies": {
-        "@vanilla/tsconfig": "^3.0.1"
+    "version": "4.0.2",
+    "main": "dist/index.mjs",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "author": {
+        "name": "Adam (charrondev) Charron",
+        "email": "acharron@higherlogic.com"
     },
     "publishConfig": {
         "access": "public"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "@vanilla/react-utils": ">=4.0.2",
+        "@vanilla/utils": ">=4.0.2",
+        "react": ">=17.0.2"
     }
 }

@@ -16,7 +16,7 @@ import { useContentItemContext } from "@vanilla/addon-vanilla/contentItem/Conten
 import { Icon } from "@vanilla/icons";
 
 export function ContentItemShareMenu() {
-    const classes = ContentItemClasses();
+    const classes = ContentItemClasses.useAsHook();
     const toast = useToast();
     const { recordType, handleCopyUrl, handleNativeShare, emailUrl, shareInMessageUrl } = useContentItemContext();
 

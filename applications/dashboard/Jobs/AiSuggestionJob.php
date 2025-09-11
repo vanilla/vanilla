@@ -28,7 +28,7 @@ class AiSuggestionJob extends \Vanilla\Scheduler\Job\LocalApiJob implements \Psr
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setMessage(array $message)
     {
@@ -36,7 +36,7 @@ class AiSuggestionJob extends \Vanilla\Scheduler\Job\LocalApiJob implements \Psr
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function run(): \Vanilla\Scheduler\Job\JobExecutionStatus
     {

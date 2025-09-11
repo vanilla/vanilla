@@ -5,7 +5,6 @@
  */
 
 import { userContentClasses } from "@library/content/UserContent.styles";
-import { ensureBuiltinEmbeds } from "@library/embeddedContent/embedService.loadable";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import getStore from "@library/redux/getStore";
 import { cx } from "@library/styles/styleShim";
@@ -24,7 +23,10 @@ import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlu
 import { FloatingElementToolbar } from "@library/vanilla-editor/toolbars/ElementToolbar";
 import { MarkToolbar } from "@library/vanilla-editor/toolbars/MarkToolbar";
 import { PersistentToolbar } from "@library/vanilla-editor/toolbars/PersistentToolbar";
-import { MyEditor, MyValue, createMyPlateEditor } from "@library/vanilla-editor/typescript";
+import { MyEditor, MyValue, type IVanillaEditorRef } from "@library/vanilla-editor/typescript";
+import { createVanillaEditor } from "./createVanillaEditor";
+import { deserializeHtml } from "./deserializeHtml";
+import { createMyPlateEditor } from "./getMyEditor";
 import {
     Plate,
     PlateProvider,
@@ -38,14 +40,30 @@ import {
 import { ELEMENT_LINK } from "@udecode/plate-link";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
-import { logError } from "@vanilla/utils";
-import React, { useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import { logError, RecordID } from "@vanilla/utils";
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import { Provider } from "react-redux";
 import { Path } from "slate";
-import { VanillaEditorContainer } from "./VanillaEditorContainer";
+import { VanillaEditorContainer } from "@library/vanilla-editor/VanillaEditorContainer";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
 import { useIsInModal } from "@library/modal/Modal.context";
-import { t } from "@library/utility/appUtils";
+import { TableToolbar } from "@library/vanilla-editor/plugins/tablePlugin/toolbar/TableToolbar";
+import { CalloutToolbar } from "@library/vanilla-editor/plugins/calloutPlugin/CalloutToolbar";
+import { VanillaEditorTableProvider } from "@library/vanilla-editor/plugins/tablePlugin/VanillaEditorTableContext";
+import { getMeta, t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import {
+    cleanTableRowspanColspan,
+    needsInitialNormalizationForTables,
+    needsRowspanColspanCleaning,
+} from "@library/vanilla-editor/plugins/tablePlugin/tableUtils";
+import { ensureBuiltinEmbedsSync } from "@library/embeddedContent/embedService.loadable";
+import { MentionsProvider } from "@library/features/users/suggestion/MentionsContext";
+
+const userMentionsEnabled: boolean = getMeta("ui.userMentionsEnabled", true);
+
+const isRichTableEnabled = getMeta("featureFlags.RichTable.Enabled", false);
 
 /**
  * @todo
@@ -95,34 +113,38 @@ export interface IVanillaEditorProps {
     onBlur?: React.TextareaHTMLAttributes<HTMLDivElement>["onBlur"];
     containerClasses?: string;
     editorClasses?: string;
+    recordID?: RecordID;
+    recordType?: "category" | "group" | "discussion" | "escalation";
 }
 
-export function createVanillaEditor(options?: { initialValue?: MyEditor; id?: string }) {
-    return createMyPlateEditor({
-        id: options?.id,
-        plugins: VanillaEditorPlugins,
-        editor: options?.initialValue,
-    });
-}
-
-export function LegacyFormVanillaEditor(props: IVanillaEditorProps) {
-    const { legacyTextArea, initialFormat, needsHtmlConversion, ...rest } = props;
+export function LegacyFormVanillaEditorLoadable(props: IVanillaEditorProps) {
+    const { legacyTextArea, initialFormat, needsHtmlConversion, containerClasses, recordID, recordType, ...rest } =
+        props;
     const store = getStore();
 
     return (
         <Provider store={store}>
-            <SynchronizationProvider
-                initialFormat={initialFormat}
-                needsHtmlConversion={needsHtmlConversion}
-                textArea={legacyTextArea}
-            >
-                <VanillaEditorLoadable legacyTextArea={legacyTextArea} {...rest} />
-            </SynchronizationProvider>
+            <MentionsProvider recordType={recordType ?? "category"} recordID={recordID}>
+                <SynchronizationProvider
+                    initialFormat={initialFormat}
+                    needsHtmlConversion={needsHtmlConversion}
+                    textArea={legacyTextArea}
+                >
+                    <VanillaEditorLoadable
+                        legacyTextArea={legacyTextArea}
+                        containerClasses={classNames(containerClasses, "is-legacy")}
+                        {...rest}
+                    />
+                </SynchronizationProvider>
+            </MentionsProvider>
         </Provider>
     );
 }
 
-export function VanillaEditorLoadable(props: IVanillaEditorProps) {
+export const VanillaEditorLoadable = forwardRef(function VanillaEditorLoadable(
+    props: IVanillaEditorProps,
+    ref: React.RefObject<IVanillaEditorRef>,
+) {
     const { uploadEnabled = true, legacyTextArea, inEditorContent } = props;
     const syncContext = useSynchronizationContext();
     const { syncTextArea, initialValue } = syncContext;
@@ -130,14 +152,18 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    ensureBuiltinEmbeds();
-
     const editorID = useUniqueID("editor");
 
     const editor = useMemo(() => {
         return props.editor ?? createVanillaEditor({ id: editorID });
     }, [props.editor]);
     useImperativeHandle(props.editorRef, () => editor, [editor]);
+
+    useImperativeHandle(ref, () => ({
+        focusEditor: () => {
+            focusEditor(editor);
+        },
+    }));
 
     const isInModal = useIsInModal();
     const device = useDevice();
@@ -214,6 +240,25 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
         }
     };
 
+    const initValue = useMemo(() => {
+        const value = props.initialContent ? ensureMyValue(props.initialContent) : initialValue;
+
+        // we need to run normalizers for initial tables manually for backwords compatibility
+        if (needsInitialNormalizationForTables(editor, value) && needsRowspanColspanCleaning(value as MyValue)) {
+            return cleanTableRowspanColspan(editor, value as MyValue) as MyValue;
+        }
+        return value;
+    }, [props.initialContent, initialValue]);
+
+    useEffect(() => {
+        if (initValue) {
+            props.onChange?.(initValue);
+        }
+    }, [initValue]);
+
+    const classesUserContent = userContentClasses.useAsHook();
+    const classesEditor = vanillaEditorClasses.useAsHook();
+
     return (
         <div id="vanilla-editor-root" ref={scrollRef} data-testid={"vanilla-editor"}>
             <PlateProvider<MyValue>
@@ -227,46 +272,48 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
                         props.onChange(newValue);
                     }
                 }}
-                initialValue={props.initialContent ? ensureMyValue(props.initialContent) : initialValue}
+                initialValue={initValue}
+                normalizeInitialValue={needsInitialNormalizationForTables(editor, initValue)}
             >
                 <ConversionNotice showConversionNotice={showConversionNotice} />
                 <VanillaEditorBoundsContext>
                     <VanillaEditorContainer boxShadow className={props.containerClasses}>
                         {props?.isPreview ? (
                             <div
-                                className={cx(
-                                    userContentClasses().root,
-                                    vanillaEditorClasses().root({ horizontalPadding: true }),
-                                )}
+                                className={cx(classesUserContent.root, classesEditor.root({ horizontalPadding: true }))}
                             >
                                 {t("This is a preview and cannot be edited.")}
                             </div>
                         ) : (
                             <VanillaEditorFocusContext>
-                                <Plate<MyValue>
-                                    id={editorID}
-                                    editor={editor}
-                                    editableProps={{
-                                        onBlur: props.onBlur,
-                                        autoFocus: props.autoFocus,
-                                        className: cx(
-                                            userContentClasses().root,
-                                            vanillaEditorClasses().root({ horizontalPadding: true }),
-                                            props.editorClasses,
-                                        ),
-                                        "aria-label": t(
-                                            "To access the paragraph format menu, press control, shift, and P. To access the text format menu, press control, shift, and I. Use the arrow keys to navigate in each menu.",
-                                        ),
-                                    }}
-                                >
-                                    <VanillaEditorPlaceholder />
-                                    <MarkToolbar />
-                                    <MentionToolbar pluginKey="@" />
-                                    <QuoteEmbedToolbar />
-                                </Plate>
+                                <ConditionalWrap component={VanillaEditorTableProvider} condition={isRichTableEnabled}>
+                                    <Plate<MyValue>
+                                        id={editorID}
+                                        editor={editor}
+                                        editableProps={{
+                                            onBlur: props.onBlur,
+                                            autoFocus: props.autoFocus,
+                                            className: cx(
+                                                classesUserContent.root,
+                                                classesEditor.root({ horizontalPadding: true }),
+                                                props.editorClasses,
+                                            ),
+                                            "aria-label": t(
+                                                "To access the paragraph format menu, press control, shift, and P. To access the text format menu, or element specific menu, press control, shift, and I. Use the arrow keys to navigate in each menu.",
+                                            ),
+                                        }}
+                                    >
+                                        <VanillaEditorPlaceholder />
+                                        <MarkToolbar />
+                                        {userMentionsEnabled && <MentionToolbar pluginKey="@" />}
+                                        <QuoteEmbedToolbar />
+                                        {isRichTableEnabled && <TableToolbar />}
+                                        <CalloutToolbar />
+                                    </Plate>
+                                </ConditionalWrap>
                             </VanillaEditorFocusContext>
                         )}
-                        <div className={vanillaEditorClasses().footer}>
+                        <div className={classesEditor.footer}>
                             {!followMobileRenderingRules && <FloatingElementToolbar />}
                             <PersistentToolbar
                                 uploadEnabled={uploadEnabled}
@@ -280,98 +327,7 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
             </PlateProvider>
         </div>
     );
-}
-
-/**
- * Pass this method HTML and it should return it back valid Rich2
- */
-export function deserializeHtml(html: string): MyValue | undefined {
-    const editor = createVanillaEditor();
-    if (!html) {
-        logError("html not provided");
-        return;
-    }
-
-    let validHTML = html;
-
-    // Parse the html string into a DOM object to evaluate nodes
-    const parser = new DOMParser();
-    const parsedHTML = parser.parseFromString(html, "text/html");
-    // Only evaluate the top level child nodes found within the body
-    const nodes = Array.from(parsedHTML.body.childNodes);
-
-    // Invalid HTML nodes exist in the list. Let's fix it, Felix!
-    if (nodes.filter((node) => !validNode(node))) {
-        // group the nodes before wrapping properly
-        const nodeGroups: Array<ChildNode | ChildNode[]> = [];
-        let tmpGroup: ChildNode[] = [];
-
-        nodes.forEach((node, idx) => {
-            // Node is valid. Add the temp group and the node to the list and reset the temp group
-            if (validNode(node)) {
-                nodeGroups.push(tmpGroup, node);
-                tmpGroup = [];
-                return;
-            }
-
-            // Add the node to the temp group
-            tmpGroup.push(node);
-
-            // Add the temp group and reset if the node and it's next sibling is a BR element or we have reached the end of the list
-            if (
-                idx === nodes.length - 1 ||
-                (node instanceof HTMLBRElement && node.nextSibling instanceof HTMLBRElement)
-            ) {
-                nodeGroups.push(tmpGroup);
-                tmpGroup = [];
-            }
-        });
-
-        // Now that we have grouped invalid nodes, let's wrap them in paragraphs and build valid HTML
-        const tmpBody = document.createElement("body");
-        const nodesLastIdx = nodeGroups.length - 1;
-        nodeGroups.forEach((item, itemIdx) => {
-            // The current item is a valid node, let's just add it to the temp body
-            if (!Array.isArray(item)) {
-                tmpBody.append(item);
-                return;
-            }
-
-            // The current item contains only an image and therefore should not be wrapped in a paragraph
-            if (item.length === 1 && item[0] instanceof HTMLImageElement) {
-                tmpBody.append(item[0]);
-                return;
-            }
-
-            // The current item is an array of elements, let's place them inside a paragraph
-            if (item.length > 0) {
-                const itemLastIdx = item.length - 1;
-                const tmpParagraph = document.createElement("p");
-                item.forEach((child, childIdx) => {
-                    // We don't want to add BR elements that created hard line breaks
-                    const addToDOM = !(
-                        child instanceof HTMLBRElement &&
-                        ((childIdx === 0 && itemIdx > 0) || (childIdx === itemLastIdx && itemIdx < nodesLastIdx))
-                    );
-
-                    if (addToDOM) {
-                        tmpParagraph.append(child);
-                    }
-                });
-
-                // Add the paragraph to the temp body
-                tmpBody.append(tmpParagraph);
-            }
-        });
-
-        // the temp body innerHTML is now our valid HTML
-        validHTML = tmpBody.innerHTML;
-    }
-
-    return plateDeserializeHtml(editor, {
-        element: validHTML,
-    }) as MyValue;
-}
+});
 
 /**
  * The version of Plate currently in use (19.3.0) does not recognize `mailto` links.
@@ -413,11 +369,4 @@ export function emailLinkCheck(value) {
     });
 
     return newValue;
-}
-
-/**
- * Determine if the node is valid as stand alone HTML
- */
-export function validNode(node) {
-    return !["Text", "HTMLBRElement", "HTMLElement", "HTMLImageElement"].includes(node.constructor.name);
 }

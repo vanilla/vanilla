@@ -8,6 +8,7 @@
 namespace Vanilla\Utility;
 
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Vanilla\Logger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\DeveloperProfileModel;
@@ -262,6 +263,11 @@ final class Timers
      */
     private function shouldRecordProfile(): bool
     {
+        $perfTraceQueryParam = \Gdn::request()->getQuery()["performanceTrace"] ?? false;
+        if ($perfTraceQueryParam) {
+            return true;
+        }
+
         if (!$this->isEnabled) {
             return false;
         }
@@ -283,6 +289,10 @@ final class Timers
         if ($this->isSlowRequest()) {
             // Slow request get sampled at a higher rate.
             $samplingRate = round($samplingRate / 100);
+        }
+
+        if ($samplingRate < 1) {
+            $samplingRate = 1;
         }
 
         $isSampleHit = random_int(1, $samplingRate) === 1;
@@ -342,7 +352,7 @@ final class Timers
                 "name" => $name,
                 "isTracked" => false,
                 "requestElapsedMs" => $elapsedMs,
-                "requestID" => $request->getMeta("requestID"),
+                "requestID" => $request->getMeta("requestID", Uuid::uuid7()->toString()),
                 "requestMethod" => $request->getMethod(),
                 "requestPath" => $request->getPath(),
                 "requestQuery" => $request->getQuery(),

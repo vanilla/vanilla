@@ -43,6 +43,12 @@ export function PermissionsContextProvider(props: PropsWithChildren<{}>) {
     );
 }
 
+/**
+ * Get the current user permissions context.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
+ */
 export function usePermissionsContext() {
     return useContext(PermissionsContext);
 }

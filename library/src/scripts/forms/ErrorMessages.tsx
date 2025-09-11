@@ -9,6 +9,7 @@ import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { capitalizeFirstLetter } from "@vanilla/utils";
+import { IApiError } from "@library/@types/api/core";
 
 interface IError {
     message: string;
@@ -17,7 +18,7 @@ interface IError {
 
 interface IProps extends IOptionalComponentID {
     className?: string;
-    errors?: IError[];
+    errors?: IError[] | IApiError[];
     padded?: boolean;
 }
 
@@ -25,7 +26,7 @@ export default function ErrorMessages(props: IProps) {
     const ownID = useUniqueID("errorMessages");
     const id = props.id ?? ownID;
     const { errors, padded } = props;
-    const classesInputBlock = inputBlockClasses();
+    const classesInputBlock = inputBlockClasses.useAsHook();
     if (errors && errors.length > 0) {
         const componentClasses = classNames(
             classesInputBlock.errors,

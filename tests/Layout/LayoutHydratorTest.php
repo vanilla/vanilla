@@ -9,6 +9,7 @@ namespace VanillaTests\Layout;
 
 use Garden\Container\Container;
 use Vanilla\Layout\LayoutHydrator;
+use Vanilla\Widgets\TitleBarWidget;
 use VanillaTests\BootstrapTestCase;
 use VanillaTests\Layout\Asset\MockAsset;
 use VanillaTests\SiteTestTrait;
@@ -18,11 +19,20 @@ use VanillaTests\SiteTestTrait;
  */
 class LayoutHydratorTest extends BootstrapTestCase
 {
+    const HYDRATED_TITLEBAR = [
+        '$reactComponent' => "TitleBar",
+        '$reactProps' => [
+            "positioning" => TitleBarWidget::POSITION_STICKY_SOLID,
+            "logoType" => "styleguide",
+            "navigationType" => "styleguide",
+        ],
+    ];
+
     use LayoutTestTrait;
     use SiteTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function configureContainerBeforeStartup(Container $container)
     {
@@ -134,6 +144,7 @@ class LayoutHydratorTest extends BootstrapTestCase
                         ],
                     ],
                 ],
+                "titleBar" => self::HYDRATED_TITLEBAR,
             ],
             [
                 "@context" => "https://schema.org",
@@ -156,19 +167,28 @@ class LayoutHydratorTest extends BootstrapTestCase
 
         yield "Resolvers not found turn into layout error react nodes" => [
             [
-                '$hydrate' => "react.some-react",
-                "thiswillfail" => true,
-            ],
-            [
-                '$reactComponent' => "LayoutError",
-                '$reactProps' => [
-                    "layoutDefinition" => [
+                "layout" => [
+                    [
                         '$hydrate' => "react.some-react",
                         "thiswillfail" => true,
                     ],
-                    "componentName" => "react.some-react",
-                    "message" => "Resolver not registered: react.some-react",
                 ],
+            ],
+            [
+                "layout" => [
+                    [
+                        '$reactComponent' => "LayoutError",
+                        '$reactProps' => [
+                            "layoutDefinition" => [
+                                '$hydrate' => "react.some-react",
+                                "thiswillfail" => true,
+                            ],
+                            "componentName" => "react.some-react",
+                            "message" => "Resolver not registered: react.some-react",
+                        ],
+                    ],
+                ],
+                "titleBar" => self::HYDRATED_TITLEBAR,
             ],
             [
                 "@context" => "https://schema.org",
@@ -228,6 +248,10 @@ class LayoutHydratorTest extends BootstrapTestCase
 
         yield "Success hydration" => [
             [
+                "titleBar" => [
+                    '$hydrate' => "react.titleBar",
+                    "logoType" => "custom",
+                ],
                 "layout" => [
                     '$hydrate' => "react.section.1-column",
                     "children" => [
@@ -241,6 +265,14 @@ class LayoutHydratorTest extends BootstrapTestCase
                 ],
             ],
             [
+                "titleBar" => [
+                    '$reactComponent' => "TitleBar",
+                    '$reactProps' => [
+                        "positioning" => TitleBarWidget::POSITION_STICKY_SOLID,
+                        "logoType" => "custom",
+                        "navigationType" => "styleguide",
+                    ],
+                ],
                 "layout" => [
                     '$reactComponent' => "SectionOneColumn",
                     '$reactProps' => [

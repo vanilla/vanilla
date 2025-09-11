@@ -121,7 +121,6 @@ const errorContainer = css({
 export default function AddEditReportReasonModalImp(props: AddEditReportReasonModalProps) {
     const { reportReason, isVisible, onVisibilityChange } = props;
     const reasonMutation = useReasonMutation(true);
-    const classesFrameBody = frameBodyClasses();
     const classFrameFooter = frameFooterClasses();
 
     const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
@@ -256,7 +255,7 @@ export default function AddEditReportReasonModalImp(props: AddEditReportReasonMo
                             />
                         }
                         body={
-                            <FrameBody className={classesFrameBody.root}>
+                            <FrameBody>
                                 {serverErrorMessage && (
                                     <div className={errorContainer}>
                                         <Message

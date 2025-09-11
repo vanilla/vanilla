@@ -14,9 +14,12 @@ use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Dashboard\Events\ThemeApplyEvent;
 use Vanilla\Dashboard\Events\ThemeEvent;
+use Vanilla\Dashboard\Models\FragmentModel;
+use Vanilla\Dashboard\Models\FragmentView;
 use Vanilla\Events\EventAction;
 use Vanilla\Logging\AuditLogger;
 use Vanilla\Logging\ErrorLogger;
+use Vanilla\Models\Model;
 use Vanilla\Models\ModelCache;
 use Vanilla\Site\SiteSectionModel;
 use Garden\Web\Exception\ClientException;
@@ -30,6 +33,10 @@ use VanillaTests\Fixtures\QuickLinks\MockQuickLinksVariableProvider;
 class ThemeService
 {
     private const MAX_PARENT_DEPTH = 3;
+
+    public const MAX_REVISIONS = 300;
+
+    public const MIN_REVISIONS = 100;
 
     /**
      * When fetching the current theme, accurate assets will be prioritized. CurrentTheme > MobileTheme
@@ -53,63 +60,26 @@ class ThemeService
     /** @var VariableDefaultsProviderInterface[] */
     private $variableDefaultsProviders = [];
 
-    /** @var ConfigurationInterface $config */
-    private $config;
-
-    /** @var \Gdn_Session */
-    private $session;
-
-    /** @var SiteSectionModel */
-    private $siteSectionModel;
-
-    /** @var AddonManager $addonManager */
-    private $addonManager;
-
-    /** @var ThemeServiceHelper $themeHelper */
-    private $themeHelper;
-
-    /** @var ThemeSectionModel */
-    private $themeSections;
-
     /** @var string $themeManagePageUrl */
     private $themeManagePageUrl = "/dashboard/settings/themes";
-
-    /** @var FsThemeProvider */
-    private $fallbackThemeProvider;
 
     /** @var ModelCache */
     private $modelCache;
 
     /**
-     * ThemeService constructor.
-     *
-     * @param ConfigurationInterface $config
-     * @param \Gdn_Session $session
-     * @param AddonManager $addonManager
-     * @param ThemeServiceHelper $themeHelper
-     * @param ThemeSectionModel $themeSections
-     * @param SiteSectionModel $siteSectionModel
-     * @param FsThemeProvider $fallbackThemeProvider
-     * @param \Gdn_Cache $cache
+     * DI.
      */
     public function __construct(
-        ConfigurationInterface $config,
-        \Gdn_Session $session,
-        AddonManager $addonManager,
-        ThemeServiceHelper $themeHelper,
-        ThemeSectionModel $themeSections,
-        SiteSectionModel $siteSectionModel,
-        FsThemeProvider $fallbackThemeProvider,
+        private ConfigurationInterface $config,
+        private \Gdn_Session $session,
+        private AddonManager $addonManager,
+        private ThemeServiceHelper $themeHelper,
+        private ThemeSectionModel $themeSections,
+        private SiteSectionModel $siteSectionModel,
+        private FsThemeProvider $fallbackThemeProvider,
+        private FragmentModel $fragmentModel,
         \Gdn_Cache $cache
     ) {
-        $this->config = $config;
-        $this->session = $session;
-        $this->addonManager = $addonManager;
-        $this->themeHelper = $themeHelper;
-        $this->themeSections = $themeSections;
-        $this->siteSectionModel = $siteSectionModel;
-        $this->fallbackThemeProvider = $fallbackThemeProvider;
-
         // When developers are working locally, this config key is enabled.
         // In that situation always use an in-memory cache instead of allowing memcached.
         // Otherwise developers working on fs-based theme will be looking at stale cached assets.
@@ -271,6 +241,43 @@ class ThemeService
             }
         }
         return $allThemes;
+    }
+
+    /**
+     * Get all fragment UUIDs by theme ID.
+     *
+     * @return array<FragmentView[]>
+     */
+    public function getFragmentViews(): array
+    {
+        return $this->modelCache->getCachedOrHydrate(
+            [__FUNCTION__],
+            function () {
+                $result = [];
+                foreach ($this->getThemes() as $theme) {
+                    $fragments = $theme->getVariables()->get("globalFragmentImpls", []);
+                    foreach ($fragments as $fragmentImpl) {
+                        $fragmentUUID = $fragmentImpl["fragmentUUID"] ?? null;
+                        if ($fragmentUUID === null || $fragmentUUID === "system") {
+                            continue;
+                        }
+
+                        $result[] = new FragmentView(
+                            $fragmentUUID,
+                            recordType: "theme",
+                            recordID: $theme->getThemeID(),
+                            recordName: $theme->getName(),
+                            recordUrl: url("/appearance/style-guides/{$theme->getThemeID()}/edit", true)
+                        );
+                    }
+                }
+
+                return $result;
+            },
+            cacheOptions: [
+                ModelCache::OPT_TTL => 60 * 60,
+            ]
+        );
     }
 
     /**
@@ -666,13 +673,10 @@ class ThemeService
      * @param string $themeKey
      * @return array
      */
-    public function getThemeRevisions(string $themeKey): array
+    public function getThemeRevisions(string $themeKey, int $limit = self::MIN_REVISIONS, int $offset = 0): array
     {
         $provider = $this->getThemeProvider($themeKey);
-        $revisions = $provider->getThemeRevisions($themeKey);
-        foreach ($revisions as &$revision) {
-            $revision = $this->normalizeTheme($revision);
-        }
+        $revisions = $provider->getThemeRevisions($themeKey, $limit, $offset);
         return $revisions;
     }
 
@@ -700,7 +704,42 @@ class ThemeService
         $theme->setCurrent($isCurrent);
 
         $this->overlayAddonVariables($theme);
+        $this->overlayFragmentImpls($theme);
         return $theme;
+    }
+
+    /**
+     * @param Theme $theme
+     * @return void
+     */
+    private function overlayFragmentImpls(Theme $theme)
+    {
+        $rawFragmentImpls = $theme->getVariables()->get("globalFragmentImpls", []);
+        $fragmentUUIDs = [];
+        foreach ($rawFragmentImpls as $fragmentType => $fragmentImpl) {
+            $fragmentUUID = $fragmentImpl["fragmentUUID"] ?? null;
+            if ($fragmentUUID !== null && $fragmentUUID !== "system") {
+                $fragmentUUIDs[] = $fragmentUUID;
+            }
+        }
+
+        // Load up the fragment data, these should be in cache.
+        $fragmentsByUUID = $this->fragmentModel->selectFragmentImpls($fragmentUUIDs);
+
+        $finalFragmentImpls = [];
+        foreach ($rawFragmentImpls as $fragmentType => $fragmentImpl) {
+            $fragmentUUID = $fragmentImpl["fragmentUUID"] ?? null;
+            $fragmentImpl = $fragmentsByUUID[$fragmentUUID] ?? null;
+            if ($fragmentImpl === null) {
+                // If the fragment is not found, revert to the system fragment.
+                $finalFragmentImpls[$fragmentType] = [
+                    "fragmentUUID" => "system",
+                ];
+                continue;
+            }
+            $finalFragmentImpls[$fragmentType] = $fragmentImpl;
+        }
+        $theme->overlayVariables(["globalFragmentImpls" => $finalFragmentImpls]);
     }
 
     /**

@@ -1,6 +1,6 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -16,7 +16,6 @@ import { ICountResult } from "@library/search/searchTypes";
 import NumberFormatted from "@library/content/NumberFormatted";
 import DateTime from "@library/content/DateTime";
 import { MetaIcon, MetaItem, MetaTag } from "@library/metas/Metas";
-import { metasClasses } from "@library/metas/Metas.styles";
 import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
 import { getMeta } from "@library/utility/appUtils";
 import { ITag } from "@library/features/tags/TagsReducer";
@@ -43,12 +42,12 @@ export function ResultMeta(props: IProps) {
             <Translate
                 source="<0/> by <1/>"
                 c0={type ? t(capitalizeFirstLetter(type)) : undefined}
-                c1={<ProfileLink className={metasClasses().metaLink} userFragment={updateUser} />}
+                c1={<ProfileLink asMeta userFragment={updateUser} />}
             />
         ) : type ? (
             t(capitalizeFirstLetter(type))
         ) : updateUser?.userID != null ? (
-            <ProfileLink className={metasClasses().metaLink} userFragment={updateUser} />
+            <ProfileLink asMeta userFragment={updateUser} />
         ) : null;
 
     const countMeta =
@@ -67,7 +66,7 @@ export function ResultMeta(props: IProps) {
             // %s discussions
             // %s comments
             return (
-                <MetaItem key={i}>
+                <MetaItem key={`${labelCode}_${i}`}>
                     <Translate source={`%s ${labelCode}`} c0={<NumberFormatted value={count} />} />
                 </MetaItem>
             );
@@ -76,34 +75,35 @@ export function ResultMeta(props: IProps) {
     const displayDate = !!dateUpdated && !isNaN(new Date(dateUpdated).getTime());
 
     const customLayoutsForDiscussionListIsEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
-
+    const taggingEnabled = getMeta("tagging.enabled", false);
     // Prevent duplicates of idea statuses
     const tagsToShow = tags?.filter((tag) => !labels?.includes(tag.name));
 
     return (
         <>
             {labels &&
-                labels.map((label) => (
-                    <MetaTag key={label} tagPreset={discussionListVariables().labels.tagPreset}>
+                labels.map((label, index) => (
+                    <MetaTag key={`${label}_${index}`} tagPreset={discussionListVariables().labels.tagPreset}>
                         {t(label)}
                     </MetaTag>
                 ))}
 
-            {tagsToShow?.map((tag) => {
-                const discussionsWithTagFilterUrl = customLayoutsForDiscussionListIsEnabled
-                    ? `/discussions?tagID=${tag.tagID}`
-                    : `/discussions/tagged/${tag.urlcode}`;
+            {taggingEnabled &&
+                tagsToShow?.map((tag, index) => {
+                    const discussionsWithTagFilterUrl = customLayoutsForDiscussionListIsEnabled
+                        ? `/discussions?tagID=${tag.tagID}`
+                        : `/discussions/tagged/${tag.urlcode}`;
 
-                return (
-                    <MetaTag
-                        key={tag.tagID}
-                        to={discussionsWithTagFilterUrl}
-                        tagPreset={discussionListVariables().userTags.tagPreset}
-                    >
-                        {t(tag.name)}
-                    </MetaTag>
-                );
-            })}
+                    return (
+                        <MetaTag
+                            key={`${tag.tagID}_${index}`}
+                            to={discussionsWithTagFilterUrl}
+                            tagPreset={discussionListVariables().userTags.tagPreset}
+                        >
+                            {t(tag.name)}
+                        </MetaTag>
+                    );
+                })}
 
             {typeMetaContents && (
                 <MetaItem>

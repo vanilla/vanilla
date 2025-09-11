@@ -32,7 +32,7 @@ class UserMentionsModelTest extends SiteTestCase
     private $commentModel;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {
@@ -40,6 +40,7 @@ class UserMentionsModelTest extends SiteTestCase
         $this->userMentionModel = $this->container()->get(UserMentionsModel::class);
         $this->discussionModel = $this->container()->get(DiscussionModel::class);
         $this->commentModel = $this->container()->get(CommentModel::class);
+        $this->setConfig(UserMentionsModel::MENTION_KEY, \UsersApiController::AT_MENTION_GLOBAL);
     }
 
     /**
@@ -172,6 +173,29 @@ class UserMentionsModelTest extends SiteTestCase
     }
 
     /**
+     * Test UserMentions are not parsed if the mentions are disabled globally.
+     *
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function testDiscussionMentionEventsWithMentionsDisabled()
+    {
+        $this->setConfig(UserMentionsModel::MENTION_KEY, \UsersApiController::AT_MENTION_DISABLED);
+        $user1 = $this->createUser(["name" => "user1" . randomString(3)]);
+        $user2 = $this->createUser(["name" => "user2" . randomString(3)]);
+
+        $discussion = $this->createDiscussion(["body" => "test @\"{$user1["name"]}\""]);
+        $resultUser1 = $this->userMentionModel->getByUser($user1["userID"]);
+        $this->assertEquals(0, count($resultUser1));
+
+        $this->api()->patch("/discussions/" . $discussion["discussionID"], ["body" => "test @\"{$user2["name"]}\""]);
+        $resultUser2 = $this->userMentionModel->getByUser($user2["userID"]);
+        $this->assertEquals(0, count($resultUser2));
+    }
+
+    /**
      * Tests for UserMentionEventHandler:: handleCommentEvent.
      */
     public function testCommentMentionEvents()
@@ -191,6 +215,22 @@ class UserMentionsModelTest extends SiteTestCase
         $this->assertEquals(1, count($resultUser2));
 
         $this->api()->delete("/comments/" . $comment["commentID"]);
+        $resultUser2 = $this->userMentionModel->getByUser($user2["userID"]);
+        $this->assertEquals(0, count($resultUser2));
+    }
+
+    public function testCommentMentionsAreNotParsedIfMentionsAreDisabled()
+    {
+        $this->setConfig(UserMentionsModel::MENTION_KEY, \UsersApiController::AT_MENTION_DISABLED);
+        $user1 = $this->createUser(["name" => "user1" . randomString(4)]);
+        $user2 = $this->createUser(["name" => "user2" . randomString(4)]);
+        $this->createDiscussion();
+
+        $comment = $this->createComment(["body" => "test @\"{$user1["name"]}\""]);
+        $resultUser1 = $this->userMentionModel->getByUser($user1["userID"]);
+        $this->assertEquals(0, count($resultUser1));
+
+        $this->api()->patch("/comments/" . $comment["commentID"], ["body" => "test @\"{$user2["name"]}\""]);
         $resultUser2 = $this->userMentionModel->getByUser($user2["userID"]);
         $this->assertEquals(0, count($resultUser2));
     }

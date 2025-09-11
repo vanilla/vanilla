@@ -9,3 +9,4 @@ export * from "./translationStore";
 export * from "./LocaleProvider";
 export * from "./ContentTranslationProvider";
 export * from "./ContentTranslator";
+export * from "./formatting";

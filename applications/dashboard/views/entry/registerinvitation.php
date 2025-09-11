@@ -20,19 +20,20 @@
         <ul>
             <li>
                 <?php
-                echo $this->Form->label("Invitation Code", "InvitationCode");
+                echo $this->Form->label("Invitation Code", "InvitationCode", ["required" => true]);
                 echo $this->Form->textBox("InvitationCode", [
                     "value" => $this->InvitationCode,
                     "autocorrect" => "off",
                     "autocapitalize" => "off",
                     "Wrap" => true,
+                    "required" => true,
                 ]);
                 ?>
             </li>
             <li>
                 <?php
-                echo $this->Form->label("Username", "Name");
-                echo $this->Form->textBox("Name", ["autocorrect" => "off", "autocapitalize" => "off", "Wrap" => true]);
+                echo $this->Form->label("Username", "Name", ["required" => true]);
+                echo $this->Form->textBox("Name", ["autocorrect" => "off", "autocapitalize" => "off", "Wrap" => true, "required" => true]);
                 echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">' .
                     t("Name Unavailable") .
                     "</span>";
@@ -46,7 +47,7 @@
             ?>
             <li>
                 <?php
-                echo $this->Form->label("Password", "Password");
+                echo $this->Form->label("Password", "Password", ["required" => true]);
                 echo wrap(
                     sprintf(t("Your password must be at least %d characters long."), c("Garden.Password.MinLength")) .
                         " " .
@@ -56,13 +57,13 @@
                     "div",
                     ["class" => "Gloss"]
                 );
-                echo $this->Form->input("Password", "password", ["Wrap" => true, "Strength" => true]);
+                echo $this->Form->input("Password", "password", ["Wrap" => true, "Strength" => true, "required" => true]);
                 ?>
             </li>
             <li>
                 <?php
-                echo $this->Form->label("Confirm Password", "PasswordMatch");
-                echo $this->Form->input("PasswordMatch", "password", ["Wrap" => true]);
+                echo $this->Form->label("Confirm Password", "PasswordMatch", ["required" => true]);
+                echo $this->Form->input("PasswordMatch", "password", ["Wrap" => true, "required" => true]);
                 echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">' .
                     t("Passwords don't match") .
                     "</span>";
@@ -72,7 +73,9 @@
             <?php $this->fireEvent("RegisterFormBeforeTerms"); ?>
             <li>
                 <?php
-                echo $this->Form->checkBox("TermsOfService", "@" . $TermsOfServiceText, ["value" => "1"], false);
+                if (Gdn::config('Garden.Registration.RequireTermsOfService', true)) {
+                    echo $this->Form->checkBox("TermsOfService", "@" . $TermsOfServiceText, ["value" => "1"], false);
+                }
                 echo $this->Form->checkBox("RememberMe", "Remember me on this computer", ["value" => "1"]);
                 ?>
             </li>

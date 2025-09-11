@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { t } from "@vanilla/i18n";
 import { ToolTip } from "@library/toolTip/ToolTip";
-import userManagementClasses from "@dashboard/users/userManagement/UserManagement.classes";
+import DashboardListPageClasses from "@dashboard/components/DashboardListPage.classes";
 import Button from "@library/forms/Button";
 import { Icon } from "@vanilla/icons";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -20,7 +20,7 @@ import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { cx } from "@emotion/css";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
 import { useAutomationRules } from "@dashboard/automationRules/AutomationRules.context";
 import { IAutomationRulesFilterValues } from "@dashboard/automationRules/AutomationRules.types";
@@ -35,6 +35,7 @@ export function AutomationRulesFilter(props: {
     const [isVisible, setIsVisible] = useState(false);
     const [localFilters, setLocalFilters] = useState<IAutomationRulesFilterValues>(filters ?? {});
 
+    const { filterButtonsContainer, actionButton, clearFilterButton } = DashboardListPageClasses.useAsHook();
     const classes = automationRulesClasses();
 
     const { automationRulesCatalog } = useAutomationRules();
@@ -94,13 +95,13 @@ export function AutomationRulesFilter(props: {
     const isFilterApplied = Object.keys(filters ?? {}).some((filter) => filters[filter]);
 
     return (
-        <div className={userManagementClasses().filterButtonsContainer}>
+        <div className={filterButtonsContainer}>
             <ToolTip label={t("Filter")} customWidth={60}>
                 <span>
                     <Button
                         buttonType={ButtonTypes.ICON}
                         onClick={() => setIsVisible(!isVisible)}
-                        className={userManagementClasses().actionButton}
+                        className={actionButton}
                         aria-label="Filter"
                     >
                         <Icon icon={`filter${isFilterApplied ? "-applied" : ""}`} />
@@ -174,7 +175,7 @@ export function AutomationRulesFilter(props: {
                                 setLocalFilters({});
                                 onFilter({});
                             }}
-                            className={userManagementClasses().clearFilterButton}
+                            className={clearFilterButton}
                         >
                             <ClearIcon />
                         </Button>

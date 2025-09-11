@@ -4,7 +4,7 @@
  */
 
 import React, { useContext, useEffect, useState } from "react";
-import qs from "qs";
+import * as qs from "qs-esm";
 import { formatUrl, getMeta, siteUrl } from "@library/utility/appUtils";
 
 // The name of the custom event that we fire when an update happens.

@@ -30,7 +30,7 @@ class SearchPlacesEvent implements \Garden\Events\TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -38,7 +38,7 @@ class SearchPlacesEvent implements \Garden\Events\TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAction(): string
     {
@@ -46,7 +46,7 @@ class SearchPlacesEvent implements \Garden\Events\TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getPayload(): ?array
     {
@@ -54,7 +54,7 @@ class SearchPlacesEvent implements \Garden\Events\TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {

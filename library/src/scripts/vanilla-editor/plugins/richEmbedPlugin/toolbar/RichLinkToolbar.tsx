@@ -1,35 +1,37 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
+import Floating, { defaultFloatingOptions } from "@library/vanilla-editor/toolbars/Floating";
+import React, { useRef } from "react";
+import { arrow, shift } from "@udecode/plate-floating";
 import { css, cx } from "@emotion/css";
+import { focusEditor, useHotkeys } from "@udecode/plate-common";
+
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Icon } from "@vanilla/icons";
+import LinkForm from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/RichLinkForm";
 import { MenuBar } from "@library/MenuBar/MenuBar";
 import { MenuBarItem } from "@library/MenuBar/MenuBarItem";
+import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
+import { TabHandler } from "@vanilla/dom-utils";
 import TruncatedText from "@library/content/TruncatedText";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { getMeta } from "@library/utility/appUtils";
-import { useVanillaEditorBounds } from "@library/vanilla-editor/VanillaEditorBoundsContext";
-import { queryRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/queries/queryRichLink";
-import LinkForm from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/RichLinkForm";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { linkToolbarClasses } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/RichLinkToolbar.classes";
+import { queryRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/queries/queryRichLink";
+import { setRichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/setRichLinkAppearance";
+import { t } from "@vanilla/i18n";
 import { triggerFloatingLinkEdit } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/triggerFloatingLinkEdit";
+import { unlinkRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/unlinkRichLink";
 import { useFloatingLinkEdit } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/useFloatingLinkEdit";
 import { useFloatingLinkInsert } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/useFloatingLinkInsert";
-import { setRichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/setRichLinkAppearance";
-import { unlinkRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/unlinkRichLink";
-import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
-import Floating, { defaultFloatingOptions } from "@library/vanilla-editor/toolbars/Floating";
-import { useMyEditorState } from "@library/vanilla-editor/typescript";
-import { focusEditor } from "@udecode/plate-common";
-import { arrow, shift } from "@udecode/plate-floating";
 import { useFloatingLinkSelectors } from "@udecode/plate-link";
-import { t } from "@vanilla/i18n";
-import { Icon } from "@vanilla/icons";
-import React, { useRef } from "react";
+import { useMyEditorState } from "@library/vanilla-editor/getMyEditor";
+import { useVanillaEditorBounds } from "@library/vanilla-editor/VanillaEditorBoundsContext";
 import { useVanillaEditorFocus } from "@library/vanilla-editor/VanillaEditorFocusContext";
 
 const FloatingLinkInsertRoot = function (props: React.PropsWithChildren<{}>) {
@@ -100,6 +102,22 @@ export default function RichLinkToolbar() {
 
     const entry = queryRichLink(editor);
 
+    useHotkeys(
+        "ctrl+shift+k",
+        (e) => {
+            const linkToolbar = document.querySelector("#floatingToolbar_richLink");
+            if (linkToolbar) {
+                const tabHandler = new TabHandler(linkToolbar);
+                tabHandler.getInitial()?.focus();
+            }
+        },
+        {
+            enabled: !isEditing,
+            enableOnContentEditable: true,
+        },
+        [],
+    );
+
     if (entry?.element?.embedData?.embedType === "quote") {
         return null;
     }
@@ -124,18 +142,27 @@ export default function RichLinkToolbar() {
     );
 
     const editContent = !isEditing ? (
-        <MenuBar className={classes.menuBar} data-testid="rich-link-menu">
+        <MenuBar className={classes.menuBar} data-testid="rich-link-menu" id="floatingToolbar_richLink">
+            <MenuBarItem
+                active={entry?.appearance === RichLinkAppearance.LINK}
+                accessibleLabel={"Display as Text"}
+                icon={<Icon icon="editor-link-text" />}
+                onActivate={() => {
+                    setRichLinkAppearance(editor, RichLinkAppearance.LINK);
+                    focusEditor(editor);
+                }}
+            ></MenuBarItem>
+            <MenuBarItem
+                active={entry?.appearance === RichLinkAppearance.BUTTON}
+                accessibleLabel={"Display as Button"}
+                icon={<Icon icon="buttons" />}
+                onActivate={() => {
+                    setRichLinkAppearance(editor, RichLinkAppearance.BUTTON);
+                    focusEditor(editor);
+                }}
+            ></MenuBarItem>
             {!isUrlEmbedsDisabled && (
                 <>
-                    <MenuBarItem
-                        active={entry?.appearance === RichLinkAppearance.LINK}
-                        accessibleLabel={"Display as Text"}
-                        icon={<Icon icon="editor-link-text" />}
-                        onActivate={() => {
-                            setRichLinkAppearance(editor, RichLinkAppearance.LINK);
-                            focusEditor(editor);
-                        }}
-                    ></MenuBarItem>
                     <MenuBarItem
                         active={entry?.appearance === RichLinkAppearance.INLINE}
                         accessibleLabel={"Display as Rich Link"}
@@ -154,19 +181,19 @@ export default function RichLinkToolbar() {
                             focusEditor(editor);
                         }}
                     ></MenuBarItem>
-                    <span
-                        role="separator"
-                        style={{
-                            display: "block",
-                            height: 16,
-                            width: 1,
-                            background: ColorsUtils.colorOut(globalVariables().border.color),
-                            marginLeft: 4,
-                            marginRight: 8,
-                        }}
-                    ></span>
                 </>
             )}
+            <span
+                role="separator"
+                style={{
+                    display: "block",
+                    height: 16,
+                    width: 1,
+                    background: ColorsUtils.colorOut(globalVariables().border.color),
+                    marginLeft: 4,
+                    marginRight: 8,
+                }}
+            ></span>
 
             {/* Some rich links may be files or images uploading and don't have a url yet. */}
             {url != null && (

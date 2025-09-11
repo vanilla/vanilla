@@ -193,6 +193,8 @@
 .modal-dialog {
     position: relative;
     margin: 3vh auto;
+    // Below titlebar
+    margin-top: calc(3vh + 56px);
     max-width: 1024px;
 
     &.modal-sm {

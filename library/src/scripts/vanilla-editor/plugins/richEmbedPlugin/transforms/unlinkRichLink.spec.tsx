@@ -8,7 +8,7 @@
 import { setRichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/setRichLinkAppearance";
 import { unlinkRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/unlinkRichLink";
 import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
-import { createVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { createVanillaEditor } from "@library/vanilla-editor/createVanillaEditor";
 import { jsx } from "@udecode/plate-test-utils";
 jsx;
 

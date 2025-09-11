@@ -20,6 +20,8 @@ import {
 import { t } from "@vanilla/i18n";
 import moment from "moment";
 import UserContent from "@library/content/UserContent";
+import { blessStringAsSanitizedHtml } from "@vanilla/dom-utils";
+import { logDebug } from "@vanilla/utils";
 
 export function mapProfileFieldDropdownOptionsToComboBoxOptions(
     dropdownOptions: NonNullable<ProfileField["dropdownOptions"]>,
@@ -109,7 +111,9 @@ export function mapProfileFieldsToSchema(
                                 ["checkBox", "richeditor"].includes(inputType) ? undefined : config[
                                       "descriptionHtml"
                                   ] ? (
-                                    <UserContent content={String(config["description"])} />
+                                    <UserContent
+                                        vanillaSanitizedHtml={blessStringAsSanitizedHtml(String(config["description"]))}
+                                    />
                                 ) : (
                                     config["description"]
                                 )
@@ -178,10 +182,16 @@ export function mapUserProfileFieldsToFormValues(schema: JsonSchema, userProfile
 
 // FIXME: https://higherlogic.atlassian.net/browse/VNLA-3088
 // Once dates are stored correctly (without time zone) in the backend, this function can be removed.
-export function formatDateStringIgnoringTimezone(value: string) {
-    //removing "Z" from the end of ISO time format will just ignore UTC Date which coordinating timezones and will just use local instead
-    if (!value) return "";
-    return new Date(value).toISOString().slice(0, -1);
+export function formatDateStringIgnoringTimezone(value: string): string {
+    const fallback = "";
+    if (!value) return fallback;
+    try {
+        //removing "Z" from the end of ISO time format will just ignore UTC Date which coordinating timezones and will just use local instead
+        return new Date(value).toISOString().slice(0, -1);
+    } catch (error) {
+        logDebug("Error formatting date string", error, "value", value);
+        return fallback;
+    }
 }
 
 /**

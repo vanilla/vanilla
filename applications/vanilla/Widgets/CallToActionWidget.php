@@ -8,21 +8,35 @@ namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Widgets\Fragments\CallToActionFragmentMeta;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
+use Vanilla\Widgets\React\ReactWidget;
 use Vanilla\Widgets\WidgetSchemaTrait;
-use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
-use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
 
 /**
  * Class CallToActionWidget
  */
-class CallToActionWidget extends AbstractReactModule implements CombinedPropsWidgetInterface
+class CallToActionWidget extends ReactWidget
 {
-    use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
     use WidgetSchemaTrait;
     use CallToActionWidgetTrait;
+
+    /**
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [CallToActionFragmentMeta::class];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Call to Action";
+    }
 
     /**
      * @inheritdoc
@@ -88,7 +102,7 @@ class CallToActionWidget extends AbstractReactModule implements CombinedPropsWid
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
@@ -10,13 +11,14 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\ApiUtils;
 use Vanilla\Community\Events\DiscussionTagEvent;
-use Vanilla\FeatureFlagHelper;
+use Vanilla\Dashboard\Scope\Models\ScopeModel;
+use Vanilla\Dashboard\Scope\Schema\ScopeSchema;
 use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Models\ModelCache;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Dashboard\Scope\ScopeHelper;
 
 /**
  * Tagging plugin.
@@ -27,27 +29,51 @@ class TagModel extends Gdn_Model
 
     const IX_TAGID = "id";
 
+    // Scope types
+    const SCOPE_TYPE_GLOBAL = "global";
+    const SCOPE_TYPE_SCOPED = "scoped";
+
     protected $Types;
 
     protected static $instance;
 
     public $StringTags;
 
-    const FIELD_MAPPINGS = ["urlcode" => "Name", "name" => "FullName"];
+    const FIELD_MAPPINGS = ["urlcode" => "Name", "name" => "FullName", "scopeType" => "scopeType"];
 
     const LIMIT_DEFAULT = 20;
 
     /** @var ModelCache */
     private $modelCache;
 
+    /** @var ScopeHelper */
+    private $scopeHelper;
+
     /**
      * @param string $name
+     * @param ScopeHelper|null $scopeHelper
      */
-    public function __construct($name = "")
+    public function __construct($name = "", ?ScopeHelper $scopeHelper = null)
     {
         parent::__construct("Tag");
         $this->StringTags = c("Vanilla.Tagging.StringTags");
         $this->modelCache = new ModelCache("tags", Gdn::cache());
+        $this->scopeHelper = $scopeHelper ?? Gdn::getContainer()->get(ScopeHelper::class);
+    }
+
+    public function discussionTaggingEnabled(): bool
+    {
+        return Gdn::config("Tagging.Discussions.Enabled", false);
+    }
+
+    /**
+     * Check if scoped tagging is enabled.
+     *
+     * @return bool
+     */
+    public static function scopedTaggingEnabled(): bool
+    {
+        return Gdn::config("Tagging.ScopedTagging.Enabled", false);
     }
 
     /**
@@ -127,60 +153,64 @@ class TagModel extends Gdn_Model
      */
     public function save($formPostValues, $settings = false)
     {
-        // Get the ID of an existing tag with the same name.
-        $existingTag = $this->getWhere([
-            "Name" => $formPostValues["Name"],
-            "TagID <>" => val("TagID", $formPostValues),
-        ])->firstRow(DATASET_TYPE_ARRAY);
-        if ($existingTag) {
-            if (!val("TagID", $formPostValues)) {
-                return $existingTag["TagID"];
+        return $this->Database->runWithTransaction(function () use ($formPostValues, $settings) {
+            // Extract scope information if it exists
+            $scope = $formPostValues["scope"] ?? null;
+
+            // Remove API-specific fields that don't belong in the Tag table
+            unset($formPostValues["scope"]);
+
+            // Get the ID of an existing tag with the same name.
+            $existingTag = $this->getWhere([
+                "Name" => $formPostValues["Name"],
+                "TagID <>" => val("TagID", $formPostValues),
+            ])->firstRow(DATASET_TYPE_ARRAY);
+
+            if ($existingTag) {
+                if (!val("TagID", $formPostValues)) {
+                    $tagID = $existingTag["TagID"];
+                } else {
+                    // This tag will be merged with the existing one.
+                    $px = $this->Database->DatabasePrefix;
+                    $fromID = $formPostValues["TagID"];
+                    $toID = $existingTag["TagID"];
+
+                    // Delete every overlapping tags.
+                    $sql = "delete tg.*
+                   from {$px}TagDiscussion tg
+                   join {$px}TagDiscussion tg2
+                     on tg.DiscussionID = tg2.DiscussionID
+                       and tg.TagID = :FromID and tg2.TagID = :ToID";
+                    $this->Database->query($sql, [":FromID" => $fromID, ":ToID" => $toID]);
+
+                    // Update the tagged discussions.
+                    $sql = "update {$px}TagDiscussion
+                   set TagID = :ToID
+                   where TagID = :FromID";
+                    $this->Database->query($sql, [":FromID" => $fromID, ":ToID" => $toID]);
+
+                    // Update the counts
+                    $this->updateTagCountDiscussions($toID);
+
+                    // Delete the old tag.
+                    $sql = "delete from {$px}Tag where TagID = :FromID";
+                    $this->Database->query($sql, [":FromID" => $fromID]);
+
+                    $tagID = $toID;
+                }
+            } else {
+                // Tag-type tags (i.e., user generated tags) are saved with no type.
+                if (strtolower(val("Type", $formPostValues)) == "tag") {
+                    $formPostValues["Type"] = "";
+                }
+
+                $tagID = parent::save($formPostValues, $settings);
             }
 
-            // This tag will be merged with the existing one.
-            $px = $this->Database->DatabasePrefix;
-            $fromID = $formPostValues["TagID"];
-            $toID = $existingTag["TagID"];
+            $this->scopeHelper->applyScopeToRecord(ScopeModel::RECORD_TYPE_TAG, $tagID, $scope);
 
-            try {
-                $this->Database->beginTransaction();
-
-                // Delete every overlapping tags.
-                $sql = "delete tg.*
-               from {$px}TagDiscussion tg
-               join {$px}TagDiscussion tg2
-                 on tg.DiscussionID = tg2.DiscussionID
-                   and tg.TagID = :FromID and tg2.TagID = :ToID";
-                $this->Database->query($sql, [":FromID" => $fromID, ":ToID" => $toID]);
-
-                // Update the tagged discussions.
-                $sql = "update {$px}TagDiscussion
-               set TagID = :ToID
-               where TagID = :FromID";
-                $this->Database->query($sql, [":FromID" => $fromID, ":ToID" => $toID]);
-
-                // Update the counts
-                $this->updateTagCountDiscussions($toID);
-
-                // Delete the old tag.
-                $sql = "delete from {$px}Tag where TagID = :FromID";
-                $this->Database->query($sql, [":FromID" => $fromID]);
-
-                $this->Database->commitTransaction();
-            } catch (Exception $ex) {
-                $this->Database->rollbackTransaction();
-                throw $ex;
-            }
-
-            return $toID;
-        } else {
-            // Tag-type tags (i.e., user generated tags) are saved with no type.
-            if (strtolower(val("Type", $formPostValues)) == "tag") {
-                $formPostValues["Type"] = "";
-            }
-
-            return parent::save($formPostValues, $settings);
-        }
+            return $tagID;
+        });
     }
 
     /**
@@ -430,14 +460,34 @@ class TagModel extends Gdn_Model
                     }
                     setValue("Tags", $row, $tags);
                 }
+                setValue("TagIDs", $row, array_column($tags, "TagID"));
             } else {
                 if ($this->StringTags) {
                     setValue("Tags", $row, "");
                 } else {
                     setValue("Tags", $row, []);
                 }
+                setValue("TagIDs", $row, []);
             }
         }
+    }
+
+    /**
+     * Select all tags for a set of discussions.
+     *
+     * @param array $ids
+     * @return array
+     */
+    public function selectDiscussionTags(array $ids): array
+    {
+        return $this->SQL
+            ->select("td.DiscussionID, t.TagID, t.Name, t.FullName, t.Type")
+            ->from("TagDiscussion td")
+            ->join("Tag t", "t.TagID = td.TagID")
+            ->where("td.DiscussionID", $ids)
+            ->where("t.Type", ["User", ""])
+            ->get()
+            ->resultArray();
     }
 
     /**
@@ -469,6 +519,10 @@ class TagModel extends Gdn_Model
                 }
             }
         );
+        if (TagModel::scopedTaggingEnabled()) {
+            ScopeSchema::applyInputSchema($schema);
+        }
+
         return $schema;
     }
 
@@ -501,6 +555,10 @@ class TagModel extends Gdn_Model
                 "countDiscussions:i",
             ])
         );
+        if (TagModel::scopedTaggingEnabled()) {
+            ScopeSchema::applyOutputSchema($fullSchema);
+        }
+
         return $fullSchema;
     }
 
@@ -1120,10 +1178,13 @@ class TagModel extends Gdn_Model
         $populate = function (array &$rows) use ($tagSchema) {
             $this->joinTags($rows);
             foreach ($rows as &$row) {
-                $row["Tags"] = $this->normalizeOutput($row["Tags"]);
-                $row = ApiUtils::convertOutputKeys($row, ["postMeta"]);
-                unset($row["Tags"]);
+                $row["tags"] = $this->normalizeOutput($row["Tags"]) ?? [];
                 $this->validateTagFragmentsOutput($row["tags"], $tagSchema);
+                unset($row["Tags"]);
+                if ($this->discussionTaggingEnabled()) {
+                    $row["tagIDs"] = $row["TagIDs"] ?? [];
+                }
+                unset($row["TagIDs"]);
             }
         };
 
@@ -1354,49 +1415,13 @@ class TagModel extends Gdn_Model
         $data = [];
         $database = Gdn::database();
         if ($query || !empty($parent) || !empty($type)) {
-            $tagQuery = Gdn::sql()
-                ->select("*")
-                ->from("Tag");
-
-            if (key_exists("tagID", $options)) {
-                $tagQuery->whereIn("TagID", $options["tagID"]);
-            }
-
-            if (key_exists("sort", $options)) {
-                $tagQuery->orderBy($options["sort"], $options["direction"] ?? "desc");
-            }
-
-            if (key_exists("limit", $options)) {
-                $offset = $options["offset"] ?? 0;
-                $tagQuery->limit($options["limit"], $offset);
-            }
-
-            if ($query) {
-                $tagQuery->like(
-                    "FullName",
-                    str_replace(["%", "_"], ["\%", "_"], $query),
-                    strlen($query) > 2 ? "both" : "right"
-                );
-            }
-
-            if (in_array("tag", $type)) {
-                $searchableTypes = $this->getAllowedTagTypes();
-                $tagQuery->where("Type", $searchableTypes); // Other UIs can set a different type
-            } elseif (!in_array("all", $type)) {
-                $tagQuery->whereIn("Type", $type);
-            }
+            $tagQuery = $this->createTagsQuery(
+                ["query" => $query, "type" => $type, "parentID" => $parent ?: []] + $options
+            );
 
             // Allow per-category tags
             if ($categorySearch) {
-                $tagQuery->where("CategoryID", $categoryID);
-            }
-
-            if ($parent) {
-                $tagQuery->whereIn("ParentTagID", $parent);
-            }
-
-            if (!empty($options["excludeNoCountDiscussion"])) {
-                $tagQuery->where("CountDiscussions >", 0);
+                $tagQuery->where("t.CategoryID", $categoryID);
             }
 
             // Run tag search query
@@ -1415,6 +1440,8 @@ class TagModel extends Gdn_Model
                         "type" => $type,
                         "parentTagID" => $tag->ParentTagID ?? null,
                         "countDiscussions" => $tag->CountDiscussions,
+                        "dateInserted" => $tag->DateInserted ?? null,
+                        "scopeType" => $tag->scopeType ?? null,
                     ];
                 } else {
                     $data[] = [
@@ -1429,12 +1456,144 @@ class TagModel extends Gdn_Model
     }
 
     /**
+     * Get count for a query from the index endpoint.
+     *
+     * @param array $query
+     * @return int
+     */
+    public function searchCount(array $query): int
+    {
+        return $this->createTagsQuery($query)->getPagingCount("TagID");
+    }
+
+    /**
+     * Build main query for list of tags.
+     *
+     * @param array $query
+     * @return Gdn_SQLDriver
+     */
+    public function createTagsQuery(array $query = []): Gdn_SQLDriver
+    {
+        $tagQuery = $this->createSql()
+            ->select("t.*")
+            ->from("Tag t");
+
+        if (isset($query["tagID"])) {
+            $tagQuery->where("t.TagID", $query["tagID"]);
+        }
+
+        if (isset($query["sort"])) {
+            $tagQuery->orderBy("t." . $query["sort"], $query["direction"] ?? "desc");
+        }
+
+        if (isset($query["limit"])) {
+            $offset = $query["offset"] ?? 0;
+            $tagQuery->limit($query["limit"], $offset);
+        }
+
+        if (!empty($query["parentID"])) {
+            $tagQuery->where("t.ParentTagID", $query["parentID"]);
+        }
+
+        if (!empty($query["excludeNoCountDiscussion"])) {
+            $tagQuery->where("t.CountDiscussions >", 0);
+        }
+
+        if ($query["query"] ?? "") {
+            $tagQuery->like(
+                "t.FullName",
+                str_replace(["%", "_"], ["\%", "_"], $query["query"] ?? ""),
+                strlen($query["query"] ?? "") > 2 ? "both" : "right"
+            );
+        }
+
+        if (in_array("tag", $query["type"] ?? [])) {
+            $searchableTypes = $this->getAllowedTagTypes();
+            $tagQuery->where("t.Type", $searchableTypes); // Other UIs can set a different type
+        } elseif (!in_array("all", $query["type"] ?? [])) {
+            $tagQuery->where("t.Type", $query["type"]);
+        }
+
+        // Apply scope filtering
+        $this->applyTagScopeQuery($tagQuery, $query);
+
+        // Remove duplicates if we joined with scope table for scope filtering
+        $tagQuery->groupBy("t.TagID");
+
+        return $tagQuery;
+    }
+
+    /**
+     * Apply scope filtering to a tag query.
+     *
+     * @param Gdn_SQLDriver $query The query object to modify.
+     * @param array $options Options array containing scope parameters.
+     * @return void
+     */
+    private function applyTagScopeQuery($query, array $options): void
+    {
+        // If scoped tagging is disabled, queries should only ever return global tags.
+        if (!$this->scopedTaggingEnabled()) {
+            $query->where("t.ScopeType", self::SCOPE_TYPE_GLOBAL);
+            return;
+        }
+
+        $scopeType = $options["scopeType"] ?? [self::SCOPE_TYPE_GLOBAL, self::SCOPE_TYPE_SCOPED];
+        [$categoryIDs, $siteSectionIDs] = $this->scopeHelper->resolveScopeRecordIDs($options["scope"] ?? []);
+
+        $query->beginWhereGroup();
+        if (in_array(ScopeModel::SCOPE_TYPE_SCOPED, $scopeType)) {
+            $query->where("t.scopeType", ScopeModel::SCOPE_TYPE_SCOPED);
+
+            $query->beginWhereGroup();
+            if ($categoryIDs !== null) {
+                $allAncestorCategoryIDs = CategoryModel::instance()->getCategoriesAncestorIDs($categoryIDs);
+
+                // Join with scope table and filter by the expanded category IDs
+                $query->leftJoin(
+                    "scope sc",
+                    "t.TagID = sc.recordID AND sc.relationType = '" .
+                        ScopeModel::RELATION_TYPE_SCOPE .
+                        "' AND sc.recordType = '" .
+                        ScopeModel::RECORD_TYPE_TAG .
+                        "' AND sc.scopeRecordType = '" .
+                        ScopeModel::SCOPE_RECORD_TYPE_CATEGORY .
+                        "'"
+                );
+                $query->where("sc.scopeRecordID", $allAncestorCategoryIDs);
+            }
+
+            if ($siteSectionIDs !== null) {
+                $query->leftJoin(
+                    "scope ss",
+                    "t.TagID = ss.recordID AND ss.relationType = '" .
+                        ScopeModel::RELATION_TYPE_SCOPE .
+                        "' AND ss.recordType = '" .
+                        ScopeModel::RECORD_TYPE_TAG .
+                        "' AND ss.scopeRecordType = '" .
+                        ScopeModel::SCOPE_RECORD_TYPE_SITE_SECTION .
+                        "'"
+                );
+                $query->orWhere("ss.scopeRecordID", $siteSectionIDs);
+            }
+            $query->endWhereGroup();
+        }
+        if (in_array(ScopeModel::SCOPE_TYPE_GLOBAL, $scopeType)) {
+            $query->orBeginWhereGroup();
+            $query->where("t.scopeType", ScopeModel::SCOPE_TYPE_GLOBAL);
+            $query->endWhereGroup();
+        }
+
+        $query->endWhereGroup();
+    }
+
+    /**
      * Checks to see if the number of tags being added exceeds the maximum number of tags allowed on the discussion.
      *
      * @param array $tags
      * @throws ClientException Throws an error if there are more tags than are allowed.
      */
-    private function checkMaxTagsLimit($tags): void
+    public function checkMaxTagsLimit($tags): void
     {
         $maxTags = Gdn::config("Vanilla.Tagging.Max", 5);
         if (count($tags) > $maxTags) {
@@ -1573,5 +1732,37 @@ class TagModel extends Gdn_Model
                 return;
             }
         }
+    }
+
+    /**
+     * Join scope information to a set of tag rows.
+     *
+     * @param array $rows Array of tag rows to attach scope data to.
+     * @return array The tag rows with scope data attached.
+     */
+    public function joinScopes(array $rows, string $idColumn = "TagID"): array
+    {
+        // If scoped tagging is not enabled, don't add scope information
+        if (!$this->scopedTaggingEnabled()) {
+            return $rows;
+        }
+
+        return $this->scopeHelper->joinScopes(ScopeModel::RECORD_TYPE_TAG, $rows, $idColumn);
+    }
+
+    /**
+     * Delete a tag by ID and clean up associated scope data.
+     *
+     * @param int $id The tag ID to delete.
+     * @param array $options Options for deletion.
+     * @return bool True if the tag was deleted successfully.
+     */
+    public function deleteID($id, $options = [])
+    {
+        // Delete associated scope data first
+        $this->scopeHelper->clearScopeData(ScopeModel::RECORD_TYPE_TAG, $id);
+
+        // Call parent deleteID method
+        return parent::deleteID($id, $options);
     }
 }

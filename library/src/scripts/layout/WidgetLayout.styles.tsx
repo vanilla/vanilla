@@ -5,7 +5,7 @@
  */
 
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
@@ -20,10 +20,19 @@ export const widgetLayoutClasses = useThemeCache(() => {
         ...Mixins.margin({
             vertical: globalVars.spacer.pageComponent,
         }),
+        ".widget-droppable.collapsed + &": {
+            marginTop: 0,
+        },
+        "& + .widget-droppable.collapsed": {
+            "--droppable-inverse-margin": -globalVars.spacer.pageComponent,
+        },
         ...layoutVars.mediaQueries().oneColumnDown({
             ...Mixins.margin({
                 vertical: globalVars.spacer.pageComponentCompact,
             }),
+            "& + .widget-droppable.collapsed": {
+                "--droppable-inverse-margin": -globalVars.spacer.pageComponentCompact,
+            },
         }),
     };
     const widget = css(widgetMixin);

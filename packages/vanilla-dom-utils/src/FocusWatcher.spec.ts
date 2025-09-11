@@ -4,11 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import sinon from "sinon";
+import { waitFor } from "@testing-library/react";
 import { FocusWatcher } from "./FocusWatcher";
 
 describe("FocusWatcher", () => {
     beforeEach(() => {
+        vi.useFakeTimers();
         document.body.innerHTML = `
         <div>
             <div tabindex="0" id="root1">
@@ -22,8 +23,8 @@ describe("FocusWatcher", () => {
         </div>`;
     });
 
-    it("notifies about focus entering", () => {
-        const spy = sinon.spy();
+    it("notifies about focus entering and leaving", () => {
+        const spy = vitest.fn();
         const root1 = document.getElementById("root1")!;
         const item2 = document.getElementById("item2")!;
         const item3 = document.getElementById("item3")!;
@@ -32,36 +33,23 @@ describe("FocusWatcher", () => {
         watcher.start();
 
         root1.focus();
-        expect(spy.calledOnceWith(true));
+        vi.advanceTimersToNextTimer();
         item3.focus();
-
-        spy.resetHistory();
+        vi.advanceTimersToNextTimer();
         item2.focus();
-        expect(spy.calledOnceWith(true));
-    });
-
-    it("notifies about focus leaving", () => {
-        const spy = sinon.spy();
-        const root1 = document.getElementById("root1")!;
-        const item2 = document.getElementById("item2")!;
-        const item3 = document.getElementById("item3")!;
-
-        const watcher = new FocusWatcher(root1, spy);
-        watcher.start();
-
-        root1.focus();
-        spy.resetHistory();
+        vi.advanceTimersToNextTimer();
         item3.focus();
-        expect(spy.calledOnceWith(false));
+        vi.advanceTimersToNextTimer();
 
-        item2.focus();
-        spy.resetHistory();
-        item3.focus();
-        expect(spy.calledOnceWith(false));
+        expect(spy).toHaveBeenCalledTimes(4);
+        expect(spy.mock.calls[0][0]).toBe(true);
+        expect(spy.mock.calls[1][0]).toBe(false);
+        expect(spy.mock.calls[2][0]).toBe(true);
+        expect(spy.mock.calls[3][0]).toBe(false);
     });
 
     it("does not notify about focus leaving into itself", () => {
-        const spy = sinon.spy();
+        const spy = vitest.fn();
         const root1 = document.getElementById("root1")!;
         const item1 = document.getElementById("item1")!;
         const modalButton = document.getElementById("modalbutton")!;
@@ -72,23 +60,25 @@ describe("FocusWatcher", () => {
         watcher.start();
 
         root1.focus();
-        spy.resetHistory();
+        vitest.advanceTimersToNextTimer();
+        spy.mockReset();
         item1.focus();
-        expect(spy.calledOnceWith(true));
+        vitest.advanceTimersToNextTimer();
+        expect(spy.mock.calls[0][0]).toBe(true);
 
-        spy.resetHistory();
-        modalButton.focus();
-        expect(spy.notCalled);
+        spy.mockReset();
 
         popover.focus();
-        expect(spy.notCalled);
+        vitest.advanceTimersToNextTimer();
+        expect(spy).not.toHaveBeenCalled();
 
         inPopover.focus();
-        expect(spy.notCalled);
+        vitest.advanceTimersToNextTimer();
+        expect(spy).not.toHaveBeenCalled();
     });
 
     it("does not notify about focus going to the 'body'", () => {
-        const spy = sinon.spy();
+        const spy = vitest.fn();
         const root1 = document.getElementById("root1")!;
         const item1 = document.getElementById("item1")!;
 
@@ -97,11 +87,11 @@ describe("FocusWatcher", () => {
 
         item1.focus();
         document.body.focus();
-        expect(spy.notCalled).eq(true);
+        expect(spy).not.toHaveBeenCalled();
     });
 
     it("does not notify when an item inside of the root is clicked", () => {
-        const spy = sinon.spy();
+        const spy = vitest.fn();
         const root1 = document.getElementById("root1")!;
         const item1 = document.getElementById("item1")!;
         const item2 = document.getElementById("item2")!;
@@ -111,18 +101,18 @@ describe("FocusWatcher", () => {
         watcher.start();
 
         root1.focus();
-        spy.resetHistory();
+        spy.mockReset();
         item2.click();
-        expect(spy.notCalled).eq(true);
+        expect(spy).not.toHaveBeenCalled();
 
         item1.focus();
-        spy.resetHistory();
+        spy.mockReset();
         notfocusable.click();
-        expect(spy.notCalled).eq(true);
+        expect(spy).not.toHaveBeenCalled();
     });
 
     it("does not notify when an item in popover of modal is clicked", () => {
-        const spy = sinon.spy();
+        const spy = vitest.fn();
         const root1 = document.getElementById("root1")!;
         const item1 = document.getElementById("item1")!;
         const item2 = document.getElementById("item2")!;
@@ -132,18 +122,18 @@ describe("FocusWatcher", () => {
         watcher.start();
 
         root1.focus();
-        spy.resetHistory();
+        spy.mockReset();
         item2.click();
-        expect(spy.notCalled).eq(true);
+        expect(spy).not.toHaveBeenCalled();
 
         item1.focus();
-        spy.resetHistory();
+        spy.mockReset();
         notfocusable.click();
-        expect(spy.notCalled).eq(true);
+        expect(spy).not.toHaveBeenCalled();
     });
 
     it("notifies false when items outside are clicked", () => {
-        const spy = sinon.spy();
+        const spy = vitest.fn();
         const root1 = document.getElementById("root1")!;
         const item1 = document.getElementById("item1")!;
         const item2 = document.getElementById("item2")!;
@@ -153,13 +143,13 @@ describe("FocusWatcher", () => {
         watcher.start();
 
         root1.focus();
-        spy.resetHistory();
+        spy.mockReset();
         item3.click();
-        expect(spy.calledOnceWith(false));
+        expect(spy).toHaveBeenCalledExactlyOnceWith(false);
 
         item1.focus();
-        spy.resetHistory();
+        spy.mockReset();
         item3.click();
-        expect(spy.calledOnceWith(false));
+        expect(spy).toHaveBeenCalledExactlyOnceWith(false);
     });
 });

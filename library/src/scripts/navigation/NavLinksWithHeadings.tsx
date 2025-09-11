@@ -37,8 +37,8 @@ export default function NavLinksWithHeadings(props: IProps) {
     const ungrouped = data.ungroupedItems || [];
     const grouped = data.groups || [];
     const groupLevel = Math.min((depth || 2) + 1, 6);
-    const classes = navLinksClasses();
-    const columns = navLinksVariables().columns.desktop;
+    const classes = navLinksClasses.useAsHook();
+    const columns = navLinksVariables.useAsHook().columns.desktop;
 
     if (ungrouped.length > 0 || grouped.length > 0) {
         const ungroupedContent =

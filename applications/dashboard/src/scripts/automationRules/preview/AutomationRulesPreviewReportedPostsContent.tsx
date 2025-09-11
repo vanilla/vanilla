@@ -89,7 +89,6 @@ export function AutomationRulesPreviewReportedPostsContent(props: IProps) {
                             showNextButton: false,
                         }}
                         onChange={(page: number) => setQuery({ ...query, page: page })}
-                        isMobile={false}
                     />
                 </div>
             )}

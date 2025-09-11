@@ -5,6 +5,7 @@
  */
 
 import React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, act, cleanup, fireEvent, within, RenderResult } from "@testing-library/react";
 import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
 import { SearchPageContent } from "./SearchPage";
@@ -30,6 +31,8 @@ import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearc
 import { ISearchForm } from "./searchTypes";
 import LOADABLE_PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain.loadable";
 
+const queryClient = new QueryClient();
+
 const MOCK_SEARCH_SOURCE = new MockSearchSource();
 
 const MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS = new MockSearchSourceWithAsyncDomains();
@@ -41,9 +44,11 @@ function MockSearchPage(props: {
         <MemoryRouter>
             <PermissionsFixtures.AllPermissions>
                 <LiveAnnouncer>
-                    <SearchFormContextProvider initialFormState={props.initialFormState}>
-                        <SearchPageContent />
-                    </SearchFormContextProvider>
+                    <QueryClientProvider client={queryClient}>
+                        <SearchFormContextProvider initialFormState={props.initialFormState}>
+                            <SearchPageContent />
+                        </SearchFormContextProvider>
+                    </QueryClientProvider>
                 </LiveAnnouncer>
             </PermissionsFixtures.AllPermissions>
         </MemoryRouter>

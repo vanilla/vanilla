@@ -7,11 +7,17 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Addon;
+use Vanilla\AddonManager;
+use VanillaTests\UsersAndRolesApiTestTrait;
+
 /**
  * Tests for the /addons endpoints
  */
 class AddonsTest extends AbstractAPIv2Test
 {
+    use UsersAndRolesApiTestTrait;
+
     private $coreAddons = [
         "conversations", // applications
         "allviewed",
@@ -44,6 +50,7 @@ class AddonsTest extends AbstractAPIv2Test
         "default",
         "mobile",
         "keystone",
+        "EKM",
     ];
 
     /**
@@ -216,5 +223,39 @@ class AddonsTest extends AbstractAPIv2Test
             return [$v];
         }, array_combine($this->hiddenAddons, $this->hiddenAddons));
         return $r;
+    }
+
+    /**
+     * Test enabling and disabling a hidden addon.
+     */
+    public function testEnableDisableHidden()
+    {
+        $addonManager = \Gdn::getContainer()->get(AddonManager::class);
+
+        // Create a super user.
+        $superAdmin = $this->createUser([], ["Admin" => 3]);
+
+        try {
+            // Try to enable a hidden addon with an unauthorized user.
+            $this->bessy()->post("/settings/plugins/all/pockets", [
+                "DeliveryType" => "VIEW",
+                "DeliveryMethod" => "HTML",
+                "TransientKey" => \Gdn::session()->transientKey(),
+            ]);
+        } catch (\Exception $e) {
+            // We expect an exception here, so we can ignore it.
+        }
+        // Pockets shouldn't be enabled
+        $isEnabled = $addonManager->isEnabled("pockets", Addon::TYPE_ADDON);
+        $this->assertFalse($isEnabled);
+
+        // Now run the request with the super admin user.
+        $this->runWithUser(function () {
+            $this->bessy()->post("/settings/plugins/all/pockets");
+        }, $superAdmin);
+
+        // Pockets should be enabled
+        $isEnabled = $addonManager->isEnabled("pockets", Addon::TYPE_ADDON);
+        $this->assertTrue($isEnabled);
     }
 }

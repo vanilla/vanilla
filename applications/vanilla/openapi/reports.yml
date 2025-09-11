@@ -122,6 +122,18 @@ paths:
                                 verifyRecordUser:
                                     type: boolean
                                     description: If true mark the user as verified.
+                                premoderatedRecord:
+                                    type: object
+                                    description: Optional mod edits to make to the post before being approved.
+                                    properties:
+                                        body:
+                                            type: string
+                                            description: Body content formatted in rich.
+                                        name:
+                                            type: string
+                                            description: Name/Title content in plain text.
+                                    required:
+                                        - body
             responses:
                 "200":
                     description: OK

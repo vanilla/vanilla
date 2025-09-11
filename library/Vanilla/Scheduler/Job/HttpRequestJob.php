@@ -102,7 +102,7 @@ class HttpRequestJob implements LocalJobInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function run(): JobExecutionStatus
     {
@@ -189,7 +189,7 @@ class HttpRequestJob implements LocalJobInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setDelay(int $seconds)
     {
@@ -230,7 +230,7 @@ class HttpRequestJob implements LocalJobInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setMessage(array $message)
     {
@@ -260,7 +260,7 @@ class HttpRequestJob implements LocalJobInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setPriority(JobPriority $priority)
     {

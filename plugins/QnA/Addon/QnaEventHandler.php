@@ -39,7 +39,7 @@ class QnaEventHandler implements PsrEventHandlersInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPsrEventHandlerMethods(): array
     {

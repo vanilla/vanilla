@@ -44,7 +44,7 @@ class DiscussionsStatusesTest extends AbstractResourceTest
     protected $testPagingOnIndex = false;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function record()
     {

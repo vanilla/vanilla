@@ -45,7 +45,7 @@ class FormTest extends MinimalContainerTestCase
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {

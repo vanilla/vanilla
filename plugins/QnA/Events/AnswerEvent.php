@@ -20,6 +20,23 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
     const ACTION_ANSWER_ACCEPTED = "accepted";
     const ACTION_ANSWER_REJECTED = "rejected";
 
+    public function __construct(string $action, array $payload, $sender = null)
+    {
+        parent::__construct($action, $payload, $sender);
+        $this->addApiParams(["expand" => "crawl,roles,vectorize"]);
+        $this->type = "answer";
+        $this->payload["recordType"] = "comment";
+        $this->payload["recordID"] = $payload["answer"]["commentID"];
+    }
+
+    /**
+     * @return string
+     */
+    public function getBaseAction(): string
+    {
+        return ResourceEvent::ACTION_UPDATE;
+    }
+
     /**
      * Create a payload suitable for tracking.
      *
@@ -39,7 +56,7 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTrackableAction(): string
     {
@@ -47,7 +64,7 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTrackableCollection(): ?string
     {
@@ -55,7 +72,7 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {
@@ -63,5 +80,26 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
             return $this->payload["answer"]["siteSectionIDs"][0];
         }
         return null;
+    }
+
+    /**
+     * Create a normalized variation of the record's payload.
+     *
+     * @return array A tuple of [string, int]
+     */
+    public function getRecordTypeAndID(): array
+    {
+        $recordType = "comment";
+
+        if ($idKey = $this->payload["documentIdField"] ?? false) {
+            $idKey = $this->$idKey;
+        } else {
+            $idKey = $recordType . "ID";
+        }
+
+        $payloadRecord = $this->payload[$this->type] ?? $this->payload;
+        $recordID = $payloadRecord["recordID"] ?? ($payloadRecord[$idKey] ?? null);
+
+        return [$recordType, $recordID];
     }
 }

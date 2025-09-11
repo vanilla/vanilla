@@ -17,20 +17,25 @@ use Vanilla\Cli\Docker\KibanaHttpClient;
  */
 class VanillaElasticService extends AbstractService
 {
-    const SERVICE_NAME = "elastic";
-
-    private ElasticSearchHttpClient $elasticClient;
+    const SERVICE_ID = "elastic";
 
     /**
      * @param ElasticSearchHttpClient $elasticClient
      */
-    public function __construct(ElasticSearchHttpClient $elasticClient)
+    public function __construct(private ElasticSearchHttpClient $elasticClient)
     {
-        $this->elasticClient = $elasticClient;
+        parent::__construct(
+            new ServiceDescriptor(
+                serviceID: self::SERVICE_ID,
+                label: "Elastic Search",
+                containerName: "elasticsearch",
+                url: "https://elastic.vanilla.local"
+            )
+        );
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEnv(): array
     {
@@ -41,38 +46,17 @@ class VanillaElasticService extends AbstractService
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function getName(): string
-    {
-        return "Vanilla Elastic";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTargetDirectory(): string
-    {
-        return DockerCommand::VNLA_DOCKER_CWD;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getHostname(): string
-    {
-        return "elastic.vanilla.local";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function start()
+    public function start(): void
     {
         parent::start();
         $this->setup();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getVanillaConfigDefaults(): array
     {
         return [
@@ -83,7 +67,7 @@ class VanillaElasticService extends AbstractService
     /**
      * Perform additional setup of indexes.
      */
-    private function setup()
+    private function setup(): void
     {
         $this->checkElasticRunning();
         $this->elasticClient->setupIndexes();
@@ -92,7 +76,7 @@ class VanillaElasticService extends AbstractService
     /**
      * Validate that the elastic search logs are running.
      */
-    private function checkElasticRunning()
+    private function checkElasticRunning(): void
     {
         $this->logger()->title("Checking ElasticSearch Health");
         try {
@@ -102,12 +86,13 @@ class VanillaElasticService extends AbstractService
                     $this->logger()->success("ElasticSearch is healthy");
                     return;
                 } catch (\Exception $e) {
+                    $this->logger()->warning("Attempt #$i Failed");
                     // We might still be starting up.
                     if ($i === 9) {
                         throw $e;
                     } else {
                         // try again.
-                        sleep(5);
+                        sleep(3);
                     }
                 }
             }

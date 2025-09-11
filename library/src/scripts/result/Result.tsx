@@ -14,7 +14,8 @@ import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ListItem } from "@library/lists/ListItem";
 import { ListItemMedia } from "@library/lists/ListItemMedia";
 
-export interface IResult extends Pick<React.ComponentProps<typeof ListItem>, "name" | "url" | "icon" | "className"> {
+export interface IResult
+    extends Pick<React.ComponentProps<typeof ListItem>, "name" | "url" | "icon" | "className" | "featuredImage"> {
     meta?: React.ReactNode;
     excerpt?: string;
     highlight?: string;
@@ -25,7 +26,7 @@ export interface IResult extends Pick<React.ComponentProps<typeof ListItem>, "na
 }
 
 function Result(props: IResult) {
-    const { name, className, meta, url, excerpt, image, imageSet, attachments, icon, highlight } = props;
+    const { name, className, meta, url, excerpt, featuredImage, image, imageSet, attachments, icon, highlight } = props;
     const hasAttachments = !!(attachments && attachments.length > 0);
     const showImage = (!!image || !!imageSet) && !hasAttachments;
     const hasMedia = hasAttachments || showImage;
@@ -58,6 +59,7 @@ function Result(props: IResult) {
             truncateDescription={!highlightElement}
             descriptionMaxCharCount={160}
             metas={meta}
+            featuredImage={featuredImage}
             mediaItem={media}
         />
     );

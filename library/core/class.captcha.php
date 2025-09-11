@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\ReCaptchaVerification;
 
 /**
@@ -142,6 +143,7 @@ class Captcha
             if ($result && val("success", $result)) {
                 $isValid = true;
             } elseif (!empty($errorCodes) && $errorCodes != ["invalid-input-response"]) {
+                ErrorLogger::warning($response->asException(), ["captcha_failed"]);
                 throw new Exception(
                     formatString(t("No response from reCAPTCHA.") . " {ErrorCodes}", [
                         "ErrorCodes" => join(", ", $errorCodes),
@@ -149,6 +151,7 @@ class Captcha
                 );
             }
         } else {
+            ErrorLogger::warning($response->asException(), ["captcha_failed"]);
             throw new Exception(t("No response from reCAPTCHA."));
         }
 

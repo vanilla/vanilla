@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -8,35 +8,33 @@ import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionOptionsDismiss from "@library/features/discussions/DiscussionOptionsDismiss";
-import { mockAPI } from "@library/__tests__/utility";
 import { ToastProvider } from "@library/features/toaster/ToastContext";
 import { vitest } from "vitest";
-import MockAdapter from "axios-mock-adapter/types";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
-import type { DiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
+import { DiscussionsApiContext } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
+import { makeMockDiscussionsApi } from "@vanilla/addon-vanilla/posts/__fixtures__/DiscussionsApi.fixture";
 
-const discussion = {
+const mockDiscussion = {
     ...DiscussionFixture.mockDiscussion,
     pinned: true,
     dismissed: false,
 };
 
+const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, enabled: true } },
+});
+
 const onMutateSuccess = vitest.fn(async function () {});
 
-async function renderInProvider() {
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: {
-                enabled: true,
-                retry: false,
-            },
-        },
-    });
+const mockDiscussionsApi = makeMockDiscussionsApi();
 
+async function renderInProvider() {
     const result = render(
         <ToastProvider>
             <QueryClientProvider client={queryClient}>
-                <DiscussionOptionsDismiss discussion={discussion} onSuccess={onMutateSuccess} />
+                <DiscussionsApiContext.Provider value={{ api: mockDiscussionsApi }}>
+                    <DiscussionOptionsDismiss discussion={mockDiscussion} onSuccess={onMutateSuccess} />
+                </DiscussionsApiContext.Provider>
             </QueryClientProvider>
         </ToastProvider>,
     );
@@ -44,29 +42,20 @@ async function renderInProvider() {
     return result;
 }
 
-let mockAdapter: MockAdapter;
-beforeEach(() => {
-    mockAdapter = mockAPI();
-    onMutateSuccess.mockReset();
+afterEach(() => {
+    queryClient.clear();
+    vitest.resetAllMocks();
 });
 
 describe("DiscussionOptionsDismiss", () => {
     describe("Success", () => {
         beforeEach(async () => {
-            mockAdapter
-                .onPut(`/discussions/${discussion.discussionID}/dismiss`)
-                .replyOnce((requestConfig: { data: DiscussionsApi.DismissParams }) => {
-                    return [
-                        200,
-                        {
-                            ...discussion,
-                            dismissed: requestConfig.data.dismissed,
-                        },
-                    ];
-                });
-
+            mockDiscussionsApi.dismiss = vitest.fn(async (_discussionID, apiParams) => {
+                return {
+                    dismissed: !!apiParams.dismissed,
+                };
+            });
             await renderInProvider();
-
             const button = await screen.findByText("Dismiss", { exact: false });
             await act(async () => {
                 fireEvent.click(button);
@@ -74,11 +63,19 @@ describe("DiscussionOptionsDismiss", () => {
         });
 
         it("makes an API call to the dismiss endpoint", async () => {
-            expect(mockAdapter.history.put.length).toBe(1);
+            expect(mockDiscussionsApi.dismiss).toHaveBeenCalledWith(
+                mockDiscussion.discussionID,
+                expect.objectContaining({
+                    dismissed: true,
+                }),
+            );
         });
 
         it("calls the onMutateSuccess callback", async () => {
-            expect(onMutateSuccess).toHaveBeenCalledTimes(1);
+            await vitest.waitFor(() => {
+                expect(mockDiscussionsApi.dismiss).toHaveReturned();
+            });
+            expect(onMutateSuccess).toHaveBeenCalled;
         });
 
         it("displays a success message", async () => {
@@ -91,10 +88,9 @@ describe("DiscussionOptionsDismiss", () => {
         const fakeErrorMessage = "Fake Error";
 
         beforeEach(async () => {
-            mockAdapter
-                .onPut(`/discussions/${discussion.discussionID}/dismiss`)
-                .replyOnce(500, { message: fakeErrorMessage });
-
+            mockDiscussionsApi.dismiss = vitest.fn(async () => {
+                throw new Error(fakeErrorMessage);
+            });
             await renderInProvider();
             const button = await screen.findByText("Dismiss", { exact: false });
             await act(async () => {

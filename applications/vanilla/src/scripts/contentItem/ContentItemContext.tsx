@@ -10,14 +10,16 @@ import { IUser, type IUserFragment } from "@library/@types/api/users";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { t } from "@vanilla/i18n";
 import { RecordID, guessOperatingSystem, OS } from "@vanilla/utils";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 export interface IContentItemContext {
     recordType: "discussion" | "comment";
     recordID: RecordID;
     recordUrl: string;
     timestamp: string;
-    dateUpdated?: string;
+    dateInserted?: string;
+    dateUpdated?: string | null;
+    insertUser?: IUserFragment;
     updateUser?: IUserFragment;
     name: string;
     authorID?: IUser["userID"];
@@ -28,6 +30,8 @@ export interface IContentItemContext {
     emailUrl: string;
     shareInMessageUrl?: string;
     extraMetas?: React.ReactNode;
+    trollContentVisible?: boolean;
+    setTrollContentVisible?: (isTrollContent: boolean) => void;
 }
 
 const ContentItemContext = React.createContext<IContentItemContext>({
@@ -40,6 +44,8 @@ const ContentItemContext = React.createContext<IContentItemContext>({
     handleCopyUrl: async () => {},
     emailUrl: "",
     shareInMessageUrl: undefined,
+    trollContentVisible: false,
+    setTrollContentVisible: () => false,
 });
 
 export function ContentItemContextProvider(
@@ -70,6 +76,8 @@ export function ContentItemContextProvider(
     const nativeShareAvailable = navigator.share !== undefined && navigator.canShare?.(shareData);
     const useNativeShare = nativeShareAvailable && [OS.ANDROID, OS.IOS].includes(os);
 
+    const [trollContentVisible, setTrollContentVisible] = useState(false);
+
     const handleNativeShare = useNativeShare
         ? async function () {
               await navigator.share(shareData);
@@ -93,10 +101,13 @@ export function ContentItemContextProvider(
 
     const contextValue = {
         ...contextProps,
+        authorID: trollContentVisible ? contextProps.authorID : 0,
         handleCopyUrl,
         handleNativeShare,
         emailUrl,
         shareInMessageUrl: canShareInMessage ? shareInMessageUrl : undefined,
+        trollContentVisible,
+        setTrollContentVisible,
     };
 
     return <ContentItemContext.Provider value={contextValue}>{props.children}</ContentItemContext.Provider>;

@@ -10,11 +10,12 @@
 use Vanilla\Addon;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\AddonModel;
+use Vanilla\Permissions;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
 use Vanilla\Theme\FsThemeProvider;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetService;
 use Vanilla\Dashboard\Controllers\Api\ChurnExportApiController;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -51,7 +52,7 @@ class SettingsController extends DashboardController
      */
     private $addonModel;
 
-    /** @var WidgetService */
+    /** @var LegacyWidgetService */
     private $widgetService;
 
     /** @var LocaleModel */
@@ -64,7 +65,7 @@ class SettingsController extends DashboardController
     {
         parent::__construct();
         $this->addonModel = \Gdn::getContainer()->get(AddonModel::class);
-        $this->widgetService = \Gdn::getContainer()->get(WidgetService::class);
+        $this->widgetService = \Gdn::getContainer()->get(LegacyWidgetService::class);
         $this->localeModel = Gdn::getContainer()->get(LocaleModel::class);
     }
 
@@ -1392,7 +1393,14 @@ class SettingsController extends DashboardController
         }
     }
 
-    public function disablePlugin($pluginName, $filter = "all")
+    /**
+     * Disable a plugin.
+     *
+     * @param string $pluginName The key of the plugin.
+     * @param string $filter
+     * @throws Exception
+     */
+    public function disablePlugin(string $pluginName, string $filter = "all")
     {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception("Requires POST", 405);
@@ -1406,6 +1414,11 @@ class SettingsController extends DashboardController
         }
 
         $addon = Gdn::addonManager()->lookupAddon($pluginName);
+
+        // If the plugin is hidden we check for super admin permissions.
+        if ($addon->getInfoValue("hidden", false)) {
+            $this->permission(Permissions::PERMISSION_SUPER_ADMIN);
+        }
 
         try {
             Gdn::pluginManager()->disablePlugin($pluginName);
@@ -1427,6 +1440,7 @@ class SettingsController extends DashboardController
      *
      * @param string $pluginName The key of the plugin.
      * @param string $filter
+     * @throws Gdn_UserException
      */
     public function enablePlugin($pluginName, $filter = "all")
     {
@@ -1442,6 +1456,12 @@ class SettingsController extends DashboardController
         }
 
         $addon = Gdn::addonManager()->lookupAddon($pluginName);
+
+        // If the plugin is hidden, we check for super admin permissions.
+        if ($addon->getInfoValue("hidden", false)) {
+            $this->permission(Permissions::PERMISSION_SUPER_ADMIN);
+        }
+
         $requirementsEnabled = [];
         try {
             $this->addonModel->validateEnable($addon);
@@ -1569,6 +1589,7 @@ class SettingsController extends DashboardController
             "Garden.Registration.InviteTarget",
             "Garden.Registration.ConfirmEmail",
             "Garden.Registration.SSOConfirmEmail",
+            "Garden.Registration.RequireTermsOfService",
         ];
         $configurationModel->setField($registrationOptions);
 

@@ -1223,6 +1223,17 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $footer = $email->getFooterContent();
         $footer = $footer ? $footer . " <br/>" : "";
         $footer .= $this->getUnsubscribeLink($activityID, $user, $email->getFormat());
+        if (
+            isset($activity["RecordType"]) &&
+            (strtolower($activity["RecordType"]) === "comment" ||
+                strtolower($activity["RecordType"]) === "discussion" ||
+                strtolower($activity["RecordType"]) === "group")
+        ) {
+            $footer .= " ";
+            $footer .= t("or");
+            $footer .= " ";
+            $footer .= $this->getMuteLink($activity, $user, $email->getFormat());
+        }
 
         $emailTemplate = $email
             ->getEmailTemplate()
@@ -1343,6 +1354,8 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             "CategoryID" => 0,
         ];
 
+        $tokenData = Gdn::eventManager()->fireFilter("activityModel_addTokenData", $tokenData, $activity);
+
         $activityData = [];
 
         if (isset($data["Reason"])) {
@@ -1356,6 +1369,9 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $tokenData["ActivityData"] = $activityData;
 
         if ($activityType == "Comment") {
+            if (isset($data["ParentRecordID"])) {
+                $tokenData["DiscussionID"] = $data["ParentRecordID"];
+            }
             if (in_array("mine", $activityData["reasons"])) {
                 $tokenData["ActivityTypes"][] = "DiscussionComment";
                 $tokenData["ActivityType"] = "DiscussionComment";
@@ -1384,9 +1400,10 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
 
         // Form a message as to why the user is receiving this email and give them the opportunity to unsubscribe
         if ($activityType == "DigestEnabled") {
-            $notifyReason = t(
-                "You are receiving this email because you are currently subscribed to receive email digests."
-            );
+            $notifyReason =
+                $this->userMetaModel->getUserMeta($user["UserID"])["Preferences.Email.DigestEnabled"] === 3
+                    ? t("You are receiving this email digest because you were opted in to receive email digests.")
+                    : t("You are receiving this email digest because you opted in to receive email digests.");
         } elseif (
             in_array("FollowedCategory", $tokenData["ActivityTypes"]) &&
             count($activityData["reasons"]) === 1 &&
@@ -1410,6 +1427,34 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $unsubscribeBody = "<br /><br />" . $notifyReason . $link;
 
         return $unsubscribeBody;
+    }
+
+    public function getMuteLink(array $activity, array $user, string $format): string
+    {
+        $linkText = t("Mute this Post");
+
+        $discussionID =
+            $activity["ActivityType"] === "Discussion" ? $activity["RecordID"] : $activity["ParentRecordID"] ?? 0;
+
+        $tokenData = [
+            "UserID" => $user["UserID"] ?? false,
+            "Name" => $user["Name"] ?? false,
+            "PhotoUrl" => $user["PhotoUrl"] ?? false,
+            "Email" => $user["Email"] ?? false,
+            "Mute" => 1,
+            "DiscussionID" => $discussionID,
+        ];
+
+        $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
+
+        $linkUri = url("/unsubscribe/$token", "https");
+        if ($format == "text") {
+            $link = "<br />" . $linkText . ": " . $linkUri;
+        } else {
+            $link = " " . anchor($linkText, $linkUri, ["target" => "_blank"]);
+        }
+
+        return $link;
     }
 
     /**
@@ -1462,7 +1507,6 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
      */
     public function getUnsubscribeDigestLink(array $user): string
     {
-        $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
         $tokenData = [
             "UserID" => val("UserID", $user, false),
             "Name" => val("Name", $user, false),
@@ -2731,11 +2775,11 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         // Replace anchors with bold text until notifications can be spun off from activities.
         $row["body"] = preg_replace("#<a [^>]+>(.+)</a>#Ui", "<strong>$1</strong>", $body);
 
-        $htmlSanitizer = Gdn::getContainer()->get(HtmlSanitizer::class);
-        $row["body"] = $htmlSanitizer->filter($row["body"]);
-
         $scheme = new CamelCaseScheme();
         $result = $scheme->convertArrayKeys($row);
+
+        $result["recordType"] = !empty($result["recordType"]) ? strtolower($result["recordType"]) : null;
+        $result["recordUrl"] = !empty($result["route"]) ? \Gdn::request()->getSimpleUrl($result["route"]) : null;
         return $result;
     }
 
@@ -2779,13 +2823,21 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             "readUrl?" => ["type" => "string"],
             "count:i?",
             "reason:s?",
+            "recordType:s?",
+            "recordID:i?",
+            "recordUrl:s?",
+            "discussionID:i|n?",
+            "discussion?" => Schema::parse(["discussionID:i", "name:s", "url:s", "categoryID:i"])->setField("type", [
+                "object",
+                "null",
+            ]),
         ]);
 
         return $result;
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {

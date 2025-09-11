@@ -13,21 +13,32 @@ class Anchor extends AbstractNode
 {
     const TYPE_KEY = "a";
 
+    const TYPE_LINK_AS_BUTTON = "link_as_button";
+
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
+        $role = null;
+        $class = null;
+        if ($this->data["type"] === self::TYPE_LINK_AS_BUTTON) {
+            $role = "button";
+            $class = $this->data["buttonType"] && $this->data["buttonType"] === "primary" ? "Button Primary" : "Button";
+        }
         $attributes = HtmlUtils::attributes([
             "href" => $this->getUrl(),
             "target" => $this->data["target"] ?? null,
             "rel" => "nofollow noopener ugc",
+            "role" => $role,
+            "class" => $class,
         ]);
+
         return "<a $attributes>";
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -49,7 +60,17 @@ class Anchor extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
+     */
+    public static function matches(array $node): bool
+    {
+        return isset($node["type"]) &&
+            in_array($node["type"], [self::TYPE_KEY, self::TYPE_LINK_AS_BUTTON], true) &&
+            !isset($node["error"]);
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

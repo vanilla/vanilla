@@ -13,6 +13,7 @@ import { INITIAL_CONFIG_STATE } from "@library/config/configReducer";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { LoadStatus } from "@library/@types/api/core";
 import { INITIAL_ROUTE_STATE } from "@library/RouteReducer";
+import type { IUser } from "@library/@types/api/users";
 
 const DEFAULT_STATE: ICoreStoreState = {
     users: {
@@ -23,7 +24,7 @@ const DEFAULT_STATE: ICoreStoreState = {
         usersByID: {
             2: {
                 status: LoadStatus.SUCCESS,
-                data: UserFixture.createMockUser({ userID: 2 }),
+                data: UserFixture.createMockUser({ userID: 2 }) as IUser,
             },
         },
     },

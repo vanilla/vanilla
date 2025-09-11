@@ -25,6 +25,17 @@ paths:
                   schema:
                       type: boolean
                 - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+                - in: query
+                  name: expand
+                  style: form
+                  description: |
+                      Expand the discussion fragment in the notification.
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - discussion
             responses:
                 "200":
                     content:
@@ -60,6 +71,17 @@ paths:
                   required: true
                   schema:
                       type: integer
+                - in: query
+                  name: expand
+                  style: form
+                  description: |
+                      Expand the discussion fragment in the notification.
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - discussion
             responses:
                 "200":
                     content:
@@ -120,6 +142,23 @@ components:
                         $ref: "#/components/schemas/NotificationSchema"
             required: true
     schemas:
+        NotificationDiscussionFragment:
+            description: An expanded discussion fragment for notifications.
+            type: object
+            properties:
+                discussionID:
+                    description: The ID of the discussion.
+                    type: integer
+                name:
+                    description: The title of the discussion.
+                    type: string
+                url:
+                    description: The URL to the discussion.
+                    type: string
+                categoryID:
+                    description: An avatar or thumbnail associated with the discussion.
+                    nullable: true
+                    type: string
         NotificationSchema:
             properties:
                 body:
@@ -157,9 +196,35 @@ components:
                 url:
                     description: The target of the notification.
                     type: string
+                count:
+                    description: The notifications API groups notifications from the same recordType/recordID. This represents how many actual notifications there were aggregated together into this one notification.
+                    type: integer
                 readUrl:
-                    description: Url to read the notification.
+                    description: Url to navigate to the notification and mark it as read.
                     type: string
+                recordUrl:
+                    description: The URL of the record that generated the notification.
+                    type: string
+                recordType:
+                    description: The type of record that generated the notification.
+                    type: string
+                    enum:
+                        - discussion
+                        - comment
+                        - post
+                        - user
+                        - group
+                        - badge
+                        - conversation
+                recordID:
+                    description: The ID of the record that generated the notification.
+                    type: integer
+                discussionID:
+                    description: The ID of the discussion associated with the notification. This is only set if the notification is related to a discussion and expand=discussion is passed.
+                    type: integer
+                    nullable: true
+                discussion:
+                    $ref: "#/components/schemas/NotificationDiscussionFragment"
             required:
                 - notificationID
                 - body

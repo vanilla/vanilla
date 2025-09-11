@@ -24,8 +24,39 @@ export const listItemMediaClasses = useThemeCache(() => {
         });
     });
 
+    const naturalRatioContainer = useThemeCache((ratio: { vertical: number; horizontal: number }) => {
+        return css({
+            position: "relative",
+            aspectRatio: `${ratio.horizontal} / ${ratio.vertical}`,
+        });
+    });
+
+    const fullParent = css({
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: "100%",
+        width: "100%",
+    });
+
+    const coverImage = css({
+        objectFit: "cover",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: "100%",
+        width: "100%",
+    });
+
     return {
         mediaItem,
         ratioContainer,
+        naturalRatioContainer,
+        fullParent,
+        coverImage,
     };
 });

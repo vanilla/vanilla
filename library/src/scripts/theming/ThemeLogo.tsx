@@ -10,6 +10,7 @@ import { connect } from "react-redux";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { t } from "@library/utility/appUtils";
 import { useThemeContext } from "./Theme.context";
+import { useTitleBarParams } from "@library/headers/TitleBar.ParamContext";
 
 export enum LogoType {
     DESKTOP = "logo",
@@ -43,12 +44,14 @@ interface IProps {
 function ThemeLogo(props: IProps) {
     let content;
 
+    const params = useTitleBarParams();
     const themeState = useThemeContext();
 
     const logoUrl = logoUrlFromState(themeState, props.type);
 
-    const themeDesktopUrl = titleBarVariables().logo.desktop.url;
-    const themeMobileUrl = titleBarVariables().logo.mobile.url;
+    const titleBarVars = titleBarVariables.useAsHook();
+    const themeDesktopUrl = params.logo.imageUrl ?? titleBarVars.logo.desktop.url;
+    const themeMobileUrl = params.logo.imageUrlMobile ?? titleBarVars.logo.mobile.url;
 
     const isDesktop = props.type === LogoType.DESKTOP;
     const themeUrl = isDesktop ? themeDesktopUrl : themeMobileUrl;

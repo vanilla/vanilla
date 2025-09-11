@@ -24,22 +24,12 @@ class Gdn_ThemeTest extends SiteTestCase
     use CommunityApiTestTrait;
 
     /**
-     * @var MockSiteSectionProvider
-     */
-    protected $siteSectionProvider;
-
-    /**
      * Set site section provider.
      */
     public function setUp(): void
     {
         parent::setUp();
         $this->useLegacyLayouts();
-        /** @var MockSiteSectionProvider $siteSectionProvider */
-        $this->siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
-        /** @var SiteSectionModel $siteSectionModel */
-        $siteSectionModel = self::container()->get(SiteSectionModel::class);
-        $siteSectionModel->resetCurrentSiteSection();
     }
 
     /**
@@ -136,22 +126,16 @@ class Gdn_ThemeTest extends SiteTestCase
      *
      * @param string $defaultController
      * @param array $items
-     * @dataProvider breadcrumbsProviderDiscussions
      * @dataProvider breadcrumbsProviderCategories
+     * @dataProvider breadcrumbsProviderDiscussions
      */
     public function testBreadcrumbsOnPage(string $defaultController, array $items): void
     {
         $category1 = $this->createCategory();
         $category2 = $this->createCategory(["parentCategoryID" => $category1["categoryID"]]);
-        /** @var \Gdn_Router $router */
-        $router = self::container()->get(\Gdn_Router::class);
-        $defaultSection = new DefaultSiteSection(
-            new MockConfig([
-                "Routes.DefaultController" => [$defaultController, "Internal"],
-            ]),
-            $router
-        );
-        $this->siteSectionProvider->setCurrentSiteSection($defaultSection);
+        self::setConfigs([
+            "Routes.DefaultController" => [$defaultController, "Internal"],
+        ]);
         $values = [
             "{category1.name}" => $category1["name"],
             "{category1.urlcode}" => $category1["urlcode"],
@@ -178,15 +162,9 @@ class Gdn_ThemeTest extends SiteTestCase
      */
     public function testBreadcrumbsOnHomepage(string $defaultController, array $items): void
     {
-        /** @var \Gdn_Router $router */
-        $router = self::container()->get(\Gdn_Router::class);
-        $defaultSection = new DefaultSiteSection(
-            new MockConfig([
-                "Routes.DefaultController" => [$defaultController, "Internal"],
-            ]),
-            $router
-        );
-        $this->siteSectionProvider->setCurrentSiteSection($defaultSection);
+        self::setConfigs([
+            "Routes.DefaultController" => [$defaultController, "Internal"],
+        ]);
         $this->bessy()
             ->getHtml($items["page"], [], ["deliveryType" => DELIVERY_TYPE_ALL])
             ->assertCssSelectorNotExists(".Breadcrumbs");

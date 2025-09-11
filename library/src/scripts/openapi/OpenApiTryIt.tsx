@@ -44,16 +44,16 @@ import {
 } from "@library/openapi/OpenApiUtils";
 import { PropertySchemaLabel } from "@library/openapi/ProperySchemaLabel";
 import { openApiTryItClasses as classes } from "@library/openapi/OpenApiTryIt.classes";
-import TextEditor from "@library/textEditor/TextEditor";
+import MonacoEditor from "@library/textEditor/MonacoEditor";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { assetUrl, siteUrl, t } from "@library/utility/appUtils";
 import { useMutation } from "@tanstack/react-query";
 import { escapeHTML } from "@vanilla/dom-utils";
 import { Icon } from "@vanilla/icons";
-import { useIsMounted } from "@vanilla/react-utils";
+import { useCopier } from "@vanilla/react-utils";
 import { notEmpty } from "@vanilla/utils";
 import { type AxiosResponse, type AxiosResponseHeaders, type Method } from "axios";
-import qs from "qs";
+import * as qs from "qs-esm";
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import Message from "@library/messages/Message";
@@ -305,11 +305,11 @@ function ResponseHeaders(props: { headers: AxiosResponse["headers"] }) {
 function ResponseContent(props: { content: any }) {
     const content = props.content;
     return (
-        <UserContent
-            content={`<pre class="code codeBlock">${
-                typeof content !== "string" ? escapeHTML(JSON.stringify(content, null, 2)) : escapeHTML(content)
-            }</pre>`}
-        />
+        <UserContent>
+            <pre className={"code codeBlock"}>
+                {typeof content !== "string" ? JSON.stringify(content, null, 2) : content}
+            </pre>
+        </UserContent>
     );
 }
 
@@ -358,7 +358,7 @@ function useApiSubmit() {
     };
 }
 
-function replacePathParameters(path: string, pathParameters: AnyObject): string {
+function replacePathParameters(path: string, pathParameters: Record<string, any>): string {
     let result = path;
     for (const [key, val] of Object.entries(pathParameters)) {
         if (val) {
@@ -367,35 +367,6 @@ function replacePathParameters(path: string, pathParameters: AnyObject): string 
         }
     }
     return result;
-}
-
-function useCopier() {
-    const [wasCopied, _setWasCopied] = useState(false);
-    const isMounted = useIsMounted();
-
-    const currentTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-    const setWasCopied = () => {
-        if (currentTimeoutRef.current) {
-            clearTimeout(currentTimeoutRef.current);
-        }
-        _setWasCopied(true);
-        currentTimeoutRef.current = setTimeout(() => {
-            if (isMounted()) {
-                _setWasCopied(false);
-            }
-        }, 3000);
-    };
-
-    function copyValue(value: string) {
-        void navigator.clipboard.writeText(value).then(() => {
-            if (isMounted()) {
-                setWasCopied();
-            }
-        });
-    }
-
-    return { wasCopied, copyValue };
 }
 
 function CopyAsDropdown(props: { route: IOpenApiRoute; submitContext: ReturnType<typeof useApiSubmit> }) {
@@ -631,7 +602,7 @@ function Form(props: {
                     {jsonError && <Message className={classes.jsonError} stringContents={jsonError} type={"error"} />}
 
                     <div>
-                        <TextEditor
+                        <MonacoEditor
                             jsonSchema={rawBodySchema as any}
                             noPadding={true}
                             language={"json"}
@@ -883,10 +854,18 @@ function schemaToFormControl(property: string, schema: JsonSchema): IFormControl
 
     if (schema.type === "boolean") {
         return {
-            inputType: "checkBox",
-            checkPosition: "right",
-            labelType: "justified",
+            inputType: "select",
             ...labelDescription,
+            options: [
+                {
+                    label: t("True"),
+                    value: "true",
+                },
+                {
+                    label: t("False"),
+                    value: "false",
+                },
+            ],
         };
     }
 

@@ -9,10 +9,12 @@ import { triggerFloatingLinkEdit } from "@library/vanilla-editor/plugins/richEmb
 import { useFloatingLinkEscape } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/useFloatingLinkEscape";
 import { useVirtualFloatingLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/useVirtualFloatingLink";
 import {
+    ELEMENT_LINK_AS_BUTTON,
     ELEMENT_RICH_EMBED_CARD,
     ELEMENT_RICH_EMBED_INLINE,
 } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
-import { MyEditor, MyValue, useMyEditorRef } from "@library/vanilla-editor/typescript";
+import { MyEditor, MyValue } from "@library/vanilla-editor/typescript";
+import { useMyEditorRef } from "@library/vanilla-editor/getMyEditor";
 import {
     getEndPoint,
     getPluginOptions,
@@ -67,6 +69,7 @@ export const useFloatingLinkEdit = ({
                     });
                 case ELEMENT_RICH_EMBED_INLINE:
                 case ELEMENT_RICH_EMBED_CARD:
+                case ELEMENT_LINK_AS_BUTTON:
                     // The embeds are "void" elements and as such don't don't get measured well by a range.
                     // The range ends up measuring the "hidden" character at the end of the element.
                     // Instead we grab the dom node and measure that directly.
@@ -102,7 +105,9 @@ export const useFloatingLinkEdit = ({
             editor.selection &&
             isCollapsed(editor.selection) && //only show edit toolbar if cursor is within a link
             !!foundNode &&
-            (foundNode.element.type === ELEMENT_LINK || foundNode.element.dataSourceType === "url") // Only show for link embeds (not images or files)
+            (foundNode.element.type === ELEMENT_LINK ||
+                foundNode.element.type === ELEMENT_LINK_AS_BUTTON ||
+                foundNode.element.dataSourceType === "url") // Only show for link embeds (not images or files)
         ) {
             floatingLinkActions.show("edit", editor.id);
             update();

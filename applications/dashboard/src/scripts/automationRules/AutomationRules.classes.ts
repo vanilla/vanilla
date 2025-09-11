@@ -240,6 +240,10 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         borderBottom: "1px solid #dddee0",
     });
 
+    const previewModalBodyWrap = css({
+        flex: 1,
+    });
+
     const addEditLoader = css({
         display: "flex",
         justifyContent: "space-between",
@@ -338,6 +342,7 @@ export const automationRulesClasses = useThemeCache((isEscalationRulesList?: boo
         previewDiscussionItem,
         previewDiscussionMeta,
         previewDiscussionBorder,
+        previewModalBodyWrap,
         addEditLoader,
         historyLoader,
         previewLoader,

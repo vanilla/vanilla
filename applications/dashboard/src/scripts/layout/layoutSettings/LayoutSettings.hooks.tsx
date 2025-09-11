@@ -13,6 +13,7 @@ import {
     LayoutViewFragment,
     LayoutViewType,
     LAYOUT_VIEW_TYPES,
+    type ILayoutCatalog,
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { Loadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -149,7 +150,7 @@ export function useCatalogForLayout(layoutID: RecordID) {
  *
  * @param layoutViewType The type of layout to use.
  */
-export function useLayoutCatalog(layoutViewType: LayoutViewType | null) {
+export function useLayoutCatalog(layoutViewType: LayoutViewType | "all" | null): ILayoutCatalog | null {
     const { fetchLayoutCatalogByViewType } = useLayoutsActions();
 
     const catalogs = useLayoutSelector(({ layoutSettings }) => layoutSettings.catalogByViewType);
@@ -197,6 +198,7 @@ export function getAllowedRecordTypesForLayout(layout: ILayoutDetails): LayoutRe
         case "helpCenterKnowledgeBase":
             return [LayoutRecordType.GLOBAL, LayoutRecordType.SUBCOMMUNITY, LayoutRecordType.KNOWLEDGE_BASE];
         case "knowledgeHome":
+        case "createPost":
             return [LayoutRecordType.GLOBAL, LayoutRecordType.SUBCOMMUNITY];
         case "nestedCategoryList":
         case "discussionCategoryPage":
@@ -205,8 +207,6 @@ export function getAllowedRecordTypesForLayout(layout: ILayoutDetails): LayoutRe
         case "discussion":
         case "question":
         case "event":
-            return [LayoutRecordType.GLOBAL, LayoutRecordType.CATEGORY, LayoutRecordType.SUBCOMMUNITY];
-        case "createPost":
             return [LayoutRecordType.GLOBAL, LayoutRecordType.CATEGORY, LayoutRecordType.SUBCOMMUNITY];
         default:
             return [];

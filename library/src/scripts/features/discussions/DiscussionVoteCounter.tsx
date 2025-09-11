@@ -18,11 +18,13 @@ import { useToast } from "@library/features/toaster/ToastContext";
 interface IProps {
     discussion: IDiscussion;
     className?: string;
+    direction: "horizontal" | "vertical";
 }
 
 const DiscussionVoteCounter: FunctionComponent<IProps> = ({
     discussion: { discussionID, reactions, score },
     className,
+    direction,
 }) => {
     const reactToDiscussion = useReactToDiscussion(discussionID);
     const removeDiscussionReaction = useRemoveDiscussionReaction(discussionID);
@@ -76,6 +78,7 @@ const DiscussionVoteCounter: FunctionComponent<IProps> = ({
             score={score}
             upvoted={hasUpvoted}
             downvoted={hasDownvoted}
+            direction={direction}
         />
     );
 };

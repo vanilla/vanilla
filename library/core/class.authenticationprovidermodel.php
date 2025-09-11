@@ -388,7 +388,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function save($formPostValues, $settings = false)
     {

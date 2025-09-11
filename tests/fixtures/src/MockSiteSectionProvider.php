@@ -198,7 +198,7 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionIDSchema(?FieldMatchConditional $conditional): ?Schema
     {

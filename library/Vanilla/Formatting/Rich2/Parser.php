@@ -13,6 +13,8 @@ use Vanilla\Formatting\Rich2\Nodes\Anchor;
 use Vanilla\Formatting\Rich2\Nodes\Blank;
 use Vanilla\Formatting\Rich2\Nodes\Blockquote;
 use Vanilla\Formatting\Rich2\Nodes\BlockquoteLine;
+use Vanilla\Formatting\Rich2\Nodes\Callout;
+use Vanilla\Formatting\Rich2\Nodes\CalloutLine;
 use Vanilla\Formatting\Rich2\Nodes\CodeBlock;
 use Vanilla\Formatting\Rich2\Nodes\CodeLine;
 use Vanilla\Formatting\Rich2\Nodes\External;
@@ -71,6 +73,8 @@ class Parser
         ListItem::class,
         ListItemChild::class,
         LegacyEmojiImage::class,
+        Callout::class,
+        CalloutLine::class,
     ];
 
     /** @var int[] */

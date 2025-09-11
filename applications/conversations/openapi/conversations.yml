@@ -287,6 +287,15 @@ components:
                     type: string
                 initialFormat:
                     $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/Format"
+                insertUserID:
+                    description: The user that created the conversation.
+                    type: integer
+                    x-hidden: true
+                dateInserted:
+                    description: When the conversation was created.
+                    format: date-time
+                    type: string
+                    x-hidden: true
             required:
                 - participantUserIDs
             type: object

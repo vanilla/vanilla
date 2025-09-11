@@ -5,7 +5,7 @@
  */
 
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
@@ -17,6 +17,7 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { important, percent, px } from "csx";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const checkRadioVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -149,8 +150,9 @@ export const checkRadioClasses = useThemeCache(() => {
         minWidth: styleUnit(vars.sizing.width),
         verticalAlign: "middle",
         cursor: "pointer",
-        backgroundColor: ColorsUtils.colorOut(vars.main.bg),
+        backgroundColor: ColorsUtils.varOverride(ColorVar.InputBackground, vars.main.bg),
         ...Mixins.border(vars.border),
+        borderColor: ColorsUtils.varOverride(ColorVar.InputBorder, vars.border.color),
     });
 
     const radioIcon = css({
@@ -281,6 +283,7 @@ export const checkRadioClasses = useThemeCache(() => {
         marginLeft: 25,
         marginTop: -5,
         ...Mixins.font(metasVariables().font),
+        color: ColorsUtils.varOverride(ColorVar.Meta, metasVariables().font.color),
     });
 
     const tooltipPerOption = css({

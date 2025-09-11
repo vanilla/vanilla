@@ -1,11 +1,12 @@
+import { RecordID, logError } from "@vanilla/utils";
+import { getMeta, getSiteSection, siteUrl } from "@library/utility/appUtils";
+
 /**
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license Proprietary
  */
 import apiv2 from "@library/apiv2";
-import { getMeta, getSiteSection, siteUrl } from "@library/utility/appUtils";
 import { delegateEvent } from "@vanilla/dom-utils";
-import { RecordID, logError } from "@vanilla/utils";
 
 export enum ViewType {
     DEFAULT = "page_view",
@@ -30,12 +31,14 @@ export const trackPageView = (url: string = window.location.href, context?: obje
     const referrer: string = document.referrer;
     const groupID: RecordID = getMeta("groupID");
     const eventID: RecordID = getMeta("eventID");
+    const pageName: string = document.title;
 
     // TickExtra could contain the categoryID
     const categoryID = tickExtra?.CategoryID;
 
     const pageViewContext = {
         url,
+        pageName,
         ...(discussionID && { discussionID }),
         ...(categoryID && { categoryID }),
         ...(siteSectionID && { siteSectionID }),

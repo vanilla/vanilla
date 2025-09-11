@@ -6,7 +6,7 @@
 
 import { safelyParseJSON, safelySerializeJSON } from "@library/utility/appUtils";
 import { MyValue } from "@library/vanilla-editor/typescript";
-import { deserializeHtml } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { deserializeHtml } from "@library/vanilla-editor/deserializeHtml";
 import debounce from "lodash-es/debounce";
 import React, { PropsWithChildren, useContext, useMemo, useState } from "react";
 

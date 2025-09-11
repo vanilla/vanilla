@@ -79,7 +79,7 @@ class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInt
     /**
      * @inheritdoc
      */
-    public function getThemeRevisions($themeKey): array
+    public function getThemeRevisions($themeKey, int $limit = 1, int $offset = 1): array
     {
         return [$this->themesByID[$themeKey]];
     }
@@ -210,6 +210,7 @@ class MockThemeProvider implements ThemeProviderInterface, ThemeProviderWriteInt
         $theme = new Theme($body);
         $theme->setAddon($addon);
         $this->themesByID[$themeID] = $theme;
+        $this->themeService->invalidateCache();
         return $theme;
     }
 

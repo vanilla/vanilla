@@ -28,7 +28,7 @@ class RolesExpander extends \Vanilla\Web\AbstractApiExpander
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFullKey(): string
     {
@@ -36,7 +36,7 @@ class RolesExpander extends \Vanilla\Web\AbstractApiExpander
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveFragments(array $recordIDs): array
     {
@@ -44,7 +44,7 @@ class RolesExpander extends \Vanilla\Web\AbstractApiExpander
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getPermission(): ?string
     {

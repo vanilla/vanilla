@@ -6,6 +6,7 @@
 
 import { IUserFragment } from "@library/@types/api/users";
 import { t } from "@vanilla/i18n";
+import { sprintf } from "sprintf-js";
 
 const commonUserFragment = {
     userID: 0,
@@ -30,6 +31,6 @@ export function unknownUserFragment(): IUserFragment {
 export function removedUserFragment(): IUserFragment {
     return {
         ...commonUserFragment,
-        name: t("Removed User"),
+        name: sprintf(t("Removed %s"), t("User")),
     };
 }

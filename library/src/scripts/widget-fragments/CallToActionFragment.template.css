@@ -1,0 +1,53 @@
+.callToActionFragment__root {
+    --default-background-color: #f5f6f7;
+    --default-text-color: #272a2d;
+    --space: 16px;
+
+    width: clamp(200px, 100%, 500px);
+
+    & .callToActionFragment__container {
+        text-align: var(--alignment, "left");
+        border-radius: 6px;
+        box-shadow: rgba(0, 0, 0, 0.22) 0px 1px 3px 0px;
+    }
+
+    &.hasBackgroundColor {
+        & .callToActionFragment__container {
+            background-color: var(--background-color, var(--default-background-color, "white"));
+        }
+    }
+
+    & .callToActionFragment_image {
+        & img {
+            width: 100%;
+            height: auto;
+        }
+    }
+
+    & .callToActionFragment_copy {
+        padding: var(--space);
+        color: var(--color, var(--default-text-color, "black"));
+
+        & h2 {
+            font-size: 18px;
+            padding-bottom: 8px;
+            color: var(--color, var(--default-text-color, "black"));
+        }
+
+        & p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+    }
+
+    & .callToActionFragment_actions {
+        display: flex;
+        gap: var(--space);
+        padding: 0 var(--space);
+
+        &:last-child {
+            padding-block-end: var(--space);
+        }
+    }
+}

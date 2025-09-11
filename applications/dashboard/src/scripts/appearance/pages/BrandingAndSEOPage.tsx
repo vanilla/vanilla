@@ -20,10 +20,11 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import { t } from "@vanilla/i18n";
 import { JsonSchemaForm, JSONSchemaType } from "@vanilla/json-schema-forms";
 import { extractSchemaDefaults } from "@vanilla/json-schema-forms/src/utils";
-import { useCollisionDetector } from "@vanilla/react-utils";
 import { useFormik } from "formik";
 import React, { useEffect, useMemo } from "react";
 import { AppearanceAdminLayout } from "@dashboard/components/navigation/AppearanceAdminLayout";
+import SmartLink from "@library/routing/links/SmartLink";
+import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
 
 const BRANDING_SETTINGS: JSONSchemaType<{
     "garden.homepageTitle": string;
@@ -204,13 +205,23 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             default: false,
             "x-control": {
                 label: t("Defer Javascript Loading"),
-                description: `${t(
-                    "This setting loads the page before executing Javascript which can improve your SEO.",
-                )}.<b>${t(
-                    "**Warning: Enabling this feature may cause Javascript errors on your site.**",
-                )}</b><br/><a href="https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature">${t(
-                    "More information",
-                )}</a>`,
+                description: (
+                    <>
+                        <p>
+                            {t("This setting loads the page before executing Javascript which can improve your SEO.")}
+                            <strong>
+                                {t("**Warning: Enabling this feature may cause Javascript errors on your site.**")}{" "}
+                                <SmartLink
+                                    to={
+                                        "https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature"
+                                    }
+                                >
+                                    {t("More information")}
+                                </SmartLink>
+                            </strong>
+                        </p>
+                    </>
+                ),
                 inputType: "toggle",
             },
         },
@@ -277,15 +288,17 @@ export default function BrandingAndSEOPage() {
             }
             contentClassNames={cx(BrandingAndSEOPageClasses.layout)}
             content={
-                <section>
-                    <DashboardSchemaForm
-                        disabled={!isLoaded}
-                        fieldErrors={error?.errors ?? {}}
-                        schema={BRANDING_SETTINGS}
-                        instance={values}
-                        onChange={setValues}
-                    />
-                </section>
+                <ErrorBoundary>
+                    <section>
+                        <DashboardSchemaForm
+                            disabled={!isLoaded}
+                            fieldErrors={error?.errors ?? {}}
+                            schema={BRANDING_SETTINGS}
+                            instance={values}
+                            onChange={setValues}
+                        />
+                    </section>
+                </ErrorBoundary>
             }
             rightPanel={
                 <PanelWidget>

@@ -109,7 +109,7 @@ export function CollapsableContent(props: IProps) {
         opacity: isExpanded ? 0 : 1,
     });
 
-    const classes = collapsableContentClasses({ bgColor: props.bgColor });
+    const classes = collapsableContentClasses.useAsHook({ bgColor: props.bgColor });
 
     const hasOverflow = measurements.height > heightLimit;
 

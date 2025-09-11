@@ -44,6 +44,7 @@ export const dynamicOptionPillClasses = (isActive: boolean) => {
         alignItems: "center",
         gap: 8,
         cursor: "pointer",
+        margin: 0,
     });
     const input = css({});
     const photo = css({

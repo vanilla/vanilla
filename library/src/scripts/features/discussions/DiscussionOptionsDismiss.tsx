@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -11,7 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import DropDownSwitchButton from "@library/flyouts/DropDownSwitchButton";
-import { DiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
+import { useDiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
 
 const DiscussionOptionsDismiss: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
     discussion,
@@ -21,9 +21,11 @@ const DiscussionOptionsDismiss: FunctionComponent<{ discussion: IDiscussion; onS
 
     const { discussionID, dismissed = false } = discussion;
 
+    const { dismiss } = useDiscussionsApi();
+
     const mutation = useMutation({
         mutationFn: async (dismissed: boolean) =>
-            await DiscussionsApi.dismiss(discussionID, {
+            await dismiss(discussionID, {
                 dismissed,
             }),
     });

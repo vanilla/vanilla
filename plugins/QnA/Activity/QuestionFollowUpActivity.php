@@ -14,7 +14,7 @@ namespace Vanilla\QnA\Activity;
 class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityTypeID(): string
     {
@@ -22,7 +22,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreference(): string
     {
@@ -30,7 +30,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceDescription(): string
     {
@@ -38,7 +38,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getGroupClass(): string
     {
@@ -46,7 +46,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function allowsComments(): bool
     {
@@ -54,7 +54,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getProfileHeadline(): ?string
     {
@@ -62,7 +62,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getFullHeadline(): ?string
     {
@@ -70,7 +70,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPluralHeadline(): ?string
     {
@@ -78,7 +78,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isNotificationType(): bool
     {
@@ -86,7 +86,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isPublicActivity(): bool
     {
@@ -108,7 +108,7 @@ class QuestionFollowUpActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityReason(): ?string
     {

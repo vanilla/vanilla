@@ -4,8 +4,10 @@
  * @license gpl-2.0-only
  */
 
+import { ButtonType } from "@library/forms/buttonTypes";
 import { queryRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/queries/queryRichLink";
 import {
+    ELEMENT_LINK_AS_BUTTON,
     ELEMENT_RICH_EMBED_CARD,
     ELEMENT_RICH_EMBED_INLINE,
     RichLinkAppearance,
@@ -100,6 +102,23 @@ export function setRichLinkAppearance(editor: MyEditor, newAppearance: RichLinkA
         return;
     }
 
+    if (newAppearance === RichLinkAppearance.BUTTON) {
+        removeNodes(editor, {
+            at: currentEmbed.path,
+        });
+        insertNodes(editor, [
+            {
+                type: ELEMENT_LINK_AS_BUTTON,
+                buttonType: ButtonType.PRIMARY,
+                url: currentEmbed.url,
+                embedData: currentEmbed.embedData,
+                children: [{ text: currentEmbed.text }],
+            },
+        ]);
+
+        return;
+    }
+
     if (newAppearance === RichLinkAppearance.INLINE) {
         // Normalizing causes text nodes to be collapsed (see #2 here: https://docs.slatejs.org/concepts/11-normalizing)
         // So if there's text before and after a link, when the link node is removed, the before & after text are collapsed,
@@ -109,17 +128,26 @@ export function setRichLinkAppearance(editor: MyEditor, newAppearance: RichLinkA
                 at: currentEmbed.path,
             });
 
+            const inlineEmbed = {
+                type: ELEMENT_RICH_EMBED_INLINE,
+                dataSourceType: "url",
+                url: currentEmbed.url,
+                embedData: currentEmbed.embedData,
+                children: [{ text: currentEmbed.text }],
+            };
+
+            // Wrap in paragraph if coming from card
+            const nodeToInsert =
+                currentEmbed.element.type === ELEMENT_RICH_EMBED_CARD
+                    ? {
+                          type: "p",
+                          children: [inlineEmbed],
+                      }
+                    : inlineEmbed;
+
             insertNodes(
                 editor,
-                [
-                    {
-                        type: ELEMENT_RICH_EMBED_INLINE,
-                        dataSourceType: "url",
-                        url: currentEmbed.url,
-                        embedData: currentEmbed.embedData,
-                        children: [{ text: currentEmbed.text }],
-                    },
-                ],
+                [nodeToInsert],
                 // Necessary to prevent certain links in pasted content from being added to the end of the document
                 {
                     at: currentEmbed.path,

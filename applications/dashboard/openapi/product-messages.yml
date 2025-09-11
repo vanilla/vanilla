@@ -1,0 +1,314 @@
+openapi: 3.0.2
+info:
+paths:
+    /product-messages:
+        get:
+            tags:
+                - Product Messages
+            summary: List product messages
+            operationId: listProductMessages
+            responses:
+                "200":
+                    description: A list of product messages.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: array
+                                        items:
+                                            $ref: "#/components/schemas/ProductMessage"
+        post:
+            x-hidden: true
+            tags:
+                - Product Messages
+            summary: Create a product message targetting the specific site.
+            operationId: createProductMessage
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ProductMessageEdit"
+            responses:
+                "201":
+                    description: Created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ProductMessage"
+    /product-message/{productMessageID}:
+        parameters:
+            - name: productMessageID
+              in: path
+              required: true
+              description: ID of the product message to retrieve.
+              schema:
+                  type: integer
+        get:
+            tags:
+                - Product Messages
+            summary: Get a product message by ID.
+            operationId: getProductMessage
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ProductMessage"
+        patch:
+            x-hidden: true
+            tags:
+                - Product Messages
+            summary: Update a product message by ID.
+            operationId: updateProductMessage
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ProductMessagePatch"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ProductMessage"
+        delete:
+            x-hidden: true
+            tags:
+                - Product Messages
+            summary: Delete a product message by ID.
+            operationId: deleteProductMessage
+            responses:
+                "204":
+                    description: Success
+    /product-messages/{productMessageID}/edit:
+        get:
+            x-hidden: true
+            tags:
+                - Product Messages
+            summary: Get a product message by ID. Editable fields only.
+            description: Only works on personal messages.
+            operationId: getProductMessage
+            parameters:
+                - name: productMessageID
+                  in: path
+                  required: true
+                  description: ID of the product message to retrieve.
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ProductMessageEdit"
+    /product-messages/{productMessageID}/dismiss:
+        post:
+            tags:
+                - Product Messages
+            summary: Dismiss a product message
+            operationId: dismissProductMessage
+            parameters:
+                - name: productMessageID
+                  in: path
+                  required: true
+                  description: ID of the product message to dismiss.
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    description: Success
+    /product-messages/{productMessageID}/viewers:
+        get:
+            x-hidden: true
+            tags:
+                - Product Messages
+            summary: Get a list of users on the site that have viewed the message.
+            operationId: listViewers
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: array
+                                        items:
+                                            $ref: "./users.yml#/components/schemas/User"
+
+    /product-messages/dismiss-all:
+        post:
+            tags:
+                - Product Messages
+            summary: Dismiss all product messages
+            operationId: dismissAllProductMessages
+            responses:
+                "200":
+                    description: Success
+    /product-messages/sync-announcements:
+        post:
+            x-hidden: true
+            tags:
+                - Product Messages
+            summary: Sync product messages from the foreign announcement source (success.vanillaforums.com)
+            operationId: syncProductMessages
+            responses:
+                "200":
+                    description: Success
+    /product-messages/foreign-users:
+        get:
+            x-hidden: true
+            tags:
+                - Product Messages
+            summary: Get a list of foreign users who we can use an author for a local product message.
+            operationId: listForeignUsers
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    data:
+                                        type: array
+                                        items:
+                                            $ref: "./users.yml#/components/schemas/User"
+components:
+    schemas:
+        AnnouncementType:
+            type: string
+            description: Determine how the message pops up.
+            enum:
+                - None
+                - Inbox
+                - Direct
+        ProductMessageEdit:
+            type: object
+            properties: &editProperties
+                name:
+                    type: string
+                    description: Title of the message.
+                body:
+                    type: string
+                    description: Raw body of the message.
+                format:
+                    type: string
+                    description: Format of the message.
+                    enum:
+                        - rich2
+                        - markdown
+                        - text
+                foreignInsertUserID:
+                    type: integer
+                    description: ID of the user who inserted the message in the foreign system.
+                ctaLabel:
+                    type: string
+                    description: Label for the call to action button.
+                ctaUrl:
+                    type: string
+                    format: uri
+                    description: URL for the call to action button.
+                announcementType:
+                    $ref: "#/components/schemas/AnnouncementType"
+            required:
+                - name
+                - body
+                - format
+                - foreignInsertUserID
+                - announcementType
+        ProductMessagePatch:
+            type: object
+            properties: *editProperties
+        ProductMessage:
+            type: object
+            properties:
+                productMessageID:
+                    type: string
+                    description: ID of the product message. Either a UUID or a foreignID.
+                productMessageType:
+                    type: string
+                    description: Type of the message.
+                    enum:
+                        - personal
+                        - announcement
+                announcementType:
+                    $ref: "#/components/schemas/AnnouncementType"
+                name:
+                    type: string
+                    description: Title of the message.
+                body:
+                    type: string
+                    description: Sanitized HTML of the message.
+                foreignInsertUser:
+                    type: object
+                    description: A user fragment from a foreign system that posted the message.
+                    properties:
+                        userID:
+                            type: integer
+                            description: ID of the user who inserted the message in the foreign system.
+                        name:
+                            type: string
+                            description: Name of the user.
+                        title:
+                            type: string
+                            description: Title of the user.
+                        photoUrl:
+                            type: string
+                            format: uri
+                            description: URL of the user's photo.
+                        url:
+                            type: string
+                            format: uri
+                    required:
+                        - userID
+                        - name
+                        - url
+                        - photoUrl
+                ctaLabel:
+                    type: string
+                    description: Label for the call to action button.
+                ctaUrl:
+                    type: string
+                    format: uri
+                    description: URL for the call to action button.
+                isDismissed:
+                    type: boolean
+                    description: Indicates if the message has been dismissed by the sessioned user.
+                dateDismissed:
+                    type: string
+                    format: date-time
+                    description: Date the message was dismissed.
+                countViewers:
+                    type: integer
+                    description: Number of users who have viewed the message.
+                dateInserted:
+                    type: string
+                    format: date-time
+                insertUserID:
+                    type: integer
+                    description: ID of the user who inserted the message.
+                dateUpdated:
+                    type: string
+                    format: date-time
+                updateUserID:
+                    type: integer
+                    description: ID of the user who updated the message.
+            required:
+                - productMessageID
+                - productMessageType
+                - announcementType
+                - name
+                - body
+                - foreignInsertUser
+                - dateInserted
+                - isDismissed
+                - countViewers

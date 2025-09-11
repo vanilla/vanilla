@@ -36,6 +36,42 @@ class DiscussionNotificationsTest extends \VanillaTests\SiteTestCase
     }
 
     /**
+     * Test that a discussion post with the "publishedSilently" flag set to true does not send a notification.
+     *
+     * @return void
+     */
+    public function testPublishingSilently(): void
+    {
+        $user = $this->createUser();
+        $this->clearUserNotifications($user);
+        $discussion = $this->createDiscussion([
+            "body" => "I'm mentioning @{$user["name"]}",
+            "publishedSilently" => true,
+        ]);
+        $this->assertUserHasNoNotifications($user);
+    }
+
+    /**
+     * Test that silent posting is ignored when a user without the "publishedSilently" permission sets the flag
+     * while posting a discussion.
+     */
+    public function testSilentPostingIgnoredForUserWithoutPermission(): void
+    {
+        $notificationUser = $this->createUser();
+        $user = $this->createUser();
+        $this->clearUserNotifications($user);
+        $discussion = $this->runWithUser(function () use ($user, $notificationUser) {
+            return $this->createDiscussion([
+                "body" => "I'm mentioning @{$notificationUser["name"]}",
+                "publishedSilently" => true,
+            ]);
+        }, $user);
+        $this->assertUserHasNotificationsLike($notificationUser, [
+            new ExpectedNotification("DiscussionMention", ["mentioned you in", $discussion["name"]], "mention"),
+        ]);
+    }
+
+    /**
      * Test that when a user is mentioned and following a category that they do not get duplicate notifications.
      */
     public function testNoDuplicateMentionAndPost(): void

@@ -9,7 +9,6 @@ import { hasPermission } from "@library/features/users/Permission";
 import getStore from "@library/redux/getStore";
 import { getCurrentLocale, translate } from "@vanilla/i18n";
 import { getAnonymizeData, setAnonymizeData } from "@library/analytics/anonymizeData";
-import { getMeta } from "@library/utility/appUtils";
 
 const VanillaGlobals: Record<string, any> = {
     apiv2,

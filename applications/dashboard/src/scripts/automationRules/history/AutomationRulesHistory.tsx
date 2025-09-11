@@ -18,7 +18,7 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 import AutomationRulesHistoryFilter from "@dashboard/automationRules/history/AutomationRulesHistoryFilter";
 import { IGetAutomationRuleDispatchesParams } from "@dashboard/automationRules/AutomationRules.types";
 import { useMemo, useState } from "react";
-import qs from "qs";
+import * as qs from "qs-esm";
 import QueryString from "@library/routing/QueryString";
 import { dateStringInUrlToDateRange } from "@library/search/SearchUtils";
 import NumberedPager from "@library/features/numberedPager/NumberedPager";
@@ -114,7 +114,6 @@ export function AutomationRulesHistoryImpl() {
                                     showNextButton: false,
                                 }}
                                 onChange={(page: number) => updateQuery({ ...query, page: page })}
-                                isMobile={false}
                             />
                         )}
                     </div>

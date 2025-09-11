@@ -65,9 +65,17 @@ export const userLabelClasses = useThemeCache(() => {
             radius: 3,
         }),
 
-        // Without these it won't align in a meta-row (and will actually push things below down by a few pixels).
-        display: "inline",
-        verticalAlign: "middle",
+        display: "inline-flex",
+        gap: 4,
+        alignItems: "center",
+
+        "& img": {
+            maxHeight: 16,
+            height: "100%",
+            alignSelf: "stretch",
+            minHeight: 0,
+            width: "auto",
+        },
 
         // Looks slightly offset without this.
         position: "relative",

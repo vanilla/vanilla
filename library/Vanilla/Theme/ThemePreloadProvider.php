@@ -104,6 +104,31 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
     }
 
     /**
+     * @return array
+     */
+    public function getPreloadFragmentScriptUrls(): array
+    {
+        $theme = $this->getPreloadTheme();
+        if (!$theme) {
+            return [];
+        }
+
+        /** These should have already been hydrated in {@link ThemeService::overlayFragmentImpls()} */
+        $fragmentImpls = $theme->getVariables()->get("globalFragmentImpls", []);
+
+        $scriptUrls = [];
+        foreach ($fragmentImpls as $impl) {
+            $fragmentUUID = $impl["fragmentUUID"] ?? "system";
+            if ($fragmentUUID === "system") {
+                continue;
+            }
+            $scriptUrls[] = $impl["jsUrl"];
+        }
+        $scriptUrls = array_filter($scriptUrls);
+        return $scriptUrls;
+    }
+
+    /**
      * Get the theme (with some local caching so it isn't requested twice).
      */
     public function getPreloadTheme(): ?Theme

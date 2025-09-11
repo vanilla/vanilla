@@ -19,13 +19,13 @@ function DisplayCurrentZindex(props) {
 }
 
 describe("Stacking Context", () => {
-    it("zIndex begins at 1051", () => {
+    it("zIndex begins at 1061", () => {
         render(
             <StackingContextProvider>
                 <DisplayCurrentZindex testid={"zindex"} />
             </StackingContextProvider>,
         );
-        expect(screen.getByTestId("zindex")).toHaveTextContent("1051");
+        expect(screen.getByTestId("zindex")).toHaveTextContent("1061");
     });
 
     it("Nested providers increment the zIndex", () => {
@@ -38,6 +38,6 @@ describe("Stacking Context", () => {
                 </DisplayCurrentZindex>
             </StackingContextProvider>,
         );
-        expect(screen.getByTestId("zindex-2")).toHaveTextContent("1052");
+        expect(screen.getByTestId("zindex-2")).toHaveTextContent("1062");
     });
 });

@@ -50,6 +50,8 @@ trait CommunityApiTestTrait
     /** @var int|null */
     protected $lastInsertedCollectionID = null;
 
+    protected $lastResponse = null;
+
     /** @var int|null */
     protected $lastReportID = null;
 
@@ -384,13 +386,13 @@ trait CommunityApiTestTrait
      *
      * @param array $overrides Fields to override on the insert.
      * @param array $extras Extra fields to set directly in the model.
-     *
+     * @param array $options
      * @return array
      * @throws ContainerException
      * @throws NotFoundException
      * @throws ValidationException
      */
-    public function createDiscussion(array $overrides = [], array $extras = []): array
+    public function createDiscussion(array $overrides = [], array $extras = [], array $options = []): array
     {
         $categoryID = $overrides["categoryID"] ?? ($this->lastInsertedCategoryID ?? -1);
 
@@ -414,7 +416,7 @@ trait CommunityApiTestTrait
             $apiUrl .= "/" . strtolower($type);
         }
 
-        $this->lastCommunityResponse = $this->api()->post($apiUrl, $params);
+        $this->lastCommunityResponse = $this->api()->post($apiUrl, $params, options: $options);
         $result = $this->lastCommunityResponse->getBody();
         $this->lastInsertedDiscussionID = $result["discussionID"] ?? null;
         if ($this->lastInsertedDiscussionID === null) {
@@ -471,6 +473,51 @@ trait CommunityApiTestTrait
     }
 
     /**
+     * Create a scoped tag.
+     *
+     * @param array $overrides
+     * @param array|null $categoryIDs
+     * @param array|null $siteSectionIDs
+     * @return array
+     */
+    public function createScopedTag(
+        array $overrides = [],
+        ?array $categoryIDs = null,
+        ?array $siteSectionIDs = null
+    ): array {
+        $tagName = $overrides["name"] ?? "scopedTagName_" . VanillaTestCase::id("scopedTagName");
+
+        $scope = [];
+        if ($categoryIDs !== null) {
+            $scope["categoryIDs"] = $categoryIDs;
+        }
+        if ($siteSectionIDs !== null) {
+            $scope["siteSectionIDs"] = $siteSectionIDs;
+        }
+
+        $params = $overrides + [
+            "name" => $tagName,
+            "fullName" => $tagName,
+            "type" => "",
+            "scopeType" => "scoped",
+        ];
+
+        if (!empty($scope)) {
+            $params["scope"] = $scope;
+        }
+
+        $apiUrl = "/tags";
+
+        $this->lastCommunityResponse = $this->api()->post($apiUrl, $params);
+        $result = $this->lastCommunityResponse->getBody();
+        $this->lastInsertedTagID = $result["tagID"] ?? null;
+        if ($this->lastInsertedTagID === null) {
+            return $result;
+        }
+        return $result;
+    }
+
+    /**
      * Create Interest
      */
     public function createInterest(array $overrides = []): array
@@ -510,10 +557,23 @@ trait CommunityApiTestTrait
     }
 
     /**
-     * Give score to a discussion.
+     * Bookmark a discussion as a specific user.
      *
-     * @param int $discussionID
-     * @param int $score
+     * @param int|array $discussionOrDiscussionID The discussion to bookmark
+     * @param array $user The user to bookmark as
+     */
+    public function bookmarkDiscussionWithUser(int|array $discussionOrDiscussionID, array $user): void
+    {
+        $this->runWithUser(function () use ($discussionOrDiscussionID) {
+            $this->bookmarkDiscussion($discussionOrDiscussionID);
+        }, $user);
+    }
+
+    /**
+     * Set a discussion's score.
+     *
+     * @param int $discussionID The discussion to set the score for.
+     * @param int $score The score to set.
      */
     public function setDiscussionScore(int $discussionID, int $score)
     {
@@ -721,6 +781,19 @@ trait CommunityApiTestTrait
     }
 
     /**
+     * Return the attachments based on a foreignID.
+     *
+     * @param string $foreignID
+     * @return array
+     */
+    public function getAttachment(string $foreignID): array
+    {
+        $attachmentModel = $this->container()->get(AttachmentModel::class);
+        $attachments = $attachmentModel->getWhere(["ForeignID" => $foreignID])->resultArray();
+        return $attachments;
+    }
+
+    /**
      * Create a post type.
      *
      * @param array $overrides
@@ -810,10 +883,10 @@ trait CommunityApiTestTrait
     /**
      * Make a reaction on a discussion.
      *
-     * @param $discussionOrDiscussionID
+     * @param array|int $discussionOrDiscussionID
      * @param string $reactionType
      */
-    public function reactDiscussion($discussionOrDiscussionID, string $reactionType)
+    public function reactDiscussion(array|int $discussionOrDiscussionID, string $reactionType): void
     {
         $discussionID = is_array($discussionOrDiscussionID)
             ? $discussionOrDiscussionID["discussionID"]
@@ -833,14 +906,32 @@ trait CommunityApiTestTrait
     }
 
     /**
+     * Apply a reaction as a specific user.
+     *
+     * @param array|int $discussionOrDiscussionID
+     * @param string $reactionType
+     * @param int|array $user
+     * @return void
+     */
+    public function reactDiscussionAsUser(
+        array|int $discussionOrDiscussionID,
+        string $reactionType,
+        int|array $user
+    ): void {
+        $this->runWithUser(function () use ($discussionOrDiscussionID, $reactionType) {
+            $this->reactDiscussion($discussionOrDiscussionID, $reactionType);
+        }, $user);
+    }
+
+    /**
      * React to a comment.
      *
-     * @param $commentOrCommentID
+     * @param array|int $commentOrCommentID
      * @param string $reactionType
      *
      * @return void
      */
-    public function reactComment($commentOrCommentID, string $reactionType): void
+    public function reactComment(array|int $commentOrCommentID, string $reactionType): void
     {
         $commentID = is_array($commentOrCommentID) ? $commentOrCommentID["commentID"] : $commentOrCommentID;
 
@@ -1005,5 +1096,23 @@ trait CommunityApiTestTrait
         } catch (NoResultsException $ex) {
             return false;
         }
+    }
+
+    /**
+     * Add a tag to a discussion.
+     *
+     * @param int|null $discussionID
+     * @param int|null $tagID
+     * @return void
+     */
+    public function tagDiscussion(?int $discussionID = null, ?int $tagID = null): void
+    {
+        $discussionID = $discussionID ?? $this->lastInsertedDiscussionID;
+        $tagID = $tagID ?? $this->lastInsertedTagID;
+        $this->api()
+            ->post("/discussions/{$discussionID}/tags", [
+                "tagIDs" => [$tagID],
+            ])
+            ->assertSuccess();
     }
 }

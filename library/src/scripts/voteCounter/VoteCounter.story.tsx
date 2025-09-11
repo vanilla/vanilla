@@ -7,6 +7,8 @@ import React, { useState } from "react";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { StoryContent } from "@library/storybook/StoryContent";
 import VoteCounterComponent from "@library/voteCounter/VoteCounter";
+import { StoryTiles } from "@library/storybook/StoryTiles";
+import { StoryTile } from "@library/storybook/StoryTile";
 
 export const VoteCounter = storyWithConfig(
     {
@@ -40,15 +42,44 @@ export const VoteCounter = storyWithConfig(
 
         return (
             <StoryContent>
-                <VoteCounterComponent upvoted={upvoted} onToggleUpvoted={handleToggleUpvoted} score={score} />
-                <br />
-                <VoteCounterComponent
-                    upvoted={upvoted}
-                    onToggleUpvoted={handleToggleUpvoted}
-                    downvoted={downvoted}
-                    onToggleDownvoted={handleToggleDownvoted}
-                    score={score}
-                />
+                <StoryTiles>
+                    <StoryTile>
+                        <VoteCounterComponent
+                            direction={"vertical"}
+                            upvoted={upvoted}
+                            onToggleUpvoted={handleToggleUpvoted}
+                            score={score}
+                        />
+                    </StoryTile>
+                    <StoryTile>
+                        <VoteCounterComponent
+                            direction={"vertical"}
+                            upvoted={upvoted}
+                            onToggleUpvoted={handleToggleUpvoted}
+                            downvoted={downvoted}
+                            onToggleDownvoted={handleToggleDownvoted}
+                            score={score}
+                        />
+                    </StoryTile>
+                    <StoryTile>
+                        <VoteCounterComponent
+                            direction={"horizontal"}
+                            upvoted={upvoted}
+                            onToggleUpvoted={handleToggleUpvoted}
+                            score={score}
+                        />
+                    </StoryTile>
+                    <StoryTile>
+                        <VoteCounterComponent
+                            direction={"horizontal"}
+                            upvoted={upvoted}
+                            onToggleUpvoted={handleToggleUpvoted}
+                            downvoted={downvoted}
+                            onToggleDownvoted={handleToggleDownvoted}
+                            score={score}
+                        />
+                    </StoryTile>
+                </StoryTiles>
             </StoryContent>
         );
     },

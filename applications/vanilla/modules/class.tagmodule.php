@@ -8,13 +8,13 @@
  */
 
 use Garden\Schema\Schema;
-use Vanilla\Widgets\AbstractWidgetModule;
+use Vanilla\Widgets\LegacyWidgetModule;
 use Vanilla\Theme\BoxThemeShim;
 
 /**
  * Class TagModule
  */
-class TagModule extends AbstractWidgetModule
+class TagModule extends LegacyWidgetModule
 {
     const TAGS_MODULE = "Popular Tags";
 

@@ -64,7 +64,7 @@ class ApprovalPremoderator implements PremoderationHandlerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function premoderateItem(PremoderationItem $item): PremoderationResponse
     {
@@ -76,17 +76,34 @@ class ApprovalPremoderator implements PremoderationHandlerInterface
         $systemUserID = $this->userModel->getSystemUserID();
 
         if ($this->requiresGlobalApproval($item)) {
-            return new PremoderationResponse(PremoderationResponse::APPROVAL_REQUIRED, $systemUserID);
+            return new PremoderationResponse(
+                PremoderationResponse::APPROVAL_REQUIRED,
+                $systemUserID,
+                PremoderationResponse::PREMODERATION_ROLE
+            );
         }
 
         if ($this->requiresCategoryApproval($item)) {
-            return new PremoderationResponse(PremoderationResponse::APPROVAL_REQUIRED, $systemUserID);
+            return new PremoderationResponse(
+                PremoderationResponse::APPROVAL_REQUIRED,
+                $systemUserID,
+                PremoderationResponse::PREMODERATION_CATEGORY
+            );
+        }
+
+        // Verified users and admins should bypass keyword pre-moderation
+        if ($this->session->isUserVerified() || $this->session->checkPermission("Garden.Moderation.Manage")) {
+            return PremoderationResponse::valid();
         }
 
         $blockedKeyword = $this->tryGetBlockedKeyword($item);
 
         if ($blockedKeyword !== null) {
-            $response = new PremoderationResponse(PremoderationResponse::APPROVAL_REQUIRED, $systemUserID);
+            $response = new PremoderationResponse(
+                PremoderationResponse::APPROVAL_REQUIRED,
+                $systemUserID,
+                PremoderationResponse::PREMODERATION_KEYWORD
+            );
             // We have a matching keyword.
             $note = <<<TWIG
 <p>The following keyword requires approval:</p><ul><li>{{ keyword }}</li></ul>

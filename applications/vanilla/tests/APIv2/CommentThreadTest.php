@@ -29,7 +29,7 @@ class CommentThreadTest extends SiteTestCase
     private CommentModel $commentModel;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -551,5 +551,45 @@ class CommentThreadTest extends SiteTestCase
         $comment1_1 = $this->createNestedComment($comment1);
         $this->expectExceptionMessage("Comment exceeds maximum depth.");
         $comment1_1 = $this->createNestedComment($comment1_1);
+    }
+
+    /**
+     * Ensure we don't blow up over the API when joining parent comment threads.
+     *
+     * @return void
+     */
+    public function testParentCommentIsEmpty(): void
+    {
+        $this->createDiscussion();
+        // Empty body
+        $comment1 = $this->createComment(extras: ["Body" => ""]);
+
+        $comment11 = $this->createNestedComment($comment1);
+        $this->api()
+            ->get("/comments/{$comment11["commentID"]}")
+            ->assertSuccess();
+    }
+
+    /**
+     * When crawling comments parent records should not be joined.
+     *
+     * @return void
+     */
+    public function testExpandCrawlExcludesParents(): void
+    {
+        $this->createDiscussion();
+        // Empty body
+        $comment1 = $this->createComment(extras: ["Body" => "Parent"]);
+
+        $comment11 = $this->createNestedComment($comment1);
+
+        $commentFetched = $this->api()
+            ->get("/comments", [
+                "commentID" => $comment11["commentID"],
+                "expand" => "crawl",
+            ])
+            ->getBody()[0];
+
+        $this->assertStringNotContainsString("Parent", $commentFetched["body"]);
     }
 }

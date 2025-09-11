@@ -20,7 +20,7 @@ export interface ITagProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 export function Tag(props: ITagProps) {
     const { to, className, color, preset = TagPreset.STANDARD, tooltipLabel, ...rest } = props;
-    const classes = tagClasses();
+    const classes = tagClasses.useAsHook();
 
     let result: React.ReactNode;
     if (to) {

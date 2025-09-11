@@ -21,7 +21,7 @@ import {
 import { useThemeCache } from "@library/styles/themeCache";
 import { ColorHelper, important, percent, px } from "csx";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { Property } from "csstype";
 import merge from "lodash-es/merge";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
@@ -41,6 +41,7 @@ import { internalAbsoluteMixins } from "@library/styles/MixinsAbsolute";
 import { generateButtonStyleProperties } from "@library/forms/styleHelperButtonGenerator";
 import { IButton } from "@library/forms/styleHelperButtonInterface";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
+import { ColorVar } from "@library/styles/CssVar";
 
 export class Mixins {
     constructor() {
@@ -53,6 +54,26 @@ export class Mixins {
         return generateButtonStyleProperties({
             buttonTypeVars,
         });
+    };
+
+    public static scrollbar = (options: {
+        barColor: string | ColorHelper;
+        trackColor: string | ColorHelper;
+        width?: "auto" | "thin";
+    }): CSSObject => {
+        return {
+            scrollbarColor: `${ColorsUtils.colorOut(options.barColor)} ${ColorsUtils.colorOut(options.trackColor)}`,
+            scrollbarWidth: options.width ?? "auto",
+            "&::-webkit-scrollbar": {
+                width: options.width === "thin" ? "8px" : "16px",
+            },
+            "&::-webkit-scrollbar-track": {
+                backgroundColor: ColorsUtils.colorOut(options.trackColor),
+            },
+            "&::-webkit-scrollbar-thumb": {
+                backgroundColor: ColorsUtils.colorOut(options.barColor),
+            },
+        };
     };
 
     public static box = (
@@ -88,7 +109,9 @@ export class Mixins {
         if (!boxHasSetPaddings && hasFullOutline) {
             spacing = {
                 horizontal: defaultSpacer,
-                vertical: [BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN].includes(borderType) ? 0 : defaultSpacer,
+                vertical: ([BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN] as BorderType[]).includes(borderType)
+                    ? 0
+                    : defaultSpacer,
             };
         }
 
@@ -102,7 +125,7 @@ export class Mixins {
 
         let extraSpacingCSS: CSSObject = {};
 
-        if ([BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN].includes(borderType)) {
+        if (([BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN] as BorderType[]).includes(borderType)) {
             const extraSpacing = globalVars.spacer.componentInner / 2;
             spacing = {
                 ...spacing,
@@ -139,7 +162,8 @@ export class Mixins {
             // Apply styles
             ...Mixins.background(background),
             ...Mixins.borderType(borderType, { border, interactiveOutline: config?.interactiveOutline }),
-            ...(hasFullOutline || [BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN].includes(borderType)
+            ...(hasFullOutline ||
+            ([BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN] as BorderType[]).includes(borderType)
                 ? {
                       "& &:first-of-type:before, & .pageBox:first-of-type:before, & .pageBoxNoCompat:first-of-type:before":
                           {
@@ -285,12 +309,16 @@ export class Mixins {
         return spacingVals;
     }
 
-    static verticallyAlignInContainer(height: number, parentLineHeight: number): CSSObject {
+    static verticallyAlignInContainer(
+        height: number,
+        parentLineHeight: number,
+        smallerThanContainer = false,
+    ): CSSObject {
         return {
             [`--offset`]: `calc(calc(1em * ${parentLineHeight}) - ${height}px) / 2`,
             [`--negative-offset`]: `min(var(--offset), -1*var(--offset))`,
-            verticalAlign: "top",
-            transform: `translateY(var(--negative-offset))`,
+            verticalAlign: smallerThanContainer ? "text-bottom" : "text-top",
+            transform: smallerThanContainer ? `translateY(var(--offset))` : `translateY(var(--negative-offset))`,
         };
     }
 
@@ -453,7 +481,9 @@ export class Mixins {
             debug?: boolean | string;
         },
     ): CSSObject {
-        const { fallbackBorderVariables = globalVariables().border, debug = false } = options || {};
+        const { fallbackBorderVariables: fallback = globalVariables().border, debug = false } = options || {};
+        const fallbackBorderVariables = { ...fallback }; // Prevent object polution.
+        fallbackBorderVariables.color = ColorsUtils.varOverride(ColorVar.Border, fallbackBorderVariables.color);
         const output: CSSObject = {};
         const style = getValueIfItExists(detailedStyles, "style", fallbackBorderVariables.style);
         const color = getValueIfItExists(detailedStyles, "color", fallbackBorderVariables.color).toString();
@@ -558,8 +588,10 @@ export class Mixins {
             backgroundSize: vars.size || "cover",
             backgroundImage: image,
             opacity: vars.opacity,
-            "--fg-contrast-color": fgColor,
             color: fgColor,
+            ...Variables.colorOverride({
+                [ColorVar.Foreground]: fgColor,
+            }),
         };
     }
 

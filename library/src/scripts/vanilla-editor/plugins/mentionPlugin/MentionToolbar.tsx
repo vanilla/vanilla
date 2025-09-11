@@ -1,21 +1,4 @@
-import { cx } from "@emotion/css";
-import { LoadStatus } from "@library/@types/api/core";
-import apiv2 from "@library/apiv2";
-import MentionSuggestion, {
-    IMentionSuggestionData,
-    MentionSuggestionLoading,
-} from "@library/editor/pieces/MentionSuggestion";
-import { mentionListClasses, mentionListItemClasses } from "@library/editor/pieces/atMentionStyles";
-import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
-import UserSuggestionModel, {
-    IInjectableSuggestionsProps,
-} from "@library/features/users/suggestion/UserSuggestionModel";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { useVanillaEditorBounds } from "@library/vanilla-editor/VanillaEditorBoundsContext";
 import { Combobox, ComboboxItemProps } from "@library/vanilla-editor/plugins/mentionPlugin/Combobox";
-import { useComboboxSelectors } from "@udecode/plate-combobox";
-import { getPluginOptions, usePlateEditorRef } from "@udecode/plate-common";
-import { offset, shift } from "@udecode/plate-floating";
 import {
     ELEMENT_MENTION,
     MentionPlugin,
@@ -23,25 +6,39 @@ import {
     getMentionOnSelectItem,
     removeMentionInput,
 } from "@udecode/plate-mention";
-import uniqueId from "lodash-es/uniqueId";
-import React, { useEffect, useMemo } from "react";
-import { connect } from "react-redux";
+import MentionSuggestion, {
+    IMentionSuggestionData,
+    MentionSuggestionLoading,
+} from "@library/editor/pieces/MentionSuggestion";
+import { getPluginOptions, usePlateEditorRef } from "@udecode/plate-common";
+import { mentionListClasses, mentionListItemClasses } from "@library/editor/pieces/atMentionStyles";
+import { offset, shift } from "@udecode/plate-floating";
+import { useEffect, useMemo } from "react";
 
-interface IProps extends IInjectableSuggestionsProps {
-    suggestionActions: UserSuggestionActions;
+import { cx } from "@emotion/css";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import uniqueId from "lodash-es/uniqueId";
+import { useComboboxSelectors } from "@udecode/plate-combobox";
+import { useMentions } from "@library/features/users/suggestion/MentionsContext";
+import { useVanillaEditorBounds } from "@library/vanilla-editor/VanillaEditorBoundsContext";
+
+interface IProps {
     pluginKey?: string;
 }
 
 function MentionToolbar(props: IProps) {
     const SUGGESTION_LIMIT = 5;
 
-    const { suggestionActions, suggestions, pluginKey = ELEMENT_MENTION } = props;
+    const { pluginKey = ELEMENT_MENTION } = props;
+
+    const { setUsername, suggestedUsers, isLoading, lastSuccessfulUsername, activeSuggestionID, setActive } =
+        useMentions();
 
     const text = useComboboxSelectors.text() ?? "";
 
     const items = useMemo(
         () =>
-            (suggestions?.data ?? []).map((data) => {
+            (suggestedUsers ?? []).map((data) => {
                 const { userID, name: text } = data;
                 return {
                     key: `${userID}`,
@@ -49,28 +46,27 @@ function MentionToolbar(props: IProps) {
                     data,
                 };
             }),
-        [suggestions],
+        [suggestedUsers],
     );
 
-    const showLoader = props.isLoading;
+    const showLoader = isLoading;
     const loaderID = uniqueId("mentionList-noResults-");
-    const matchedString = props.lastSuccessfulUsername;
-    const activeSuggestionID = props.activeSuggestionID;
+    const matchedString = lastSuccessfulUsername;
 
     const highlightedIndex = useComboboxSelectors.highlightedIndex();
 
     useEffect(() => {
         if (highlightedIndex !== undefined && items[highlightedIndex]?.data) {
             const activeSuggestionId = items[highlightedIndex].data.domID;
-            props.suggestionActions.setActive(activeSuggestionId, highlightedIndex);
+            setActive(activeSuggestionId, highlightedIndex);
         }
-    }, [highlightedIndex, items]);
+    }, [highlightedIndex, items, setActive]);
 
     useEffect(() => {
         if (text) {
-            suggestionActions.loadUsers(text);
+            setUsername(text);
         }
-    }, [text]);
+    }, [text, setUsername]);
 
     const editor = usePlateEditorRef();
 
@@ -82,16 +78,11 @@ function MentionToolbar(props: IProps) {
 
     useEffect(() => {
         const currentMentionInput = findMentionInput(editor)!;
-        if (
-            text &&
-            currentMentionInput &&
-            props.suggestions?.data?.length === 0 &&
-            props.suggestions.status === LoadStatus.SUCCESS
-        ) {
+        if (text && currentMentionInput && suggestedUsers?.length === 0 && !isLoading) {
             // if there are no matches, exit the combobox
             removeMentionInput(editor, currentMentionInput[1]);
         }
-    }, [text, editor, props.suggestions]);
+    }, [text, editor, suggestedUsers, isLoading]);
 
     function RenderItem(props: ComboboxItemProps<IMentionSuggestionData>) {
         return (
@@ -161,8 +152,4 @@ function MentionToolbar(props: IProps) {
     );
 }
 
-const withRedux = connect(UserSuggestionModel.mapStateToProps, (dispatch) => ({
-    suggestionActions: new UserSuggestionActions(dispatch, apiv2),
-}));
-
-export default withRedux(MentionToolbar);
+export default MentionToolbar;

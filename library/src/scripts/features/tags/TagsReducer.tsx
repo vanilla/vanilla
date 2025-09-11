@@ -13,7 +13,6 @@ export interface ITag {
     tagID: number;
     name: string;
     urlcode: string;
-    parentTagID?: number | null;
     urlCode?: string;
     countDiscussions?: number;
     type?: string;
@@ -31,7 +30,7 @@ export const INITIAL_TAGS_STATE: ITagState = {
     tagsByName: {},
 };
 
-export const tagsReducer = produce(
+export const tagsReducer: any = produce(
     reducerWithInitialState<ITagState>(INITIAL_TAGS_STATE)
         .case(TagsAction.getTagsACs.started, (nextState, action) => {
             nextState.tagsByName[action.name] = { status: LoadStatus.LOADING };

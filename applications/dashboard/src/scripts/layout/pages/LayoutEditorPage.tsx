@@ -4,23 +4,35 @@
  * @license gpl-2.0-only
  */
 
-import { LayoutOverviewRoute, LegacyLayoutsRoute } from "@dashboard/appearance/routes/appearanceRoutes";
-import { LayoutEditor } from "@dashboard/layout/editor/LayoutEditor";
+import {
+    CustomPagesRoute,
+    LayoutOverviewRoute,
+    LegacyLayoutsRoute,
+} from "@dashboard/appearance/routes/appearanceRoutes";
+import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
+import { EditorRolePreviewDropDownItem, EditorRolePreviewProvider } from "@dashboard/roles/EditorRolePreviewContext";
+import {
+    EditorThemePreviewDropDownItem,
+    EditorThemePreviewOverrides,
+    EditorThemePreviewProvider,
+} from "@library/theming/EditorThemePreviewContext";
+import { RouteComponentProps, useLocation } from "react-router-dom";
+import { getRelativeUrl, siteUrl, t } from "@library/utility/appUtils";
 import { useLayoutDraft, useTextEditorJsonBuffer } from "@dashboard/layout/editor/LayoutEditor.hooks";
+
+import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
+import { LayoutEditor } from "@dashboard/layout/editor/LayoutEditor";
 import { LayoutEditorTitleBar } from "@dashboard/layout/editor/LayoutEditorTitleBar";
-import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
-import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
-import { useToast } from "@library/features/toaster/ToastContext";
-import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import Message from "@library/messages/Message";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import TextEditor from "@library/textEditor/TextEditor";
-import { getRelativeUrl, siteUrl, t } from "@library/utility/appUtils";
-import React, { useState } from "react";
-import { RouteComponentProps, useLocation } from "react-router-dom";
+import MonacoEditor from "@library/textEditor/MonacoEditor";
+import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.classes";
+import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
+import { useState } from "react";
+import { useToast } from "@library/features/toaster/ToastContext";
 
 export default function LayoutTextEditorPage(
     props: RouteComponentProps<{
@@ -31,9 +43,9 @@ export default function LayoutTextEditorPage(
     const isCopy = new URLSearchParams(useLocation().search).get("copy") === "true";
     const { history } = props;
     const { layoutViewType, layoutID } = props.match.params;
+    const isCustomPage = layoutViewType === "customPage";
     const { layoutDraft, persistDraft, updateDraft } = useLayoutDraft(layoutID, layoutViewType, isCopy);
     const toast = useToast();
-
     const [isSaving, setIsSaving] = useState(false);
 
     const { textContent, setTextContent, loadTextDraft, validateTextDraft, dismissJsonError, jsonErrorMessage } =
@@ -49,7 +61,8 @@ export default function LayoutTextEditorPage(
             setIsSaving(true);
             const savedLayout = await persistDraft(layoutDraft);
             if (savedLayout) {
-                history.replace(getRelativeUrl(LayoutOverviewRoute.url(savedLayout)));
+                const redirectUrl = isCustomPage ? CustomPagesRoute.url(null) : LayoutOverviewRoute.url(savedLayout);
+                history.replace(getRelativeUrl(redirectUrl));
                 toast.addToast({
                     autoDismiss: true,
                     body: <>{t("Layout saved.")}</>,
@@ -79,44 +92,59 @@ export default function LayoutTextEditorPage(
         setTextContent("");
     }
 
-    return (
-        <Modal size={ModalSizes.FULL_SCREEN} isVisible scrollable>
-            <LayoutEditorTitleBar
-                actions={
-                    <Button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            openTextEditor();
-                        }}
-                        buttonType={ButtonTypes.TEXT}
-                    >
-                        {t("Advanced")}
-                    </Button>
-                }
-                onSave={handleSave}
-                cancelPath={
-                    layoutID == null
-                        ? LegacyLayoutsRoute.url(layoutViewType)
-                        : LayoutOverviewRoute.url({
-                              name: layoutDraft?.name ?? t("My Layout"),
-                              layoutID,
-                              layoutViewType,
-                          })
-                }
-                autoFocusTitleInput={layoutID == null}
-                title={layoutDraft?.name ?? t("My Layout")}
-                onTitleChange={(newTitle) => {
-                    updateDraft({ name: newTitle });
-                }}
-                disableSave={!!jsonErrorMessage}
-                isSaving={isSaving}
-            />
+    const classes = layoutEditorClasses();
 
-            {!layoutDraft || !catalog ? (
-                <LayoutOverviewSkeleton />
-            ) : (
-                <LayoutEditor draft={layoutDraft} onDraftChange={updateDraft} catalog={catalog} />
-            )}
+    return (
+        <Modal size={ModalSizes.FULL_SCREEN} isVisible className={classes.modal}>
+            <EditorThemePreviewProvider>
+                <EditorRolePreviewProvider>
+                    <LayoutEditorTitleBar
+                        actions={
+                            <>
+                                <DropDown flyoutType={FlyoutType.LIST}>
+                                    <EditorThemePreviewDropDownItem />
+                                    <EditorRolePreviewDropDownItem />
+                                    <DropDownItemButton
+                                        onClick={() => {
+                                            openTextEditor();
+                                        }}
+                                    >
+                                        {t("Advanced")}
+                                    </DropDownItemButton>
+                                </DropDown>
+                            </>
+                        }
+                        onSave={handleSave}
+                        cancelPath={
+                            isCustomPage
+                                ? CustomPagesRoute.url(null)
+                                : layoutID == null
+                                ? LegacyLayoutsRoute.url(layoutViewType)
+                                : LayoutOverviewRoute.url({
+                                      name: layoutDraft?.name ?? t("My Layout"),
+                                      layoutID,
+                                      layoutViewType,
+                                  })
+                        }
+                        autoFocusTitleInput={layoutID == null}
+                        title={layoutDraft?.name ?? t("My Layout")}
+                        onTitleChange={(newTitle) => {
+                            updateDraft({ name: newTitle });
+                        }}
+                        disableSave={!!jsonErrorMessage}
+                        isSaving={isSaving}
+                    />
+
+                    <EditorThemePreviewOverrides fallback={<LayoutOverviewSkeleton />}>
+                        {!layoutDraft || !catalog ? (
+                            <LayoutOverviewSkeleton />
+                        ) : (
+                            <LayoutEditor draft={layoutDraft} onDraftChange={updateDraft} catalog={catalog} />
+                        )}
+                    </EditorThemePreviewOverrides>
+                </EditorRolePreviewProvider>
+            </EditorThemePreviewProvider>
+
             <Modal
                 exitHandler={() => {
                     closeTextEditor();
@@ -139,7 +167,7 @@ export default function LayoutTextEditorPage(
                         stringContents={jsonErrorMessage}
                     />
                 )}
-                <TextEditor
+                <MonacoEditor
                     value={textContent}
                     onChange={(value) => {
                         if (value) {

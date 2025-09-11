@@ -98,7 +98,7 @@ export function useCommentThreadPager(
                 }}
             />
             <FlexSpacer />
-            <NumberedPager {...pagerProps} isMobile={false} showNextButton={false} className={classes.topPager} />
+            <NumberedPager {...pagerProps} showNextButton={false} className={classes.topPager} />
         </div>
     );
 

@@ -35,6 +35,8 @@ const reasonsDescriptions = {
     GroupInvite: t("I'm invited to a group"),
     GroupRequestApproved: t("My group membership request is approved"),
     GroupNewDiscussion: t("New posts in groups I'm a member of"),
+    NewArticle: t("New articles"),
+    UpdatedArticle: t("Updated articles"),
 };
 
 export function getUnsubscribeReason({ preferenceName, preferenceRaw }: IUnsubscribePreference): ReactElement {
@@ -68,10 +70,11 @@ export function getFollowedContentReason(
         );
     }
 
-    const description =
-        preferenceName.includes("NewDiscussion") || preferenceName.includes("Posts")
-            ? t("New posts")
-            : t("New comments on posts");
+    const description = ["NewArticle", "UpdatedArticle"].includes(preferenceName)
+        ? reasonsDescriptions[preferenceName]
+        : preferenceName.includes("NewDiscussion") || preferenceName.includes("Posts")
+        ? t("New posts")
+        : t("New comments on posts");
     return (
         <p key={preferenceRaw}>
             {contentLink}

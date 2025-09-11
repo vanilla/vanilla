@@ -16,7 +16,7 @@ use Vanilla\AutomationRules\Triggers\StaleCollectionTrigger;
 class CollectionRuleDataType extends RuleDataType
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     protected function getAllTriggerClasses(): array
     {
@@ -24,7 +24,7 @@ class CollectionRuleDataType extends RuleDataType
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     protected function getAllActionsClasses(): array
     {

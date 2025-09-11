@@ -27,7 +27,7 @@ class SqlUtilsTest extends BootstrapTestCase
     private $sql;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

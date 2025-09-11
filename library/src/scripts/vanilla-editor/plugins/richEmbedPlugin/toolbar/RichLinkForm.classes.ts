@@ -4,6 +4,8 @@
  */
 
 import { css } from "@emotion/css";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/themeCache";
 
 export const richLinkFormClasses = useThemeCache(() => {
@@ -16,5 +18,25 @@ export const richLinkFormClasses = useThemeCache(() => {
         marginLeft: "auto",
     });
 
-    return { separator, addLinkButton };
+    const buttonTypeRadioGroup = css({
+        display: "flex",
+        flexDirection: "column",
+    });
+
+    const buttonTypeRadioOption = css({
+        cursor: "pointer",
+        padding: 8,
+        paddingLeft: 16,
+        paddingRight: 16,
+        marginLeft: -16,
+        marginRight: -16,
+        "&:hover, &:active, &.focus-visible": {
+            backgroundColor: ColorsUtils.colorOut(globalVariables().states.hover.highlight),
+        },
+        "&.isSelected": {
+            color: ColorsUtils.colorOut(globalVariables().mainColors.primary),
+        },
+    });
+
+    return { separator, addLinkButton, buttonTypeRadioOption, buttonTypeRadioGroup };
 });

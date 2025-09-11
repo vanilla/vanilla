@@ -13,7 +13,7 @@ namespace Vanilla\Dashboard\Activity;
 class EmailDigestActivityGroup extends ActivityGroup
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityGroupID(): string
     {
@@ -21,7 +21,7 @@ class EmailDigestActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceLabel(): string
     {
@@ -29,7 +29,7 @@ class EmailDigestActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceDescription(): ?string
     {
@@ -37,8 +37,8 @@ class EmailDigestActivityGroup extends ActivityGroup
         $isGroupsEnabled = \Gdn::config("EnabledApplications.Groups") === "groups";
 
         $descriptionString = $isGroupsEnabled
-            ? t("The email digest delivers top content from categories and groups you follow, straight to your inbox.")
-            : t("The email digest delivers top content from categories you follow, straight to your inbox.");
+            ? "The email digest delivers top content from the categories and groups you follow—straight to your inbox."
+            : "The email digest delivers top content from the categories you follow—straight to your inbox.";
 
         $descriptionString .= " <a href='{url,html}'>" . t("Manage Followed Content") . "</a>";
 
@@ -47,7 +47,7 @@ class EmailDigestActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getParentGroupClass(): ?string
     {

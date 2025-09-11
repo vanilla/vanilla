@@ -15,7 +15,7 @@ use Vanilla\Layout\View\LegacyLayoutViewInterface;
 class LegacyCategoryListLayoutView implements LegacyLayoutViewInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -23,7 +23,7 @@ class LegacyCategoryListLayoutView implements LegacyLayoutViewInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -31,7 +31,7 @@ class LegacyCategoryListLayoutView implements LegacyLayoutViewInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLegacyType(): string
     {

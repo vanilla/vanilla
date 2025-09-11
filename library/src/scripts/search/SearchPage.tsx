@@ -22,7 +22,7 @@ import { t, formatUrl } from "@library/utility/appUtils";
 import Banner from "@library/banner/Banner";
 import { useSearchForm } from "@library/search/SearchFormContext";
 import { useLastValue } from "@vanilla/react-utils";
-import qs from "qs";
+import * as qs from "qs-esm";
 import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import { useLocation, useHistory } from "react-router";
 import SectionTwoColumns from "@library/layout/TwoColumnSection";
@@ -38,6 +38,7 @@ import {
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
+import { AiSearchResultsPanel, AiSearchSourcesPanel } from "@library/search/AiSearchSummary";
 import History from "history";
 import { Backgrounds } from "@library/layout/Backgrounds";
 import { Tabs } from "@library/sectioning/Tabs";
@@ -47,6 +48,7 @@ import { ALL_CONTENT_DOMAIN_KEY } from "./searchConstants";
 import PlacesSearchListing from "./PlacesSearchListing";
 import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
 import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
+import apiv2 from "@library/apiv2";
 
 export function SearchPageContent() {
     const {
@@ -152,6 +154,15 @@ export function SearchPageContent() {
         </>
     );
 
+    // Track query for AI Search
+    const [currentQuery, setCurrentQuery] = useState(form.query);
+
+    useEffect(() => {
+        if (form.query) {
+            setCurrentQuery(typeof form.query === "string" ? form.query : "");
+        }
+    }, [form.initialized]);
+
     return (
         <Container>
             <SectionTwoColumns
@@ -168,7 +179,15 @@ export function SearchPageContent() {
                                     <SearchBar
                                         onChange={(newQuery) => updateForm({ query: newQuery })}
                                         value={`${form.query}`}
-                                        onSearch={search}
+                                        onSearch={() => {
+                                            setCurrentQuery(
+                                                typeof form.query === "string" && form.query !== currentQuery
+                                                    ? form.query
+                                                    : "",
+                                            );
+
+                                            return search();
+                                        }}
                                         isLoading={response.status === LoadStatus.LOADING}
                                         optionComponent={SearchOption}
                                         triggerSearchOnClear={true}
@@ -184,6 +203,8 @@ export function SearchPageContent() {
                                     <SpecificRecordComponent discussionID={specificRecordID} />
                                 )}
                             </ConditionalWrap>
+
+                            <AiSearchResultsPanel query={currentQuery as string} />
                         </PanelWidget>
                     </>
                 }
@@ -213,7 +234,15 @@ export function SearchPageContent() {
                         )}
                     </PanelWidgetHorizontalPadding>
                 }
-                secondaryTop={!isCompact && !!rightTopContent && <PanelWidget>{rightTopContent}</PanelWidget>}
+                secondaryTop={
+                    !isCompact &&
+                    !!rightTopContent && (
+                        <PanelWidget>
+                            <AiSearchSourcesPanel />
+                            {rightTopContent}
+                        </PanelWidget>
+                    )
+                }
             />
         </Container>
     );
@@ -237,62 +266,131 @@ function useInitialQueryParamSync() {
         return unregisterListener;
     }, []);
 
+    // Look up labels and names from IDs for filter options
+    const hydrateFormOptions = async (queryForm: Record<string, any>) => {
+        let modifiedQueryForm = { ...queryForm };
+
+        const hydrateOptions = async (
+            queryFormKey: string,
+            apiEndpoint: string,
+            idField: string,
+            fields: string[],
+            modifiedQueryForm: Record<string, any>,
+        ) => {
+            if (queryForm?.[queryFormKey]) {
+                const ids = Array.isArray(queryForm[queryFormKey])
+                    ? queryForm[queryFormKey]?.map((item) => item?.value)
+                    : queryForm[queryFormKey]?.value;
+
+                const requestData = await apiv2
+                    .get(apiEndpoint, {
+                        params: {
+                            [idField]: ids,
+                            fields,
+                        },
+                    })
+                    .then((response) =>
+                        response.data.reduce((acc, curr) => {
+                            return {
+                                ...acc,
+                                [curr[idField]]: curr,
+                            };
+                        }, {}),
+                    );
+
+                if (Array.isArray(modifiedQueryForm[queryFormKey])) {
+                    modifiedQueryForm[queryFormKey] = modifiedQueryForm[queryFormKey].map((item) => {
+                        const data = requestData[item?.value];
+                        if (data) {
+                            return {
+                                ...item,
+                                label: data.name,
+                                ...(data.tagCode && { tagCode: data.tagCode }),
+                            };
+                        }
+                        return item;
+                    });
+                } else {
+                    const existingValue = modifiedQueryForm[queryFormKey]?.value;
+                    modifiedQueryForm[queryFormKey]["label"] = requestData[existingValue]?.name;
+                }
+            }
+        };
+
+        await hydrateOptions("authors", "/users", "userID", ["name", "userID"], modifiedQueryForm);
+        await hydrateOptions("tagsOptions", "/tags", "tagID", ["name", "tagID", "tagCode"], modifiedQueryForm);
+        await hydrateOptions(
+            "knowledgeBaseOption",
+            "/knowledge-bases",
+            "knowledgeBaseID",
+            ["name", "knowledgeBaseID"],
+            modifiedQueryForm,
+        );
+        return modifiedQueryForm;
+    };
+
     useEffect(() => {
         if (initialized) {
             // We're already initialized.
             return;
         }
 
-        const { search: browserQuery } = location;
-        const queryForm: any = qs.parse(browserQuery, { ignoreQueryPrefix: true });
+        const initializeFormOnLoad = async () => {
+            const { search: browserQuery } = location;
+            const queryForm: any = qs.parse(browserQuery, { ignoreQueryPrefix: true });
 
-        for (const [key, value] of Object.entries(queryForm)) {
-            if (value === "true") {
-                queryForm[key] = true;
-            }
+            for (const [key, value] of Object.entries(queryForm)) {
+                if (value === "true") {
+                    queryForm[key] = true;
+                }
 
-            if (value === "false") {
-                queryForm[key] = false;
-            }
+                if (value === "false") {
+                    queryForm[key] = false;
+                }
 
-            if (
-                // turn pure integer values into numbers.
-                typeof value === "string" &&
-                value.match(/^[\d]*$/) &&
-                !value.match(/^0/)
-            ) {
-                let intVal = parseInt(value, 10);
-                if (!Number.isNaN(intVal)) {
-                    queryForm[key] = intVal;
+                if (
+                    // turn pure integer values into numbers.
+                    typeof value === "string" &&
+                    value.match(/^[\d]*$/) &&
+                    !value.match(/^0/)
+                ) {
+                    let intVal = parseInt(value, 10);
+                    if (!Number.isNaN(intVal)) {
+                        queryForm[key] = intVal;
+                    }
+                }
+
+                if (key.toLocaleLowerCase() === "search") {
+                    queryForm["query"] = queryForm[key];
+                }
+
+                if (key === "discussionID") {
+                    queryForm.domain = "discussions";
                 }
             }
 
-            if (key.toLocaleLowerCase() === "search") {
-                queryForm["query"] = queryForm[key];
+            const blockedKeys = ["needsResearch", "initialized", "pageURL", "offset"];
+            blockedKeys.forEach((key) => {
+                if (queryForm[key] !== undefined) {
+                    delete queryForm[key];
+                }
+            });
+
+            if (typeof queryForm.scope === "string") {
+                searchScope.setValue?.(queryForm.scope);
             }
 
-            if (key === "discussionID") {
-                queryForm.domain = "discussions";
-            }
-        }
+            queryForm.initialized = true;
 
-        // fixme
-        const blockedKeys = ["needsResearch", "initialized", "pageURL", "offset"];
-        blockedKeys.forEach((key) => {
-            if (queryForm[key] !== undefined) {
-                delete queryForm[key];
-            }
+            const modifiedQueryForm = await hydrateFormOptions(queryForm);
+
+            updateForm(modifiedQueryForm);
+        };
+
+        initializeFormOnLoad().catch((error) => {
+            console.error("Error initializing form on load:", error);
         });
-
-        if (typeof queryForm.scope === "string") {
-            searchScope.setValue?.(queryForm.scope);
-        }
-
-        queryForm.initialized = true;
-
-        updateForm(queryForm);
         // Only for first initialization.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialized]);
 }
 
@@ -306,7 +404,7 @@ export function SearchPage() {
             {/* Add a context provider so that smartlinks within search use dynamic navigation. */}
             <LinkContextProvider linkContexts={[formatUrl("/search", true)]}>
                 <DocumentTitle title={form.query ? `${form.query}` : t("Search Results")}>
-                    <TitleBar title={t("Search")} />
+                    <TitleBar />
                     <Banner isContentBanner />
                     <SearchPageContent />
                 </DocumentTitle>

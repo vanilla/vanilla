@@ -37,6 +37,8 @@ class ViteBuildArtifact implements AssetInterface
     /** @var string|mixed Name of the asset. */
     public string $name;
 
+    public bool $isDynamicEntry = false;
+
     /**
      * Constructor.
      *
@@ -50,6 +52,7 @@ class ViteBuildArtifact implements AssetInterface
         $this->assetID = $assetID;
         $this->file = $jsonBlob["file"];
         $this->name = $jsonBlob["name"] ?? "unknown";
+        $this->isDynamicEntry = $jsonBlob["isDynamicEntry"] ?? false;
         $this->dynamicImportAssetIDs = $jsonBlob["dynamicImports"] ?? ($jsonBlob["dynamicImportAssetIDs"] ?? []);
         $this->importAssetIDs = $jsonBlob["imports"] ?? ($jsonBlob["importAssetIDs"] ?? []);
     }
@@ -88,7 +91,7 @@ class ViteBuildArtifact implements AssetInterface
      *
      * @param array<string, ViteBuildArtifact> $allAssetsByID
      *
-     * @return ViteBuildArtifact[]
+     * @return array<string, ViteBuildArtifact>
      */
     public function resolveDependencies(array $allAssetsByID): array
     {
@@ -109,27 +112,33 @@ class ViteBuildArtifact implements AssetInterface
                 $resolvedAssets[$assetID] = $asset;
 
                 $assetIDsToResolve = array_unique(array_merge($assetIDsToResolve, $asset->importAssetIDs));
-            } else {
-                $resolvedAssets[$assetID] = null;
             }
         }
 
-        return array_values(array_filter($resolvedAssets));
+        return $resolvedAssets;
     }
 
     /**
-     * Determine if this is required for initial page load.
-     *
-     * @param string $section
+     * Determine if this is an entry for an addon.
      *
      * @return bool
      */
-    public function isEntry(string $section): bool
+    public function isAddonEntry(): bool
     {
-        $isSectionEntry = preg_match("/^assets\/{$section}/", $this->file);
         $isAddonEntry = preg_match("/entries\/addons/", $this->file);
 
-        return $isSectionEntry || $isAddonEntry;
+        return $isAddonEntry;
+    }
+
+    /**
+     * Return if the file is a build asset (like CSS)
+     *
+     * @return bool
+     */
+    public function isAsset(): bool
+    {
+        $isAsset = preg_match("/^assets\/{$this->buildSection}/", $this->file);
+        return $isAsset;
     }
 
     /**
@@ -141,11 +150,16 @@ class ViteBuildArtifact implements AssetInterface
     public function belongsToAddon(array $addonKeys)
     {
         foreach ($addonKeys as $addonKey) {
-            $isAddon = str_contains($this->file, "addons/{$addonKey}");
+            $isAddon = str_contains(strtolower($this->file), strtolower("addons/{$addonKey}"));
             if ($isAddon) {
                 return true;
             }
         }
         return false;
+    }
+
+    public function isPrimaryEntry(): bool
+    {
+        return !$this->isDynamicEntry && preg_match("/entries\/{$this->buildSection}/", $this->file);
     }
 }

@@ -124,7 +124,7 @@ export default React.forwardRef(function SearchBar(
     const isMenuVisible: boolean | undefined =
         forceMenuClosed || props.value.length === 0 || props.disableAutocomplete ? false : undefined;
 
-    const classes = searchBarClasses(props.overwriteSearchBar);
+    const classes = searchBarClasses.useAsHook(props.overwriteSearchBar);
 
     // Stash the props in a a ref so the inner components can use the latest value, but still have a stable identity.
     const controlProps = {
@@ -236,53 +236,50 @@ export default React.forwardRef(function SearchBar(
             createOptionPosition="first"
             formatCreateLabel={formatReactSelectLabel}
             ref={inputRef}
-            onKeyDown={
-                props.handleOnKeyDown ??
-                ((event: React.KeyboardEvent<HTMLInputElement>) => {
-                    const triggeringElement = event.target as HTMLInputElement;
+            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+                const triggeringElement = event.target as HTMLInputElement;
 
-                    if (
-                        triggeringElement.value &&
-                        event.key === "Tab" &&
-                        !event.shiftKey &&
-                        triggeringElement.tagName !== "BUTTON"
-                    ) {
-                        event.preventDefault();
-                        const clearButton = triggeringElement.closest(".isClearable")?.querySelector("button");
-                        if (clearButton) {
-                            clearButton.focus();
-                        }
+                if (
+                    triggeringElement.value &&
+                    event.key === "Tab" &&
+                    !event.shiftKey &&
+                    triggeringElement.tagName !== "BUTTON"
+                ) {
+                    event.preventDefault();
+                    const clearButton = triggeringElement.closest(".isClearable")?.querySelector("button");
+                    if (clearButton) {
+                        clearButton.focus();
                     }
+                }
 
-                    if (!isFocused) {
-                        return;
-                    }
-
-                    if (!(triggeringElement instanceof HTMLInputElement)) {
-                        return;
-                    }
-
-                    if (event.key === "Enter") {
-                        return true; // submits form
-                    } else if (event.key === "Home") {
-                        if (options.length === 0) {
-                            event.preventDefault();
-                            triggeringElement.setSelectionRange(0, 0);
-                            setForceMenuClosed(true);
-                            return;
-                        }
-                    } else if (event.key === "End") {
-                        if (options.length === 0) {
-                            event.preventDefault();
-                            const length = triggeringElement.value.length;
-                            triggeringElement.setSelectionRange(length, length);
-                            return;
-                        }
-                    }
-                    setForceMenuClosed(false);
+                if (!isFocused) {
                     return;
-                })
-            }
+                }
+
+                if (!(triggeringElement instanceof HTMLInputElement)) {
+                    return;
+                }
+
+                if (event.key === "Enter") {
+                    return true; // submits form
+                } else if (event.key === "Home") {
+                    if (options.length === 0) {
+                        event.preventDefault();
+                        triggeringElement.setSelectionRange(0, 0);
+                        setForceMenuClosed(true);
+                        return;
+                    }
+                } else if (event.key === "End") {
+                    if (options.length === 0) {
+                        event.preventDefault();
+                        const length = triggeringElement.value.length;
+                        triggeringElement.setSelectionRange(length, length);
+                        return;
+                    }
+                }
+                setForceMenuClosed(false);
+                return;
+            }}
             onMenuOpen={props.onOpenSuggestions}
             onMenuClose={props.onCloseSuggestions}
             onFocus={() => setFocused(true)}

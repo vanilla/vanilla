@@ -29,11 +29,9 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import { CreatableFieldDataType } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { RecordID } from "@vanilla/utils";
 import { convertPostFormClasses } from "@library/features/discussions/forms/ConvertPostForm.classes";
+import { sprintf } from "sprintf-js";
+import { IConvertPostFormLoadableProps } from "@library/features/discussions/forms/CovertPostForm.types";
 
-const DISCARD_INFO_FIELD = {
-    value: "discard-this-info",
-    label: t("Discard this information"),
-};
 interface IGetPostFieldOptions {
     postFields: PostField[] | undefined;
     omitPublic?: boolean;
@@ -62,6 +60,10 @@ function getPostFieldOptions(params: IGetPostFieldOptions) {
                   label: field.label,
               }));
 
+    const DISCARD_INFO_FIELD = {
+        value: "discard-this-info",
+        label: t("Discard this information"),
+    };
     return returnValue.concat([DISCARD_INFO_FIELD]);
 }
 
@@ -127,7 +129,7 @@ export function ConvertPostFormImpl(props: IProps) {
 
         mapSchema
             .selectStatic(postField.postFieldID, postField.label, postField.description, options)
-            .withTooltip(`User submitted value: ${sourceFieldValue}`);
+            .withTooltip(sprintf(t("User submitted value: %s"), sourceFieldValue));
     });
 
     const sourceIDs = postFieldsSource?.map((field) => field.postFieldID);
@@ -276,7 +278,7 @@ export function ConvertPostFormImpl(props: IProps) {
                 body={
                     <FrameBody hasVerticalPadding>
                         <NestedSelect
-                            label="Current post type"
+                            label={t("Current post type")}
                             value={currentPostTypeDefinition?.postTypeID}
                             options={[
                                 {
@@ -290,7 +292,7 @@ export function ConvertPostFormImpl(props: IProps) {
                         />
 
                         <NestedSelect
-                            label="Select post type to change to"
+                            label={t("Select post type to change to")}
                             options={postTypeOptions}
                             onChange={(selectedPostType: string) => {
                                 setDestinationPostType(selectedPostType);
@@ -321,30 +323,39 @@ export function ConvertPostFormImpl(props: IProps) {
 
                         {unmappedRequiredDestinationIDs.length > 0 && (
                             <p className={convertPostFormClasses().errorContainer}>
-                                <b>
-                                    {unmappedRequiredDestinationIDs.map((id) => {
-                                        const field = postFieldsDestination?.find((field) => field.postFieldID === id);
-                                        return `${field?.label} `;
-                                    })}
-                                </b>
-                                {t(
-                                    " field(s) are required for this post type. You must map data to these required fields to continue.",
-                                )}
+                                <Translate
+                                    source="<0/> field(s) are required for this post type. You must map data to these required fields to continue."
+                                    c0={
+                                        <b>
+                                            {unmappedRequiredDestinationIDs.map((id) => {
+                                                const field = postFieldsDestination?.find(
+                                                    (field) => field.postFieldID === id,
+                                                );
+                                                return `${field?.label} `;
+                                            })}
+                                        </b>
+                                    }
+                                />
                             </p>
                         )}
 
                         {values.destinationPostType && unmappedSourceIDs.length > 0 && (
                             <p className={convertPostFormClasses().warningContainer}>
-                                {t("You have not mapped field(s):")}{" "}
-                                <b>
-                                    {unmappedSourceIDs.map((fieldID) => {
-                                        const field = postFieldsSource?.find((field) => field.postFieldID === fieldID);
-                                        return `${field?.label}, `;
-                                    })}
-                                </b>
-                                {
-                                    " to another field in the new post type. If you proceed with the conversion, the information from those fields will be lost."
-                                }
+                                <Translate
+                                    source={
+                                        "You have not mapped field(s): <0/> to another field in the new post type. If you proceed with the conversion, the information from those fields will be lost."
+                                    }
+                                    c0={
+                                        <b>
+                                            {unmappedSourceIDs.map((fieldID) => {
+                                                const field = postFieldsSource?.find(
+                                                    (field) => field.postFieldID === fieldID,
+                                                );
+                                                return `${field?.label}, `;
+                                            })}
+                                        </b>
+                                    }
+                                />
                             </p>
                         )}
                     </FrameBody>
@@ -369,12 +380,7 @@ export function ConvertPostFormImpl(props: IProps) {
     );
 }
 
-interface ILoadableProps {
-    onClose: () => void;
-    onSuccess?: () => Promise<void>;
-    discussion: IDiscussion;
-}
-export default function ConvertPostFormLoadable(props: ILoadableProps) {
+export default function ConvertPostFormLoadable(props: IConvertPostFormLoadableProps) {
     const { onClose, discussion, onSuccess } = props;
 
     const postTypesQuery = usePostTypeQuery({ expand: ["all"] });

@@ -17,35 +17,32 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 /**
  * Widget with the users having the top points.
  */
-class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface
+class LeaderboardWidget extends LegacyReactModule implements CombinedPropsWidgetInterface
 {
-    use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
     use FilterableWidgetTrait;
-
-    /** @var UserLeaderService */
-    private UserLeaderService $userLeaderService;
-
-    /** @var UserModel */
-    private UserModel $userModel;
+    use CombinedPropsWidgetTrait;
 
     /**
      * DI.
-     *
-     * @param UserLeaderService $userLeaderService
-     * @param UserModel $userModel
      */
-    public function __construct(UserLeaderService $userLeaderService, UserModel $userModel)
+    public function __construct(private UserLeaderService $userLeaderService, private UserModel $userModel)
     {
         parent::__construct();
-        $this->userLeaderService = $userLeaderService;
-        $this->userModel = $userModel;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Members";
     }
 
     /**
@@ -67,7 +64,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getProps(): ?array
     {
@@ -122,7 +119,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -137,7 +134,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -231,7 +228,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -239,7 +236,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -247,7 +244,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {

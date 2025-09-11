@@ -24,7 +24,7 @@ use Vanilla\OpenAI\OpenAIClient;
 class GptTranslationServiceE2ETest extends GptTranslationServiceTest
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

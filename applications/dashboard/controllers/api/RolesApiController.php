@@ -293,6 +293,9 @@ class RolesApiController extends AbstractApiController
         $in = $this->schema(
             [
                 "expand?" => ApiUtils::getExpandDefinition(["permissions", "assignable"]),
+                "personalInfo:b?" => [
+                    "default" => $canViewPersonalInfo,
+                ],
             ],
             "in"
         )->setDescription("List roles.");
@@ -303,7 +306,10 @@ class RolesApiController extends AbstractApiController
         $query = $in->validate($query);
 
         $rows = $this->roleModel->getWithRankPermissions()->resultArray();
-        $rows = $canViewPersonalInfo ? $rows : array_filter($rows, "RoleModel::filterPersonalInfo");
+        $rows =
+            $canViewPersonalInfo && $query["personalInfo"]
+                ? $rows
+                : array_filter($rows, "RoleModel::filterPersonalInfo");
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row, $query["expand"]);
         }

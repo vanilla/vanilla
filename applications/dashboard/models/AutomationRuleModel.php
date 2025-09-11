@@ -33,6 +33,7 @@ use Vanilla\FeatureFlagHelper;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Logger;
 use Vanilla\Models\LegacyModelUtils;
+use Vanilla\Models\Model;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\SchemaFactory;
@@ -102,6 +103,7 @@ class AutomationRuleModel extends PipelineModel
             ->column("updateUserID", "int", true)
             ->column("dateLastRun", "datetime", true)
             ->column("status", ["active", "inactive", "deleted"], "inactive")
+            ->column("systemInitialRuleID", "varchar(50)", nullDefault: true, keyType: "index")
             ->set($explicit, $drop);
         self::createDefaultAutomationRules($database);
     }
@@ -114,65 +116,104 @@ class AutomationRuleModel extends PipelineModel
      */
     private static function createDefaultAutomationRules(\Gdn_Database $database): void
     {
-        //check configs to see if we need to create default automation rules
-        if (
-            FeatureFlagHelper::featureEnabled("AutomationRules") &&
-            FeatureFlagHelper::featureEnabled("CommunityManagementBeta") &&
-            FeatureFlagHelper::featureEnabled("escalations") &&
-            !Gdn::config()->get("Preferences.AutomationRules.Defaults", false)
-        ) {
-            $automationRuleModel = Gdn::getContainer()->get(AutomationRuleModel::class);
-            $defaultAction = [
-                "actionType" => CreateEscalationAction::getType(),
-                "actionValue" => [
-                    "recordIsLive" => true,
-                ],
-            ];
-            $defaultAutomationRules = [
-                [
-                    "name" => "Escalate posts with no comments after 3 days",
-                    "triggerType" => StaleDiscussionTrigger::getType(),
-                    "triggerValue" => [
-                        "applyToNewContentOnly" => true,
-                        "triggerTimeDelay" => [
-                            "length" => 3,
-                            "unit" => "day",
-                        ],
-                        "postType" => \DiscussionModel::apiDiscussionTypes(),
+        $automationRuleModel = Gdn::getContainer()->get(AutomationRuleModel::class);
+        $defaultAction = [
+            "actionType" => CreateEscalationAction::getType(),
+            "actionValue" => [
+                "recordIsLive" => true,
+            ],
+        ];
+        $defaultAutomationRules = [
+            [
+                "name" => "Escalate posts with no comments after 3 days",
+                "triggerType" => StaleDiscussionTrigger::getType(),
+                "triggerValue" => [
+                    "applyToNewContentOnly" => true,
+                    "triggerTimeDelay" => [
+                        "length" => 3,
+                        "unit" => "day",
                     ],
                 ],
-                [
-                    "name" => "Escalate unanswered questions after 2 days",
-                    "triggerType" => "unAnsweredQuestionTrigger",
-                    "triggerValue" => [
-                        "applyToNewContentOnly" => true,
-                        "triggerTimeDelay" => [
-                            "length" => 2,
-                            "unit" => "day",
-                        ],
+                "systemInitialRuleID" => "escalate_no_comments",
+            ],
+            [
+                "name" => "Escalate unanswered questions after 2 days",
+                "triggerType" => "unAnsweredQuestionTrigger",
+                "triggerValue" => [
+                    "applyToNewContentOnly" => true,
+                    "triggerTimeDelay" => [
+                        "length" => 2,
+                        "unit" => "day",
                     ],
                 ],
-                [
-                    "name" => "Escalate and remove posts with 5 reports",
-                    "triggerType" => ReportPostTrigger::getType(),
-                    "triggerValue" => [
-                        "countReports" => 5,
-                    ],
+                "systemInitialRuleID" => "escalate_unanswered",
+            ],
+            [
+                "name" => "Escalate and remove posts with 5 reports",
+                "triggerType" => ReportPostTrigger::getType(),
+                "triggerValue" => [
+                    "countReports" => 5,
                 ],
-            ];
+                "systemInitialRuleID" => "remove_reported_posts",
+            ],
+        ];
 
-            $automationRuleConfig = [];
-            foreach ($defaultAutomationRules as $defaultAutomationRule) {
-                $defaultAutomationRule = array_merge($defaultAutomationRule, $defaultAction, [
-                    "status" => self::STATUS_INACTIVE,
-                ]);
-                if ($defaultAutomationRule["triggerType"] === ReportPostTrigger::getType()) {
-                    $defaultAutomationRule["actionValue"]["recordIsLive"] = false;
+        // Backwards compatibility in 008 release
+        // Previously these were stored in a awfully formed config key.
+        $legacyConfigs = Gdn::config()->get("Preferences.AutomationRules.Defaults", null);
+        if ($legacyConfigs !== null) {
+            try {
+                $decodedLegacyConfigs = json_decode($legacyConfigs, true);
+
+                foreach ($decodedLegacyConfigs as $triggerType => $ruleID) {
+                    $initialRule =
+                        array_filter(
+                            $defaultAutomationRules,
+                            fn($rule) => $rule["systemInitialRuleID"] === $ruleID
+                        )[0] ?? null;
+
+                    if (!$initialRule) {
+                        continue;
+                    }
+
+                    $automationRuleModel->update(
+                        set: [
+                            "systemInitialRuleID" => $initialRule["systemInitialRuleID"],
+                        ],
+                        where: [
+                            "automationRuleID" => $ruleID,
+                        ]
+                    );
                 }
-                $automationRuleID = $automationRuleModel->saveAutomationRule($defaultAutomationRule);
-                $automationRuleConfig[$defaultAutomationRule["triggerType"]] = $automationRuleID;
+            } catch (\Throwable $ex) {
+                // Malformed legacy config, let's get rid of it.
+                // Just proceed to the finally block.
+            } finally {
+                Gdn::config()->removeFromConfig("Preferences.AutomationRules.Defaults");
             }
-            Gdn::config()->set("Preferences.AutomationRules.Defaults", json_encode($automationRuleConfig));
+        }
+
+        $existingInitialRuleIDs = $database
+            ->createSql()
+            ->from("automationRule")
+            ->select("systemInitialRuleID")
+            ->get()
+            ->column("systemInitialRuleID");
+
+        foreach ($defaultAutomationRules as $defaultAutomationRule) {
+            if (in_array(needle: $defaultAutomationRule["systemInitialRuleID"], haystack: $existingInitialRuleIDs)) {
+                continue;
+            }
+
+            $defaultAutomationRule = array_merge($defaultAutomationRule, $defaultAction, [
+                "status" => self::STATUS_INACTIVE,
+            ]);
+            if ($defaultAutomationRule["triggerType"] === ReportPostTrigger::getType()) {
+                $defaultAutomationRule["actionValue"]["recordIsLive"] = false;
+            }
+
+            // Actually save the rule.
+            $automationRuleModel->saveAutomationRule($defaultAutomationRule);
         }
     }
 
@@ -499,6 +540,7 @@ class AutomationRuleModel extends PipelineModel
         }
         $automationRule["name"] =
             $automationRuleData["name"] ?? "Untitled Recipe - {$automationRuleData["automationRuleID"]}";
+        $automationRule["systemInitialRuleID"] = $automationRuleData["systemInitialRuleID"] ?? null;
         try {
             $this->database->beginTransaction();
             $automationRuleRevisionID = $this->automationRuleRevisionModel->insert($automationRuleData);

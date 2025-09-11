@@ -1,11 +1,11 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
 import { metasClasses } from "@library/metas/Metas.styles";
-import React from "react";
+import React, { ElementType } from "react";
 import { cx } from "@emotion/css";
 import classNames from "classnames";
 import { Tag } from "@library/metas/Tags";
@@ -17,24 +17,26 @@ import ProfileLink from "@library/navigation/ProfileLink";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { IUserFragment } from "@library/@types/api/users";
 
-interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface IMetasProps extends React.HTMLAttributes<HTMLElement> {
     flex?: boolean;
+    as?: ElementType;
 }
 
-export function Metas(props: IProps) {
-    const classes = metasClasses();
+export function Metas(props: IMetasProps) {
+    const classes = metasClasses.useAsHook();
     // note: using cx to compose the class name breaks the sibling selectors required to ensure spacing between list item metas & description
-    return <div {...props} className={classNames(classes.root, props.className)} />;
+    return <div {...props} className={cx(classes.root, props.className)} />;
 }
 
-export const MetaItem = React.forwardRef(function MetaItem(props: IProps, ref: React.RefObject<HTMLDivElement>) {
-    const classes = metasClasses();
-    const { flex, ...rest } = props;
-    return <div {...rest} ref={ref} className={cx(classes.meta, flex && classes.metaFlexed, props.className)} />;
+export const MetaItem = React.forwardRef(function MetaItem(props: IMetasProps, ref: React.RefObject<HTMLDivElement>) {
+    const classes = metasClasses.useAsHook();
+    const { flex, as = "div", ...rest } = props;
+    const Component = (as as "div") ?? "div";
+    return <Component {...rest} ref={ref} className={cx(classes.meta, flex && classes.metaFlexed, props.className)} />;
 });
 
 export function MetaLink(props: React.ComponentProps<typeof SmartLink>) {
-    const classes = metasClasses();
+    const classes = metasClasses.useAsHook();
 
     const { className, ...linkProps } = props;
     return (
@@ -52,7 +54,7 @@ export const MetaTag = React.forwardRef(function MetaTag(
 ) {
     const { tagPreset, ...rest } = props;
     const { height } = tagsVariables();
-    const classes = metasClasses();
+    const classes = metasClasses.useAsHook();
 
     return (
         <MetaItem ref={ref}>
@@ -65,18 +67,27 @@ export const MetaTag = React.forwardRef(function MetaTag(
     );
 });
 
-export function MetaIcon(props: React.ComponentProps<typeof Icon>) {
-    const { className, children, ...rest } = props;
+export function MetaIcon(
+    props: React.ComponentProps<typeof Icon> & {
+        smallerThanContainer?: boolean;
+    },
+) {
+    const { className, children, smallerThanContainer = false, ...rest } = props;
     const {
         standard: { height },
     } = iconVariables();
 
     const iconHeight = props.size ? IconSize[props.size] : height;
-    const classes = metasClasses();
+    const classes = metasClasses.useAsHook();
 
     return (
         <MetaItem className={className}>
-            <Icon {...rest} className={classes.alignVerticallyInMetaItem(iconHeight)} aria-hidden={false} /> {children}
+            <Icon
+                {...rest}
+                className={classes.alignVerticallyInMetaItem(iconHeight, smallerThanContainer)}
+                aria-hidden={false}
+            />
+            {children}
         </MetaItem>
     );
 }
@@ -87,7 +98,7 @@ export function MetaButton(
         buttonClassName?: string;
     },
 ) {
-    const classes = metasClasses();
+    const classes = metasClasses.useAsHook();
 
     const { icon, className, children, buttonClassName, ...buttonProps } = props;
 
@@ -115,12 +126,12 @@ export function MetaButton(
     );
 }
 
-export function MetaProfile(props: { user: IUserFragment; className?: string }) {
-    const classes = metasClasses();
+export function MetaProfile(props: { user: IUserFragment; className?: string; isUserCard?: boolean }) {
+    const classes = metasClasses.useAsHook();
 
     return (
         <span className={cx(classes.profileMeta, props.className)}>
-            <ProfileLink userFragment={props.user} isUserCard>
+            <ProfileLink userFragment={props.user} isUserCard={props.isUserCard ?? true}>
                 <UserPhoto size={UserPhotoSize.XSMALL} userInfo={props.user} />
                 {props.user.name}
             </ProfileLink>

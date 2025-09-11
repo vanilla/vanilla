@@ -26,8 +26,9 @@ export class UnsubscribeFixture {
     public static FETCH_RESULT_TEMPLATE = {
         preferences: [],
         followedContent: undefined,
+        mutedContent: undefined,
         hasMultiple: false,
-        isAllProcessed: false,
+        isAlreadyProcessed: false,
         isEmailDigest: false,
         isUnfollowContent: false,
     };
@@ -45,7 +46,7 @@ export class UnsubscribeFixture {
         ...this.TOKEN_RESULT_TEMPLATE,
         ...this.FETCH_RESULT_TEMPLATE,
         activityTypes: ["Mention"],
-        isAllProcessed: true,
+        isAlreadyProcessed: true,
     };
 
     // Notification that the user earned a new badge
@@ -65,7 +66,7 @@ export class UnsubscribeFixture {
     public static MOCK_BADGE_DATA = {
         ...this.TOKEN_RESULT_TEMPLATE,
         ...this.FETCH_RESULT_TEMPLATE,
-        isAllProcessed: true,
+        isAlreadyProcessed: true,
         activityTypes: ["Badge"],
         preferences: [
             {
@@ -82,7 +83,7 @@ export class UnsubscribeFixture {
         ...this.TOKEN_RESULT_TEMPLATE,
         ...this.FETCH_RESULT_TEMPLATE,
         activityTypes: ["Badge"],
-        isAllProcessed: true,
+        isAlreadyProcessed: true,
         preferences: [
             {
                 ...this.MOCK_BADGE_DATA.preferences[0],

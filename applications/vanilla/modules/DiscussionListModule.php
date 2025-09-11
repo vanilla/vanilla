@@ -28,7 +28,7 @@ class DiscussionListModule extends BaseDiscussionWidgetModule
     private $isMainContent = false;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getApiSchema(): Schema
     {

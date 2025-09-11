@@ -24,6 +24,12 @@ import { reactionsSlice } from "@library/reactions/ReactionsReducer";
 
 let dynamicReducers = {};
 
+declare global {
+    interface Window {
+        __ACTIONS__: any[];
+    }
+}
+
 export function registerReducer(name: string, reducer: Reducer) {
     dynamicReducers[name] = reducer;
     if (hasStore()) {

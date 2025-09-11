@@ -7,7 +7,7 @@ import { cx } from "@emotion/css";
 import React, { useMemo } from "react";
 import { animated, useTransition } from "react-spring";
 
-interface IProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     // Whether or not the element has entered the screen and should be visible.
     // NOTE: For animations OUT to work, you need to continue to render the element throughout it's transition.
     // This means you can't do {isVisible && <EntranceAnimation />}
@@ -42,8 +42,8 @@ interface IProps extends React.HtmlHTMLAttributes<HTMLDivElement> {
     onDestroyed?: () => void;
 
     // Special class to apply when the first child has multiple
-    firstItemProps?: React.HtmlHTMLAttributes<HTMLDivElement>;
-    lastItemProps?: React.HtmlHTMLAttributes<HTMLDivElement>;
+    firstItemProps?: React.HTMLAttributes<HTMLDivElement>;
+    lastItemProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
 export enum FromDirection {
@@ -63,9 +63,9 @@ export interface ITargetTransform {
  *
  * It's transition is configurable through props.
  */
-export const EntranceAnimation = React.forwardRef<HTMLDivElement, IProps>(function EntranceAnimation(
+export const EntranceAnimation = React.forwardRef(function EntranceAnimation(
     _props: IProps,
-    ref,
+    ref: React.Ref<HTMLDivElement>,
 ) {
     const {
         firstItemProps,
@@ -83,34 +83,38 @@ export const EntranceAnimation = React.forwardRef<HTMLDivElement, IProps>(functi
     } = _props;
     const config = useTransitionConfig(_props);
 
-    const transitions = useTransition(isEntered ? children : null, (item) => item?.key, config);
+    const transitions = useTransition(isEntered ? children : null, (item: any) => item?.key, config as any);
     const AnimatedComponent = asElement ? animated[asElement] : animated.div;
 
-    return transitions.map(({ item, key, props: style }, i) => {
-        const isFirst = i === 0;
-        const isLast = i === transitions.length - 1;
-        const classes = cx(
-            divProps.className,
-            isFirst && firstItemProps?.className,
-            isLast && lastItemProps?.className,
-        );
+    return (
+        <>
+            {transitions.map(({ item, key, props: style }, i) => {
+                const isFirst = i === 0;
+                const isLast = i === transitions.length - 1;
+                const classes = cx(
+                    divProps.className,
+                    isFirst && firstItemProps?.className,
+                    isLast && lastItemProps?.className,
+                );
 
-        return (
-            item && (
-                <AnimatedComponent
-                    {...divProps}
-                    {...(isFirst ? firstItemProps ?? {} : {})}
-                    {...(isLast ? lastItemProps ?? {} : {})}
-                    className={classes}
-                    ref={ref}
-                    key={key}
-                    style={style}
-                >
-                    {item}
-                </AnimatedComponent>
-            )
-        );
-    });
+                return (
+                    item && (
+                        <AnimatedComponent
+                            {...divProps}
+                            {...(isFirst ? firstItemProps ?? {} : {})}
+                            {...(isLast ? lastItemProps ?? {} : {})}
+                            className={classes}
+                            ref={ref}
+                            key={key}
+                            style={style}
+                        >
+                            {item}
+                        </AnimatedComponent>
+                    )
+                );
+            })}
+        </>
+    );
 });
 
 const useTransitionConfig = (props: IProps) => {

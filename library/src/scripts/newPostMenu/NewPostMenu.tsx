@@ -1,14 +1,17 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
+import { getMeta } from "@library/utility/appUtils";
 import { useSection } from "@library/layout/LayoutContext";
-import { Widget } from "@library/layout/Widget";
-import NewPostMenuFAB from "@library/newPostMenu/NewPostMenuFAB";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import NewPostMenuDropDown from "@library/newPostMenu/NewPostMenuDropdown";
 import { DeepPartial } from "redux";
-import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import type { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { createLoadableComponent } from "@vanilla/react-utils";
+import AiFAB from "@library/aiConversations/AiFAB";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 export enum PostTypes {
     LINK = "link",
@@ -37,8 +40,14 @@ export interface INewPostMenuProps {
     postableDiscussionTypes?: string[];
 }
 
+const NewPostMenuFAB = createLoadableComponent({
+    loadFunction: () => import("./NewPostMenuFAB.loadable"),
+    fallback: () => null, // No fallback, just don't show the fab until it's loaded.
+});
+
 export default function NewPostMenu(props: INewPostMenuProps) {
     const { postableDiscussionTypes, items, ...rest } = props;
+    const { hasPermission } = usePermissionsContext();
     const isCompact = !useSection().isFullWidth && !props.forceDesktopOnly;
 
     const filteredItems =
@@ -52,11 +61,18 @@ export default function NewPostMenu(props: INewPostMenuProps) {
         return <></>;
     }
 
+    const isAiConversationEnabled = getMeta("featureFlags.aiConversation.Enabled", false);
+    const hasAiConversationPermission = hasPermission("aiAssistedSearch.view");
+    const isEnabled = isAiConversationEnabled && hasAiConversationPermission;
+
     const content = isCompact ? (
         <NewPostMenuFAB items={filteredItems} />
     ) : (
-        <NewPostMenuDropDown items={filteredItems} {...rest} />
+        <>
+            <NewPostMenuDropDown items={filteredItems} {...rest} />
+            {isEnabled && <AiFAB />}
+        </>
     );
 
-    return <Widget>{content}</Widget>;
+    return <LayoutWidget>{content}</LayoutWidget>;
 }

@@ -3,8 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { Draft } from "immer";
-
 interface IClass {
     new (): any;
 }
@@ -92,11 +90,4 @@ export function forceBool(maybeBool: any): boolean {
     }
 
     return !!maybeBool;
-}
-
-/**
- * Can be removed once we update our typescript version.
- */
-export function castDraft<T>(item: T): Draft<T> {
-    return item as Draft<T>;
 }

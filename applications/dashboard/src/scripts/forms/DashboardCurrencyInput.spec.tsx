@@ -2,7 +2,7 @@ import { useState } from "react";
 import { RenderResult, act, fireEvent, render, screen } from "@testing-library/react";
 import DashboardCurrencyInput from "@dashboard/forms/DashboardCurrencyInput";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "./DashboardLabelType";
 
 interface IMockFormProps {
     minimumFractionDigits?: number;

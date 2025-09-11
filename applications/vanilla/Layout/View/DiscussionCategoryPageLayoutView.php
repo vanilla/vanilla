@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,6 +8,7 @@ namespace Vanilla\Forum\Layout\View;
 
 use CategoryModel;
 use Garden\Schema\Schema;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Widgets\CategoryFollowAsset;
 use Vanilla\Forum\Widgets\CategoryListAsset;
@@ -42,7 +43,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -50,7 +51,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -58,7 +59,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTemplateID(): string
     {
@@ -66,7 +67,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamInputSchema(): Schema
     {
@@ -74,7 +75,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamResolvedSchema(): Schema
     {
@@ -82,7 +83,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {
@@ -90,6 +91,9 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
         $this->setSiteSection($category, $paramInput["siteSection"] ?? []);
         $pageHead->setSeoTitle($category["name"], false);
 
+        if (!CategoryModel::checkPermission($category["categoryID"], "Vanilla.Discussions.View")) {
+            throw new PermissionException("Vanilla.Discussions.View");
+        }
         if (!empty($category["description"])) {
             $pageHead->setSeoDescription($category["description"]);
         }

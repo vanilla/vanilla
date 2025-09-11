@@ -168,7 +168,7 @@ class AttachmentModel extends Gdn_Model
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * in addition; We CalculateRow on the record found (Add Attachments)
      * @see Gdn_Model::GetID
      */
@@ -183,7 +183,7 @@ class AttachmentModel extends Gdn_Model
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * in addition; We CalculateRow for each record found (Add Attachments)
      * @see Gdn_Model::GetWhere
      */
@@ -503,7 +503,7 @@ class AttachmentModel extends Gdn_Model
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      * @param array $formPostValues
      * @param bool $settings
      * @return bool|mixed Primary Key Value

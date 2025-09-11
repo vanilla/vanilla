@@ -1,25 +1,27 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-import { useVanillaEditorFocus } from "@library/vanilla-editor/VanillaEditorFocusContext";
 import {
+    PlateEditor,
+    Value,
     collapseSelection,
     focusEditor,
     getSelectionText,
     isSelectionExpanded,
     mergeProps,
-    PlateEditor,
     useEventPlateId,
     useHotkeys,
     usePlateEditorState,
-    Value,
 } from "@udecode/plate-common";
-import { useVirtualFloating, UseVirtualFloatingOptions, UseVirtualFloatingReturn } from "@udecode/plate-floating";
+import { UseVirtualFloatingOptions, UseVirtualFloatingReturn, useVirtualFloating } from "@udecode/plate-floating";
 import { useEffect, useState } from "react";
+
+import { TabHandler } from "@vanilla/dom-utils";
 import { useFocused } from "slate-react";
+import { useVanillaEditorFocus } from "@library/vanilla-editor/VanillaEditorFocusContext";
 
 export const useFloatingMarkToolbar = ({
     floatingOptions,
@@ -107,17 +109,17 @@ export const useFloatingMarkToolbar = ({
     );
 
     useHotkeys(
-        "ctrl+shift+i",
+        "ctrl+shift+k",
         (e) => {
-            setOpen(true);
-            const menuItems = document.querySelectorAll(`[role="menuitem"]`);
-            if (menuItems.length > 0) {
-                const firstItem = menuItems[0] as HTMLElement;
-                firstItem.focus();
+            const markToolbar = document.querySelector("#floatingToolbar_markToolbar");
+            if (markToolbar) {
+                // find the first focusable element and focus
+                const tabHandler = new TabHandler(markToolbar);
+                tabHandler.getInitial()?.focus();
             }
         },
         {
-            enabled: isEditorFocused,
+            enabled: open,
             enableOnContentEditable: true,
         },
         [],

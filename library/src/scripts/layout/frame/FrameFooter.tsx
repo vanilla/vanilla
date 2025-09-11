@@ -19,26 +19,20 @@ export interface IFrameFooterProps {
 /**
  * Generic footer for frame component
  */
-export default class FrameFooter extends React.PureComponent<IFrameFooterProps> {
-    public static defaultProps = {
-        validSelection: false,
-    };
-
-    public render() {
-        const classes = frameFooterClasses();
-        return (
-            <footer
-                className={classNames(
-                    "frameFooter",
-                    classes.root,
-                    this.props.className,
-                    this.props.justifyRight && classes.justifiedRight,
-                    this.props.selfPadded ? classes.selfPadded : "",
-                    this.props.forDashboard ? classes.forDashboard : "",
-                )}
-            >
-                {this.props.children}
-            </footer>
-        );
-    }
+export default function FrameFooter(props: IFrameFooterProps) {
+    const classes = frameFooterClasses.useAsHook();
+    return (
+        <footer
+            className={classNames(
+                "frameFooter",
+                classes.root,
+                props.className,
+                props.justifyRight && classes.justifiedRight,
+                props.selfPadded ? classes.selfPadded : "",
+                props.forDashboard ? classes.forDashboard : "",
+            )}
+        >
+            {props.children}
+        </footer>
+    );
 }

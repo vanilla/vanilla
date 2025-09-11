@@ -7,7 +7,7 @@
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { flexHelper, spinnerLoaderAnimationProperties } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { css } from "@emotion/css";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
@@ -18,12 +18,38 @@ import { oneColumnVariables } from "@library/layout/Section.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { buttonResetMixin } from "./buttonMixins";
 import { buttonVariables, buttonGlobalVariables } from "./Button.variables";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const buttonClasses = useThemeCache(() => {
     const vars = buttonVariables();
+
+    const input = css({
+        ...buttonResetMixin(),
+        whiteSpace: "nowrap",
+        background: ColorsUtils.var(ColorVar.InputBackground),
+        padding: "2px 12px",
+        border: `1px solid ${ColorsUtils.var(ColorVar.InputBorder)}`,
+        borderRadius: 6,
+        position: "relative",
+        minHeight: 36,
+        "&:hover, &:active, &:focus": {
+            borderColor: ColorsUtils.var(ColorVar.InputBorderActive),
+            outline: "none",
+        },
+        "&:focus-visible": {
+            borderColor: ColorsUtils.var(ColorVar.Primary),
+        },
+    });
+
     return {
         primary: generateButtonClass(vars.primary),
-        standard: generateButtonClass(vars.standard),
+        standard: generateButtonClass(vars.standard, {
+            extra: {
+                backgroundColor: ColorsUtils.varOverride(ColorVar.Background, vars.standard.colors?.bg),
+                color: ColorsUtils.varOverride(ColorVar.Foreground, vars.standard.colors?.fg),
+                borderColor: ColorsUtils.varOverride(ColorVar.Border, vars.standard.borders?.color),
+            },
+        }),
         outline: generateButtonClass(vars.outline),
         transparent: generateButtonClass(vars.transparent),
         translucid: generateButtonClass(vars.translucid),
@@ -34,6 +60,7 @@ export const buttonClasses = useThemeCache(() => {
         radio: generateButtonClass(vars.radio),
         custom: "",
         notStandard: generateButtonClass(vars.notStandard),
+        input,
     };
 });
 
@@ -113,20 +140,20 @@ export const buttonUtilityClasses = useThemeCache(() => {
                 outline: 0,
             },
             "&:focus, &:active, &:hover": {
-                color: ColorsUtils.colorOut(globalVars.mainColors.secondary),
+                color: ColorsUtils.varOverride(ColorVar.Link, globalVars.links.colors.active),
             },
         },
     });
 
     const buttonAsTextPrimary = css(asTextStyles, {
         "&&": {
-            color: ColorsUtils.colorOut(globalVars.links.colors.default),
+            color: ColorsUtils.varOverride(ColorVar.Link, globalVars.links.colors.default),
         },
         "&&:not(.focus-visible)": {
             outline: 0,
         },
         "&&:hover, &&:focus, &&:active": {
-            color: ColorsUtils.colorOut(globalVars.links.colors.active),
+            color: ColorsUtils.varOverride(ColorVar.LinkActive, globalVars.links.colors.active),
         },
     });
 

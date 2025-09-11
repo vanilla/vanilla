@@ -14,7 +14,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, px } from "csx";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { userContentVariables } from "@library/content/UserContent.variables";
 
 export const embedContainerVariables = useThemeCache(() => {
@@ -195,7 +195,11 @@ export const embedContentClasses = useThemeCache(() => {
         zIndex: 11,
     });
 
-    return { small, root, menuBar };
+    const positionBelow = css({
+        transform: "translate(-50%, 20px)",
+    });
+
+    return { small, root, menuBar, positionBelow };
 });
 
 export const embedElementClasses = useThemeCache(() => {

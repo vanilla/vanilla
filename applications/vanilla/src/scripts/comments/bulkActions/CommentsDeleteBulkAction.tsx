@@ -1,24 +1,17 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
- * @license Proprietary
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2025 Vanilla Forums Inc.
+ * @license gpl-2.0-only
  */
 
-import { CommentDeleteMethod } from "@dashboard/@types/api/comment";
-import { IBulkActionForm } from "@library/bulkActions/BulkActions.types";
-import { useCommentsBulkActionsContext } from "@vanilla/addon-vanilla/comments/bulkActions/CommentsBulkActionsContext";
-import DeleteCommentsForm from "@vanilla/addon-vanilla/comments/DeleteCommentsForm";
+import Loader from "@library/loaders/Loader";
+import { loaderClasses } from "@library/loaders/loaderStyles";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-export default function CommentsDeleteBulkAction(props: IBulkActionForm) {
-    const { checkedCommentIDs, handleMutateSuccess } = useCommentsBulkActionsContext();
-
-    return (
-        <DeleteCommentsForm
-            close={props.onCancel}
-            onMutateSuccess={async (deleteMethod?: CommentDeleteMethod) => {
-                props.onSuccess();
-                await handleMutateSuccess(deleteMethod);
-            }}
-            commentIDs={checkedCommentIDs}
-        />
-    );
-}
+const CommentsDeleteBulkAction = createLoadableComponent({
+    loadFunction: () => import("./CommentsDeleteBulkAction.loadable"),
+    fallback() {
+        return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
+    },
+});
+export default CommentsDeleteBulkAction;

@@ -92,7 +92,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
      * @inheritdoc
      * @return RichFormatParsed
      */
-    public function parse(string $content)
+    public function parse(string $content, bool $throw = false)
     {
         try {
             $parseMode = $this->allowExtendedContent
@@ -100,6 +100,9 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
                 : Quill\Parser::PARSE_MODE_NORMAL;
             return $this->parseInternal($content, $parseMode);
         } catch (\Throwable $e) {
+            if ($throw) {
+                throw new FormattingException($e->getMessage(), $e->getCode(), $e);
+            }
             $this->logBadInput($content);
             return new RichFormatParsed(
                 '[{"insert":"' . self::RENDER_ERROR_MESSAGE . '"}]',
@@ -469,7 +472,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseDOM(string $content): TextDOMInterface
     {
@@ -547,7 +550,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseAllMentions($body): array
     {

@@ -1,0 +1,22 @@
+[
+    {
+        "insert": {
+            "embed-external": {
+                "data": {
+                    "url": "__UPLOAD_URL__/uploads/SON7DOW86RO1/2022-hl-hours-1.pdf",
+                    "name": "2022_HL_Hours__1_.pdf",
+                    "type": "application/pdf",
+                    "size": 106672,
+                    "displaySize": "large",
+                    "float": "none",
+                    "mediaID": 114,
+                    "dateInserted": "2022-12-21T05:24:52+00:00",
+                    "insertUserID": 2,
+                    "foreignType": "embed",
+                    "foreignID": 2,
+                    "embedType": "file"
+                }
+            }
+        }
+    }
+]

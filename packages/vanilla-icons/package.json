@@ -1,21 +1,29 @@
 {
     "name": "@vanilla/icons",
-    "main": "./index.ts",
-    "module": "./index.ts",
-    "license": "MIT",
-    "version": "3.0.1",
-    "peerDependencies": {
-        "@emotion/css": "*",
-        "@vanilla/utils": "*",
-        "react": "*"
+    "version": "4.0.2",
+    "main": "dist/index.mjs",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "author": {
+        "name": "Adam (charrondev) Charron",
+        "email": "acharron@higherlogic.com"
     },
     "publishConfig": {
         "access": "public"
     },
+    "license": "MIT",
+    "peerDependencies": {
+        "@emotion/css": "*",
+        "react": "*"
+    },
     "scripts": {
-        "build:icon-types": "node ./generateIconTypes.js"
+        "build:icon-types": "node ./generateIconTypes.cjs"
     },
     "dependencies": {
+        "@vanilla/utils": ">=4.0.2",
         "lodash-es": "^4.17.21"
     },
     "devDependencies": {

@@ -4,12 +4,9 @@
  */
 
 import React, { ReactNode, useDebugValue, useMemo } from "react";
-import {
-    IHomeWidgetItemOptions,
-    homeWidgetItemVariables,
-    homeWidgetItemClasses,
-    HomeWidgetItemContentType,
-} from "@library/homeWidget/HomeWidgetItem.styles";
+import { homeWidgetItemVariables, homeWidgetItemClasses } from "@library/homeWidget/HomeWidgetItem.styles";
+import { IHomeWidgetItemOptions, WidgetImageType, widgetItemContentTypeToImageType } from "./WidgetItemOptions";
+import { WidgetItemContentType } from "./WidgetItemOptions";
 import SmartLink from "@library/routing/links/SmartLink";
 import { LocationDescriptor } from "history";
 import Heading from "@library/layout/Heading";
@@ -17,13 +14,13 @@ import TruncatedText from "@library/content/TruncatedText";
 import { ICountResult } from "@library/search/searchTypes";
 import { ResultMeta } from "@library/result/ResultMeta";
 import { getClassForButtonType } from "@library/forms/Button.getClassForButtonType";
-import { createSourceSetValue, ImageSourceSet, t } from "@library/utility/appUtils";
+import { createSourceSetValue, ImageSourceSet, siteUrl, t } from "@library/utility/appUtils";
 import { ArrowIcon } from "@library/icons/common";
 import { DeepPartial } from "redux";
 import { MetaItem, Metas } from "@library/metas/Metas";
 import { cx } from "@emotion/css";
 import { buttonClasses } from "@library/forms/Button.styles";
-import { HomeWidgetItemDefaultImage } from "@library/homeWidget/HomeWidgetItemDefaultImage";
+import { WidgetDefaultImage } from "@library/homeWidget/WidgetDefaultImage";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Button from "@library/forms/Button";
@@ -65,9 +62,9 @@ export type IHomeWidgetItemProps = CommonHomeWidgetItemProps &
 
 export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     const { to, callback } = props;
-    const vars = homeWidgetItemVariables(props.options);
+    const vars = homeWidgetItemVariables.useAsHook(props.options);
     const options = vars.options;
-    const classes = homeWidgetItemClasses(props.options);
+    const classes = homeWidgetItemClasses.useAsHook(props.options);
     const isMobile = [Devices.MOBILE, Devices.XS].includes(useDevice());
 
     const imageUrlSrcSet = useMemo(() => {
@@ -104,16 +101,15 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
         return <>{props.children}</>;
     }
 
-    const isAbsoluteContent = [
-        HomeWidgetItemContentType.TITLE_BACKGROUND,
-        HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
-    ].includes(options.contentType);
+    const imageType = widgetItemContentTypeToImageType(options.contentType);
+
+    const isAbsoluteContent = imageType === WidgetImageType.Background;
     const imageUrl = props.imageUrl ?? options.defaultImageUrl;
     const iconUrl = props.iconUrl ?? options.defaultIconUrl;
     const hasMetas = (props.counts && options.display.counts) || props.metaComponent;
     const hasMetaDescription =
-        [HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION].includes(options.contentType) && props.description;
-    const isChatBubble = [HomeWidgetItemContentType.TITLE_CHAT_BUBBLE].includes(options.contentType);
+        options.contentType === WidgetItemContentType.TitleBackgroundDescription && props.description;
+    const isChatBubble = options.contentType === WidgetItemContentType.TitleChatBubble;
 
     const metas = props.metaComponent
         ? props.metaComponent
@@ -135,7 +131,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
 
     const icon = props.iconComponent
         ? props.iconComponent
-        : HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON === options.contentType &&
+        : WidgetItemContentType.TitleDescriptionIcon === options.contentType &&
           iconUrl && (
               <div className={classes.iconContainer}>
                   <div className={classes.iconWrap}>
@@ -144,7 +140,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                           height={isMobile ? vars.icon.sizeMobile : vars.icon.size}
                           width={"auto"}
                           role="presentation"
-                          src={iconUrl}
+                          src={siteUrl(iconUrl)}
                           alt={props.name}
                           loading="lazy"
                           {...iconUrlSrcSet}
@@ -156,32 +152,31 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     const content = (
         <>
             <div className={classes.backgroundContainer}>
-                {[
-                    HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
-                    HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
-                    HomeWidgetItemContentType.TITLE_BACKGROUND,
-                ].includes(options.contentType) && (
+                {(
+                    [
+                        WidgetItemContentType.TitleBackgroundDescription,
+                        WidgetItemContentType.TitleDescriptionImage,
+                        WidgetItemContentType.TitleBackground,
+                    ] as WidgetItemContentType[]
+                ).includes(options.contentType) && (
                     <div className={classes.imageContainerWrapper}>
                         <div className={classes.imageContainer}>
                             {imageUrl ? (
                                 <img
                                     height={vars.icon.size}
                                     className={classes.image}
-                                    src={imageUrl}
+                                    src={siteUrl(imageUrl)}
                                     alt={props.name}
                                     loading="lazy"
                                     {...imageUrlSrcSet}
                                 />
                             ) : (
-                                <HomeWidgetItemDefaultImage />
+                                <WidgetDefaultImage />
                             )}
                         </div>
                     </div>
                 )}
-                {[
-                    HomeWidgetItemContentType.TITLE_BACKGROUND,
-                    HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
-                ].includes(options.contentType) && <div className={classes.backgroundScrim}></div>}
+                {imageType === WidgetImageType.Background && <div className={classes.backgroundScrim}></div>}
 
                 {icon}
 
@@ -192,7 +187,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                 )}
             </div>
             {isAbsoluteContent && metas}
-            {[HomeWidgetItemContentType.TITLE_CHAT_BUBBLE].includes(options.contentType) && (
+            {options.contentType === WidgetItemContentType.TitleChatBubble && (
                 <span className={classes.callToAction}>
                     <span>{t(options.callToActionText)}</span>
                     <ArrowIcon />
@@ -230,20 +225,22 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
 }
 
 function HomeWidgetStaticContent(props: IHomeWidgetItemProps & { extraChildren?: React.ReactNode }) {
-    const options = homeWidgetItemVariables(props.options).options;
-    const classes = homeWidgetItemClasses(props.options);
+    const options = homeWidgetItemVariables.useAsHook(props.options).options;
+    const classes = homeWidgetItemClasses.useAsHook(props.options);
 
     return (
         <div className={classes.content}>
             <Heading depth={3} className={cx(classes.name, props.nameClassName)}>
                 {props.name}
             </Heading>
-            {[
-                HomeWidgetItemContentType.TITLE_DESCRIPTION,
-                HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
-                HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
-                HomeWidgetItemContentType.TITLE_CHAT_BUBBLE,
-            ].includes(options.contentType) &&
+            {(
+                [
+                    WidgetItemContentType.TitleDescription,
+                    WidgetItemContentType.TitleDescriptionImage,
+                    WidgetItemContentType.TitleDescriptionIcon,
+                    WidgetItemContentType.TitleChatBubble,
+                ] as WidgetItemContentType[]
+            ).includes(options.contentType) &&
                 options.display.description &&
                 props.description && (
                     <TruncatedText
@@ -262,8 +259,8 @@ function HomeWidgetStaticContent(props: IHomeWidgetItemProps & { extraChildren?:
 }
 
 function HomeWidgetAbsoluteContent(props: IHomeWidgetItemProps) {
-    const options = homeWidgetItemVariables(props.options).options;
-    const classes = homeWidgetItemClasses(props.options);
+    const options = homeWidgetItemVariables.useAsHook(props.options).options;
+    const classes = homeWidgetItemClasses.useAsHook(props.options);
     const viewMoreCode = options.viewMore?.labelCode;
 
     return (

@@ -7,8 +7,9 @@
 import { css } from "@emotion/css";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { useThemeCache } from "@library/styles/themeCache";
 
-export const postTypeSettingsClasses = () => {
+export const postTypeSettingsClasses = useThemeCache(() => {
     const sectionIndex = css({
         position: "relative",
         zIndex: 1,
@@ -136,4 +137,4 @@ export const postTypeSettingsClasses = () => {
         actionButtonsContainer,
         bottomBorderOverride,
     };
-};
+});

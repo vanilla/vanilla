@@ -1,3 +1,4 @@
+https://dev.vanilla.local/discussion/comment/668#Comment_668
 @AtMentionedUserOutsideOfQuoteBlock@mention/slashes
 This sentence is a link
 plain text url http://vanilla.test/minimal-container-test/profile/Plain%20Text%20Profile%20URL

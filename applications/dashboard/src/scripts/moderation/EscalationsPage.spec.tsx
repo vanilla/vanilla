@@ -4,13 +4,14 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { fireEvent, render, waitFor, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+
 import { CommunityManagementFixture } from "@dashboard/moderation/__fixtures__/CommunityManagement.Fixture";
-import { mockAPI } from "@library/__tests__/utility";
+import EscalationsPage from "@dashboard/moderation/EscalationsPage";
 import { FAKE_INTEGRATIONS_CATALOG } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
 import MockAdapter from "axios-mock-adapter";
-import EscalationsPage from "@dashboard/moderation/EscalationsPage";
+import React from "react";
+import { mockAPI } from "@library/__tests__/utility";
 
 describe("EscalationsPage", () => {
     let mockAdapter: MockAdapter;

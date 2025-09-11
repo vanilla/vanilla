@@ -23,7 +23,7 @@ class ExternalBlot extends AbstractBlot
     private $embedService;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $operation): bool
     {
@@ -84,7 +84,7 @@ class ExternalBlot extends AbstractBlot
 
     /**
      * Render out the content of the blot using the EmbedService.
-     * @inheritDoc
+     * @inheritdoc
      */
     public function render(): string
     {
@@ -116,7 +116,7 @@ class ExternalBlot extends AbstractBlot
 
     /**
      * Block embeds are always their own group.
-     * @inheritDoc
+     * @inheritdoc
      */
     public function isOwnGroup(): bool
     {
@@ -124,7 +124,7 @@ class ExternalBlot extends AbstractBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupOpeningTag(): string
     {
@@ -132,7 +132,7 @@ class ExternalBlot extends AbstractBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupClosingTag(): string
     {

@@ -23,7 +23,7 @@ class SessionModelTest extends SiteTestCase
     private $sessionModel;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

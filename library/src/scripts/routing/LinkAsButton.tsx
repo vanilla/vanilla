@@ -5,7 +5,7 @@
  */
 
 import React, { useMemo } from "react";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonTypes, type ButtonType } from "@library/forms/buttonTypes";
 import { getClassForButtonType } from "@library/forms/Button.getClassForButtonType";
 import SmartLink from "@library/routing/links/SmartLink";
 import { IOptionalComponentID } from "@library/utility/idUtils";
@@ -13,6 +13,7 @@ import { LinkProps } from "react-router-dom";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { buttonLabelWrapClass } from "@library/forms/Button.styles";
 import { cx } from "@emotion/css";
+import { useWithThemeContext } from "@library/theming/ThemeOverrideContext";
 
 interface IProps extends IOptionalComponentID, LinkProps {
     children: React.ReactNode;
@@ -20,7 +21,7 @@ interface IProps extends IOptionalComponentID, LinkProps {
     to: string;
     title?: string;
     ariaLabel?: string;
-    buttonType?: ButtonTypes;
+    buttonType?: ButtonType;
     tabIndex?: number;
     disabled?: boolean;
     addWrap?: boolean; // Adds wrapper class to help with overflowing text
@@ -42,7 +43,8 @@ export function LinkAsButton(props: IProps) {
         disabled,
         ...restProps
     } = props;
-    const componentClasses = cx(getClassForButtonType(buttonType), className);
+    const componentClasses = useWithThemeContext(() => cx(getClassForButtonType(buttonType), className));
+    const wrapClasses = buttonLabelWrapClass.useAsHook();
 
     const fallbackTitle = typeof children === "string" ? children : undefined;
 
@@ -61,7 +63,7 @@ export function LinkAsButton(props: IProps) {
     if (disabled) {
         return (
             <span {...linkProps} {...restProps}>
-                <ConditionalWrap className={buttonLabelWrapClass().root} condition={addWrap}>
+                <ConditionalWrap className={wrapClasses.root} condition={addWrap}>
                     {children}
                 </ConditionalWrap>
             </span>
@@ -70,7 +72,7 @@ export function LinkAsButton(props: IProps) {
 
     return (
         <SmartLink {...linkProps} to={to ?? ""} {...restProps}>
-            <ConditionalWrap className={buttonLabelWrapClass().root} condition={addWrap}>
+            <ConditionalWrap className={wrapClasses.root} condition={addWrap}>
                 {children}
             </ConditionalWrap>
         </SmartLink>

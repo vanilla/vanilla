@@ -10,22 +10,21 @@ namespace Vanilla\Forum\Search;
 use Garden\Schema\Schema;
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
-use Vanilla\Cloud\ElasticSearch\Driver\ElasticSearchQuery;
 use Vanilla\DateFilterSchema;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Forum\Models\PostFieldModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Search\BoostableSearchQueryInterface;
-use Vanilla\Search\CollapsableSearchQueryInterface;
 use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
-use Vanilla\Search\SearchResultItem;
 use Vanilla\Search\SearchTypeQueryExtenderInterface;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Contracts\ConfigurationInterface;
 
 /**
@@ -33,28 +32,10 @@ use Vanilla\Contracts\ConfigurationInterface;
  */
 class DiscussionSearchType extends AbstractSearchType
 {
-    /** @var \DiscussionsApiController */
-    protected $discussionsApi;
-
-    /** @var \CategoryModel */
-    protected $categoryModel;
-
-    /** @var \UserModel $userModel */
-    protected $userModel;
-
-    /** @var \TagModel */
-    protected $tagModel;
-
-    /** @var BreadcrumbModel */
-    protected $breadcrumbModel;
-
     /** @var array extenders */
     protected $extenders = [];
 
     protected $extendersEnabled = true;
-
-    /** @var ConfigurationInterface */
-    private $config;
 
     /**
      * DI.
@@ -67,19 +48,14 @@ class DiscussionSearchType extends AbstractSearchType
      * @param ConfigurationInterface $config
      */
     public function __construct(
-        \DiscussionsApiController $discussionsApi,
-        \CategoryModel $categoryModel,
-        \UserModel $userModel,
-        \TagModel $tagModel,
-        BreadcrumbModel $breadcrumbModel,
-        ConfigurationInterface $config
+        protected \DiscussionsApiController $discussionsApi,
+        protected \CategoryModel $categoryModel,
+        protected \UserModel $userModel,
+        protected \TagModel $tagModel,
+        protected BreadcrumbModel $breadcrumbModel,
+        private ConfigurationInterface $config,
+        protected PostFieldModel $postFieldModel
     ) {
-        $this->discussionsApi = $discussionsApi;
-        $this->categoryModel = $categoryModel;
-        $this->userModel = $userModel;
-        $this->tagModel = $tagModel;
-        $this->breadcrumbModel = $breadcrumbModel;
-        $this->config = $config;
     }
 
     /**
@@ -227,6 +203,24 @@ class DiscussionSearchType extends AbstractSearchType
             if (!empty($excludedInsertUserIDs)) {
                 $query->setFilter("insertUserID", $excludedInsertUserIDs, filterOp: SearchQuery::FILTER_OP_NOT);
             }
+
+            $statusIDs = $query->getQueryParameter("statusID");
+            if (!empty($statusIDs)) {
+                $statusIDs[] = null;
+                $query->setFilter("statusID", $statusIDs, filterOp: SearchQuery::FILTER_OP_OR);
+            }
+            $answerStatusID = $query->getQueryParameter("answerStatusID");
+            if (!empty($answerStatusID)) {
+                $answerStatusID[] = null;
+                $query->setFilter("answerStatusID", $answerStatusID, filterOp: SearchQuery::FILTER_OP_OR);
+            }
+
+            $postTypeIDs = $query->getQueryParameter("postTypeID");
+            if (!empty($postTypeIDs)) {
+                $query->setFilter("postTypeID", $postTypeIDs, filterOp: SearchQuery::FILTER_OP_OR);
+            }
+
+            $this->applyPostMetaFilters($query);
         }
     }
 
@@ -288,6 +282,26 @@ class DiscussionSearchType extends AbstractSearchType
                     "type" => "integer",
                 ],
             ],
+            "postMeta:o?" => $this->getPostMetaFilterSchema(),
+            "statusID:a?" => [
+                "items" => [
+                    "type" => "integer",
+                ],
+                "style" => "form",
+            ],
+            "answerStatusID:a?" => [
+                "items" => [
+                    "type" => "string",
+                    "enum" => ["accepted", "rejected", "pending"],
+                ],
+                "style" => "form",
+            ],
+            "postTypeID:a?" => [
+                "items" => [
+                    "type" => "string",
+                ],
+                "style" => "form",
+            ],
         ]);
     }
 
@@ -333,6 +347,7 @@ class DiscussionSearchType extends AbstractSearchType
             $validation->addError("categoryID", "Only one of categoryID, categoryIDs are allowed.");
             throw new ValidationException($validation);
         }
+        $this->validatePostMetaFilters($query);
     }
 
     /**
@@ -548,5 +563,123 @@ class DiscussionSearchType extends AbstractSearchType
     protected function allowsExtenders(SearchQuery $query): bool
     {
         return $query->supportsExtenders() && $this->extendersEnabled;
+    }
+
+    /**
+     * Return a schema for validating post meta filters.
+     *
+     * @return Schema
+     */
+    public static function getPostMetaFilterSchema(): Schema
+    {
+        $schemaArray = [];
+        $postFieldModel = \Gdn::getContainer()->get(PostFieldModel::class);
+        $postFields = array_column($postFieldModel->getWhere(["isActive" => true]), null, "postFieldID");
+
+        foreach ($postFields as $field) {
+            $formType = $field["formType"];
+            $dataType = $field["dataType"];
+            $postFieldID = $field["postFieldID"];
+
+            switch ([$dataType, $formType]) {
+                case ["text", "text"]:
+                case ["text", "text-multiline"]:
+                    $schemaArray["$postFieldID?"] = ["type" => "string"];
+                    break;
+                case ["boolean", "checkbox"]:
+                    $schemaArray["$postFieldID?"] = ["type" => "boolean", "example" => "true|false"];
+                    break;
+                case ["text", "dropdown"]:
+                case ["string[]", "tokens"]:
+                    $schemaArray["$postFieldID:a?"] = [
+                        "items" => ["type" => "string"],
+                        "style" => "form",
+                        "example" => "option1,option2,option3",
+                    ];
+                    break;
+                case ["number[]", "tokens"]:
+                case ["number", "number"]:
+                case ["number", "dropdown"]:
+                    $schemaArray["$postFieldID?"] = RangeExpression::createSchema([":int"], true);
+                    break;
+
+                case ["date", "date"]:
+                    $schemaArray["$postFieldID?"] = new DateFilterSchema();
+                    break;
+            }
+        }
+
+        return Schema::parse($schemaArray);
+    }
+
+    /**
+     * Apply post meta filters to the query if we have them.
+     *
+     * @param SearchQuery $query
+     * @return void
+     * @throws \Exception
+     */
+    protected function applyPostMetaFilters(SearchQuery $query): void
+    {
+        $postMeta = $query->getQueryParameter("postMeta");
+        if (empty($postMeta)) {
+            return;
+        }
+
+        $postFields = array_column($this->postFieldModel->getWhere(["isActive" => true]), null, "postFieldID");
+        foreach ($postMeta as $postFieldID => $value) {
+            $formType = $postFields[$postFieldID]["formType"] ?? null;
+            $dataType = $postFields[$postFieldID]["dataType"] ?? null;
+            switch ([$dataType, $formType]) {
+                case ["text", "text"]:
+                case ["text", "text-multiline"]:
+                    $query->whereText($value, ["postMeta.$postFieldID"], SearchQuery::MATCH_WILDCARD);
+                    break;
+                case ["boolean", "checkbox"]:
+                    if ($value) {
+                        $query->setFilter("postMeta.$postFieldID", [true]);
+                    } else {
+                        $query->setFilter("postMeta.$postFieldID", [true], filterOp: SearchQuery::FILTER_OP_NOT);
+                    }
+                    break;
+                case ["text", "dropdown"]:
+                case ["string[]", "tokens"]:
+                    $databaseOptions = $postFields[$postFieldID]["dropdownOptions"] ?? [];
+                    $filteredOptions = array_intersect($databaseOptions, $value);
+                    $query->setFilter("postMeta.$postFieldID.keyword", $filteredOptions);
+                    break;
+                case ["number[]", "tokens"]:
+                case ["number", "number"]:
+                case ["number", "dropdown"]:
+                    /** @var $value RangeExpression */
+                    $query->setRangeExpressionFilter("postMeta.$postFieldID", $value);
+                    break;
+                case ["date", "date"]:
+                    $query->setDateFilterSchema("postMeta.$postFieldID", $value);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Validate that the current user has permission to filter by post fields.
+     *
+     * @param SearchQuery $query
+     * @return void
+     * @throws ForbiddenException
+     */
+    private function validatePostMetaFilters(SearchQuery $query): void
+    {
+        $postMeta = $query->getQueryParameter("postMeta");
+        if (!empty($postMeta)) {
+            $availableFields = PostFieldModel::getAvailableViewFieldsForCurrentSessionUser();
+            $postFieldIDs = array_column($availableFields, "postFieldID");
+            $invalidFields = array_diff(array_keys($postMeta), $postFieldIDs);
+            if (!empty($invalidFields)) {
+                throw new ForbiddenException(
+                    "You don't have permission to access the following fields: " . implode(", ", $invalidFields)
+                );
+            }
+        }
     }
 }

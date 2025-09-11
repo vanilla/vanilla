@@ -1,19 +1,22 @@
 {
     "name": "@vanilla/utils",
-    "main": "./index.ts",
-    "module": "./index.ts",
-    "license": "MIT",
-    "version": "3.0.1",
-    "devDependencies": {
-        "@vanilla/tsconfig": "^3.0.1"
-    },
-    "dependencies": {
-        "immer": "^2.0.0"
-    },
-    "peerDependencies": {
-        "lodash-es": "*"
+    "description": "Utility functions for Higher Logic Vanilla applications.",
+    "version": "4.0.2",
+    "main": "dist/index.mjs",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "author": {
+        "name": "Adam (charrondev) Charron",
+        "email": "acharron@higherlogic.com"
     },
     "publishConfig": {
         "access": "public"
+    },
+    "license": "MIT",
+    "peerDependencies": {
+        "lodash-es": "*"
     }
 }

@@ -1,14 +1,13 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import apiv2 from "@library/apiv2";
-import { IError } from "@library/errorPages/CoreErrorMessages";
 import { getFollowedContentReason, getUnsubscribeReason } from "@library/unsubscribe/getUnsubscribeReason";
 import { t } from "@library/utility/appUtils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { QueryKey, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     IDecodedToken,
     IUnsubscribeData,
@@ -21,38 +20,26 @@ import { useCurrentUser } from "@library/features/users/userHooks";
 /**
  * Get the token from the url params and decode it
  */
-export function useGetUnsubscribe(token: IUnsubscribeToken) {
-    const queryClient = useQueryClient();
-    const decodedToken = decodeToken(token);
+export function useUnsubscribeData(token: IUnsubscribeToken) {
+    const queryKey: QueryKey = ["unsubscribe", token];
 
-    return useMutation({
-        mutationKey: ["unsubscribe", decodedToken?.activityID ?? "invalid"],
-        mutationFn: async (token: IUnsubscribeToken) => {
+    return useQuery({
+        queryKey,
+        queryFn: async () => {
+            const decodedToken = decodeToken(token);
+
             if (!decodedToken) {
                 throw { message: t("Unsubscribe token is invalid.") };
             }
 
-            const response = await apiv2.post(`/unsubscribe/${token}`);
+            const response = await apiv2.post<IUnsubscribeResult>(`/unsubscribe/${token}`);
 
             const data = {
                 ...decodedToken,
                 ...reduceUnsubscribe(response.data),
             } as IUnsubscribeData;
 
-            if (
-                response.data.preferences?.length === 0 &&
-                (response.data.followCategory?.length === 0 || response.data.followContent?.length === 0)
-            ) {
-                data.isAllProcessed = true;
-            }
-
             return data;
-        },
-        onSuccess: () => {
-            void queryClient.invalidateQueries();
-        },
-        onError: (error: IError) => {
-            throw error;
         },
     });
 }
@@ -63,6 +50,7 @@ export function useGetUnsubscribe(token: IUnsubscribeToken) {
 export function useUndoUnsubscribe(token: IUnsubscribeToken) {
     const queryClient = useQueryClient();
     const decodedToken = decodeToken(token);
+    const queryKey: QueryKey = ["unsubscribe", token];
 
     return useMutation({
         mutationKey: ["undo_unsubscribe", decodedToken?.activityID ?? "invalid"],
@@ -71,18 +59,15 @@ export function useUndoUnsubscribe(token: IUnsubscribeToken) {
                 throw { message: t("Unsubscribe token is invalid.") };
             }
 
-            const response = await apiv2.post(`/unsubscribe/resubscribe/${token}`);
+            const response = await apiv2.post<IUnsubscribeResult>(`/unsubscribe/resubscribe/${token}`);
 
             return {
                 ...decodedToken,
                 ...reduceUnsubscribe(response.data),
             } as IUnsubscribeData;
         },
-        onSuccess: () => {
-            void queryClient.invalidateQueries();
-        },
-        onError: (error: IError) => {
-            throw error;
+        onSuccess: (newData) => {
+            queryClient.setQueryData<IUnsubscribeData>(queryKey, newData);
         },
     });
 }
@@ -93,6 +78,7 @@ export function useUndoUnsubscribe(token: IUnsubscribeToken) {
 export function useSaveUnsubscribe(token: IUnsubscribeToken) {
     const queryClient = useQueryClient();
     const decodedToken = decodeToken(token);
+    const queryKey: QueryKey = ["unsubscribe", token];
 
     return useMutation({
         mutationKey: ["unsubscribe_multiple", decodedToken?.activityID ?? "invalid"],
@@ -131,18 +117,15 @@ export function useSaveUnsubscribe(token: IUnsubscribeToken) {
                 }
             }
 
-            const response = await apiv2.patch(`/unsubscribe/${token}`, params);
+            const response = await apiv2.patch<IUnsubscribeResult>(`/unsubscribe/${token}`, params);
 
             return {
                 ...decodedToken,
                 ...reduceUnsubscribe(response.data),
             } as IUnsubscribeData;
         },
-        onSuccess: () => {
-            void queryClient.invalidateQueries();
-        },
-        onError: (error: IError) => {
-            throw error;
+        onSuccess: (newData) => {
+            queryClient.setQueryData<IUnsubscribeData>(queryKey, newData);
         },
     });
 }
@@ -150,7 +133,7 @@ export function useSaveUnsubscribe(token: IUnsubscribeToken) {
 /**
  * Construct a link to the notification preferences or followed content page
  */
-export function usePreferenceLink() {
+export function useGetPreferenceLink() {
     const currentUser = useCurrentUser();
 
     return function (user?: IDecodedToken["user"], isFollowedContent?: boolean): string {
@@ -165,9 +148,9 @@ export function usePreferenceLink() {
 }
 
 // Decode the token string into an object
-function decodeToken(token: IUnsubscribeToken): IDecodedToken | null {
+function decodeToken(token: IUnsubscribeToken): IDecodedToken | undefined {
     if (!token) {
-        return null;
+        return;
     }
 
     try {
@@ -185,7 +168,7 @@ function decodeToken(token: IUnsubscribeToken): IDecodedToken | null {
             },
         };
     } catch {
-        return null;
+        return;
     }
 }
 
@@ -193,6 +176,14 @@ function decodeToken(token: IUnsubscribeToken): IDecodedToken | null {
 function reduceUnsubscribe(data: IUnsubscribeResult): Partial<IUnsubscribeData> {
     if (!data) {
         return {};
+    }
+
+    let mutedContent: IUnsubscribeData["mutedContent"] | undefined;
+    if (data.mute) {
+        mutedContent = {
+            discussionID: data.mute.discussionID,
+            label: data.mute.discussionName,
+        };
     }
 
     const preferences: IUnsubscribePreference[] = (data.preferences ?? []).map(({ preference, enabled }) => {
@@ -218,11 +209,13 @@ function reduceUnsubscribe(data: IUnsubscribeResult): Partial<IUnsubscribeData> 
     let isDigestHideContent: boolean = false;
 
     const followContentFromAPI = data.followCategory || data.followContent;
+    const { followCategory, followContent } = data;
+
     if (!Array.isArray(followContentFromAPI) && followContentFromAPI) {
-        const isContentCategory = Boolean(data.followCategory);
-        const preference = isContentCategory ? data.followCategory?.["preference"] : data.followContent?.["preference"];
+        const isContentCategory = !!followCategory && !Array.isArray(followCategory);
+        const preference = isContentCategory ? followCategory?.["preference"] : followContent?.["preference"];
         const preferenceData = (preference ?? "")
-            .replace(`.${isContentCategory ? data.followCategory?.categoryID : data.followContent?.contentID}`, "")
+            .replace(`.${isContentCategory ? followCategory.categoryID : followContent?.["contentID"]}`, "")
             .split(".");
         const preferenceName = preferenceData[preferenceData.length - 1];
         followedContent = {
@@ -250,12 +243,26 @@ function reduceUnsubscribe(data: IUnsubscribeResult): Partial<IUnsubscribeData> 
     const disabledPreferences = preferences.filter(({ enabled }) => enabled).length > 0;
     const contentDisabled = !followedContent || (followedContent && followedContent.enabled);
 
+    let isAlreadyProcessed = false;
+
+    if (!mutedContent) {
+        isAlreadyProcessed = !hasMultiple && disabledPreferences && contentDisabled;
+        if (
+            preferences?.length === 0 &&
+            ((Array.isArray(followCategory) && followCategory?.length === 0) ||
+                (Array.isArray(followContent) && followContent?.length === 0))
+        ) {
+            isAlreadyProcessed = true;
+        }
+    }
+
     return {
         preferences,
         followedContent,
         hasMultiple,
-        isAllProcessed: !hasMultiple && disabledPreferences && contentDisabled,
+        isAlreadyProcessed,
         isEmailDigest: preferences.length === 1 && preferences[0].preferenceName === "DigestEnabled",
         isUnfollowContent,
+        mutedContent,
     };
 }

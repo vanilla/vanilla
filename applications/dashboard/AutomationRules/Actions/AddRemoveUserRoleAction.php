@@ -8,6 +8,7 @@
 namespace Vanilla\Dashboard\AutomationRules\Actions;
 
 use Vanilla\Dashboard\AutomationRules\Models\UserRuleDataType;
+use Vanilla\Dashboard\AutomationRules\Triggers\TimeSinceLastActiveTrigger;
 use Vanilla\Dashboard\Models\AutomationRuleDispatchesModel;
 use Exception;
 use Garden\Container\ContainerException;
@@ -53,7 +54,7 @@ class AddRemoveUserRoleAction extends AutomationAction implements UserInterface,
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -61,7 +62,7 @@ class AddRemoveUserRoleAction extends AutomationAction implements UserInterface,
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -69,7 +70,7 @@ class AddRemoveUserRoleAction extends AutomationAction implements UserInterface,
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -77,15 +78,15 @@ class AddRemoveUserRoleAction extends AutomationAction implements UserInterface,
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
-        return UserRuleDataType::getTriggers();
+        return array_merge(UserRuleDataType::getTriggers(), [TimeSinceLastActiveTrigger::class]);
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -115,7 +116,7 @@ class AddRemoveUserRoleAction extends AutomationAction implements UserInterface,
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function execute(): bool
     {
@@ -192,7 +193,7 @@ class AddRemoveUserRoleAction extends AutomationAction implements UserInterface,
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
@@ -202,7 +203,7 @@ class AddRemoveUserRoleAction extends AutomationAction implements UserInterface,
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -289,7 +290,7 @@ class AddRemoveUserRoleAction extends AutomationAction implements UserInterface,
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {

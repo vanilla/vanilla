@@ -61,7 +61,7 @@ class SectionOneColumn extends AbstractLayoutSection
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

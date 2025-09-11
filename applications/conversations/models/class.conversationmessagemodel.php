@@ -237,8 +237,13 @@ class ConversationMessageModel extends ConversationsModel
         $this->Validation->applyRule("Body", "Required");
         $this->addInsertFields($formPostValues);
 
+        if (c("Garden.ForceInputFormatter")) {
+            $formPostValues["Format"] = c("Garden.InputFormatter");
+        }
+
         $this->EventArguments["FormPostValues"] = $formPostValues;
         $this->fireEvent("BeforeSaveValidation");
+        $userID = $formPostValues["InsertUserID"] ?? Gdn::session()->UserID;
 
         $formIsValid = $this->validate($formPostValues);
 
@@ -262,7 +267,6 @@ class ConversationMessageModel extends ConversationsModel
             if (isset($fields["MessageID"])) {
                 unset($fields["MessageID"]);
             }
-            touchValue("Format", $fields, c("Garden.InputFormatter", "Html"));
 
             $this->EventArguments["Fields"] = $fields;
             $this->fireEvent("BeforeSave");
@@ -304,7 +308,7 @@ class ConversationMessageModel extends ConversationsModel
             $sql->update("Conversation c")
                 ->set("CountMessages", $countMessages)
                 ->set("LastMessageID", $lastMessageID)
-                ->set("UpdateUserID", Gdn::session()->UserID)
+                ->set("UpdateUserID", $userID)
                 ->set("DateUpdated", $dateUpdated)
                 ->where("ConversationID", $conversationID);
             if ($countMessages == 1) {
@@ -321,7 +325,7 @@ class ConversationMessageModel extends ConversationsModel
                 ->where("uc.ConversationID", $conversationID)
                 ->where("uc.Deleted", "0")
                 ->where("uc.CountReadMessages", $countMessages - 1)
-                ->where("uc.UserID <>", $session->UserID)
+                ->where("uc.UserID <>", $userID)
                 ->put();
 
             // Update the date updated of the users that were not up-to-date.
@@ -332,7 +336,7 @@ class ConversationMessageModel extends ConversationsModel
                 ->where("uc.ConversationID", $conversationID)
                 ->where("uc.Deleted", "0")
                 ->where("uc.CountReadMessages <>", $countMessages - 1)
-                ->where("uc.UserID <>", $session->UserID)
+                ->where("uc.UserID <>", $userID)
                 ->put();
 
             // Update the sending user.
@@ -344,7 +348,7 @@ class ConversationMessageModel extends ConversationsModel
             $sql->set("Deleted", 0)
                 ->set("uc.DateConversationUpdated", $dateUpdated)
                 ->where("ConversationID", $conversationID)
-                ->where("UserID", $session->UserID)
+                ->where("UserID", $userID)
                 ->put();
 
             // Find users involved in this conversation
@@ -433,7 +437,7 @@ class ConversationMessageModel extends ConversationsModel
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function validate($formPostValues, $insert = false)
     {

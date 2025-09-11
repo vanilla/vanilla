@@ -58,7 +58,7 @@ abstract class AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getLongRunnerMethod(): string
     {
@@ -66,7 +66,7 @@ abstract class AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess($lastRecordId, array $where): iterable
     {
@@ -74,7 +74,7 @@ abstract class AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {

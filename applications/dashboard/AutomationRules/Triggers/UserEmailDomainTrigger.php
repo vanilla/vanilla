@@ -25,7 +25,7 @@ class UserEmailDomainTrigger extends AutomationTrigger
 {
     use UserSearchTrait;
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -33,7 +33,7 @@ class UserEmailDomainTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -41,7 +41,7 @@ class UserEmailDomainTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -49,7 +49,7 @@ class UserEmailDomainTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -57,7 +57,7 @@ class UserEmailDomainTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -76,7 +76,7 @@ class UserEmailDomainTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -124,7 +124,7 @@ class UserEmailDomainTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {
@@ -155,7 +155,7 @@ class UserEmailDomainTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess($lastRecordId, array $where): iterable
     {

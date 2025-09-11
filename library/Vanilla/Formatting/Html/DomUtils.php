@@ -302,10 +302,15 @@ final class DomUtils
             $node->removeChild($node->firstChild);
         }
 
-        $fragment = $node->ownerDocument->createDocumentFragment();
-        $fragment->appendXML($content);
-        $node->ownerDocument->importNode($fragment, true);
-        $node->appendChild($fragment);
+        if (!empty($content)) {
+            @$fragment = $node->ownerDocument->createDocumentFragment();
+            @$fragment->appendXML($content);
+            @$node->ownerDocument->importNode($fragment, true);
+
+            if ($fragment->hasChildNodes()) {
+                @$node->appendChild($fragment);
+            }
+        }
     }
 
     /**
@@ -316,10 +321,10 @@ final class DomUtils
      */
     public static function setOuterHTML(\DOMNode $node, string $content): void
     {
-        $fragment = $node->ownerDocument->createDocumentFragment();
-        $fragment->appendXML($content);
-        $newNode = $node->ownerDocument->importNode($fragment, true);
-        $node->parentNode->replaceChild($newNode, $node);
+        @$fragment = $node->ownerDocument->createDocumentFragment();
+        @$fragment->appendXML($content);
+        @$newNode = $node->ownerDocument->importNode($fragment, true);
+        @$node->parentNode->replaceChild($newNode, $node);
     }
 
     /**
@@ -344,7 +349,7 @@ final class DomUtils
         $fragment->appendXML($content);
         $newFrom = $fragment->firstChild;
         $newTo = $fragment->lastChild;
-        $from->parentNode->insertBefore($fragment, $from);
+        @$from->parentNode->insertBefore($fragment, $from);
 
         // Remove all of the original nodes.
         $sanity = $from->parentNode->childNodes->count();

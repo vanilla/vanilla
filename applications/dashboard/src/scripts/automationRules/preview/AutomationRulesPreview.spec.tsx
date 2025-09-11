@@ -26,6 +26,7 @@ import { AutomationRulesRunOnce } from "@dashboard/automationRules/AutomationRul
 import { AutomationRulesPreviewCollectionRecordsContent } from "@dashboard/automationRules/preview/AutomationRulesPreviewCollectionRecordsContent";
 import { CollectionRecordTypes, ICollectionResource } from "@library/featuredCollections/Collections.variables";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
+import { setMeta } from "@library/utility/appUtils";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -52,7 +53,6 @@ const mockCollectionResource: ICollectionResource = {
 
 beforeAll(() => {
     mockAdapter = mockAPI();
-
     mockAdapter.onGet(/automation-rules\/recipes/).reply(200, mockRecipesList);
     mockAdapter.onGet("/users?expand=profileFields").reply(200, [mockUser], { "x-app-page-result-count": 1 });
     mockAdapter
@@ -98,6 +98,7 @@ const renderInProvider = (children: React.ReactNode, values?: IAutomationRulesCo
 };
 
 describe("AutomationRules Preview", () => {
+    setMeta("featureFlags.CustomProfileFields.Enabled", true);
     it("Toggling the enable button will render the preview modal with relevant content in it", async () => {
         renderInProvider(<AutomationRulesList />);
 

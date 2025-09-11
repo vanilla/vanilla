@@ -17,7 +17,15 @@ export function VanillaEditorFocusContext(props: { children: React.ReactNode }) 
         if (!isFocusWithinEditor && isFocused) {
             setIsFocusWithinEditor(true);
         } else if (isFocusWithinEditor && !isFocused) {
-            setIsFocusWithinEditor(false);
+            // AIDEV-NOTE: Prevents premature focus loss during complex interactions (e.g., table cell clicks)
+            // Uses requestAnimationFrame to check focus state after DOM updates complete
+            requestAnimationFrame(() => {
+                const activeElement = document.activeElement;
+                const isStillFocusedWithinEditor = activeElement && ownRef.current?.contains(activeElement);
+                if (!isStillFocusedWithinEditor) {
+                    setIsFocusWithinEditor(false);
+                }
+            });
         }
     });
 

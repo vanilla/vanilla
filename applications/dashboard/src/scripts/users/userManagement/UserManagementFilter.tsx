@@ -23,7 +23,7 @@ import {
 } from "@dashboard/users/userManagement/UserManagementUtils";
 import { IGetUsersQueryParams } from "@dashboard/users/userManagement/UserManagement.hooks";
 import { spaceshipCompare } from "@vanilla/utils";
-
+import DashboardListPageClasses from "@dashboard/components/DashboardListPage.classes";
 interface IProps {
     profileFields?: ProfileField[];
     updateQuery: (newQueryParams: IGetUsersQueryParams) => void;
@@ -32,7 +32,8 @@ interface IProps {
 
 export default function UserManagementFilter(props: IProps) {
     const { profileFields, updateQuery, initialFilters } = props;
-    const classes = userManagementClasses();
+    const { filterModal } = userManagementClasses.useAsHook();
+    const { filterButtonsContainer, clearFilterButton } = DashboardListPageClasses.useAsHook();
     const { additionalFiltersSchemaFields } = useUserManagement();
     const [filters, setFilters] = useState<IUserManagementFilterValues | undefined>(initialFilters);
 
@@ -91,7 +92,7 @@ export default function UserManagementFilter(props: IProps) {
     }, [filters]);
 
     return (
-        <div className={classes.filterButtonsContainer}>
+        <div className={filterButtonsContainer}>
             <AdvancedMembersFilters
                 ModalTriggerButton={FilterModalTriggerButton}
                 modalTriggerButtonProps={{ dirty: isDirty }}
@@ -103,7 +104,7 @@ export default function UserManagementFilter(props: IProps) {
                 }}
                 schema={schema}
                 noFocusOnModalExit
-                modalClassName={classes.filterModal}
+                modalClassName={filterModal}
                 modalTitleAndDescription={{
                     titleID: "UserManagementFilterModal",
                     title: "Filters",
@@ -120,7 +121,7 @@ export default function UserManagementFilter(props: IProps) {
                                 updateQuery({ page: 1 });
                                 setFilters({});
                             }}
-                            className={classes.clearFilterButton}
+                            className={clearFilterButton}
                         >
                             <ClearIcon />
                         </Button>
@@ -132,7 +133,7 @@ export default function UserManagementFilter(props: IProps) {
 }
 
 export function FilterModalTriggerButton(props: { onClick: () => void; dirty: boolean }) {
-    const classes = userManagementClasses();
+    const { actionButton } = DashboardListPageClasses.useAsHook();
 
     return (
         <ToolTip label={t("Filter")} customWidth={60}>
@@ -142,7 +143,7 @@ export function FilterModalTriggerButton(props: { onClick: () => void; dirty: bo
                     onClick={() => {
                         props.onClick();
                     }}
-                    className={classes.actionButton}
+                    className={actionButton}
                 >
                     <Icon icon={`filter${props.dirty ? "-applied" : ""}`} />
                 </Button>

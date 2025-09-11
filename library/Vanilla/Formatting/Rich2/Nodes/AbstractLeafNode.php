@@ -13,7 +13,7 @@ namespace Vanilla\Formatting\Rich2\Nodes;
 abstract class AbstractLeafNode extends AbstractNode
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -21,7 +21,7 @@ abstract class AbstractLeafNode extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -29,7 +29,7 @@ abstract class AbstractLeafNode extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function render(): string
     {
@@ -37,7 +37,7 @@ abstract class AbstractLeafNode extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderText(): string
     {

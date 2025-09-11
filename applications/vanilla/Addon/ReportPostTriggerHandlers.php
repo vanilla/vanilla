@@ -67,12 +67,25 @@ class ReportPostTriggerHandler
     }
 
     /**
-     * Handle a post report action.
+     * Handle a post report action.  Trigger action as system user.
      *
      * @param int $reportID
      * @return void
      */
     public function handleUserEvent(int $reportID): void
+    {
+        $this->automationRuleService->runWithSystemUser(function () use ($reportID) {
+            $this->evaluateReportRules($reportID);
+        });
+    }
+
+    /**
+     * Evaluate and execute automation Rule for report count.
+     *
+     * @param int $reportID
+     * @return void
+     */
+    public function evaluateReportRules(int $reportID): void
     {
         $report = $this->reportModel->selectVisibleReports(["r.reportID" => $reportID])[0];
         $recordReports = $this->reportModel->selectVisibleReports([
@@ -102,10 +115,13 @@ class ReportPostTriggerHandler
                 if ($categoryIDs !== null) {
                     $categories = [];
                     foreach ($categoryIDs as $categoryID) {
-                        $categories[] = $this->categoryModel->getSearchCategoryIDs(
-                            $categoryID,
-                            false,
-                            $automationRule["triggerValue"]["includeSubcategories"]
+                        $categories = array_merge(
+                            $categories,
+                            $this->categoryModel->getSearchCategoryIDs(
+                                $categoryID,
+                                false,
+                                $automationRule["triggerValue"]["includeSubcategories"] ?? false
+                            )
                         );
                     }
                     $recordReports = array_filter($recordReports, function ($recordReport) use ($categories) {
@@ -125,6 +141,7 @@ class ReportPostTriggerHandler
                 if (count($recordReports) < $automationRule["triggerValue"]["countReports"]) {
                     continue;
                 }
+
                 $this->executeAction($actionType, $automationRule["automationRuleID"], $report);
             }
         }

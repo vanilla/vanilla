@@ -158,7 +158,7 @@ class ApiFilterMiddlewareTest extends TestCase
     public function testAddBlacklistField()
     {
         $apiMiddleware = new ApiFilterMiddleware();
-        $this->invokeProtectedMethod($apiMiddleware, "addBlacklistField", ["topsecretinfo"]);
+        $apiMiddleware->addBlacklistField("topsecretinfo");
         $blacklistFields = $apiMiddleware->getBlacklistFields();
         $this->assertContains("topsecretinfo", $blacklistFields);
     }

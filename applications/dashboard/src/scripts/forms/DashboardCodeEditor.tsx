@@ -7,7 +7,7 @@
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import { css } from "@emotion/css";
-import TextEditor from "@library/textEditor/TextEditor";
+import MonacoEditor from "@library/textEditor/MonacoEditor";
 import { mountReact } from "@vanilla/react-utils";
 import { logWarning } from "@vanilla/utils";
 import { useMemo, useState } from "react";
@@ -40,7 +40,7 @@ export function DashboardCodeEditor(props: IProps) {
     return (
         <DashboardInputWrap>
             <input id={inputID} name={inputName} type="hidden" value={value || ""} aria-hidden={true} />
-            <TextEditor
+            <MonacoEditor
                 minimal
                 language={language ?? "text/html"}
                 jsonSchemaUri={jsonSchemaUri}

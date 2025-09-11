@@ -1,10 +1,9 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
-import React, { useEffect, useState } from "react";
-import { AutoComplete, FormGroup, FormGroupInput, FormGroupLabel, NumberBox } from "@vanilla/ui";
+import { AutoComplete, FormGroup, FormGroupInput, FormGroupLabel } from "@vanilla/ui";
 import DayPicker from "react-day-picker";
 import DatePickerNav from "@library/forms/rangePicker/DatePickerNav";
 import { rangePickerClasses } from "./RangePicker.styles";
@@ -14,12 +13,12 @@ import { cx } from "@emotion/css";
 import { t } from "@vanilla/i18n";
 import {
     DateAddSubtractOperation,
-    DateAddSubtractUnit,
     DateOperation,
     IDateModifierPickerProps,
     IDateOperationPickerProps,
 } from "@library/forms/rangePicker/types";
 import { applyDateModifier } from "@library/forms/rangePicker/utils";
+import { NumberBox } from "@library/forms/NumberBox";
 
 const UNIT_VALUES = {
     days: "Days",
@@ -83,7 +82,7 @@ const OperationPicker = (props: IDateOperationPickerProps) => {
                             size="small"
                             name="Amount"
                             min={0}
-                            onValueChange={(value) => {
+                            onChange={(value) => {
                                 if (!["add", "subtract"].includes(type)) {
                                     return;
                                 }

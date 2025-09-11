@@ -44,7 +44,7 @@ abstract class ExternalAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setPostRecord(array $postRecord): void
     {
@@ -52,7 +52,7 @@ abstract class ExternalAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getPostRecord(): array
     {

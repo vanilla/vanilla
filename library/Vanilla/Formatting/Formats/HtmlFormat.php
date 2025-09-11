@@ -353,7 +353,7 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function parseDOM(string $content): TextDOMInterface
     {

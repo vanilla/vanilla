@@ -57,7 +57,7 @@ class GlobalLayoutRecordProvider implements LayoutViewRecordProviderInterface
     /**
      * No resolution needed.
      *
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveLayoutQuery(LayoutQuery $query): LayoutQuery
     {

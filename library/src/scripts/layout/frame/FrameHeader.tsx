@@ -13,6 +13,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import CloseButton from "@library/navigation/CloseButton";
 import classNames from "classnames";
 import { LeftChevronIcon } from "@library/icons/common";
+import { cx } from "@emotion/css";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {
     closeFrame?: (e) => void; // Necessary when in modal, but not if in flyouts
@@ -22,69 +23,60 @@ export interface IFrameHeaderProps extends ICommonHeadingProps {
     titleID?: string;
     children?: React.ReactNode;
     borderless?: boolean;
+    onClick?: () => void;
 }
 
 /**
  * Generic header for frame
  */
-export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> {
-    public static defaultProps = {
-        heading: 2,
-        srOnlyTitle: false,
-    };
+export default function FrameHeader(props: IFrameHeaderProps) {
+    const backTitle = t("Back");
+    const classes = frameHeaderClasses.useAsHook();
 
-    public render() {
-        const backTitle = t("Back");
-        const classes = frameHeaderClasses();
-
-        let backLink;
-        if (this.props.onBackClick) {
-            backLink = (
-                <Button
-                    title={backTitle}
-                    aria-label={backTitle}
-                    buttonType={ButtonTypes.ICON_COMPACT}
-                    onClick={this.props.onBackClick}
-                    className={classNames("frameHeader-backButton", classes.backButton)}
-                >
-                    <LeftChevronIcon className={classNames(classes.backButtonIcon)} centred={true} />
-                </Button>
-            );
-        }
-
-        let closeButton;
-        if (this.props.closeFrame) {
-            closeButton = (
-                <div className={classes.action}>
-                    <CloseButton className={classes.close} onClick={this.props.closeFrame} compact />
-                </div>
-            );
-        }
-
-        return (
-            <header
-                className={classNames(
-                    "frameHeader",
-                    this.props.className,
-                    classes.root,
-                    this.props.borderless && classes.rootBorderLess,
-                )}
+    let backLink;
+    if (props.onBackClick) {
+        backLink = (
+            <Button
+                title={backTitle}
+                aria-label={backTitle}
+                buttonType={ButtonTypes.ICON_COMPACT}
+                onClick={props.onBackClick}
+                className={classNames("frameHeader-backButton", classes.backButton)}
             >
-                <Heading
-                    id={this.props.titleID}
-                    title={this.props.title}
-                    depth={this.props.depth}
-                    className={classNames("frameHeader-heading", classes.heading, this.props.titleClass, {
-                        "sr-only": this.props.srOnlyTitle,
-                    })}
-                    tabIndex={0}
-                >
-                    {backLink}
-                    {this.props.title}
-                </Heading>
-                {this.props.children}
-                {closeButton}
-            </header>
+                <LeftChevronIcon className={classNames(classes.backButtonIcon)} centred={true} />
+            </Button>
         );
     }
+
+    let closeButton;
+    if (props.closeFrame) {
+        closeButton = (
+            <div className={classes.action}>
+                <CloseButton className={classes.close} onClick={props.closeFrame} compact />
+            </div>
+        );
+    }
+
+    return (
+        <header
+            onClick={props.onClick}
+            role={props.onClick ? "button" : undefined}
+            className={cx("frameHeader", classes.root, props.borderless && classes.rootBorderLess, props.className)}
+        >
+            <Heading
+                id={props.titleID}
+                title={props.title}
+                depth={props.depth ?? 2}
+                className={classNames("frameHeader-heading", classes.heading, props.titleClass, {
+                    "sr-only": props.srOnlyTitle,
+                })}
+                tabIndex={0}
+            >
+                {backLink}
+                {props.title}
+            </Heading>
+            {props.children}
+            {closeButton}
+        </header>
+    );
 }

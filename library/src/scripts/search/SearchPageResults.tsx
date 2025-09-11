@@ -16,10 +16,10 @@ import React, { useLayoutEffect, useMemo } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
 import { formatUrl, t } from "@library/utility/appUtils";
-import qs from "qs";
+import * as qs from "qs-esm";
 import { sprintf } from "sprintf-js";
 import { MetaLink } from "@library/metas/Metas";
-import QueryString from "qs";
+import * as QueryString from "qs-esm";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ALL_CONTENT_DOMAIN_KEY } from "./searchConstants";
 

@@ -9,7 +9,6 @@
         "eamodio.gitlens",
         "ziyasal.vscode-open-in-github",
         "neilbrayfield.php-docblocker",
-        "bmewburn.vscode-intelephense-client",
         "esbenp.prettier-vscode",
         "mblode.twig-language-2",
         "redhat.vscode-yaml",
@@ -18,6 +17,10 @@
         "nhoizey.gremlins",
         "Orta.vscode-jest",
         "BriteSnow.vscode-toggle-quotes",
+        "xdebug.php-debug",
+        "whatwedo.twig",
+        "recca0120.vscode-phpunit",
+        "bmewburn.vscode-intelephense-client",
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []

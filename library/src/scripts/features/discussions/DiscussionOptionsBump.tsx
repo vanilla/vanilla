@@ -11,7 +11,7 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IError } from "@library/errorPages/CoreErrorMessages";
-import { DiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
+import { useDiscussionsApi } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
 
 const DiscussionOptionsBump: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
     discussion,
@@ -21,8 +21,10 @@ const DiscussionOptionsBump: FunctionComponent<{ discussion: IDiscussion; onSucc
 
     const toast = useToast();
 
+    const { bump } = useDiscussionsApi();
+
     const mutation = useMutation({
-        mutationFn: async () => await DiscussionsApi.bump(discussionID),
+        mutationFn: async () => bump(discussionID),
     });
 
     async function handleSuccess() {

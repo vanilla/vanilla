@@ -1,0 +1,26 @@
+{
+    "extends": "./tsconfig.aliases.json",
+
+    "compilerOptions": {
+        "incremental": true,
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "types": ["node", "jquery", "vite/client"],
+        "esModuleInterop": true,
+        "module": "ESNext",
+        "emitDeclarationOnly": true,
+        "declaration": true
+    },
+
+    "files": [
+        "library/src/scripts/htmlWidget/HtmlWidgetEditor.d.ts",
+        "node_modules/vite/client.d.ts",
+        "library/src/scripts/@types/global.d.ts",
+        "library/src/scripts/@types/react-spring.d.ts"
+    ],
+
+    // Notably this is a much smaller set than in tsconfig.json
+    // This is to lessen the requirements on the codebase not used in fragments.
+    // These files and everything in them must be capable of generating a valid d.ts file from typescript.
+    "include": ["./**/widget-fragments/*.ts", "./**/widget-fragments/*.tsx"]
+}

@@ -24,7 +24,7 @@ import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import DiscussionListLoader from "@library/features/discussions/DiscussionListLoader";
 import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
 import { ListItemIconPosition } from "@library/lists/ListItem.variables";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { usePermissionsContext } from "../users/PermissionsContext";
 import { BorderType } from "@library/styles/styleHelpersBorders";
@@ -269,7 +269,7 @@ export function DiscussionListAsset(props: IProps) {
                         extraHeader={assetHeader}
                     />
                 ) : (
-                    <Widget>
+                    <LayoutWidget>
                         <PageHeadingBox
                             title={title}
                             options={{
@@ -278,7 +278,7 @@ export function DiscussionListAsset(props: IProps) {
                         />
                         {assetHeader}
                         <PageBox>{loading}</PageBox>
-                    </Widget>
+                    </LayoutWidget>
                 )}
                 {assetFooter}
             </div>

@@ -121,7 +121,7 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {
@@ -910,6 +910,7 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
         $templateConfig = $this->config->get("Garden.EmailTemplate", []);
         $templateSetting = [
             "siteUrl" => \Gdn::request()->getSimpleUrl(),
+            "digestSubscribeReason" => "*/digest_subscribe_reason/*",
             "digestUnsubscribeLink" => "*/digest_unsubscribe/*",
             "notificationPreferenceLink" => url("/profile/preferences", true),
             "imageUrl" => $this->config->get("Garden.Digest.Logo", null) ?? ($templateConfig["Image"] ?? ""),

@@ -45,6 +45,12 @@ echo $this->Form->errors();
     echo $this->Form->toggle("Garden.Registration.SSOConfirmEmail", $label);
     ?>
 </div>
+<div class="form-group<?php echo !$confirmationSupported ? " foggy" : ""; ?>">
+    <?php
+    $label = t("Require Terms of Service", "Require users to agree to the Terms of Service (recommended)");
+    echo $this->Form->toggle("Garden.Registration.RequireTermsOfService", $label);
+    ?>
+</div>
 
 <div id="RegistrationMethods">
     <div class="table-wrap">

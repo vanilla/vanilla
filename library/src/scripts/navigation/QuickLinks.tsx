@@ -6,6 +6,7 @@
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { DynamicComponentTypes, useHamburgerMenuContext } from "@library/contexts/HamburgerMenuContext";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { useCurrentUser } from "@library/features/users/userHooks";
 import { varItemToNavTreeItem } from "@library/flyouts/Hamburger";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
@@ -26,10 +27,21 @@ interface IProps {
 }
 
 export function QuickLinks(props: IProps) {
+    const currentUser = useCurrentUser();
     const { hasPermission } = usePermissionsContext();
     const { addComponent, removeComponentByID, isCompact } = useHamburgerMenuContext();
 
-    const links = !!props.links && props.links.length > 0 ? props.links : quickLinksVariables().links;
+    const variableLinks = quickLinksVariables.useAsHook().links;
+    let links = !!props.links && props.links.length > 0 ? props.links : variableLinks;
+
+    // Fitler the roles
+    links = links.filter((link) => {
+        return (
+            link.roleIDs == null ||
+            link.roleIDs.length === 0 ||
+            link.roleIDs.some((roleID) => currentUser?.roleIDs.includes(roleID))
+        );
+    });
 
     // we don't have a react-router context here, so we determine the active link (if any) upfront.
     const activePath =

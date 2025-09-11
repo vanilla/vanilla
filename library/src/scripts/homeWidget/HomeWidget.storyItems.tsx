@@ -5,7 +5,7 @@
  */
 
 import { IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
-import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
+import { WidgetItemContentType } from "./WidgetItemOptions";
 import { STORY_IMAGE, STORY_ICON, STORY_IPSUM_SHORT, STORY_IPSUM_MEDIUM } from "@library/storybook/storyData";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 
@@ -34,10 +34,10 @@ export function dummyWidgetItemProps(props?: IDummyWidgetItemProps): IHomeWidget
     return {
         options: {
             contentType: props?.image
-                ? HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE
+                ? WidgetItemContentType.TitleDescriptionImage
                 : props?.icon
-                ? HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON
-                : HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                ? WidgetItemContentType.TitleDescriptionIcon
+                : WidgetItemContentType.TitleDescription,
 
             box: {
                 borderType: props?.noBorder ? BorderType.NONE : undefined,

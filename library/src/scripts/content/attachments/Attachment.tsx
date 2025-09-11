@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { HumanFileSize } from "@library/utility/fileUtils";
 import { GetAttachmentIcon } from "@library/content/attachments/attachmentUtils";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
@@ -60,8 +59,8 @@ export default function Attachment(props: IProps) {
                             <GetAttachmentIcon type={type} className={iconClasses.root} />
                         </div>
                     )}
-                    <div className={classNames(classes.main)}>
-                        <div className={classNames(classes.title)}>{label}</div>
+                    <div className={classNames(classes.main, "attachment-main")}>
+                        <div className={classNames(classes.title, "attachment-title")}>{label}</div>
                         <div className={classNames(classes.metas, classesMetas.root)}>
                             {dateUploaded && (
                                 <span className={classesMetas.meta}>

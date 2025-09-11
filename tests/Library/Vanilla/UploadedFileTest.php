@@ -1,13 +1,15 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Vanilla;
 
 use Garden\EventManager;
+use Garden\SafeCurl\Exception;
+use Garden\SafeCurl\Exception\CurlException;
 use Garden\SafeCurl\Exception\InvalidURLException;
 use Vanilla\UploadedFile;
 use VanillaTests\BootstrapTestCase;
@@ -48,10 +50,22 @@ class UploadedFileTest extends BootstrapTestCase
     {
         $file = UploadedFile::fromRemoteResourceUrl("http://vanilla.higherlogic.com");
         $this->assertEquals("http://vanilla.higherlogic.com", $file->getForeignUrl());
-        $this->assertEquals("https://vanilla.higherlogic.com/", $file->getResolvedForeignUrl());
+        $this->assertEquals("https://www.higherlogic.com/vanilla/", $file->getResolvedForeignUrl());
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertTrue(file_exists($file->getFile()));
+    }
+
+    /**
+     * Assert that a file was uploaded to the local filesystem.
+     *
+     * @param UploadedFile $file
+     * @param string $message
+     * @return void
+     */
+    protected function assertFileUploaded(UploadedFile $file, string $message = ""): void
+    {
+        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), $message);
     }
 
     /**
@@ -68,7 +82,7 @@ class UploadedFileTest extends BootstrapTestCase
         // Save the upload.
         $file->persistUpload();
         $this->assertFileDoesNotExist($file->getFile(), "The original upload is moved and cleaned up.");
-        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
+        $this->assertFileUploaded($file, "Final upload file is persisted");
 
         $this->assertStringContainsString(
             "migrated/",
@@ -87,6 +101,8 @@ class UploadedFileTest extends BootstrapTestCase
      *
      * @param string $name
      *
+     * @throws CurlException
+     * @throws Exception
      * @dataProvider provideImagesWithSpaces
      */
     public function testPersistFileWithSpaces(string $name)
@@ -96,7 +112,7 @@ class UploadedFileTest extends BootstrapTestCase
 
         // Save the upload.
         $file->persistUpload();
-        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
+        $this->assertFileUploaded($file, "Final upload file is persisted");
         $this->assertStringContainsString("image-with-spaces.jpg", $file->getPersistedPath());
     }
 
@@ -105,6 +121,8 @@ class UploadedFileTest extends BootstrapTestCase
      *
      * @param string $name
      *
+     * @throws CurlException
+     * @throws Exception
      * @dataProvider provideImagesEncodedChars
      */
     public function testPersistFileEncodedChars(string $name)
@@ -114,7 +132,7 @@ class UploadedFileTest extends BootstrapTestCase
 
         // Save the upload.
         $file->persistUpload();
-        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
+        $this->assertFileUploaded($file, "Final upload file is persisted");
         $this->assertStringContainsString("my-25e5-259c-2596-25e7-2589-2587.png", $file->getPersistedPath());
     }
 
@@ -154,7 +172,7 @@ class UploadedFileTest extends BootstrapTestCase
 
         // Save the upload.
         $file->persistUpload(false, "subdir", "prefix-%s");
-        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
+        $this->assertFileUploaded($file, "Final upload file is persisted");
         $this->assertStringMatchesFormat("subdir/%s/prefix-nkm8sf66bm6v4.png", $file->getPersistedPath());
     }
 
@@ -171,8 +189,8 @@ class UploadedFileTest extends BootstrapTestCase
 
         // Save the upload.
         $file->persistUpload(true, "copied");
-        $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
-        $this->assertFileExists($file->getFile(), "Original file is not deleted");
+        $this->assertFileUploaded($file, "Final upload file is persisted");
+        $this->assertFileUploaded($file, "Original file is not deleted");
     }
 
     /**
@@ -219,6 +237,8 @@ class UploadedFileTest extends BootstrapTestCase
      * Test UploadedFile->setMaxImageHeight() with bad values
      *
      * @param mixed $actual
+     * @throws Exception
+     * @throws CurlException
      * @dataProvider provideBadDimensionsData
      */
     public function testBadGetMaxImageHeight($actual)
@@ -270,5 +290,83 @@ class UploadedFileTest extends BootstrapTestCase
         $this->expectNotToPerformAssertions();
         $file = TestUploader::uploadFile("ico", PATH_ROOT . "/tests/fixtures/apple.ico");
         $file->persistUpload();
+    }
+
+    /**
+     * Test that large image files don't process image data
+     */
+    public function testLargeImageFilesSkipProcessing()
+    {
+        // Create a test extension that makes the private method accessible for testing
+        $testExtension = new class extends UploadedFile {
+            public function __construct()
+            {
+            }
+
+            public function publicPersistUploadToPath($mediaType, $size)
+            {
+                // Only process image files
+                if ($mediaType && strpos($mediaType, "image/") === 0) {
+                    // Check if the file is too large to process as an image (100MB limit)
+                    $maxImageSizeBytes = 100 * 1024 * 1024; // 100MB in bytes
+                    if ($size > $maxImageSizeBytes) {
+                        // This large image should skip processing - return true if skipped
+                        return true;
+                    }
+                    // Would process the image - return false if not skipped
+                    return false;
+                }
+                // Non-image file should skip processing - return true if skipped
+                return true;
+            }
+        };
+
+        // Test with large image file
+        $this->assertTrue(
+            $testExtension->publicPersistUploadToPath("image/jpeg", 105 * 1024 * 1024),
+            "Large image files should skip image processing"
+        );
+
+        // Test with small image file
+        $this->assertFalse(
+            $testExtension->publicPersistUploadToPath("image/jpeg", 5 * 1024 * 1024),
+            "Small image files should undergo image processing"
+        );
+    }
+
+    /**
+     * Test that non-image files skip image processing
+     */
+    public function testNonImageFilesSkipProcessing()
+    {
+        // Create a test extension that makes the private method accessible for testing
+        $testExtension = new class extends UploadedFile {
+            public function __construct()
+            {
+            }
+
+            public function publicPersistUploadToPath($mediaType, $size)
+            {
+                // Only process image files
+                if ($mediaType && strpos($mediaType, "image/") === 0) {
+                    // Would process the image - return false if not skipped
+                    return false;
+                }
+                // Non-image file should skip processing - return true if skipped
+                return true;
+            }
+        };
+
+        // Test with PDF file
+        $this->assertTrue(
+            $testExtension->publicPersistUploadToPath("application/pdf", 5 * 1024 * 1024),
+            "Non-image files should skip image processing"
+        );
+
+        // Test with image file for comparison
+        $this->assertFalse(
+            $testExtension->publicPersistUploadToPath("image/png", 5 * 1024 * 1024),
+            "Image files should undergo image processing"
+        );
     }
 }

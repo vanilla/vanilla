@@ -13,7 +13,6 @@ export class TagFixture {
         name: "Mock Tag 1",
         urlcode: "/mock-tag",
         countDiscussions: 10,
-        parentTagID: null,
     };
 
     public static getTags(numberOfTags = 1, overrides?: Partial<ITag>): ITag[] {
@@ -25,7 +24,6 @@ export class TagFixture {
                 name,
                 urlcode,
                 countDiscussions: 10,
-                parentTagID: null,
                 ...overrides,
             } as ITag;
         });

@@ -5,11 +5,12 @@
  */
 
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
+import { bodyStyleMixin } from "@library/layout/bodyStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
-import { styleUnit } from "@library/styles/styleHelpers";
+import { singleBorder, styleUnit } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Property } from "csstype";
 
@@ -20,14 +21,14 @@ export const layoutEditorClasses = useThemeCache(() => {
         size: 28,
         circle: {
             color: {
-                bg: globalVars.elementaryColors.white,
-                fg: globalVars.mainColors.primary,
-                border: "#1B6496",
+                bg: globalVars.mainColors.bg,
+                fg: globalVars.mainColors.fg,
+                border: globalVars.mainColors.fg,
             },
             active: {
                 bg: globalVars.mainColors.primary,
-                fg: globalVars.elementaryColors.white,
-                border: "#0055C0",
+                fg: globalVars.mainColors.primaryContrast,
+                border: globalVars.mainColors.primary,
             },
         },
         line: {
@@ -40,31 +41,25 @@ export const layoutEditorClasses = useThemeCache(() => {
         height: 80,
         topHeight: 50,
         color: {
-            bg: "#ECF5FA",
+            bg: globalVars.states.hover.highlight,
         },
         border: {
-            color: "#555A62",
-            active: globalVars.elementaryColors.primary,
+            color: globalVars.mainColors.fg,
+            active: globalVars.mainColors.primary,
         },
     };
 
     const focusShadow = `0 0 0 2px ${ColorsUtils.colorOut(globalVars.mainColors.primary)}`;
 
-    const scrollableRegion = css({
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100%",
-    });
-
     const root = css({
-        flex: "1 0 auto",
+        ...bodyStyleMixin(),
+        flex: "1",
         position: "relative",
-        display: "flex",
-        flexDirection: "column",
         "&:focus, &:focus-visible": {
             outline: "none",
             boxShadow: focusShadow,
         },
+        overflow: "auto",
     });
 
     const sectionToolbar = css({
@@ -213,7 +208,7 @@ export const layoutEditorClasses = useThemeCache(() => {
         justifyContent: "center",
         position: "absolute",
         ...Mixins.margin({ horizontal: "auto" }),
-        zIndex: 100,
+        zIndex: 1,
     });
 
     const section = useThemeCache((focusRingZIndex: Property.ZIndex = "initial") =>
@@ -221,32 +216,31 @@ export const layoutEditorClasses = useThemeCache(() => {
             "&:focus": {
                 outline: "none",
             },
-            "&:before": {
+            "&:after": {
                 pointerEvents: "none",
                 content: "''",
                 position: "absolute",
-                top: 0,
-                bottom: 0,
+                top: -16,
+                bottom: -16,
                 // 2 pixels to account for the shadow and 1 extra pixel so we aren't butted directly against the edge.
                 left: 3,
                 right: 3,
-                borderRadius: 2,
-                zIndex: focusRingZIndex,
+                borderRadius: 6,
+                zIndex: 1,
             },
-            "&.isFullWidth:before": {
+            "&.isFullWidth:after": {
                 top: 0,
                 left: 2,
                 right: 2,
                 bottom: 0,
             },
-            "&.isActive:before": {
-                border: "1px dashed #555A62",
+            "&.isActive:after": {
+                border: "3px dashed rgb(200, 195, 195)",
             },
             "&.isActive:focus": {
-                "&:before": {
+                "&:after": {
                     outline: "none",
-                    boxShadow: focusShadow,
-                    border: "none",
+                    border: `3px dashed ${globalVars.mainColors.primary}`,
                 },
             },
         }),
@@ -264,21 +258,21 @@ export const layoutEditorClasses = useThemeCache(() => {
     });
 
     const widgetBorder = css({
-        pointerEvents: "none",
         content: "''",
         position: "absolute",
-        top: -4,
-        bottom: -4,
-        left: -4,
-        right: -4,
-        boxShadow: focusShadow,
-        borderRadius: 2,
+        top: -10,
+        bottom: -10,
+        left: -10,
+        right: -10,
+        border: `3px dashed ${globalVars.mainColors.primary}`,
+        zIndex: 1,
+        borderRadius: 6,
 
         ".isFullWidth &": {
-            top: 6,
+            top: 3,
             right: 8,
             left: 8,
-            bottom: 6,
+            bottom: 3,
         },
     });
 
@@ -288,6 +282,7 @@ export const layoutEditorClasses = useThemeCache(() => {
     });
 
     const toolbarMenu = css({
+        border: singleBorder(),
         "&& button": {
             marginLeft: 2,
             marginRight: 2,
@@ -295,6 +290,11 @@ export const layoutEditorClasses = useThemeCache(() => {
     });
 
     return {
+        modal: css({
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+        }),
         root,
         screen,
         fullWidth,

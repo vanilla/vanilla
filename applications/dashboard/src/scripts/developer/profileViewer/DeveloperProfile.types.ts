@@ -31,7 +31,7 @@ export interface IDeveloperProfileDbSpan extends IBaseSpan {
     type: "dbRead" | "dbWrite";
     data: {
         query: string;
-        params: AnyObject;
+        params: Record<string, any>;
     };
 }
 
@@ -40,7 +40,7 @@ export interface IDeveloperProfileRequestSpan extends IBaseSpan {
     data: {
         method: string;
         url: string;
-        query: AnyObject;
+        query: Record<string, any>;
     };
 }
 
@@ -64,7 +64,7 @@ export interface IDeveloperProfile {
     requestElapsedMs: number;
     requestMethod: string;
     requestPath: string;
-    requestQuery: AnyObject;
+    requestQuery: Record<string, any>;
     isTracked: boolean;
     name: string;
 }

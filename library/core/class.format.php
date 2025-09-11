@@ -1035,7 +1035,7 @@ class Gdn_Format
             // Text before the mention.
             if ($i == 0) {
                 if (!empty($str)) {
-                    $str[0] = htmlspecialchars(mb_substr($str, 0, 1));
+                    $str = htmlspecialchars(mb_substr($str, 0, 1)) . mb_substr($str, 1);
                 }
                 continue;
             }
@@ -1118,13 +1118,16 @@ class Gdn_Format
             }
 
             // Handle @mentions.
-            if (c("Garden.Format.Mentions", true)) {
+            if (
+                Gdn::config("Garden.Format.Mentions", true) ||
+                Gdn::config("Garden.Format.Mentions", "global") === UsersApiController::AT_MENTION_GLOBAL
+            ) {
                 // Only format mentions that are not already in anchor tags or code tags.
                 $mixed = self::tagContent($mixed, "Gdn_Format::formatMentionsCallback");
             }
 
             // Handle #hashtag searches
-            if (c("Garden.Format.Hashtags", false)) {
+            if (Gdn::config("Garden.Format.Hashtags", false)) {
                 $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
                     '\1' . anchor('#\2', url('/search?Search=%23\2&Mode=like', true)) . '\3',
@@ -1133,7 +1136,7 @@ class Gdn_Format
             }
 
             // Handle "/me does x" action statements
-            if (c("Garden.Format.MeActions", false)) {
+            if (Gdn::config("Garden.Format.MeActions", false)) {
                 $mixed = FormatUtil::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
                     '\1' .

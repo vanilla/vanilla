@@ -17,6 +17,42 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
+    "admin-assistant": {
+        height: "24px",
+        viewBox: "0 -960 960 960",
+        width: "24px",
+        fill: "currentColor",
+    },
+    "admin-community": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "admin-docs": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "admin-events": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "admin-ideas": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "admin-messages": {
+        width: "24",
+        height: "27",
+        viewBox: "0 0 24 27",
+        fill: "none",
+    },
     "ai-indicator": {
         width: "16",
         height: "16",
@@ -28,6 +64,24 @@ export const coreIconsData = {
         height: "16",
         viewBox: "0 0 16 16",
         fill: "currentColor",
+    },
+    "align-center": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "align-left": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "align-right": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
     },
     "bookmark-empty": {
         width: "24",
@@ -44,9 +98,56 @@ export const coreIconsData = {
         stroke: "currentColor",
         strokeWidth: "1.4",
     },
+    "button-primary": {
+        width: "28",
+        height: "12",
+        viewBox: "0 0 28 12",
+        fill: "none",
+    },
+    "button-standard": {
+        width: "28",
+        height: "12",
+        viewBox: "0 0 28 12",
+        fill: "none",
+    },
+    buttons: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "callout-alert": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "callout-info": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "callout-neutral": {
+        width: "24px",
+        height: "24px",
+        viewBox: "0 0 24 24",
+    },
+    "callout-warning": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
     "collapse-all": {
         viewBox: "0 0 24 24",
         role: "img",
+    },
+    copy: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
     },
     "copy-link": {
         width: "24",
@@ -85,6 +186,12 @@ export const coreIconsData = {
         viewBox: "0 0 22 22",
     },
     "data-checked": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "data-muted": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -136,6 +243,12 @@ export const coreIconsData = {
         fill: "none",
     },
     "editor-link-text": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "editor-resize-inline": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -364,6 +477,12 @@ export const coreIconsData = {
         fill: "none",
     },
     "meta-questions": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "meta-scheduled": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -643,6 +762,12 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
+    settings: {
+        width: "24",
+        height: "25",
+        viewBox: "0 0 24 25",
+        fill: "none",
+    },
     share: {
         width: "16",
         height: "16",
@@ -686,6 +811,66 @@ export const coreIconsData = {
         fill: "none",
     },
     swap: {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "table-add-column-left": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "table-add-column-right": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "table-add-row-above": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "table-add-row-below": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "table-column": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "table-left-header": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "table-row": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "table-top-header": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "table-top-left-header": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    table: {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",

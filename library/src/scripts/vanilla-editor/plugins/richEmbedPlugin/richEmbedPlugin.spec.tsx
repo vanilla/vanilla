@@ -9,7 +9,7 @@ import { setMeta } from "@library/utility/appUtils";
 import { insertRichEmbed } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichEmbed";
 import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 import { MyEditor } from "@library/vanilla-editor/typescript";
-import { createVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { createVanillaEditor } from "@library/vanilla-editor/createVanillaEditor";
 import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { mockAPI } from "@library/__tests__/utility";

@@ -14,6 +14,11 @@ class PremoderationResponse
 {
     const VALID = "valid";
     const SPAM = "spam";
+    const PREMODERATION_SPAM_AKISMENT = "premoderatedSpamAkisment";
+    const PREMODERATION_SPAM_STOP_FORUM_SPAM = "premoderatedSpamStopForumSpam";
+    const PREMODERATION_ROLE = "premoderatedRole";
+    const PREMODERATION_CATEGORY = "premoderatedCategory";
+    const PREMODERATION_KEYWORD = "premoderatedKeyword";
     const SUPER_SPAM = "super-spam";
     const APPROVAL_REQUIRED = "approval-required";
 
@@ -21,10 +26,14 @@ class PremoderationResponse
 
     /**
      * @param string $responseType
+     * @param string $premoderationType
      * @param ?int $moderatorUserID
      */
-    public function __construct(private string $responseType, private ?int $moderatorUserID)
-    {
+    public function __construct(
+        private string $responseType,
+        private ?int $moderatorUserID,
+        private ?string $premoderationType = null
+    ) {
     }
 
     public function getNoteHtml(): string
@@ -43,6 +52,14 @@ class PremoderationResponse
     public static function valid(): PremoderationResponse
     {
         return new PremoderationResponse(self::VALID, null);
+    }
+
+    /**
+     * @return ?string
+     */
+    public function getPremoderationType(): ?string
+    {
+        return $this->premoderationType;
     }
 
     /**

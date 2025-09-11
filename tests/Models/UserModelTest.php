@@ -75,7 +75,7 @@ class UserModelTest extends SiteTestCase
     private $config;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setup(): void
     {
@@ -329,7 +329,7 @@ class UserModelTest extends SiteTestCase
      */
     public function lockoutTimes(): array
     {
-        $defaultErrorMessage = "You’ve reached the maximum login attempts. Please wait %s and try again.";
+        $defaultErrorMessage = "You've reached the maximum login attempts. Please wait %s and try again.";
         return [
             "less then 1 second" => [1, sprintf($defaultErrorMessage, "1 second")],
             "less then 60 seconds" => [45, sprintf($defaultErrorMessage, "45 seconds")],
@@ -979,6 +979,89 @@ class UserModelTest extends SiteTestCase
                 $this->userModel->saveAttribute($newUserId, ["LoginRate" => 2]);
                 $result = UserModel::rateLimit($user);
                 $this->assertTrue($result);
+            }
+        );
+    }
+
+    /**
+     * Test rate limiting with no user.
+     */
+    public function testRateLimitWithoutUser(): void
+    {
+        $this->runWithConfig(
+            [
+                "Cache.Enabled" => true,
+                "Garden.User.RateLimit" => 60,
+            ],
+            function () {
+                // First attempt should succeed
+                $result = UserModel::rateLimit();
+                $this->assertTrue($result);
+
+                // Second attempt within rate limit window should fail
+                try {
+                    UserModel::rateLimit();
+                    $this->fail("Expected rate limit exception for exceeding IP rate limit.");
+                } catch (\Gdn_UserException $e) {
+                    $this->assertEquals("Your IP is trying to log in too often. Slow down!", $e->getMessage());
+                }
+            }
+        );
+    }
+
+    /**
+     * Test rate limiting with no user when cache is disabled.
+     * This tests the fallback behavior when no cache is available.
+     */
+    public function testRateLimitWithoutUserNoCache(): void
+    {
+        $this->runWithConfig(
+            [
+                "Cache.Enabled" => false,
+                "Garden.User.RateLimit" => 60,
+            ],
+            function () {
+                // When cache is disabled and no UserID is present, rate limiting should still work
+                // but it will fall back to a no-op since there's no UserID to track
+                $result = UserModel::rateLimit();
+                $this->assertTrue($result);
+
+                // Second attempt should also succeed since there's no UserID to track
+                $result = UserModel::rateLimit();
+                $this->assertTrue($result);
+            }
+        );
+    }
+
+    /**
+     * Test IP-based rate limiting in addition to user/email rate limiting.
+     */
+    public function testRateLimitIPBased(): void
+    {
+        $this->runWithConfig(
+            [
+                "Cache.Enabled" => true,
+                "Garden.User.RateLimit" => 60,
+            ],
+            function () {
+                $userID = $this->createUser("rateLimitUser1" . rand(1, 1000));
+                $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+
+                // First attempt should succeed
+                $result = UserModel::rateLimit($user);
+                $this->assertTrue($result);
+
+                // Create a different user but from same IP
+                $userID2 = $this->createUser("rateLimitUser2" . rand(1, 1000));
+                $user2 = $this->userModel->getID($userID2, DATASET_TYPE_ARRAY);
+
+                // This should fail due to IP-based rate limiting
+                try {
+                    UserModel::rateLimit($user2);
+                    $this->fail("Expected IP-based rate limit exception");
+                } catch (\Gdn_UserException $e) {
+                    $this->assertEquals("Your IP is trying to log in too often. Slow down!", $e->getMessage());
+                }
             }
         );
     }

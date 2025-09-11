@@ -37,7 +37,7 @@ export interface IAttachmentLayoutProps {
 
 export default function AttachmentLayout(props: IAttachmentLayoutProps) {
     const { icon, title, notice, url, id, idLabel, dateUpdated, user, metadata, attachmentTypeIcon, metas } = props;
-    const classes = AttachmentLayoutClasses();
+    const classes = AttachmentLayoutClasses.useAsHook();
 
     // TODO: small temporary dependency from attachmentTypeIcon here to hide the notice/status from the layout
     // as we don't have the status sync for "zendesk draft articles" yet
@@ -77,7 +77,7 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                                     <Translate
                                         source="Last refreshed <0/> by <1/>."
                                         c0={<DateTime timestamp={dateUpdated} />}
-                                        c1={<ProfileLink className={metasClasses().metaLink} userFragment={user} />}
+                                        c1={<ProfileLink asMeta userFragment={user} />}
                                     />
                                 </MetaItem>
                             )}

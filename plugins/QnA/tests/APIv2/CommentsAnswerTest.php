@@ -10,6 +10,7 @@ namespace VanillaTests\APIv2;
 use CategoriesApiController;
 use Garden\Web\Exception\ForbiddenException;
 use Gdn_Session;
+use QnAPlugin;
 use UserModel;
 use Vanilla\CurrentTimeStamp;
 use VanillaTests\ExpectedNotification;
@@ -208,6 +209,73 @@ class CommentsAnswerTest extends AbstractAPIv2Test
 
         $answeredQuestion = $this->getQuestion($question["discussionID"]);
         $this->assertIsQuestion($answeredQuestion, ["status" => "answered"]);
+    }
+
+    /**
+     * Test that post authors can accept answers on their own questions.
+     */
+    public function testAcceptAnswerByAuthor(): void
+    {
+        $memberUser = $this->createUser();
+        $this->createCategory();
+
+        $question = $this->runWithUser(function () {
+            return $this->createQuestion();
+        }, $memberUser);
+        $answer = $this->createAnswer();
+
+        $this->acceptAnswerAsUser($answer, $memberUser);
+
+        // Discussion should now be accepted.
+        $this->api()
+            ->get("/discussions/{$question["discussionID"]}")
+            ->assertJsonObjectLike([
+                "statusID" => QnAPlugin::DISCUSSION_STATUS_ACCEPTED,
+            ]);
+    }
+
+    /**
+     * Test that users with discussions.edit permission can accept answers.
+     */
+    public function testAcceptAnswerByCategoryEditPermission(): void
+    {
+        $category = $this->createCategory();
+        $user = $this->createUserWithCategoryPermissions($category, [
+            "discussions.edit" => true,
+        ]);
+
+        $question = $this->createQuestion();
+        $answer = $this->createAnswer();
+
+        $this->acceptAnswerAsUser($answer, $user);
+
+        // Discussion should now be accepted.
+        $this->api()
+            ->get("/discussions/{$question["discussionID"]}")
+            ->assertJsonObjectLike([
+                "statusID" => QnAPlugin::DISCUSSION_STATUS_ACCEPTED,
+            ]);
+    }
+
+    /**
+     * Test that users with curation.manage permission can accept answers.
+     */
+    public function testAcceptAnswerByCurationPermission(): void
+    {
+        $this->createCategory();
+        $user = $this->createCurator();
+
+        $question = $this->createQuestion();
+        $answer = $this->createAnswer();
+
+        $this->acceptAnswerAsUser($answer, $user);
+
+        // Discussion should now be accepted.
+        $this->api()
+            ->get("/discussions/{$question["discussionID"]}")
+            ->assertJsonObjectLike([
+                "statusID" => QnAPlugin::DISCUSSION_STATUS_ACCEPTED,
+            ]);
     }
 
     /**
@@ -526,6 +594,10 @@ class CommentsAnswerTest extends AbstractAPIv2Test
     public function testAnswerNotifications()
     {
         $notifyUser = $this->createUser();
+        $this->api()->patch("/notification-preferences/{$notifyUser["userID"]}", [
+            "QuestionAnswer" => ["email" => true, "popup" => true],
+            "DiscussionComment" => ["email" => false, "popup" => false],
+        ]);
         $question = $this->runWithUser(function () {
             return $this->createQuestion();
         }, $notifyUser);
@@ -563,6 +635,51 @@ class CommentsAnswerTest extends AbstractAPIv2Test
             ],
             true
         );
+    }
+
+    /**
+     * Test that user preferences for receiving notifications when a question is answered are respected.
+     *
+     * @return void
+     */
+    public function testEmailPreferenceRespected(): void
+    {
+        $this->api()->patch("/notification-preferences/defaults", [
+            "QuestionAnswer" => ["email" => true, "popup" => true],
+        ]);
+
+        $defaultPreferences = $this->api()
+            ->get("/notification-preferences/defaults")
+            ->getBody();
+        $this->assertTrue($defaultPreferences["QuestionAnswer"]["email"]);
+        $this->assertTrue($defaultPreferences["QuestionAnswer"]["popup"]);
+
+        $notifyUser = $this->createUser();
+        $this->api()->patch("/notification-preferences/{$notifyUser["userID"]}", [
+            "QuestionAnswer" => ["email" => false, "popup" => false],
+            "DiscussionComment" => ["email" => false, "popup" => false],
+        ]);
+        $notifyUserPreferences = $this->api()
+            ->get("/notification-preferences/{$notifyUser["userID"]}")
+            ->getBody();
+        $this->assertFalse($notifyUserPreferences["QuestionAnswer"]["email"]);
+        $this->assertFalse($notifyUserPreferences["QuestionAnswer"]["popup"]);
+
+        $question = $this->runWithUser(function () {
+            return $this->createQuestion();
+        }, $notifyUser);
+
+        $this->clearUserNotifications($notifyUser);
+
+        $user = $this->createUser();
+        $this->runWithUser(function () {
+            $this->createAnswer([
+                "body" => "check your notifications",
+            ]);
+        }, $user);
+
+        $this->assertUserHasNoNotifications($notifyUser);
+        $this->assertUserHasNoEmails($notifyUser);
     }
 
     /**

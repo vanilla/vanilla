@@ -18,13 +18,13 @@ use Vanilla\Navigation\NavLinkSchema;
 use Vanilla\Theme\VariableProviders\QuickLink;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 /**
  * Class QuickLinksWidget
  */
-class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidgetInterface
+class QuickLinksWidget extends LegacyReactModule implements CombinedPropsWidgetInterface
 {
     use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
@@ -45,7 +45,7 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -53,7 +53,7 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -61,7 +61,7 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -90,7 +90,7 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -110,7 +110,7 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getProps(): ?array
     {
@@ -127,7 +127,7 @@ class QuickLinksWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

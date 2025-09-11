@@ -186,3 +186,48 @@ describe("createSourceSetValue", () => {
         expect(actual).toEqual(expected);
     });
 });
+
+describe("buildUrl", () => {
+    beforeEach(() => {
+        stubLocation("https://mysite.com");
+        application.setMeta("context.basePath", "/test");
+    });
+
+    it("returns absolute URLs unchanged", () => {
+        const urls = ["https://example.com", "http://test.com", "https://mysite.com/path"];
+        urls.forEach((url) => {
+            expect(application.buildUrl(url)).toBe(url);
+        });
+    });
+
+    it("returns full URLs for relative paths when alwaysFullUrl is true", () => {
+        const urls = [
+            ["path", "https://mysite.com/test/path"],
+            ["/path", "https://mysite.com/test/path"],
+            ["/path/to/file", "https://mysite.com/test/path/to/file"],
+        ];
+        urls.forEach(([input, expected]) => {
+            expect(application.buildUrl(input, true)).toBe(expected);
+        });
+    });
+
+    it("adds http:// to hostnames without protocol", () => {
+        const urls = [
+            ["example.com", "http://example.com"],
+            ["test.com/path", "http://test.com/path"],
+            ["sub.domain.com/path/to/file", "http://sub.domain.com/path/to/file"],
+        ];
+        urls.forEach(([input, expected]) => {
+            expect(application.buildUrl(input)).toBe(expected);
+        });
+    });
+
+    it("prevents javascript: protocol", () => {
+        expect(application.buildUrl("javascript:alert('xss')")).toBe("/");
+    });
+
+    it("trims whitespace from input", () => {
+        expect(application.buildUrl("  path  ")).toBe("/path");
+        expect(application.buildUrl("  https://example.com  ")).toBe("https://example.com");
+    });
+});

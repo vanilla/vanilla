@@ -36,7 +36,7 @@ class AiSuggestionsJobTest extends \VanillaTests\SiteTestCase
     ];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function setUpBeforeClass(): void
     {
@@ -55,7 +55,7 @@ class AiSuggestionsJobTest extends \VanillaTests\SiteTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

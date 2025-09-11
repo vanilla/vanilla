@@ -220,7 +220,7 @@ abstract class AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -244,6 +244,12 @@ abstract class AutomationAction
         ?array $attributes = null
     ): string {
         $automationRule = $this->getAutomationRule();
+        $existing = $this->automationRuleDispatchesModel->select([
+            "automationRuleDispatchUUID" => $this->getDispatchUUID(),
+        ]);
+        if (count($existing) > 0) {
+            $this->setDispatchUUID();
+        }
         $dispatches = [
             "automationRuleDispatchUUID" => $this->getDispatchUUID(),
             "automationRuleID" => $automationRule["automationRuleID"],

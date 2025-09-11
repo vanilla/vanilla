@@ -20,10 +20,10 @@ export default {
 //  this story can be restored when the monaco config issue in TextEditor is resolved (probably after updating to new monaco editor version)
 // export function TextEditors() {
 //     const tabData = [
-//         { label: "Header", contents: <TextEditor language={"html"} /> },
-//         { label: "Footer", contents: <TextEditor language={"html"} /> },
-//         { label: "CSS", contents: <TextEditor language={"css"} /> },
-//         { label: "JS", contents: <TextEditor language={"javascript"} /> },
+//         { label: "Header", contents: <MonacoEditor language={"html"} /> },
+//         { label: "Footer", contents: <MonacoEditor language={"html"} /> },
+//         { label: "CSS", contents: <MonacoEditor language={"css"} /> },
+//         { label: "JS", contents: <MonacoEditor language={"javascript"} /> },
 //     ];
 
 //     return (

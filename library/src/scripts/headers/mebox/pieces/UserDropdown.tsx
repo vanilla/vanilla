@@ -10,7 +10,7 @@ import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import UserDropDownContents from "@library/headers/mebox/pieces/UserDropDownContents";
 import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownStyles";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { titleBarClasses } from "@library/headers/TitleBar.classes";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { getMeta, t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -19,6 +19,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { connect } from "react-redux";
 import { MeBoxIcon } from "@library/headers/mebox/pieces/MeBoxIcon";
 import { UserIconTypes } from "@library/icons/titleBar";
+import { useCurrentUser } from "@library/features/users/userHooks";
 
 /**
  * Implements User Drop down for header
@@ -27,6 +28,8 @@ export function UserDropDown(props: IProps) {
     const ID = useMemo(() => uniqueIDFromPrefix("userDropDown"), []);
     const [isOpen, setOpen] = useState(false);
     const { checkCountData } = props;
+    const classes = userDropDownClasses.useAsHook();
+    const classesHeader = titleBarClasses.useAsHook();
 
     useEffect(() => {
         if (isOpen) {
@@ -34,13 +37,10 @@ export function UserDropDown(props: IProps) {
         }
     }, [isOpen, checkCountData]);
 
-    const { userInfo } = props;
+    const userInfo = useCurrentUser();
     if (!userInfo) {
         return null;
     }
-
-    const classes = userDropDownClasses();
-    const classesHeader = titleBarClasses();
 
     return (
         <DropDown
@@ -75,7 +75,6 @@ type IProps = IOwnProps & ReturnType<typeof mapStateToProps> & ReturnType<typeof
 
 function mapStateToProps(state: ICoreStoreState) {
     return {
-        userInfo: state.users.current.data ? state.users.current.data : null,
         counts: state.users.countInformation.counts,
     };
 }

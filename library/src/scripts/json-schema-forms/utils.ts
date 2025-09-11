@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { Condition, IFieldError, IPtrReference, JsonSchema } from "./types";
+import { Condition, IFieldError, IPtrReference, JsonSchema, type CustomConditionEvaluator } from "./types";
 import get from "lodash-es/get";
 import { logError, notEmpty } from "@vanilla/utils";
 import { FormikErrors } from "formik";
@@ -31,9 +31,24 @@ export function getValidationResult(conditions: Condition, value: any): Validati
  * @param conditions
  * @returns
  */
-export function validateConditions(conditions: Condition[], rootInstance: any) {
+export function validateConditions(
+    conditions: Condition[],
+    rootInstance: any,
+    customValidator?: CustomConditionEvaluator,
+) {
     const invalid = conditions.flatMap((condition) => {
         try {
+            if (customValidator) {
+                const customValidationResult = customValidator(condition, rootInstance);
+                if (customValidationResult !== null) {
+                    if (customValidationResult) {
+                        return [];
+                    } else {
+                        return [condition];
+                    }
+                }
+            }
+
             let val = get(rootInstance, condition.field ?? "", condition.default ?? null);
             if (condition.type === "object") {
                 // If were checking multiple properties for conditions, value validation must occur for each field
@@ -62,7 +77,7 @@ export function validateConditions(conditions: Condition[], rootInstance: any) {
                 }, val);
             }
             const validationResult = getValidationResult(condition, val);
-            if (!validationResult.valid) {
+            if (condition.invert ? validationResult.valid : !validationResult.valid) {
                 return [condition];
             }
         } catch (error) {

@@ -13,6 +13,7 @@ import UserSuggestionModel from "@library/features/users/suggestion/UserSuggesti
 import { Dispatch } from "redux";
 import apiv2 from "@library/apiv2";
 import debounce from "lodash-es/debounce";
+import { getSiteSection, getMeta } from "@library/utility/appUtils";
 
 interface ILookupUserOptions {
     username: string;
@@ -137,6 +138,7 @@ export default class UserSuggestionActions extends ReduxActions {
 
             const params = {
                 name: username + "*",
+                siteSectionID: getSiteSection().sectionID,
                 order: "mention",
                 limit: UserSuggestionActions.USER_LIMIT,
             };

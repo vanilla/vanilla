@@ -14,7 +14,7 @@
 class ModuleController extends Gdn_Controller
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function initialize()
     {

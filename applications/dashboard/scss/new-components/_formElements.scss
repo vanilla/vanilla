@@ -100,6 +100,16 @@ $fontSize-small: 12px !default;
         }
     }
 
+    label {
+        position: relative;
+    }
+
+    .requiredAsterix {
+        position: absolute;
+        left: -10px;
+        color: rgb(208, 2, 27);
+    }
+
     .file-upload {
         display: flex;
         align-items: flex-start;

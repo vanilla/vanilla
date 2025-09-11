@@ -17,7 +17,7 @@ use Vanilla\Salesforce\Action\EscalateSalesforceLeadAction;
 class QuestionRuleDataType extends RuleDataType
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     protected function getAllTriggerClasses(): array
     {
@@ -25,7 +25,7 @@ class QuestionRuleDataType extends RuleDataType
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     protected function getAllActionsClasses(): array
     {

@@ -18,7 +18,8 @@ import {
     WidgetContainerDisplayType,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
-import { HomeWidgetItemContentType, IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
+import { IHomeWidgetItemOptions } from "./WidgetItemOptions";
+import { WidgetItemContentType } from "./WidgetItemOptions";
 import Container from "@library/layout/components/Container";
 import { SubtitleType } from "@library/layout/PageHeadingBox.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
@@ -47,7 +48,7 @@ const iconUrls = {
 
 export function ContentTypeChatBubble() {
     const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
-        contentType: HomeWidgetItemContentType.TITLE_CHAT_BUBBLE,
+        contentType: WidgetItemContentType.TitleChatBubble,
     };
     return (
         <div>
@@ -81,7 +82,7 @@ export function ContentTypeChatBubble() {
 
 export function ContentTypeText() {
     const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
-        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+        contentType: WidgetItemContentType.TitleDescription,
     };
     return (
         <div>
@@ -115,7 +116,7 @@ export function ContentTypeText() {
 
 export function ContentTypeImage() {
     const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
-        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+        contentType: WidgetItemContentType.TitleDescriptionImage,
     };
     return (
         <div>
@@ -155,7 +156,7 @@ export function ContentTypeImage() {
 
 export function ContentTypeIcon() {
     const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
-        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
+        contentType: WidgetItemContentType.TitleDescriptionIcon,
     };
 
     return (
@@ -190,7 +191,7 @@ export function ContentTypeIcon() {
 
 export function ContentTypeBackground() {
     const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
-        contentType: HomeWidgetItemContentType.TITLE_BACKGROUND,
+        contentType: WidgetItemContentType.TitleBackground,
     };
 
     return (
@@ -225,7 +226,7 @@ export function ContentTypeBackground() {
 
 export function ContentTypeBackgroundWithCTAInCaption() {
     const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
-        contentType: HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
+        contentType: WidgetItemContentType.TitleBackgroundDescription,
         alignment: "left",
         display: {
             cta: false,
@@ -274,20 +275,20 @@ export function NoMetas() {
                 itemData={STORY_WIDGET_ITEMS}
                 itemOptions={{
                     ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_BACKGROUND,
+                    contentType: WidgetItemContentType.TitleBackground,
                 }}
             />
             <HomeWidget
                 title="No Metas with Icon"
                 itemData={STORY_WIDGET_ITEMS}
-                itemOptions={{ ...itemOptions, contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON }}
+                itemOptions={{ ...itemOptions, contentType: WidgetItemContentType.TitleDescriptionIcon }}
             />
             <HomeWidget
                 title="No Metas with Image"
                 itemData={STORY_WIDGET_ITEMS}
                 itemOptions={{
                     ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                    contentType: WidgetItemContentType.TitleDescriptionImage,
                 }}
             />
             <HomeWidget
@@ -295,7 +296,7 @@ export function NoMetas() {
                 itemData={STORY_WIDGET_ITEMS}
                 itemOptions={{
                     ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                    contentType: WidgetItemContentType.TitleDescription,
                 }}
             />
         </div>
@@ -318,14 +319,14 @@ export const Carousel = storyWithConfig({ useWrappers: false }, () => {
                 containerOptions={containerOptions}
                 itemOptions={{
                     ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_BACKGROUND,
+                    contentType: WidgetItemContentType.TitleBackground,
                 }}
             />
             <HomeWidget
                 title="Carousel with Icon"
                 itemData={STORY_WIDGET_ITEMS}
                 containerOptions={containerOptions}
-                itemOptions={{ ...itemOptions, contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON }}
+                itemOptions={{ ...itemOptions, contentType: WidgetItemContentType.TitleDescriptionIcon }}
             />
             <HomeWidget
                 title="Carousel with Image"
@@ -333,7 +334,7 @@ export const Carousel = storyWithConfig({ useWrappers: false }, () => {
                 containerOptions={containerOptions}
                 itemOptions={{
                     ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                    contentType: WidgetItemContentType.TitleDescriptionImage,
                 }}
             />
             <HomeWidget
@@ -342,7 +343,7 @@ export const Carousel = storyWithConfig({ useWrappers: false }, () => {
                 containerOptions={containerOptions}
                 itemOptions={{
                     ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                    contentType: WidgetItemContentType.TitleDescription,
                 }}
             />
             <HomeWidget
@@ -351,7 +352,7 @@ export const Carousel = storyWithConfig({ useWrappers: false }, () => {
                 containerOptions={{ ...containerOptions, maxColumnCount: 4 }}
                 itemOptions={{
                     ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                    contentType: WidgetItemContentType.TitleDescriptionImage,
                 }}
             />
             <HomeWidget
@@ -360,7 +361,7 @@ export const Carousel = storyWithConfig({ useWrappers: false }, () => {
                 containerOptions={{ ...containerOptions, maxColumnCount: 2 }}
                 itemOptions={{
                     ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                    contentType: WidgetItemContentType.TitleDescriptionImage,
                 }}
             />
         </div>
@@ -383,7 +384,7 @@ export const List = storyWithConfig({ useWrappers: false }, () => {
                 containerOptions={containerOptions}
                 itemOptions={{
                     ...itemOptions,
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                    contentType: WidgetItemContentType.TitleDescription,
                     box: {
                         borderType: BorderType.SEPARATOR,
                     },
@@ -393,7 +394,7 @@ export const List = storyWithConfig({ useWrappers: false }, () => {
                 title="List with Icon"
                 itemData={STORY_WIDGET_ITEMS}
                 containerOptions={containerOptions}
-                itemOptions={{ ...itemOptions, contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON }}
+                itemOptions={{ ...itemOptions, contentType: WidgetItemContentType.TitleDescriptionIcon }}
             />
         </div>
     );
@@ -529,12 +530,12 @@ export function IconPlacementLeft() {
 export const ImagePlacementLeft = storyWithConfig({ useWrappers: false }, () => {
     const itemOptions: DeepPartial<IHomeWidgetItemOptions> = {
         imagePlacement: "left",
-        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+        contentType: WidgetItemContentType.TitleDescriptionImage,
     };
 
     const mobileItemOptions: DeepPartial<IHomeWidgetItemOptions> = {
         imagePlacementMobile: "left",
-        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+        contentType: WidgetItemContentType.TitleDescriptionImage,
     };
 
     const items = [
@@ -612,7 +613,7 @@ ImagePlacementLeft.parameters = {
 
 export function ContentTypeVariants() {
     const itemOptionsVariantA: DeepPartial<IHomeWidgetItemOptions> = {
-        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
+        contentType: WidgetItemContentType.TitleDescriptionIcon,
         box: {
             borderType: BorderType.SHADOW,
             border: {
@@ -623,7 +624,7 @@ export function ContentTypeVariants() {
     };
 
     const itemOptionsVariantB: DeepPartial<IHomeWidgetItemOptions> = {
-        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+        contentType: WidgetItemContentType.TitleDescriptionImage,
         box: {
             border: {
                 radius: 2,
@@ -634,7 +635,7 @@ export function ContentTypeVariants() {
     };
 
     const itemOptionsVariantC: DeepPartial<IHomeWidgetItemOptions> = {
-        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
+        contentType: WidgetItemContentType.TitleDescriptionIcon,
         box: {
             border: {
                 radius: 2,
@@ -678,7 +679,7 @@ export function ContentTypeVariants() {
                 containerOptions={{ maxColumnCount: 4 }}
                 itemOptions={{
                     ...itemOptionsVariantD,
-                    contentType: HomeWidgetItemContentType.TITLE_BACKGROUND,
+                    contentType: WidgetItemContentType.TitleBackground,
                 }}
             />
         </div>
@@ -701,7 +702,7 @@ export function ContainerHeadingVariants() {
                     },
                 }}
                 itemOptions={{
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                    contentType: WidgetItemContentType.TitleDescriptionImage,
                 }}
             />
             <HomeWidget
@@ -717,7 +718,7 @@ export function ContainerHeadingVariants() {
                     },
                 }}
                 itemOptions={{
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                    contentType: WidgetItemContentType.TitleDescriptionImage,
                 }}
             />
         </>
@@ -805,19 +806,10 @@ export function NotEnoughItems() {
 
     return (
         <div>
-            <DifferentCounts prefix={"Text"} options={{ contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION }} />
-            <DifferentCounts
-                prefix={"Images"}
-                options={{ contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE }}
-            />
-            <DifferentCounts
-                prefix={"Background"}
-                options={{ contentType: HomeWidgetItemContentType.TITLE_BACKGROUND }}
-            />
-            <DifferentCounts
-                prefix={"Icon"}
-                options={{ contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON }}
-            />
+            <DifferentCounts prefix={"Text"} options={{ contentType: WidgetItemContentType.TitleDescription }} />
+            <DifferentCounts prefix={"Images"} options={{ contentType: WidgetItemContentType.TitleDescriptionImage }} />
+            <DifferentCounts prefix={"Background"} options={{ contentType: WidgetItemContentType.TitleBackground }} />
+            <DifferentCounts prefix={"Icon"} options={{ contentType: WidgetItemContentType.TitleDescriptionIcon }} />
         </div>
     );
 }
@@ -842,7 +834,7 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
                         viewAll: { to: "#", position: "top" },
                     }}
                     itemOptions={{
-                        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                        contentType: WidgetItemContentType.TitleDescription,
                     }}
                 />
                 <HomeWidget
@@ -860,7 +852,7 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
                         box: {
                             borderType: BorderType.SHADOW,
                         },
-                        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                        contentType: WidgetItemContentType.TitleDescription,
                     }}
                 />
                 <HomeWidget
@@ -874,7 +866,7 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
                         viewAll: { to: "#", displayType: ButtonTypes.PRIMARY },
                     }}
                     itemOptions={{
-                        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                        contentType: WidgetItemContentType.TitleDescription,
                     }}
                 />
                 <HomeWidget
@@ -883,7 +875,7 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
                     title="Very Very Very Very Long Title with a top view all button, Very Very Very long"
                     containerOptions={{ maxColumnCount: 2, viewAll: { to: "#", position: "top" } }}
                     itemOptions={{
-                        contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                        contentType: WidgetItemContentType.TitleDescription,
                     }}
                 />
             </div>
@@ -919,7 +911,7 @@ export function Items() {
                     name="Hello Title with an Image"
                     description={STORY_IPSUM_MEDIUM}
                     imageUrl={STORY_IMAGE}
-                    options={{ contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE }}
+                    options={{ contentType: WidgetItemContentType.TitleDescriptionImage }}
                 ></HomeWidgetItem>
             </ItemIn4Variants>
             <StoryHeading>Missing Image</StoryHeading>
@@ -928,7 +920,7 @@ export function Items() {
                     to="#"
                     name="Hello Title with a missing Image"
                     description={STORY_IPSUM_MEDIUM}
-                    options={{ contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE }}
+                    options={{ contentType: WidgetItemContentType.TitleDescriptionImage }}
                 ></HomeWidgetItem>
             </ItemIn4Variants>
             <StoryHeading>Active States</StoryHeading>
@@ -958,7 +950,7 @@ export const AsNavLinks = storyWithConfig({ useWrappers: false }, () => {
                     viewAll: { to: "#", position: "bottom" },
                 }}
                 itemOptions={{
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                    contentType: WidgetItemContentType.TitleDescription,
                 }}
             />
             <HomeWidget
@@ -971,7 +963,7 @@ export const AsNavLinks = storyWithConfig({ useWrappers: false }, () => {
                     viewAll: { to: "#", position: "bottom" },
                 }}
                 itemOptions={{
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION,
+                    contentType: WidgetItemContentType.TitleDescription,
                 }}
             />
         </Container>
@@ -987,7 +979,7 @@ export const AsNavLinksFullBg = storyWithConfig({ useWrappers: false }, () => {
                 title="After Navigation Links"
                 maxItemCount={3}
                 itemOptions={{
-                    contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                    contentType: WidgetItemContentType.TitleDescriptionImage,
                 }}
                 containerOptions={{
                     viewAll: { to: "#" },

@@ -39,7 +39,9 @@ export type FilterBlockProps = {
 
 export function FilterBlock(props: FilterBlockProps) {
     const classes = filterBlockClasses();
-    const [filters, setFilters] = useState<Record<string, boolean>>({});
+    const [filters, setFilters] = useState<Record<string, boolean>>(
+        Object.fromEntries(props.initialFilters?.map((filter) => [filter, true]) ?? []),
+    );
     const [dynamicOptions, setDynamicOptions] = useState<ISelectBoxItem[]>([]);
     const [selectedOptions, setSelectedOptions] = useState<ISelectBoxItem[]>([]);
     const [showDynamicInput, setShowDynamicInput] = useState(false);
@@ -179,7 +181,7 @@ export function FilterBlock(props: FilterBlockProps) {
                             <CheckBox
                                 key={`${option.name}`}
                                 className={classes.checkbox}
-                                label={t(`${option.name}`)}
+                                label={t(`${option.name}`, { optional: true })}
                                 labelBold={false}
                                 checked={filters[option.value] ?? false}
                                 onChange={(e) => setFilters((prev) => ({ ...prev, [option.value]: e.target.checked }))}

@@ -6,11 +6,11 @@
 
 namespace Vanilla\Forum\Layout\View;
 
+use CategoryModel;
 use Garden\Schema\Schema;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
-use Vanilla\Forum\Widgets\CategoryFollowAsset;
 use Vanilla\Forum\Widgets\CategoryListAsset;
-use Vanilla\Forum\Widgets\DiscussionListAsset;
 use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Navigation\BreadcrumbModel;
@@ -36,7 +36,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -44,7 +44,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -52,7 +52,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTemplateID(): string
     {
@@ -60,7 +60,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamInputSchema(): Schema
     {
@@ -68,7 +68,7 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamResolvedSchema(): Schema
     {
@@ -76,13 +76,15 @@ class NestedCategoryListPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {
         $category = $paramInput["category"];
         $pageHead->setSeoTitle($category["name"], false);
-
+        if (!CategoryModel::checkPermission($category["categoryID"], "Vanilla.Discussions.View")) {
+            throw new PermissionException("Vanilla.Discussions.View");
+        }
         if (!empty($category["description"])) {
             $pageHead->setSeoDescription($category["description"]);
         }

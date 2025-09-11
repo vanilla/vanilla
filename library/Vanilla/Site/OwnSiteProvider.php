@@ -20,15 +20,11 @@ use Vanilla\Contracts\Site\VanillaSite;
  */
 class OwnSiteProvider extends VanillaSiteProvider
 {
-    private OwnSite $ownSite;
-
     /**
      * @param OwnSite $ownSite
      */
     public function __construct(OwnSite $ownSite)
     {
-        $this->ownSite = $ownSite;
-        $this->ownSite->setSiteProvider($this);
         parent::__construct([$ownSite->getCluster()->getRegionID()]);
         $this->setCache(new NullAdapter());
     }
@@ -38,7 +34,9 @@ class OwnSiteProvider extends VanillaSiteProvider
      */
     public function getOwnSite(): VanillaSite
     {
-        return $this->ownSite;
+        $ownSite = \Gdn::getContainer()->get(OwnSite::class);
+        $ownSite->setSiteProvider($this);
+        return $ownSite;
     }
 
     /**
@@ -47,7 +45,7 @@ class OwnSiteProvider extends VanillaSiteProvider
     protected function loadAllSiteRecords(): array
     {
         return [
-            $this->ownSite->getSiteID() => $this->ownSite->getSiteRecord(),
+            $this->getOwnSite()->getSiteID() => $this->getOwnSite()->getSiteRecord(),
         ];
     }
 
@@ -56,11 +54,11 @@ class OwnSiteProvider extends VanillaSiteProvider
      */
     public function getSite(int $siteID): Site
     {
-        if ($siteID !== $this->ownSite->getSiteID()) {
+        if ($siteID !== $this->getOwnSite()->getSiteID()) {
             throw new SiteNotFoundException($siteID);
         }
 
-        return $this->ownSite;
+        return $this->getOwnSite();
     }
 
     /**
@@ -68,7 +66,7 @@ class OwnSiteProvider extends VanillaSiteProvider
      */
     protected function loadAllClusters(): array
     {
-        $cluster = $this->ownSite->getCluster();
+        $cluster = $this->getOwnSite()->getCluster();
         return [
             $cluster->getClusterID() => $cluster,
         ];

@@ -72,7 +72,8 @@ class PermissionNotificationGenerator implements SystemCallableInterface
         ?string $junctionTable = null,
         ?int $junctionID = null,
         bool $hasDefaultPreferences = false,
-        array $options = []
+        array $options = [],
+        ?int $discussionID = null
     ): void {
         $action = new LongRunnerAction(self::class, "notificationGenerator", [
             $activity,
@@ -83,6 +84,7 @@ class PermissionNotificationGenerator implements SystemCallableInterface
             $junctionID,
             $hasDefaultPreferences,
             $options,
+            $discussionID,
         ]);
 
         $this->longRunner->runDeferred($action);
@@ -110,7 +112,8 @@ class PermissionNotificationGenerator implements SystemCallableInterface
         ?string $junctionTable = null,
         ?int $junctionID = null,
         bool $supportDefaultPreferences = false,
-        array $options = []
+        array $options = [],
+        ?int $discussionID = null
     ): Generator {
         $activityType = $activity["ActivityType"] ?? "Default";
         $defaultEmail = $supportDefaultPreferences && $this->config->get("Preferences.Email.$preference");
@@ -120,7 +123,7 @@ class PermissionNotificationGenerator implements SystemCallableInterface
         // Yield total users to notify.
         yield new LongRunnerQuantityTotal(
             [$this, "getUsersToNotifyIteratorCount"],
-            [$permissions, $preference, $junctionTable, $junctionID, $hasDefaultPreferences]
+            [$permissions, $preference, $junctionTable, $junctionID, $hasDefaultPreferences, $discussionID]
         );
 
         // Start sending the notifications.
@@ -131,7 +134,8 @@ class PermissionNotificationGenerator implements SystemCallableInterface
                 $lastUserID,
                 $junctionTable,
                 $junctionID,
-                $hasDefaultPreferences
+                $hasDefaultPreferences,
+                $discussionID
             );
 
             foreach ($usersToNotify as $userID => $userPreferences) {
@@ -199,6 +203,7 @@ class PermissionNotificationGenerator implements SystemCallableInterface
      * @param string|null $junctionTable
      * @param int|null $junctionID
      * @param bool $hasDefaultPreferences
+     * @param int|null $discussionID
      * @return Gdn_MySQLDriver
      */
     private function getUserToNotifyQuery(
@@ -206,7 +211,8 @@ class PermissionNotificationGenerator implements SystemCallableInterface
         string $preference,
         ?string $junctionTable = null,
         ?int $junctionID = null,
-        bool $hasDefaultPreferences = false
+        bool $hasDefaultPreferences = false,
+        ?int $discussionID = null
     ): Gdn_MySQLDriver {
         $validRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission(
             $permissions,
@@ -243,6 +249,14 @@ class PermissionNotificationGenerator implements SystemCallableInterface
                 ]);
         }
 
+        // Add the condition to exclude muted users if a discussion is provided.
+        if ($discussionID !== null) {
+            $sql->leftJoin(
+                "UserDiscussion ud",
+                "ud.UserID = ur.UserID AND ud.DiscussionID = {$discussionID} AND ud.Muted = 1"
+            )->where("ud.UserID IS NULL");
+        }
+
         return $sql;
     }
 
@@ -253,6 +267,8 @@ class PermissionNotificationGenerator implements SystemCallableInterface
      * @param string $preference
      * @param string|null $junctionTable
      * @param int|null $junctionID
+     * @param bool $hasDefaultPreferences
+     * @param int|null $discussionID
      * @return int
      * @throws Gdn_UserException
      */
@@ -261,14 +277,16 @@ class PermissionNotificationGenerator implements SystemCallableInterface
         string $preference,
         ?string $junctionTable = null,
         ?int $junctionID = null,
-        bool $hasDefaultPreferences = false
+        bool $hasDefaultPreferences = false,
+        ?int $discussionID = null
     ): int {
         $query = $this->getUserToNotifyQuery(
             $permissions,
             $preference,
             $junctionTable,
             $junctionID,
-            $hasDefaultPreferences
+            $hasDefaultPreferences,
+            $discussionID
         );
 
         $query->select("distinct(ur.UserID)", "count", "RowCount");
@@ -286,6 +304,8 @@ class PermissionNotificationGenerator implements SystemCallableInterface
      * @param int $lastUserID
      * @param string|null $junctionTable
      * @param int|null $junctionID
+     * @param bool $hasDefaultPreferences
+     * @param int|null $discussionID
      * @return array
      * @throws Exception
      */
@@ -295,7 +315,8 @@ class PermissionNotificationGenerator implements SystemCallableInterface
         int $lastUserID,
         ?string $junctionTable = null,
         ?int $junctionID = null,
-        bool $hasDefaultPreferences = false
+        bool $hasDefaultPreferences = false,
+        ?int $discussionID = null
     ): array {
         $userToNotifyByID = [];
 
@@ -304,7 +325,8 @@ class PermissionNotificationGenerator implements SystemCallableInterface
             $preference,
             $junctionTable,
             $junctionID,
-            $hasDefaultPreferences
+            $hasDefaultPreferences,
+            $discussionID
         );
         $sql->select("ur.UserID")
             ->where("ur.UserID >", $lastUserID)

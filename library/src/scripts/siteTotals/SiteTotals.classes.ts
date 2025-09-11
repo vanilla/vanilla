@@ -17,11 +17,6 @@ export const siteTotalsClasses = useThemeCache((shouldWrap: boolean, options?: D
     const globalVars = globalVariables();
     const mediaQueries = vars.mediaQueries();
 
-    const widget = css({
-        margin: 0,
-        padding: 0,
-    });
-
     const root = css({
         display: "flex",
         justifyContent: vars.options.alignment,
@@ -58,7 +53,6 @@ export const siteTotalsClasses = useThemeCache((shouldWrap: boolean, options?: D
     });
 
     return {
-        widget,
         root,
         countContainer,
         icon,

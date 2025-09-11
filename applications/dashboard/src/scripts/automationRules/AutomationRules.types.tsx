@@ -6,7 +6,7 @@
 import { IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 import { IGetUsersQueryParams } from "@dashboard/users/userManagement/UserManagement.hooks";
 import { IUserFragment } from "@library/@types/api/users";
-import { IGetCategoryListParams } from "@library/categoriesWidget/CategoryList.hooks";
+import { IGetCategoryListParams } from "@library/widgets/CategoriesWidget.hooks";
 import { IGetCollectionResourcesParams } from "@library/featuredCollections/collectionsHooks";
 import { IGetTagsParams } from "@library/features/tags/TagsHooks";
 import { JsonSchema } from "@vanilla/json-schema-forms";
@@ -24,6 +24,7 @@ export type AutomationRuleTriggerType =
     | "staleDiscussionTrigger"
     | "staleCollectionTrigger"
     | "timeSinceUserRegistrationTrigger"
+    | "timeSinceLastActiveTrigger"
     | "unAnsweredQuestionTrigger";
 export type AutomationRuleActionType =
     | "addDiscussionToCollectionAction"

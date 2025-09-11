@@ -10,43 +10,30 @@ namespace Vanilla\Forum\Widgets;
 use Garden\Schema\Schema;
 use Vanilla\Controllers\Api\CollectionsApiController;
 use Vanilla\Forms\ApiFormChoices;
-use Vanilla\Http\InternalClient;
-use Vanilla\InjectableInterface;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
-use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
-use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
-use Vanilla\Widgets\React\DefaultSectionTrait;
-use Vanilla\Widgets\React\ReactWidgetInterface;
+use Vanilla\Widgets\React\ReactWidget;
 use Vanilla\Widgets\WidgetSchemaTrait;
 
 /**
  * Widget to display featured content in custom layouts
  */
-class FeaturedCollectionsWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, InjectableInterface
+class FeaturedCollectionsWidget extends ReactWidget
 {
-    use DefaultSectionTrait;
-    use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
     use WidgetSchemaTrait;
 
-    /** @var CollectionsApiController */
-    private $api;
-
     /**
      * DI.
-     *
-     * @param CollectionsApiController $api
      */
-    public function setDependencies(CollectionsApiController $api)
+    public function __construct(private CollectionsApiController $api)
     {
-        $this->api = $api;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -54,7 +41,7 @@ class FeaturedCollectionsWidget implements ReactWidgetInterface, CombinedPropsWi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -62,7 +49,7 @@ class FeaturedCollectionsWidget implements ReactWidgetInterface, CombinedPropsWi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -70,7 +57,7 @@ class FeaturedCollectionsWidget implements ReactWidgetInterface, CombinedPropsWi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): string
     {
@@ -96,7 +83,7 @@ class FeaturedCollectionsWidget implements ReactWidgetInterface, CombinedPropsWi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -125,7 +112,7 @@ class FeaturedCollectionsWidget implements ReactWidgetInterface, CombinedPropsWi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

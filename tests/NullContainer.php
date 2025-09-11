@@ -18,7 +18,7 @@ class NullContainer extends \Garden\Container\Container
 
     /**
      * Make sure that we fail!
-     * @inheritDoc
+     * @inheritdoc
      */
     public function rule($id)
     {

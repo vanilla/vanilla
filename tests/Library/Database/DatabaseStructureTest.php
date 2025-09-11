@@ -23,7 +23,7 @@ class DatabaseStructureTest extends BootstrapTestCase
     private $structure;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

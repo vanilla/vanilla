@@ -28,7 +28,7 @@ class MessagesControllerTest extends SiteTestCase
     private static $conversation;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

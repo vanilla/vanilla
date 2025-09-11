@@ -20,7 +20,7 @@ class BBCodeFormatTest extends AbstractFormatTestCase
     use UserMentionTestTraits;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function prepareFormatter(): FormatInterface
     {
@@ -28,7 +28,7 @@ class BBCodeFormatTest extends AbstractFormatTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function prepareFixtures(): array
     {

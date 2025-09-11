@@ -26,6 +26,7 @@ import {
     unwrapNodes,
 } from "@udecode/plate-common";
 import { ELEMENT_H2, ELEMENT_H3, ELEMENT_H4, ELEMENT_H5 } from "@udecode/plate-heading";
+import { ELEMENT_LINK } from "@udecode/plate-link";
 import {
     ELEMENT_LI,
     ELEMENT_OL,
@@ -38,6 +39,10 @@ import {
 } from "@udecode/plate-list";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { Path } from "slate";
+import { toggleCallout } from "@library/vanilla-editor/plugins/calloutPlugin/toggleCallout";
+import { CalloutAppearance, ELEMENT_CALLOUT } from "@library/vanilla-editor/plugins/calloutPlugin/createCalloutPlugin";
+import { unwrapCallout } from "@library/vanilla-editor/plugins/calloutPlugin/unwrapCallout";
+import { appearance } from "@library/styles/styleHelpersReset";
 
 export class VanillaEditorFormatter {
     public constructor(private editor: MyEditor) {}
@@ -63,6 +68,10 @@ export class VanillaEditorFormatter {
 
         if (this.isSpoiler()) {
             unwrapSpoiler(this.editor);
+        }
+
+        if (this.isCallout()) {
+            unwrapCallout(this.editor);
         }
 
         toggleNodeType(this.editor, {
@@ -210,5 +219,35 @@ export class VanillaEditorFormatter {
 
     public isEmbed = (): boolean => {
         return this.isElement([ELEMENT_RICH_EMBED_INLINE, ELEMENT_RICH_EMBED_CARD]);
+    };
+
+    public isCallout = (): boolean => {
+        return this.isElement(ELEMENT_CALLOUT);
+    };
+
+    public calloutAppearance = (): CalloutAppearance => {
+        if (!this.editor?.selection) {
+            return "neutral";
+        }
+
+        const calloutEntry = getAboveNode(this.editor, {
+            match: (node: TElement) => node.type === ELEMENT_CALLOUT,
+        });
+
+        return (
+            calloutEntry?.[0] && calloutEntry?.[0]["appearance"] ? calloutEntry?.[0]["appearance"] : "neutral"
+        ) as CalloutAppearance;
+    };
+
+    public callout = (): void => {
+        if (!this.isCallout()) {
+            this.paragraph();
+            toggleCallout(this.editor, "neutral");
+            focusEditor(this.editor);
+        }
+    };
+
+    public isLink = (): boolean => {
+        return this.isElement([ELEMENT_RICH_EMBED_INLINE, ELEMENT_RICH_EMBED_CARD, ELEMENT_LINK]);
     };
 }

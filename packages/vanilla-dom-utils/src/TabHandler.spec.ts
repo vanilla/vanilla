@@ -263,4 +263,23 @@ describe("TabHandler", () => {
 
         expect(nextItem).eq(item5);
     });
+
+    it("ignores inert elements", () => {
+        document.body.innerHTML = `
+        <div>
+            <button id="item1"></button>
+            <button id="item2" inert="true"></button>
+            <div inert="inert"><button id="item3"></button></div>
+            <button id="item4"></button>
+        </div>`;
+
+        const item1 = document.getElementById("item1")!;
+        const item4 = document.getElementById("item4")!;
+
+        item1.focus();
+        const handler = new TabHandler();
+        const nextItem = handler.getNext();
+
+        expect(nextItem).eq(item4);
+    });
 });

@@ -190,6 +190,7 @@ export default function EmbedFlyout(props: IProps) {
                 flyoutType={FlyoutType.FRAME}
                 isVisible={isVisible}
                 preventFocusOnVisible
+                asReachPopover
             >
                 <Frame
                     body={

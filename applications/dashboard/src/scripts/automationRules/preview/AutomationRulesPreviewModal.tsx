@@ -126,6 +126,7 @@ export function AutomationRulesPreviewModal(props: IProps) {
                         </FrameBody>
                     }
                     footer={<FrameFooter justifyRight>{modalFooterButtons}</FrameFooter>}
+                    bodyWrapClass={classes.previewModalBodyWrap}
                 />
             </Modal>
         </>

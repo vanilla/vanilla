@@ -6,7 +6,7 @@
 
 import { ModerationAdminLayout } from "@dashboard/components/navigation/ModerationAdminLayout";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardFormReadOnlySection } from "@dashboard/forms/DashboardFormReadonlySection";
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
@@ -35,10 +35,10 @@ import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { NumberBox } from "@vanilla/ui";
 import { logError, uuidv4 } from "@vanilla/utils";
 import { useEffect, useState } from "react";
 import { sprintf } from "sprintf-js";
+import { NumberBox } from "@library/forms/NumberBox";
 
 const BETA_ENABLED = getMeta("featureFlags.CommunityManagementBeta.Enabled", false);
 
@@ -228,7 +228,7 @@ export function PremoderationSettingsPage() {
                             <NumberBox
                                 value={challengeCutoffAge}
                                 className={classes.comboInput}
-                                onValueChange={setChallengeCutoffAge}
+                                onChange={setChallengeCutoffAge}
                             />
                             <Button
                                 buttonType={ButtonTypes.STANDARD}
@@ -507,12 +507,12 @@ function KeywordModal(props: ModalProps) {
             fullWidthContent
         >
             <InputTextBlock
-                disabled={areConfigsLoading || configPatcher.isLoading}
                 label={t("Keywords & Phrases")}
                 inputProps={{
                     multiline: true,
                     value: keywords,
                     onChange: (e) => setKeywords(e.target.value),
+                    disabled: areConfigsLoading || configPatcher.isLoading,
                 }}
                 multiLineProps={{
                     rows: 5,
@@ -524,6 +524,11 @@ function KeywordModal(props: ModalProps) {
 
 export default PremoderationSettingsPage;
 
+declare global {
+    interface Window {
+        __VANILLA_ENABLED_ADDON_KEYS__: string[];
+    }
+}
 function addonEnabled(addonKey: string): boolean {
     const enabledAddonKeys = window.__VANILLA_ENABLED_ADDON_KEYS__ ?? [];
     return enabledAddonKeys.includes(addonKey.toLowerCase());

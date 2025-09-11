@@ -9,7 +9,6 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { getActiveRecord } from "@library/flyouts/Hamburger";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
-import { useCollisionDetector } from "@vanilla/react-utils";
 import { RecordID, stableObjectHash } from "@vanilla/utils";
 import omit from "lodash-es/omit";
 import React, { createContext, ReactNode, useContext, useState } from "react";
@@ -66,8 +65,7 @@ export function HamburgerMenuContextProvider(props: { children: ReactNode }) {
     const { children } = props;
 
     const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
+    const isCompact = device === TitleBarDevices.COMPACT;
 
     /** This state maintains the various components that should be rendered in the hamburger menu */
     const [dynamicComponents, _setDynamicComponents] = useState<Record<string, IComponentListItem> | null>(null);

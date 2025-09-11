@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 $desc = t('Routes are used to redirect users.', 'Routes are used to redirect users depending on the URL requested.');
-$desc .= ' '.anchor(t('Learn about custom routing.', 'Learn about custom routing.'), 'http://docs.vanillaforums.com/developers/routes');
 helpAsset(sprintf(t('About %s'), t('Routes')), $desc);
+helpAsset(t("Use Routes with Caution"), t("RoutesWarning"));
 echo heading(t('Manage Routes'), t('Add Route'), 'dashboard/routes/add', 'js-modal btn btn-primary');
 ?>
 <div class="table-wrap">

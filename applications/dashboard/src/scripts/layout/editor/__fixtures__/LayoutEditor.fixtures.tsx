@@ -42,6 +42,7 @@ export class LayoutEditorFixture {
                     $reactComponent: "MyWidget",
                     schema: EMPTY_SCHEMA,
                     name: "My Widget",
+                    widgetGroup: "Widgets",
                 },
             },
             assets: {},
@@ -51,15 +52,18 @@ export class LayoutEditorFixture {
                     allowedWidgetIDs: [],
                     schema: EMPTY_SCHEMA,
                     name: "1 column",
+                    widgetGroup: "Sections",
                 },
                 "react.section.2-columns": {
                     $reactComponent: "SectionTwoColumns",
                     allowedWidgetIDs: [],
                     schema: EMPTY_SCHEMA,
                     name: "2 columns",
+                    widgetGroup: "Sections",
                 },
             },
             middlewares: {},
+            fragments: {},
         };
     }
 
@@ -76,6 +80,7 @@ export class LayoutEditorFixture {
                         $reactComponent: "",
                         iconUrl: "test/url/path",
                         name: widget.replace("react.", "").replace(/\./gi, " "),
+                        widgetGroup: "Group",
                     },
                 ];
             }),
@@ -112,6 +117,10 @@ export class LayoutEditorFixture {
             {
                 layoutViewType: layoutViewType ?? "home",
                 layout: layoutContents,
+                titleBar: {
+                    testID: "titleBar",
+                    $hydrate: "react.titleBar",
+                } as any,
             },
             this.catalog(),
         );

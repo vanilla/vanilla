@@ -81,7 +81,7 @@ class HtmlSanitizer
      */
     public static function containsHtmlTags(string $toCheck): bool
     {
-        return strpos($toCheck, "<") >= 0 || (bool) preg_match("/&#?[a-z0-9]{1,10};/i", $toCheck);
+        return strpos($toCheck, "<") !== false || (bool) preg_match("/&#?[a-z0-9]{1,10};/i", $toCheck);
     }
 
     /**

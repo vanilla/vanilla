@@ -15,6 +15,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 describe("Tags", () => {
     const discussion = { ...DiscussionFixture.fakeDiscussions[2], url: "/mockPath", name: "Mock Discussion" };
     const tagID = STORY_TAGS[0].tagID;
+
+    beforeEach(() => {
+        setMeta("tagging.enabled", true);
+    });
+
     describe("Custom Layouts ARE NOT enabled for discussion lists, no tag has a url pointing to new discussion list page.", () => {
         beforeEach(() => {
             setMeta("featureFlags.customLayout.discussionList.Enabled", false);

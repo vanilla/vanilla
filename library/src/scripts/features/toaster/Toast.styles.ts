@@ -10,6 +10,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { css } from "@emotion/css";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const toastClasses = () => {
     const globalVars = globalVariables();
@@ -25,7 +26,8 @@ export const toastClasses = () => {
 
         ...Mixins.border(),
         ...shadowHelper().dropDown(),
-        background: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        background: ColorsUtils.varOverride(ColorVar.Background, globalVars.mainColors.bg),
+        color: ColorsUtils.varOverride(ColorVar.Foreground, globalVars.mainColors.fg),
         width: 280,
         maxWidth: "100%",
         maxHeight: 120,

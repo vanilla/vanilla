@@ -42,7 +42,7 @@ class APIExpandMiddlewareTest extends SiteTestCase
     protected $middleware;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function setUpBeforeClass(): void
     {

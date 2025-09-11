@@ -7,18 +7,24 @@
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { normalizeUrl } from "@library/utility/appUtils";
 import { queryRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/queries/queryRichLink";
-import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
-import { IVanillaLinkElement, useMyEditorRef } from "@library/vanilla-editor/typescript";
-import { focusEditor, isUrl, setNodes } from "@udecode/plate-common";
+import { ELEMENT_LINK_AS_BUTTON, RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
+import { IVanillaLinkElement } from "@library/vanilla-editor/typescript";
+import { useMyEditorRef } from "@library/vanilla-editor/getMyEditor";
+import { focusEditor, insertNodes, isUrl, removeNodes, setNodes } from "@udecode/plate-common";
 import { floatingLinkActions, submitFloatingLink, useFloatingLinkSelectors } from "@udecode/plate-link";
 import { t } from "@vanilla/i18n";
 import { useFormik } from "formik";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
+import { ButtonType, ButtonTypes } from "@library/forms/buttonTypes";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { richLinkFormClasses } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/RichLinkForm.classes";
 import { cx } from "@emotion/css";
+import InputBlock from "@library/forms/InputBlock";
+import { Icon } from "@vanilla/icons";
+import { Row } from "@library/layout/Row";
+import { CustomRadioGroup, CustomRadioInput } from "@vanilla/ui";
+import { RecordID } from "@vanilla/utils";
 
 export default function LinkForm() {
     const editor = useMyEditorRef();
@@ -45,6 +51,7 @@ export default function LinkForm() {
         initialValues: {
             url,
             text,
+            buttonType: embed?.element?.buttonType ?? ButtonType.PRIMARY,
         },
         onSubmit: function () {
             if (!embed || embed.appearance === RichLinkAppearance.LINK) {
@@ -52,14 +59,34 @@ export default function LinkForm() {
                 submitFloatingLink(editor);
             } else {
                 floatingLinkActions.hide();
-                setNodes<IVanillaLinkElement>(
-                    editor,
-                    {
-                        url,
-                        embedData: null,
-                    },
-                    { at: embed?.path },
-                );
+
+                // our link_as_buttin is still a void element, so when we are updating text re-render won't trigger automatically
+                // so we need to manually remove and insert a new one
+                if (embed.appearance === RichLinkAppearance.BUTTON) {
+                    removeNodes(editor, {
+                        at: embed.path,
+                    });
+                    // Make sure we give it text content.
+                    insertNodes(editor, [
+                        {
+                            type: ELEMENT_LINK_AS_BUTTON,
+                            url,
+                            embedData: null,
+                            children: values.text && values.text !== "" ? [{ text: values.text }] : [{ text: url }],
+                            buttonType: values.buttonType,
+                        },
+                    ]);
+                } else {
+                    setNodes<IVanillaLinkElement>(
+                        editor,
+                        {
+                            url,
+                            embedData: null,
+                        },
+                        { at: embed?.path },
+                    );
+                }
+
                 focusEditor(editor);
             }
         },
@@ -128,6 +155,55 @@ export default function LinkForm() {
                     }}
                 />
             )}
+            {embed?.appearance === RichLinkAppearance.BUTTON && (
+                <InputBlock label={t("Button Type")}>
+                    <CustomRadioGroup
+                        name="buttonType"
+                        onChange={(selected: string) => {
+                            void setFieldValue("buttonType", selected);
+                        }}
+                        value={values.buttonType as RecordID}
+                        className={richLinkFormClasses().buttonTypeRadioGroup}
+                        // this is to prevent the focus flickr with editor when we click on the radio button
+                        onMouseDown={(e) => {
+                            e.preventDefault();
+                        }}
+                    >
+                        <CustomRadioInput value={ButtonType.PRIMARY}>
+                            {({ isSelected, isFocused }) => (
+                                <Row
+                                    gap={8}
+                                    align="center"
+                                    className={cx(richLinkFormClasses().buttonTypeRadioOption, {
+                                        isSelected,
+                                        "focus-visible": isFocused,
+                                    })}
+                                >
+                                    <Icon icon="button-primary" />
+                                    {t("Primary")}
+                                    {isSelected && <Icon icon="dismiss" />}
+                                </Row>
+                            )}
+                        </CustomRadioInput>
+                        <CustomRadioInput value={ButtonType.STANDARD}>
+                            {({ isSelected, isFocused }) => (
+                                <Row
+                                    gap={8}
+                                    align="center"
+                                    className={cx(richLinkFormClasses().buttonTypeRadioOption, {
+                                        isSelected,
+                                        "focus-visible": isFocused,
+                                    })}
+                                >
+                                    <Icon icon="button-standard" />
+                                    {t("Secondary")}
+                                    {isSelected && <Icon icon="dismiss" />}
+                                </Row>
+                            )}
+                        </CustomRadioInput>
+                    </CustomRadioGroup>
+                </InputBlock>
+            )}
 
             <hr className={cx(dropDownClasses().separator, richLinkFormClasses().separator)} />
 
@@ -142,7 +218,7 @@ export default function LinkForm() {
                 type="submit"
                 className={richLinkFormClasses().addLinkButton}
             >
-                {t("Add Link")}
+                {embed?.url ? t("Save") : t("Add Link")}
             </Button>
         </form>
     );

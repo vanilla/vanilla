@@ -18,7 +18,7 @@ export function PlacesResultMeta(props: { searchResult: Partial<IPlacesSearchRes
     const { type, counts } = searchResult;
 
     // Do not apply all of the same result meta.
-    return <ResultMeta type={type} counts={counts} />;
+    return <ResultMeta type={type === "customPage" ? "Page" : type} counts={counts} />;
 }
 
 class PlacesSearchDomain extends SearchDomain<IPlacesSearchTypes> {
@@ -39,13 +39,14 @@ class PlacesSearchDomain extends SearchDomain<IPlacesSearchTypes> {
         const supportedTypes = flatten(PlacesSearchTypeFilter.searchTypes.map((type) => type.values));
         return {
             ...form,
-            types: form.types ? supportedTypes.filter((type) => supportedTypes.includes(type)) : supportedTypes,
+            types:
+                form.types !== undefined ? supportedTypes.filter((type) => form.types!.includes(type)) : supportedTypes,
             expand: ["breadcrumbs", "image", "excerpt", "-body"],
             recordTypes: undefined,
         };
     };
 
-    public recordTypes = ["category"];
+    public recordTypes = ["category", "customPage"];
 
     public PanelComponent = PlacesSearchFilterPanel;
 

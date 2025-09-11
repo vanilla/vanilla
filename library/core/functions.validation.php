@@ -81,6 +81,10 @@ if (!function_exists("ValidateRequired")) {
             return true;
         }
 
+        if ($value instanceof DateTimeInterface) {
+            return true;
+        }
+
         return false;
     }
 }
@@ -361,6 +365,10 @@ if (!function_exists("validateDate")) {
      */
     function validateDate($value)
     {
+        if ($value instanceof DateTimeInterface) {
+            return true;
+        }
+
         // Dates should be in YYYY-MM-DD or YYYY-MM-DD HH:MM:SS format
         if (empty($value)) {
             return true; // blank dates validated through required.

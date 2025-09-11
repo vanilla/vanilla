@@ -6,6 +6,7 @@
 
 import React from "react";
 import { carouselClasses } from "@library/carousel/Carousel.style";
+import { cx } from "@emotion/css";
 
 type ISliderWrapperProps = {
     sliderStyle: object;
@@ -15,14 +16,19 @@ type ISliderWrapperProps = {
 type ISectionProps = {
     children: React.ReactNode;
     sectionWrapperRef: React.Ref<HTMLDivElement>;
+    visuallyHidden?: boolean;
 };
 
 export function CarouselSectionSliderWrapper(props: ISectionProps) {
     const classes = carouselClasses();
-    const { children, sectionWrapperRef } = props;
+    const { children, sectionWrapperRef, visuallyHidden } = props;
     //Need to fix slides when adding negative margin on small size
     return (
-        <section ref={sectionWrapperRef} className={classes.sectionWrapper} aria-labelledby="carousel-Title">
+        <section
+            ref={sectionWrapperRef}
+            className={cx(classes.sectionWrapper, { visuallyHidden })}
+            aria-labelledby="carousel-Title"
+        >
             {children}
         </section>
     );

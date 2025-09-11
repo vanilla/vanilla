@@ -6,6 +6,7 @@
 
 namespace VanillaTests\Forum\Widgets;
 
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\SiteTestCase;
 use VanillaTests\Layout\LayoutTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -22,6 +23,7 @@ class TagWidgetTest extends SiteTestCase
      */
     public function testHydrateTagWidget()
     {
+        CurrentTimeStamp::mockTime(time());
         //create tags
         $tag1 = $this->createTag(["name" => "tagName_1"]);
         $tag2 = $this->createTag(["name" => "tagName_2"]);
@@ -53,6 +55,7 @@ class TagWidgetTest extends SiteTestCase
                 "urlCode" => $tag["urlcode"],
                 "url" => url("discussions/tagged/" . $tag["urlcode"], true),
                 "type" => "User",
+                "dateInserted" => CurrentTimeStamp::getDateTime()->format("c"),
             ];
         }
 

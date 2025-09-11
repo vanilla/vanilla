@@ -1,0 +1,131 @@
+---
+description:
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+## Application Structrure & Addons
+
+An addon is a toggleable piece of functionality in the application. Even some core functionality is represented through addons.
+
+Utility/framework type code library/src/scripts.
+
+Otherwise functionality will fall into an addon.
+
+- /applications/dashboard/src/scripts (alias @vanilla/dashboard/*)
+  This addon contains core functionality of the application such as users, roles, permissions, Automation, styleguides/themes, layouts, emails,
+- /applications/vanilla/src/scripts (alias @vanilla/addon-vanilla/*)/
+  Contains the community forum part of the application such as categories, posts, comments, tags, and moderation
+
+_Code under the cloud directory is proprietary. Things outside of the cloud directory should never have a dependency on the cloud directory._
+
+- /cloud/applications/groups/src/scripts (alias @vanilla/groups/*)
+  This addon contains groups and events functionality.
+- /cloud/plugins/knowledge/src/scripts (alias @vanilla/knowledge/*)
+  Contains Knowledge Bases, knowledge categories, and articles.
+
+There are many more addons in /plugins and /cloud/plugins. Try to avoid having dependencies between addons. If something is needed to be shared put it in library or dashboard.
+
+## Bootstrapping & Entrypoints
+
+Library and each addon can contain code targetting different entrypoints. These entrypoints are placed in /entries in each addon's src/scripts.
+
+There are 5 named entrypoints
+
+- layouts
+  - Single page react application, routed with layout router [LayoutPage.registry.tsx](mdc:library/src/scripts/features/Layout/LayoutPage.registry.tsx)
+  - Modern end-user facing section.
+  - Chunk splitting is done through [createLoadableComponent.tsx](mdc:packages/vanilla-react-utils/src/createLoadableComponent.tsx). Individual forms/modals/components are dynamically loaded.
+- admin-new
+  - Single Page React application. Routed with [Router.registry.tsx](mdc:library/src/scripts/Router.registry.tsx)
+  - Modern administrator facing section.
+  - Chunk splitting is done by page using [RouteHandler.tsx](mdc:library/src/scripts/routing/RouteHandler.tsx)
+- admin
+  - Legacy admin section. Routing is exclusively done on the backend and individual react components are mounted into specific parts of the page.
+  - Components registered with registerComponent from [appUtils.tsx](mdc:library/src/scripts/utility/appUtils.tsx)
+- forum
+  - Legacy frontend section Routing is exclusively done on the backend and individual react components are mounted into specific parts of the page.
+  - Components registered with registerComponent from @appUtils.tsx
+- knowledge
+  - Legacy frontend section for knowledge base addon.
+  - Single page react application, Rotued with [Router.registry.tsx](mdc:library/src/scripts/Router.registry.tsx)
+  - Chunk splitting is done by page using @RouteHandler.tsx
+
+Some functionality may be registed in a "common" section which will apply to all sections. Avoid putting new code in common.
+
+Each section is done as part of it's own build process.
+
+## Tooling and Standards
+
+- Frontend is written in react and typescript.
+  - Use functional components and TypeScript interfaces.
+  - Use declarative JSX.
+  - Use named functions, array function, for component definition.
+  - Use "function" keyword for pure functions
+  - Use TypeScript for all code. Prefer interfaces over types. Avoid typescript enums, use maps.
+  - Avoid using `any` types.
+- File names: Use the component name follwed by a period with to denote the content of the file.
+  - Component.tsx: Component file
+  - Component.spec.tsx: Test file
+  - Component.types.ts: Types file
+  - Component.classes.ts: Styles file
+- Prioritize error handling and edge cases:
+  - Handle errors and edge cases at the beginning of functions.
+  - Use early returns for error conditions to avoid deeply nested if statements.
+  - Place the happy path last in the function for improved readability.
+  - Avoid unnecessary else statements; use if-return pattern instead.
+  - Use guard clauses to handle preconditions and invalid states early.
+  - If user-friendly error messages are created, highlight them to the developer.
+
+## Formatting Code
+
+- Code is formatted with prettier.
+- Always run prettier after you are done modifying all files.
+- Component names should be in PascalCase and abbreviations should also be pascal cased. Example: `HtmlEditor` instead of `HTMLEditor`
+- Type names should follow the same rules as component names expect be prefixed with an `I` unless the type declaration is merged with a concrete implementation.
+- Variable names should be descriptive and require minimal outside context to understand.
+
+
+## Styling
+
+- Styling is done using @emotion/css.
+- Classes generated using @emotion/css should always be cached or constant.
+  - When returning a generated class from a function either use useThemeCache from [themeCache.ts](mdc:library/src/scripts/styles/themeCache.ts) or declare them at the top level of a file.
+  - Declaring them inline in a component render may cause performance issues.
+- Re-use common CSS variables where possible [CssVar.ts](mdc:library/src/scripts/styles/CssVar.ts). Also consult [globalStyleVars.ts](mdc:library/src/scripts/styles/globalStyleVars.ts)
+- Make use of common mixins where possible [Mixins.ts](mdc:library/src/scripts/styles/Mixins.ts)
+- Prefer creating new classes or composing multiple classes together using the `cx` utility from `@emotion/css` over nested child selectors.
+- When adding a hardcoded number in a component such as padding, height, size that is not referencing a css variable, Leave a comment of where the number came from.
+
+
+## Testing
+
+- Tests run using vitest and @testing-library/react
+- Outline tests to run.
+- NEVER modify existing tests without explicit prompting.
+- DO create new test fixtures, blocks, descriptions, and test outlines, but leave test assertions for developers to write with an AIDEV-TODO: anchor comment.
+- Do not create fixtures for component props
+- Never mock modules unless expliciltly requested
+- For selecting DOM elements, prefer the helpers from @testing-library/react over DOM selectors
+- Unless excpliclty instructed to, never create a new test file when creating new files, functions and components.
+  - Ensure that the newly created functionality is working as intended, verified by the developer, before moving onto generating test files.
+
+To run an indvidual test
+
+```sh
+node ./node_modules/.bin/vitest --run --disable-console-intercept -t "Name of test" PATH_TO_TEST
+```
+
+## Data fetching and API usage.
+
+There are 2 ways the frontend fetches data.
+
+- Data may be fetched over the API using @tanstack/react-query and the axios client in [apiv2.tsx](mdc:library/src/scripts/apiv2.tsx)
+  - The API is documented in various /openapi directories throughout the code base.
+  - Authentication is automatically handled.
+- Data may preloaded from the backend during render. The data will injected as props along with initial `apiParams` to refetch the data or paginate, or apply filters. See [DiscussionListAsset.tsx](mdc:library/src/scripts/features/discussions/DiscussionListAsset.tsx) for an example.
+- Data should always be fetched with useQuery()
+- Modification of data should always use useMutation()
+
+## Development Cycle
+- Attempt to find all related files and functions before putting a plan together to implement the requirements
+- Always check in with the developer that the intended changes are functioning as expected

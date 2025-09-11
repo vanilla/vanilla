@@ -460,7 +460,7 @@ class OAuth2Plugin extends Gdn_OAuth2
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function entryEndpoint($sender, $code, $state = "")
     {
@@ -513,7 +513,7 @@ class OAuth2Plugin extends Gdn_OAuth2
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function issueAccessToken(string $clientID, string $oauthAccessToken): array
     {

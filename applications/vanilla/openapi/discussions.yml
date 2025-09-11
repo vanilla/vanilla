@@ -52,6 +52,11 @@ paths:
                       type: string
                   x-filter:
                       field: d.Type
+                - name: postTypeID
+                  description: Filter by one or more postTypeIDs.
+                  in: query
+                  schema:
+                      type: string
                 - name: status
                   description: Filter questions by status (accepted, answered, unanswered).
                   in: query
@@ -62,7 +67,7 @@ paths:
                 - name: excludeHiddenCategories
                   description: Exclude discussions from categories that has the `HideAllDiscussions` option set to true.
                   in: query
-                  required: true
+                  required: false
                   schema:
                       default: false
                       type: boolean
@@ -71,7 +76,7 @@ paths:
                       Only fetch discussions from followed categories. Pinned
                       discussions are mixed in.
                   in: query
-                  required: true
+                  required: false
                   schema:
                       default: false
                       type: boolean
@@ -221,6 +226,7 @@ paths:
                           - balanced
                           - positive
                           - stronglyPositive
+                - $ref: "#/components/parameters/PostFieldFilters"
             responses:
                 "200":
                     content:
@@ -241,6 +247,13 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Discussion"
                     description: Success
+                "202":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/PostPremoderation"
+                    description: Premoderation
+
             tags:
                 - Discussions
             requestBody:
@@ -276,6 +289,32 @@ paths:
             tags:
                 - Discussions
             summary: Get a list of the current user's bookmarked discussions.
+    /discussions/muted:
+        get:
+            parameters:
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+                - description: |
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 100
+                      minimum: 1
+                - $ref: "#/components/parameters/expand"
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/Discussion"
+                                type: array
+                    description: Success
+            tags:
+                - Discussions
+            summary: Get a list of the current user's muted discussions.
     /discussions/idea:
         x-addon: ideation
         post:
@@ -286,6 +325,12 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Discussion"
                     description: Success
+                "202":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/PostPremoderation"
+                    description: Premoderation
             tags:
                 - Discussions
             requestBody:
@@ -305,6 +350,12 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Discussion"
                     description: Success
+                "202":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/PostPremoderation"
+                    description: Premoderation
             tags:
                 - Discussions
             requestBody:
@@ -419,6 +470,12 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Discussion"
                     description: Success
+                "202":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/PostPremoderation"
+                    description: Premoderation
             tags:
                 - Discussions
             requestBody:
@@ -576,9 +633,6 @@ paths:
                                         postType:
                                             description: Post type of the discussion.
                                             type: string
-                                        #postTypeID: Placeholder for custom post types.
-                                        #   description: Post type ID of the discussion.
-                                        #   type: integer
                                         authorType:
                                             description: Author of the new discussion.
                                             type: string
@@ -654,6 +708,42 @@ paths:
                             type: object
                 required: true
             summary: Bookmark a discussion.
+    "/discussions/{id}/mute":
+        put:
+            parameters:
+                - description: The discussion ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                properties:
+                                    muted:
+                                        description: The current muted value.
+                                        type: boolean
+                                required:
+                                    - muted
+                                type: object
+                    description: Success
+            tags:
+                - Discussions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                muted:
+                                    description: Pass true to mute or false to unmute a discussion.
+                                    type: boolean
+                            required:
+                                - muted
+                            type: object
+                required: true
     "/discussions/{id}/edit":
         get:
             parameters:
@@ -1287,6 +1377,16 @@ components:
                         - postMeta
                         - permissions
             style: form
+        PostFieldFilters:
+            x-hidden: true
+            name: postMeta
+            description: Filter by users' discussions by their post field meta values.
+            in: query
+            schema:
+                type: object
+                properties:
+                    postMeta:
+                        type: object
 
     schemas:
         PostMeta:
@@ -1325,6 +1425,31 @@ components:
                 - name
                 - url
             type: object
+        PostPremoderation:
+            properties:
+                description:
+                    description: Body of the premoderation
+                    type: string
+                message:
+                    description: General Message of the premoderation
+                    type: string
+                reportID:
+                    description: Id of the Report of the premoderation
+                    type: string
+                premoderatinReasons:
+                    items:
+                        properties:
+                            premoderationType:
+                                description: Premoderation Type
+                                enum:
+                                    - premoderatedCategory
+                                    - premoderatedKeyword
+                                    - premoderatedRole
+                                    - premoderatedSpamStopForumSpam
+                                    - premoderatedSpamAkisment
+                                type: string
+                        type: object
+                    type: array
         Discussion:
             properties:
                 attributes:
@@ -1381,6 +1506,9 @@ components:
                 bookmarked:
                     description: Whether or not the discussion is bookmarked by the current user.
                     type: boolean
+                muted:
+                    description: Whether or not the discussion is muted by the current user.
+                    type: boolean
                 category:
                     $ref: "#/components/schemas/CategoryFragment"
                 categoryID:
@@ -1426,6 +1554,11 @@ components:
                 insertUserID:
                     description: The user that created the discussion.
                     type: integer
+                updateUserID:
+                    description: The user that last updated the discussion.
+                    type: integer
+                    nullable: true
+                    x-hidden: true
                 lastPost:
                     $ref: "#/components/schemas/PostFragment"
                 lastUserID:
@@ -1450,6 +1583,9 @@ components:
                     type: string
                 pinned:
                     description: Whether or not the discussion has been pinned.
+                    type: boolean
+                publishedSilently:
+                    description: Whether or not the discussion was published silently.
                     type: boolean
                 reactions:
                     items:
@@ -1572,6 +1708,7 @@ components:
                 - countViews
                 - score
                 - bookmarked
+                - muted
                 - unread
                 - attributes
             type: object
@@ -1622,6 +1759,10 @@ components:
                     type: string
                 postMeta:
                     $ref: "#/components/schemas/PostMeta"
+                tagIDs:
+                    type: array
+                    items:
+                        type: integer
             required:
                 - discussionID
                 - name
@@ -1635,6 +1776,11 @@ components:
             type: object
         DiscussionPost:
             properties:
+                aiGenerated:
+                    type: boolean
+                    description: Whether the discussion was AI generated.
+                    default: false
+                    x-hidden: true
                 body:
                     description: The body of the discussion.
                     minLength: 1
@@ -1682,6 +1828,38 @@ components:
                     type: string
                 postMeta:
                     $ref: "#/components/schemas/PostMeta"
+                publishedSilently:
+                    description: Whether the discussion should be published silently without sending notifications or webhooks. Requires silentPosting.allow permission.
+                    type: boolean
+                    nullable: true
+                newTagNames:
+                    type: array
+                    items:
+                        type: string
+                tagIDs:
+                    type: array
+                    items:
+                        type: integer
+                dateInserted:
+                    description: When the discussion was created.
+                    format: date-time
+                    type: string
+                    x-hidden: true
+                dateUpdated:
+                    description: When the discussion was last updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                    x-hidden: true
+                insertUserID:
+                    description: The user that created the discussion.
+                    type: integer
+                    x-hidden: true
+                updateUserID:
+                    description: The user that last updated the discussion.
+                    type: integer
+                    nullable: true
+                    x-hidden: true
             required:
                 - name
                 - body
@@ -1733,6 +1911,34 @@ components:
                     type: boolean
                 postMeta:
                     $ref: "#/components/schemas/PostMeta"
+                newTagNames:
+                    type: array
+                    items:
+                        type: string
+                tagIDs:
+                    type: array
+                    items:
+                        type: integer
+                dateInserted:
+                    description: When the discussion was created.
+                    format: date-time
+                    type: string
+                    x-hidden: true
+                dateUpdated:
+                    description: When the discussion was last updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                    x-hidden: true
+                insertUserID:
+                    description: The user that created the discussion.
+                    type: integer
+                    x-hidden: true
+                updateUserID:
+                    description: The user that last updated the discussion.
+                    type: integer
+                    nullable: true
+                    x-hidden: true
             type: object
         PostFragment:
             properties:

@@ -112,23 +112,18 @@ class MessagesApiController extends AbstractApiController
      */
     private function fullSchema()
     {
-        /** @var Schema $schema */
-        static $schema;
-
-        if ($schema === null) {
-            // Name this schema so that it can be read by swagger.
-            $schema = $this->schema(
-                [
-                    "messageID:i" => "The ID of the message.",
-                    "conversationID:i" => "The ID of the conversation.",
-                    "body:s" => "The body of the message.",
-                    "insertUserID:i" => "The user that created the message.",
-                    "insertUser?" => $this->getUserFragmentSchema(),
-                    "dateInserted:dt" => "When the message was created.",
-                ],
-                "Message"
-            );
-        }
+        // Name this schema so that it can be read by swagger.
+        $schema = $this->schema(
+            [
+                "messageID:i" => "The ID of the message.",
+                "conversationID:i" => "The ID of the conversation.",
+                "body:s" => "The body of the message.",
+                "insertUserID:i" => "The user that created the message.",
+                "insertUser?" => $this->getUserFragmentSchema(),
+                "dateInserted:dt" => "When the message was created.",
+            ],
+            "Message"
+        );
 
         return $schema;
     }
@@ -366,20 +361,18 @@ class MessagesApiController extends AbstractApiController
      */
     public function postSchema($type)
     {
-        static $postSchema;
-
-        if ($postSchema === null) {
-            $postSchema = $this->schema(
-                Schema::parse([
-                    "conversationID",
-                    "body:s" => [
-                        "maxLength" => $this->config->get("Conversations.Message.MaxLength", 2000),
-                    ],
-                    "format" => new \Vanilla\Models\FormatSchema(),
-                ])->add($this->fullSchema()),
-                "MessagePost"
-            );
-        }
+        $postSchema = $this->schema(
+            Schema::parse([
+                "conversationID",
+                "body:s" => [
+                    "maxLength" => $this->config->get("Conversations.Message.MaxLength", 2000),
+                ],
+                "format" => new \Vanilla\Models\FormatSchema(),
+            ])
+                ->merge(new MigratableSchema(["insertUserID:i?"]))
+                ->add($this->fullSchema()),
+            "MessagePost"
+        );
 
         return $this->schema($postSchema, $type);
     }

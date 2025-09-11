@@ -12,6 +12,7 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { important } from "csx";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const formToggleVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -33,10 +34,12 @@ export const formToggleVariables = useThemeCache((forcedVars?: IThemeVariables) 
         border: {
             ...inputVars.border,
             radius: sizing.height,
+            color: ColorsUtils.varOverride(ColorVar.InputBorder, inputVars.border.color),
+            colorHover: ColorsUtils.varOverride(ColorVar.InputBorderActive, inputVars.border.colorHover),
         },
-        color: globalVars.mainColors.bg,
-        colorActive: globalVars.mainColors.primary,
-        colorActiveState: globalVars.mainColors.secondary,
+        color: ColorsUtils.varOverride(ColorVar.InputBackground, globalVars.mainColors.bg),
+        colorActive: ColorsUtils.varOverride(ColorVar.Primary, globalVars.mainColors.primary),
+        colorActiveState: ColorsUtils.varOverride(ColorVar.PrimaryState, globalVars.mainColors.secondary),
     });
 
     const slider = makeVars("sizing", {
@@ -45,8 +48,10 @@ export const formToggleVariables = useThemeCache((forcedVars?: IThemeVariables) 
         border: {
             ...inputVars.border,
             radius: sizing.height,
+            color: ColorsUtils.varOverride(ColorVar.InputBorder, inputVars.border.color),
+            colorHover: ColorsUtils.varOverride(ColorVar.InputBorderActive, inputVars.border.colorHover),
         },
-        color: globalVars.mainColors.bg,
+        color: ColorsUtils.var(ColorVar.InputBackground, globalVars.mainColors.bg),
     });
 
     return { options, sizing, well, slider };

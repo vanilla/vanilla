@@ -125,7 +125,7 @@ class LongRunner implements SystemCallableInterface, LoggerAwareInterface
         $this->logger->info("Running long runner deferred: {$action->getCallableName()}", [
             Logger::FIELD_TAGS => ["longRunner"],
             Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-            "args" => json_encode($action->getArgs(), JSON_PRETTY_PRINT),
+            "args" => json_encode($action->getArgs(), JSON_PRETTY_PRINT, 4),
         ]);
         $this->validateLongRunnable($action);
         $job = new NormalJobDescriptor(LongRunnerJob::class);
@@ -158,7 +158,7 @@ class LongRunner implements SystemCallableInterface, LoggerAwareInterface
         $this->logger->info("Running long runner immediately: {$action->getCallableName()}", [
             Logger::FIELD_TAGS => ["longRunner"],
             Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-            "args" => json_encode($action->getArgs(), JSON_PRETTY_PRINT),
+            "args" => json_encode($action->getArgs(), JSON_PRETTY_PRINT, 4),
         ]);
         $generator = $this->runIterator($action);
         return ModelUtils::consumeGenerator($generator);

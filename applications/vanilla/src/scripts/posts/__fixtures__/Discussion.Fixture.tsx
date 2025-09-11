@@ -6,6 +6,7 @@
 
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
+import { blessStringAsSanitizedHtml } from "@vanilla/dom-utils";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { STORY_IPSUM_MEDIUM, STORY_TAGS } from "@library/storybook/storyData";
 import {
@@ -30,6 +31,7 @@ export class DiscussionFixture {
         bookmarked: false,
         categoryID: 123,
         statusID: 1,
+        muted: false,
     };
 
     public static CommentParentProvider = (props: { children: React.ReactNode }) => {
@@ -40,7 +42,10 @@ export class DiscussionFixture {
         );
     };
 
-    public static PostPageProvider = (props: { children: React.ReactNode; discussion?: Partial<IDiscussion> }) => {
+    public static PostPageProvider = (props: {
+        children: React.ReactNode;
+        discussion?: Partial<IDiscussion> | IDiscussion;
+    }) => {
         return (
             <PostPageContextProvider
                 initialPage={1}
@@ -57,7 +62,7 @@ export class DiscussionFixture {
         url: "https://vanillaforums.com/discussion/10",
         canonicalUrl: "https://vanillaforums.com/discussion/10",
         name: "Mock Discussion",
-        body: "Mock discussion content",
+        body: blessStringAsSanitizedHtml("Mock discussion content"),
         excerpt: "This is a mock discussion",
         discussionID: 10,
         countViews: 10,
@@ -89,6 +94,7 @@ export class DiscussionFixture {
             name: "Unresolved Discussion",
             excerpt: STORY_IPSUM_MEDIUM,
             discussionID: 10,
+            tags: STORY_TAGS,
             countViews: 10,
             countComments: 0,
             dateLastComment: "2021-02-17 17:51:15",
@@ -97,6 +103,11 @@ export class DiscussionFixture {
             type: "discussion",
             pinned: true,
             score: 2,
+            category: {
+                categoryID: 987,
+                name: "General",
+                url: "#",
+            },
             resolved: false,
         },
         {
@@ -115,6 +126,7 @@ export class DiscussionFixture {
                 url: "#",
             },
             resolved: true,
+            muted: true,
         },
         {
             ...this.commonFields,

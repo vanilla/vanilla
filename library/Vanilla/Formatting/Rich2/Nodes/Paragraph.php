@@ -12,7 +12,7 @@ class Paragraph extends AbstractNode
     const TYPE_KEY = "p";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -20,7 +20,7 @@ class Paragraph extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -28,7 +28,7 @@ class Paragraph extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getTextEnd(): string
     {
@@ -36,7 +36,7 @@ class Paragraph extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

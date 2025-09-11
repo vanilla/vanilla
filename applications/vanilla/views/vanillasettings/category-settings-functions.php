@@ -136,7 +136,7 @@ function symbol($name, $alt = '') {
     }
 
     $r = <<<EOT
-<svg {$alt}class="icon icon-16 icon-$name" viewBox="0 0 16 16"><use xlink:href="#$name" /></svg>
+<svg {$alt}class="icon icon-16 icon-$name" viewBox="0 0 16 16"><use xlink:href="#dash-$name" /></svg>
 EOT;
 
     return $r;

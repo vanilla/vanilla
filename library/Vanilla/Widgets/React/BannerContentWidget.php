@@ -19,7 +19,7 @@ use Vanilla\Layout\Section\SectionFullWidth;
 class BannerContentWidget extends BannerFullWidget
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -27,7 +27,15 @@ class BannerContentWidget extends BannerFullWidget
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -51,7 +59,7 @@ class BannerContentWidget extends BannerFullWidget
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {

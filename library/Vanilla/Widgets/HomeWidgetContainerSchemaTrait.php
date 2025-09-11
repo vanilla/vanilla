@@ -168,7 +168,7 @@ trait HomeWidgetContainerSchemaTrait
         $options->option("Custom", "static");
 
         return Schema::parse([
-            "descriptionType" => [
+            $required ? "descriptionType:s" : "descriptionType:s?" => [
                 "type" => "string",
                 "description" => "The type of description to use (contextual or static)",
                 "default" => $defaultValue ? "static" : "none",

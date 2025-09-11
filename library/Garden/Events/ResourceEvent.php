@@ -57,6 +57,9 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
     /** @var bool */
     protected bool $textUpdated;
 
+    /** @var bool */
+    protected bool $suppressWebhooks = false;
+
     /** @var array $apiParams */
     protected $apiParams;
 
@@ -309,7 +312,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
 
     /**
      * We can format audit messages for all resource events.
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function canFormatAuditMessage(string $eventType, array $context, array $meta): bool
     {
@@ -319,7 +322,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
 
     /**
      * User the explicit log entry message if {@link LoggableEventInterface} is implemented.
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function formatAuditMessage(string $eventType, array $context, array $meta): string
     {
@@ -332,7 +335,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getAuditEventType(): string
     {
@@ -340,7 +343,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getAuditContext(): array
     {
@@ -377,7 +380,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getAuditLogID(): string
     {
@@ -419,7 +422,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSessionUserID(): int
     {
@@ -430,7 +433,7 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSessionUsername(): string
     {
@@ -438,5 +441,22 @@ abstract class ResourceEvent implements \JsonSerializable, AuditLogEventInterfac
             return $this->sender["name"];
         }
         return $this->getTraitSessionUsername();
+    }
+
+    /**
+     * Get the canonical ID for the resource.
+     *
+     * @return string
+     */
+    public function getCanonicalID(): string
+    {
+        $canonicalID = $this->getPayload()[$this->getType()]["canonicalID"] ?? null;
+        if ($canonicalID) {
+            return $canonicalID;
+        }
+
+        // Fallback to {recordType}_{recordID}
+        [$recordType, $recordID] = $this->getRecordTypeAndID();
+        return $recordType . "_" . $recordID;
     }
 }

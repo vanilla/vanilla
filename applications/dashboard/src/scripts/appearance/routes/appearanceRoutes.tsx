@@ -9,6 +9,7 @@ import { slugify } from "@vanilla/utils";
 import ModalLoader from "@library/modal/ModalLoader";
 import AppearanceRoutePageLoader from "../components/AppearanceRoutePageLoader";
 import { getLayoutTypeSettingsUrl } from "../components/layoutViewUtils";
+import type { FragmentsApi } from "@dashboard/appearance/fragmentEditor/FragmentsApi";
 
 type LayoutFragment = {
     layoutID: ILayoutDetails["layoutID"];
@@ -84,6 +85,43 @@ export const AppearanceLayoutsRoute = new RouteHandler(
     AppearanceRoutePageLoader,
 );
 
+export const FragmentEditorPreviewRoute = new RouteHandler(
+    () => import("@dashboard/appearance/pages/FragmentEditorPreviewPage"),
+    "/appearance/fragments/preview",
+    (params: { fragmentType: string }) => "/appearance/fragments/preview?fragmentType=" + params.fragmentType,
+    ModalLoader,
+);
+
+export const FragmentEditorRoute = new RouteHandler(
+    () => import("@dashboard/appearance/pages/FragmentEditorPage"),
+    [`/appearance/fragments/:fragmentType/:fragmentUUID/edit`, "/appearance/fragments/:fragmentType/add"],
+    (widgetFragment: Partial<FragmentsApi.Fragment> & { isCopy?: boolean }) => {
+        if (widgetFragment.fragmentUUID) {
+            let slug = widgetFragment.fragmentUUID;
+
+            return (
+                `/appearance/fragments/${widgetFragment.fragmentType}/${slug}/edit` +
+                (widgetFragment.isCopy ? "?copy=true" : "")
+            );
+        } else {
+            return `/appearance/fragments/${widgetFragment.fragmentType}/add`;
+        }
+    },
+    ModalLoader,
+);
+
+export const WidgetBuilderRoute = new RouteHandler(
+    () => import("@dashboard/appearance/pages/WidgetBuilderPage"),
+    "/appearance/widget-builder",
+    () => "/appearance/widget-builder",
+);
+
+export const CustomPagesRoute = new RouteHandler(
+    () => import("@dashboard/appearance/pages/CustomPagesManagement"),
+    "/appearance/custom-pages",
+    () => "/appearance/custom-pages",
+);
+
 export function getAppearanceRoutes() {
     return [
         AppearanceRoute.route,
@@ -93,5 +131,9 @@ export function getAppearanceRoutes() {
         LayoutEditorRoute.route,
         LayoutOverviewRoute.route,
         LayoutOverviewRedirectRoute.route,
+        FragmentEditorPreviewRoute.route,
+        FragmentEditorRoute.route,
+        WidgetBuilderRoute.route,
+        CustomPagesRoute.route,
     ];
 }

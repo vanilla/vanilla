@@ -1,7 +1,7 @@
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { RichEmbedElement } from "@library/vanilla-editor/plugins/richEmbedPlugin/elements/RichEmbedElement";
-import { createVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { createVanillaEditor } from "@library/vanilla-editor/createVanillaEditor";
 import { ELEMENT_RICH_EMBED_CARD } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 
 export default {

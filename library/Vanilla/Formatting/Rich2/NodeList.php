@@ -80,7 +80,7 @@ class NodeList implements \JsonSerializable, TextDOMInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function jsonSerialize(): array
     {
@@ -96,7 +96,7 @@ class NodeList implements \JsonSerializable, TextDOMInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function stringify(): FormatText
     {
@@ -104,7 +104,7 @@ class NodeList implements \JsonSerializable, TextDOMInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFragments(): array
     {
@@ -130,7 +130,7 @@ class NodeList implements \JsonSerializable, TextDOMInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderHTML(): string
     {

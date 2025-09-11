@@ -16,9 +16,13 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Attributes;
+use Vanilla\CurrentTimeStamp;
+use Vanilla\Logging\AuditLogger;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Community\Events\DiscussionQueryEvent;
 use Vanilla\Community\Events\DiscussionStatusEvent;
@@ -29,7 +33,6 @@ use Vanilla\Contracts\Models\CrawlableInterface;
 use Vanilla\Contracts\Models\FragmentFetcherInterface;
 use Vanilla\Contracts\Models\VectorizeInterface;
 use Vanilla\Dashboard\AiSuggestionModel;
-use Vanilla\Dashboard\DocumentModel;
 use Vanilla\Dashboard\Models\AggregateCountableInterface;
 use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 use Vanilla\Dashboard\Models\PremoderationModel;
@@ -54,7 +57,9 @@ use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\MainImageSchema;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Logger;
+use Vanilla\Models\CollectionModel;
 use Vanilla\Permissions;
+use Vanilla\PostTypeConversionPayload;
 use Vanilla\Premoderation\PremoderationException;
 use Vanilla\Premoderation\PremoderationItem;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
@@ -82,6 +87,7 @@ use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Web\SystemCallableInterface;
 use Vanilla\Formatting\Formats\TextFormat;
+use Vanilla\Dashboard\Events\DiscussionPostTypeChangeEvent;
 
 /**
  * Manages discussions data.
@@ -166,6 +172,8 @@ class DiscussionModel extends Gdn_Model implements
         "new" => ["key" => "new", "name" => "New", "orderBy" => ["DateInserted" => "desc"]],
     ];
 
+    public const SCHEDULE_TYPE = "Scheduled";
+
     /** @var CategoryModel */
     private $categoryModel;
 
@@ -195,6 +203,10 @@ class DiscussionModel extends Gdn_Model implements
     public const CATEGORY_ANNOUNCEMENT = 2;
 
     public const ANNOUNCEMENT = [self::GLOBAL_ANNOUNCEMENT, self::CATEGORY_ANNOUNCEMENT];
+
+    public const MAX_TITLE_LENGTH_UPPER_LIMIT = 250;
+
+    public const MAX_TITLE_LENGTH_LOWER_LIMIT = 50;
 
     /**
      * @deprecated 2.6
@@ -285,9 +297,6 @@ class DiscussionModel extends Gdn_Model implements
 
     private PostTypeModel $postTypeModel;
 
-    /** @var DocumentModel */
-    private DocumentModel $documentModel;
-
     /**
      * Clear out the statically cached values for tests.
      */
@@ -320,8 +329,7 @@ class DiscussionModel extends Gdn_Model implements
             DiscussionStatusModel $discussionStatusModel,
             AiSuggestionModel $aiSuggestionModel,
             PostMetaModel $postMetaModel,
-            PostTypeModel $postTypeModel,
-            DocumentModel $documentModel
+            PostTypeModel $postTypeModel
         ) {
             $this->categoryModel = $categoryModel;
             $this->userModel = $userModel;
@@ -332,7 +340,6 @@ class DiscussionModel extends Gdn_Model implements
             $this->aiSuggestionModel = $aiSuggestionModel;
             $this->postMetaModel = $postMetaModel;
             $this->postTypeModel = $postTypeModel;
-            $this->documentModel = $documentModel;
         });
         $this->setFormatterService(Gdn::getContainer()->get(FormatService::class));
         $this->setMediaForeignTable($this->Name);
@@ -658,7 +665,7 @@ class DiscussionModel extends Gdn_Model implements
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function calculateAggregates(string $aggregateName, int $from, int $to)
     {
@@ -944,7 +951,7 @@ class DiscussionModel extends Gdn_Model implements
         $this->EventArguments["sql"] = &$this->SQL;
         $this->fireEvent("BeforeGet"); // @see 'BeforeGetCount' for consistency in results vs. counts
         $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL));
+        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL, $this->SQL));
 
         $removeAnnouncements = true;
         if (strtolower(val("Announce", $wheres)) == "all") {
@@ -1131,6 +1138,8 @@ class DiscussionModel extends Gdn_Model implements
      * @param bool|string $filterType Query Filter.
      * @param bool|int $userID potential User ID.
      * @param array $selects Extra fields to select.
+     * @param array $extraInnerSelects Extra fields to select on the inner query.
+     *
      * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
      * @throws Exception
      */
@@ -1143,7 +1152,8 @@ class DiscussionModel extends Gdn_Model implements
         bool $expand = true,
         $filterType = false,
         $userID = false,
-        array $selects = []
+        array $selects = [],
+        array $extraInnerSelects = []
     ) {
         $limit = $limit ?? $this->getDefaultLimit();
 
@@ -1159,10 +1169,18 @@ class DiscussionModel extends Gdn_Model implements
         $this->EventArguments["Wheres"] = &$where;
         $this->EventArguments["Selects"] = &$selects;
         $this->getEventManager()->fire("discussionModel_beforeGet", $this, $this->EventArguments);
-        $finalQuery = $this->getWhereQuery($where, $orderBy, $selects, $limit, $offset, $filterType, $userID);
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new DiscussionQueryEvent($finalQuery));
+        $finalQuery = $this->getWhereQuery(
+            $where,
+            $orderBy,
+            $selects,
+            $limit,
+            $offset,
+            $filterType,
+            $userID,
+            $extraInnerSelects
+        );
         $data = $finalQuery->get();
+        $this->SQL->reset();
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
@@ -1195,6 +1213,8 @@ class DiscussionModel extends Gdn_Model implements
      * @param int|false $offset The offset within the total set.
      * @param bool|string $filterType Query Filter.
      * @param bool|int $userID potential User ID.
+     * @param array $extraInnerSelects
+     *
      * @return Gdn_MySQLDriver Returns query of discussions.
      * @throws Exception
      */
@@ -1205,7 +1225,9 @@ class DiscussionModel extends Gdn_Model implements
         $limit = false,
         $offset = false,
         $filterType = false,
-        $userID = false
+        $userID = false,
+        array $extraInnerSelects = [],
+        bool $innerOnly = false
     ): Gdn_MySQLDriver {
         $limit = $limit ?: $this->getDefaultLimit();
         $offset = $offset ?: 0;
@@ -1228,13 +1250,26 @@ class DiscussionModel extends Gdn_Model implements
             }
         }
 
-        $sql = $this->SQL;
+        // We're doing an inner/outer query pattern here for performance reasons.
+        // The inner query MUST only select the primary key.
+        // This optimizes deep offset selects, by avoiding the need to scan the entire table content.
+        // Instead MySQL can do index scans.
+        // Still needs to be the GLOBAL SQL object because of plugins reading it.
+        $innerQuery = $this->SQL->select("d.DiscussionID")->from("Discussion d");
+        if (!empty($extraInnerSelects)) {
+            $innerQuery->select($extraInnerSelects);
+        }
 
-        $sql->select("d.*")->from("Discussion d");
+        $outerQuery = $this->createSql()
+            ->with("DiscussionBase", $innerQuery)
+            ->select("d.*")
+            ->select($selects)
+            ->from("@DiscussionBase db")
+            ->join("Discussion d", "d.DiscussionID = db.DiscussionID");
 
         // Set Dirty records
         if ($joinDirtyRecords) {
-            $this->applyDirtyWheres("d");
+            $this->applyDirtyWheres("d", $innerQuery);
         }
 
         if (isset($where["d.Followed"])) {
@@ -1251,12 +1286,13 @@ class DiscussionModel extends Gdn_Model implements
         }
 
         if (isset($where["d.Type"])) {
-            PostTypeModel::whereParentPostType($sql, $where["d.Type"], "d.");
+            PostTypeModel::whereParentPostType($innerQuery, $where["d.Type"], "d.");
             unset($where["d.Type"]);
         }
 
         if (isset($where["d.DiscussionID"]) && isset($where["d.InterestCategoryID"])) {
-            $sql->beginWhereGroup()
+            $innerQuery
+                ->beginWhereGroup()
                 ->where("d.DiscussionID", $where["d.DiscussionID"])
                 ->orWhere(
                     "d.CategoryID",
@@ -1276,11 +1312,15 @@ class DiscussionModel extends Gdn_Model implements
 
         // Add the UserDiscussion query.
         if ($userID > 0) {
-            $sql->join("UserDiscussion ud", "ud.DiscussionID = d.DiscussionID and ud.UserID = $userID", "left")
+            $outerQuery
+                ->leftJoin("UserDiscussion ud", "ud.DiscussionID = d.DiscussionID and ud.UserID = $userID")
                 ->select("ud.UserID", "", "WatchUserID")
-                ->select("ud.DateLastViewed, ud.Dismissed, ud.Bookmarked")
+                ->select("ud.DateLastViewed, ud.Dismissed, ud.Bookmarked, ud.Muted")
                 ->select("ud.CountComments", "", "CountCommentWatch")
                 ->select("ud.Participated");
+
+            // Keeping as left join to mitgate performance impact if we don't actually have a where with `ud.*`
+            $innerQuery->leftJoin("UserDiscussion ud", "ud.DiscussionID = d.DiscussionID and ud.UserID = $userID");
 
             if ($filterType) {
                 $where["ud." . ucfirst($filterType)] = 1;
@@ -1298,12 +1338,14 @@ class DiscussionModel extends Gdn_Model implements
 
             $announceValue = (array) $where["d.Announce"];
             if (in_array(0, $announceValue)) {
-                $sql->beginWhereGroup()
+                $innerQuery
+                    ->beginWhereGroup()
                     ->where(["d.Announce" => $announceValue])
                     ->orWhere(["ud.Dismissed <>" => 0])
                     ->endWhereGroup();
             } else {
-                $sql->where(["d.Announce" => $where["d.Announce"]])
+                $innerQuery
+                    ->where(["d.Announce" => $where["d.Announce"]])
                     ->beginWhereGroup()
                     ->where(["ud.Dismissed <>" => 1])
                     ->orWhere("ud.Dismissed is null")
@@ -1314,27 +1356,36 @@ class DiscussionModel extends Gdn_Model implements
 
         $insertUserRoleIDs = $where["uri.RoleID"] ?? null;
         if (!empty($insertUserRoleIDs)) {
-            $sql->join("UserRole uri", "d.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
+            $innerQuery->join("UserRole uri", "d.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
 
             // Ensure rows aren't duplicated
-            $sql->distinct();
+            $innerQuery->groupBy("d.DiscussionID");
         }
         unset($where["uri.RoleID"]);
 
-        $this->EventArguments["SQL"] = $sql;
+        // Used for customer plugins.
+        $this->EventArguments["SQL"] = $innerQuery;
         $this->fireEvent("BeforeGetSubQuery");
 
-        $sql->select($selects);
-        $sql->where($where);
+        $innerQuery->where($where);
+        $innerQuery->limit($limit);
+        $innerQuery->offset($offset);
 
         if (!empty($orderBy)) {
-            $sql->orderBy($orderBy);
+            $orderBy = $this->normalizeQuery($orderBy, "d");
+            $innerQuery->orderBy($orderBy);
+            $outerQuery->orderBy($orderBy);
         }
 
-        $sql->limit($limit);
-        $sql->offset($offset);
+        $eventManager = $this->getEventManager();
 
-        return $sql;
+        if ($innerOnly) {
+            $eventManager->dispatch(new DiscussionQueryEvent(innerQuery: $innerQuery, outerQuery: $innerQuery));
+            return $innerQuery;
+        } else {
+            $eventManager->dispatch(new DiscussionQueryEvent(innerQuery: $innerQuery, outerQuery: $outerQuery));
+            return $outerQuery;
+        }
     }
 
     /**
@@ -1348,6 +1399,10 @@ class DiscussionModel extends Gdn_Model implements
     {
         $safeWheres = [];
         foreach ($where as $key => $value) {
+            if ($key === ModelUtils::SORT_TRENDING) {
+                $safeWheres[$key] = $value;
+                continue;
+            }
             if ($value instanceof \Vanilla\Database\CallbackWhereExpression) {
                 $safeWheres[$key] = $value;
                 continue;
@@ -1379,13 +1434,14 @@ class DiscussionModel extends Gdn_Model implements
     public function getPagingCount(array $where = [], $filterType = false, $userID = false): int
     {
         $count = $this->getWhereQuery(
-            $where,
-            [],
-            ["d.DiscussionID"],
-            false,
-            false,
-            $filterType,
-            $userID
+            where: $where,
+            orderBy: [],
+            selects: ["d.DiscussionID"],
+            limit: false,
+            offset: false,
+            filterType: $filterType,
+            userID: $userID,
+            innerOnly: true
         )->getPagingCount("d.DiscussionID");
         return $count;
     }
@@ -1880,7 +1936,7 @@ class DiscussionModel extends Gdn_Model implements
             $this->SQL->limit($limit, $offset);
         }
         $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL));
+        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL, $this->SQL));
         $this->fireEvent("BeforeGetByUser");
 
         $data = $this->SQL->get();
@@ -2359,7 +2415,7 @@ class DiscussionModel extends Gdn_Model implements
         $this->SQL
             ->select("d.*")
             ->select("w.UserID", "", "WatchUserID")
-            ->select("w.DateLastViewed, w.Dismissed, w.Bookmarked")
+            ->select("w.DateLastViewed, w.Dismissed, w.Bookmarked, w.Muted")
             ->select("w.CountComments", "", "CountCommentWatch")
             ->select("w.Participated")
             ->select("d.DateLastComment", "", "LastDate")
@@ -2631,21 +2687,30 @@ class DiscussionModel extends Gdn_Model implements
      * @param array|false $settings
      * - CheckPermission - Check permissions during insert. Default true.
      *
-     * @return int $discussionID Unique ID of the discussion.
+     * @return int|string|bool Result of the save operation.
+     * - int: DiscussionID on successful insert/update.
+     * - string: "SPAM" or "UNAPPROVED" when content requires moderation.
+     * - bool: false when validation fails and no custom value is supplied by event listeners.
      * @throws ContainerException
      * @throws NotFoundException
      * @throws NotFoundException
      * @throws PremoderationException
      */
-    public function save($formPostValues, $settings = false)
+    public function save($formPostValues, $settings = false): int|string|bool
     {
+        $isSchedule = $settings["scheduled"] ?? false;
+
         // Define the primary key in this model's table.
         $settings = is_array($settings) ? $settings : [];
         $this->defineSchema();
 
         // Get the DiscussionID from the form to know if we are inserting or updating a record.
-        $discussionID = val("DiscussionID", $formPostValues, "");
-        $insert = $discussionID == "" ? true : false;
+        $discussionID = $scheduledDiscussionID = val("DiscussionID", $formPostValues, "");
+        if ($isSchedule || ($settings["insert"] ?? false)) {
+            $insert = true;
+        } else {
+            $insert = $discussionID == "";
+        }
         $currentDiscussionData = $insert ? [] : $this->getID($discussionID, DATASET_TYPE_ARRAY);
         $textUpdated = false;
         // Avoid polluting validation rules between operation types (e.g. persisting insert rules for an update).
@@ -2682,7 +2747,7 @@ class DiscussionModel extends Gdn_Model implements
         if ($maxTitleLength && array_key_exists("Name", $formPostValues)) {
             if (is_numeric($maxTitleLength) && $maxTitleLength > 0) {
                 $validation->setSchemaProperty("Name", "maxPlainTextLength", $maxTitleLength);
-                $validation->applyRule("Name", "plainTextLength");
+                $validation->applyRule("Name", "nonformattedPlainTextLength");
             }
         }
 
@@ -2791,13 +2856,21 @@ class DiscussionModel extends Gdn_Model implements
         $validationResults = array_merge($this->Validation->results(), $validation->results());
         $this->Validation->setResults($validationResults);
 
-        // If the body is not required, remove it's validation errors.
+        // If the body is not required, remove its validation errors.
         $bodyRequired = c("Vanilla.DiscussionBody.Required", true);
         if (!$bodyRequired && array_key_exists("Body", $validationResults)) {
             unset($validationResults["Body"]);
         }
 
         if (count($validationResults) == 0) {
+            if ($isSchedule) {
+                if ($insert && empty($discussionID)) {
+                    $fields = $validation->schemaValidationFields();
+                    return $this->saveScheduledPost($fields);
+                } else {
+                    return intval($discussionID);
+                }
+            }
             // Backward compatible check for flood control
             if (!val("SpamCheck", $this, true)) {
                 deprecated("DiscussionModel->SpamCheck attribute", "FloodControlTrait->setFloodControlEnabled()");
@@ -2834,6 +2907,15 @@ class DiscussionModel extends Gdn_Model implements
                         throw new NotFoundException("Discussion", [
                             "discussionID" => $discussionID,
                         ]);
+                    }
+
+                    if (
+                        PostTypeModel::isPostTypesFeatureEnabled() &&
+                        $stored->postTypeID === null &&
+                        ($fields["postTypeID"] ?? null) === null
+                    ) {
+                        $stored->Type = DiscussionModel::normalizeDiscussionType($stored->Type ?? null);
+                        $fields["postTypeID"] = $stored->Type;
                     }
 
                     // Make sure that the discussion get formatted in the method defined by Garden.
@@ -2886,7 +2968,9 @@ class DiscussionModel extends Gdn_Model implements
                     $oldCategoryID = $stored->CategoryID ?? null;
                     $newCategoryID = $fields["CategoryID"] ?? null;
                     $hasCategoryUpdate =
-                        $oldCategoryID !== null && $newCategoryID !== null && $oldCategoryID !== $newCategoryID;
+                        $oldCategoryID !== null &&
+                        $newCategoryID !== null &&
+                        (int) $oldCategoryID !== (int) $newCategoryID;
                     $textUpdated =
                         $currentDiscussionData["Name"] !== ($fields["Name"] ?? $currentDiscussionData["Name"]) ||
                         $currentDiscussionData["Body"] !== ($fields["Body"] ?? $currentDiscussionData["Body"]);
@@ -2911,6 +2995,9 @@ class DiscussionModel extends Gdn_Model implements
                     }
                 } else {
                     // Inserting.
+                    $hasCategoryUpdate = false; // Initialize for insert case
+                    $textUpdated = false; // Initialize for insert case
+
                     $format = $fields["Format"] ?? null;
                     if (!$format || c("Garden.ForceInputFormatter")) {
                         $fields["Format"] = $forcedFormat && $format ? $format : c("Garden.InputFormatter", "");
@@ -2965,9 +3052,20 @@ class DiscussionModel extends Gdn_Model implements
                         }
                     }
 
+                    if ($formPostValues["AiGenerated"] ?? false) {
+                        $fields["Attributes"] = array_merge($fields["Attributes"] ?? [], ["aiGenerated" => true]);
+                    }
+
                     // Create discussion
                     $this->serializeRow($fields);
                     $fields["hot"] = $this->getHotCalculationExpression();
+                    if ($settings["forcedDiscussion"] ?? false) {
+                        $recordID = $scheduledDiscussionID ?? $discussionID;
+                        if (empty($recordID)) {
+                            throw new ClientException("DiscussionID has not been provided to create a discussion");
+                        }
+                        $fields["DiscussionID"] = $recordID;
+                    }
                     $discussionID = $this->SQL->insert($this->Name, $fields);
                     $fields["DiscussionID"] = $discussionID;
 
@@ -2990,14 +3088,19 @@ class DiscussionModel extends Gdn_Model implements
                     $formPostValues["DiscussionID"] = $discussionID;
 
                     $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
-                    if ($discussion) {
+                    if ($discussion && !($settings["skipEvents"] ?? false)) {
                         $this->aggregateModel()->handleDiscussionInsert($discussion);
                         $this->EventArguments["DiscussionData"] = $discussion;
+
+                        $publishSilently = $discussion["Attributes"]["PublishedSilently"] ?? false;
+
                         // Send notifications
-                        $notificationGenerator = Gdn::getContainer()->get(
-                            \Vanilla\Models\CommunityNotificationGenerator::class
-                        );
-                        $notificationGenerator->notifyNewDiscussion($discussion);
+                        if (!$publishSilently) {
+                            $notificationGenerator = Gdn::getContainer()->get(
+                                \Vanilla\Models\CommunityNotificationGenerator::class
+                            );
+                            $notificationGenerator->notifyNewDiscussion($discussion);
+                        }
                     }
                 }
                 if (!$insert && !empty($formPostValues["Announce"]) && !$currentDiscussionData["Announce"]) {
@@ -3016,24 +3119,51 @@ class DiscussionModel extends Gdn_Model implements
                 // Fire an event that the discussion was saved.
                 $this->EventArguments["FormPostValues"] = $formPostValues;
                 $this->EventArguments["Fields"] = $fields;
+                $this->EventArguments["skipEvents"] = $settings["skipEvents"] ?? false;
                 $this->EventArguments["DiscussionID"] = $discussionID;
+                $this->EventArguments["CategoryUpdate"] = $hasCategoryUpdate;
                 $this->fireEvent("AfterSaveDiscussion");
 
                 $event = new MachineTranslationEvent("discussion", [$discussionID]);
                 $this->getEventManager()->dispatch($event);
-
-                $action = $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE;
-                \Gdn::scheduler()->addJobDescriptor(
-                    new NormalJobDescriptor(DeferredResourceEventJob::class, [
-                        "id" => $discussionID,
-                        "model" => DiscussionModel::class,
-                        "action" => $action,
-                        "textUpdated" => $textUpdated,
-                    ])
-                );
+                if (!($settings["skipEvents"] ?? false)) {
+                    $action = $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE;
+                    \Gdn::scheduler()->addJobDescriptor(
+                        new NormalJobDescriptor(DeferredResourceEventJob::class, [
+                            "id" => $discussionID,
+                            "model" => DiscussionModel::class,
+                            "action" => $action,
+                            "textUpdated" => $textUpdated,
+                        ])
+                    );
+                }
             }
         }
 
+        return intval($discussionID);
+    }
+
+    /**
+     * Save a scheduled post-entry
+     *
+     * @param array $postFields
+     * @return int
+     * @throws NotFoundException
+     */
+    private function saveScheduledPost(array $postFields): int
+    {
+        $discussionID = $postFields["DiscussionID"] ?? 0;
+        $postFields["Type"] = DiscussionModel::SCHEDULE_TYPE;
+        if (!$discussionID) {
+            $format = $postFields["Format"] ?? null;
+            if (!$format || c("Garden.ForceInputFormatter")) {
+                $postFields["Format"] = $format ?: c("Garden.InputFormatter", "");
+            }
+            $postFields["CategoryID"] = -50; // provide an invalid category so that the record remain hidden
+            $this->serializeRow($postFields);
+
+            return $this->SQL->insert($this->Name, $postFields);
+        }
         return $discussionID;
     }
 
@@ -3256,6 +3386,43 @@ class DiscussionModel extends Gdn_Model implements
         $this->fireEvent("AfterBookmark");
 
         return (bool) $bookmarked;
+    }
+
+    /**
+     * Mutes or unmutes a discussion for the specified user.
+     *
+     * @param int $discussionID
+     * @param int $userID
+     * @param int $muted
+     * @return bool
+     */
+    public function mute(int $discussionID, int $userID, bool $muted): bool
+    {
+        $existingRow = $this->createSql()
+            ->from("UserDiscussion")
+            ->where([
+                "DiscussionID" => $discussionID,
+                "UserID" => $userID,
+            ])
+            ->get()
+            ->resultArray();
+
+        if (!empty($existingRow)) {
+            $this->createSql()
+                ->update("UserDiscussion")
+                ->set("Muted", $muted ? 1 : 0)
+                ->where("DiscussionID", $discussionID)
+                ->where("UserID", $userID)
+                ->put();
+        } else {
+            $this->createSql()->insert("UserDiscussion", [
+                "UserID" => $userID,
+                "DiscussionID" => $discussionID,
+                "Muted" => $muted,
+                "DateMuted" => DateTimeFormatter::timeStampToDateTime(CurrentTimeStamp::get()),
+            ]);
+        }
+        return $muted;
     }
 
     /**
@@ -4216,9 +4383,8 @@ SQL;
     {
         $name = $discussion["Name"] ?? "";
         $dateInserted = $discussion["DateInserted"] ?? "";
-        $body = Gdn_Format::reduceWhiteSpaces(
-            Gdn_Format::excerpt($discussion["Body"] ?? "", $discussion["Format"] ?? "Html")
-        );
+        // The body is always rendered in HTML at this point
+        $body = Gdn::formatService()->renderExcerpt($discussion["Body"] ?? "", $discussion["Format"] ?? "Html");
 
         $result = [
             "headline" => $name,
@@ -4360,6 +4526,7 @@ SQL;
 
         $row["Announce"] = (bool) ($row["Announce"] ?? 0);
         $row["Dismissed"] = (bool) ($row["Dismissed"] ?? 0);
+        $row["Muted"] = (bool) ($row["Muted"] ?? 0);
         $row["Url"] = discussionUrl($row);
         $row["CanonicalUrl"] =
             isset($row["CanonicalUrl"]) && is_string($row["CanonicalUrl"]) ? $row["CanonicalUrl"] : $row["Url"];
@@ -4466,6 +4633,9 @@ SQL;
 
         // Get the discussion's parsed body's first image & get the srcset for it.
         $result["image"] = $this->formatterService->parseMainImage($bodyParsed, $format);
+
+        $result["publishedSilently"] =
+            isset($result["attributes"]["publishedSilently"]) && $result["attributes"]["publishedSilently"];
 
         // Return suggestions if suggestions are enabled and exist for the discussion
         if (FeatureFlagHelper::featureEnabled("AISuggestions")) {
@@ -4592,15 +4762,16 @@ SQL;
             "lastUserID:i",
             "lastUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
             "pinned:b?" => "Whether or not the discussion has been pinned.",
-            "pinLocation:s|n" => [
+            "pinLocation:s?" => [
                 "enum" => ["category", "recent"],
+                "allowNull" => true,
                 "description" =>
                     "The location for the discussion, if pinned. " .
                     '"category" are pinned to their own category. ' .
                     '"recent" are pinned to the recent discussions list, as well as their own category.',
             ],
             "closed:b" => "Whether the discussion is closed or open.",
-            "announce:b" => "Whether the discussion is an announcement.",
+            "announce:b?" => "Whether the discussion is an announcement.",
             "sink:b" => "Whether or not the discussion has been sunk.",
             "countComments:i" => "The number of comments on the discussion.",
             "countViews:i" => "The number of views on the discussion.",
@@ -4609,7 +4780,6 @@ SQL;
             "url:s?" => "The full URL to the discussion.",
             "canonicalUrl:s" => "The full canonical URL to the discussion.",
             "format:s?" => "Format of the discussion",
-            "tagIDs:a?" => ["items" => ["type" => "integer"]],
             "labelCodes:a?" => ["items" => ["type" => "string"]],
             "lastPost?" => SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
             "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
@@ -4629,24 +4799,40 @@ SQL;
                     "statusChanged" => [
                         "type" => "boolean",
                     ],
+                    "aiGenerated" => [
+                        "type" => "boolean",
+                    ],
                 ],
             ],
             "status?" => RecordStatusModel::getSchemaFragment(),
             "trending:o?",
             "reactions?" => $this->reactionModel->getReactionSummaryFragment(),
             "reportMeta?" => \Vanilla\Forum\Models\CommunityManagement\ReportModel::reportMetaSchema(),
+            "tags?",
             "attachments:a?",
             "countReports:i?",
             "suggestions:a?",
             "showSuggestions:b?",
             "postMeta?",
             "permissions:o?",
+            "tagIDs:a?" => [
+                "type" => "array",
+                "items" => [
+                    "type" => "integer",
+                ],
+            ],
         ];
         if (\Gdn::session()->checkPermission("staff.allow")) {
             $schema["internalStatusID:i"] = ["default" => RecordStatusModel::DISCUSSION_STATUS_UNRESOLVED];
             $schema["internalStatus?"] = RecordStatusModel::getSchemaFragment();
             $schema["resolved:b"] = [
                 "default" => false,
+            ];
+        }
+        if (\Gdn::session()->checkPermission("silentPosting.allow")) {
+            $schema["publishedSilently:b?"] = [
+                "default" => false,
+                "description" => "Whether or not the discussion was published silently.",
             ];
         }
 
@@ -4666,6 +4852,7 @@ SQL;
             "unread:b" => "Whether or not the discussion should have an unread indicator.",
             "countUnread:i?" => "The number of unread comments.",
             "dismissed:b" => "Whether or not the discussion has been dismissed by the current user.",
+            "muted:b" => "Whether or not the discussion has been muted by the current user.",
         ]);
         return $result;
     }
@@ -4903,13 +5090,13 @@ SQL;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCrawlInfo(): array
     {
         $r = LegacyModelUtils::getCrawlInfoFromPrimaryKey(
             $this,
-            "/api/v2/discussions?pinOrder=mixed&sort=-discussionID&expand=crawl,tagIDs,roles",
+            "/api/v2/discussions?pinOrder=mixed&sort=-discussionID&expand=crawl,tagIDs,roles,postMeta",
             "discussionID"
         );
         return $r;
@@ -5106,6 +5293,7 @@ SQL;
         try {
             $db->beginTransaction();
             $this->SQL->delete("Discussion", ["DiscussionID" => $discussionID]);
+            $this->SQL->delete("collectionRecord", ["recordType" => "discussion", "recordID" => $discussionID]);
             $event = new MachineTranslationEvent("discussion", [$discussionID]);
             $this->getEventManager()->dispatch($event);
             $this->SQL->delete("UserDiscussion", ["DiscussionID" => $discussionID]);
@@ -5197,7 +5385,8 @@ SQL;
         $discussionOrDiscussionID,
         $categoryOrCategoryID,
         bool $addRedirects,
-        ?string $postTypeID = null
+        ?string $postTypeID = null,
+        ?array $postMeta = null
     ): bool {
         $newCategory = is_numeric($categoryOrCategoryID)
             ? CategoryModel::categories($categoryOrCategoryID)
@@ -5214,6 +5403,15 @@ SQL;
         }
         // Default/Empty/Null discussion type is a discussion.
         $discussion["Type"] = $discussion["Type"] ?? self::DISCUSSION_TYPE;
+
+        $conversionPayload =
+            $postTypeID !== null
+                ? PostTypeConversionPayload::fromDiscussion(
+                    $discussion,
+                    toPostTypeID: $postTypeID,
+                    postMeta: $postMeta ?? []
+                )
+                : null;
 
         $discussionID = $discussion["DiscussionID"];
         $newCategoryID = $newCategory["CategoryID"];
@@ -5245,16 +5443,21 @@ SQL;
 
             $allowedDiscussionTypes = array_map("strtolower", $allowedDiscussionTypes);
 
-            if (
-                isset($discussion["Type"]) &&
-                !empty($allowedDiscussionTypes) &&
-                !in_array(strtolower($discussion["Type"]), $allowedDiscussionTypes)
-            ) {
-                throw new ClientException("Discussion type is not allowed in the destination category.", 400, [
-                    "discussionID" => $discussionID,
-                    "discussionType" => $discussion["Type"],
-                    "allowedDiscussionTypes" => $allowedDiscussionTypes,
-                ]);
+            // Make sure we use the new post type.
+            if ($conversionPayload !== null) {
+                $newBasePostType = $conversionPayload->toBaseType;
+            } else {
+                $newBasePostType = strtolower($discussion["Type"] ?? self::DISCUSSION_TYPE);
+            }
+
+            if ($discussion["Type"] !== self::REDIRECT_TYPE) {
+                if (!empty($allowedDiscussionTypes) && !in_array($newBasePostType, $allowedDiscussionTypes)) {
+                    throw new ClientException("Discussion type is not allowed in the destination category.", 400, [
+                        "discussionID" => $discussionID,
+                        "discussionType" => $discussion["Type"],
+                        "allowedDiscussionTypes" => $allowedDiscussionTypes,
+                    ]);
+                }
             }
 
             // Create the redirect.
@@ -5291,9 +5494,10 @@ SQL;
         }
 
         // Update the post type using the DiscussionTypeConverter if we are changing the post type.
-        if (isset($postTypeID) && $discussion["postTypeID"] !== $postTypeID) {
+        if ($conversionPayload !== null && $conversionPayload->hasTypeChange()) {
             $discussionTypeConverter = Gdn::getContainer()->get(\Vanilla\DiscussionTypeConverter::class);
-            $discussionTypeConverter->convert($discussion, $postTypeID, isCustomPostType: true);
+            $conversionPayload->targetCategoryRow = CategoryModel::categories($newCategoryID);
+            $discussionTypeConverter->convert($conversionPayload);
         }
         return true;
     }
@@ -5317,7 +5521,7 @@ SQL;
      *
      * @param array $discussionRow
      */
-    public function tryRedirectFromDiscussion(array $discussionRow): void
+    public function tryRedirectFromDiscussion(array $discussionRow, bool $throw = false): void
     {
         $type = $discussionRow["type"] ?? ($discussionRow["Type"] ?? null);
         $body = $discussionRow["body"] ?? ($discussionRow["Body"] ?? "");
@@ -5327,7 +5531,12 @@ SQL;
             $renderedBody = \Gdn::formatService()->renderHTML($body, $format ?? null);
             if (preg_match('`href="([^"]+)"`i', $renderedBody, $matches)) {
                 $url = $matches[1];
-                redirectTo(htmlspecialchars_decode($url), 301);
+
+                if ($throw) {
+                    throw new ResponseException(new Redirect($url, 301));
+                } else {
+                    redirectTo(htmlspecialchars_decode($url), 301);
+                }
             }
         }
     }
@@ -5346,7 +5555,8 @@ SQL;
         array $discussionIDs,
         int $categoryID,
         bool $addRedirects,
-        ?string $postTypeID = null
+        ?string $postTypeID = null,
+        ?array $postMeta = null
     ): Generator {
         $discussionIDs = array_unique($discussionIDs);
         $handledDiscussionIDs = [];
@@ -5355,7 +5565,7 @@ SQL;
 
             foreach ($discussionIDs as $discussionID) {
                 try {
-                    $this->moveDiscussion($discussionID, $categoryID, $addRedirects, $postTypeID);
+                    $this->moveDiscussion($discussionID, $categoryID, $addRedirects, $postTypeID, $postMeta);
                     $handledDiscussionIDs[] = $discussionID;
                     yield new LongRunnerSuccessID($discussionID);
                 } catch (Exception $e) {
@@ -5369,7 +5579,13 @@ SQL;
             }
         } catch (LongRunnerTimeoutException $e) {
             $remainingDiscussionIDs = array_diff($discussionIDs, $handledDiscussionIDs);
-            return new LongRunnerNextArgs([$remainingDiscussionIDs, $categoryID, $addRedirects, $postTypeID]);
+            return new LongRunnerNextArgs([
+                $remainingDiscussionIDs,
+                $categoryID,
+                $addRedirects,
+                $postTypeID,
+                $postMeta,
+            ]);
         }
     }
 
@@ -5527,7 +5743,6 @@ SQL
     {
         if (PostTypeModel::isPostTypesFeatureEnabled()) {
             // If Post Types is on, then we are converting to a custom post type.
-
             if (isset(PostTypeModel::LEGACY_TYPE_MAP[$to])) {
                 // If this is a legacy type name, convert to post type ID first.
                 $to = PostTypeModel::LEGACY_TYPE_MAP[$to];
@@ -5538,15 +5753,9 @@ SQL
                 return;
             }
 
-            try {
-                $this->SQL->Database->beginTransaction();
-                $discussion = $this->getID($id, DATASET_TYPE_ARRAY);
-                $fromType = $discussion["postTypeID"] ?? lcfirst($discussion["Type"]);
-                if (isset($postMeta)) {
-                    $this->postMetaModel->updatePostMeta("discussion", $id, $postMeta);
-                } else {
-                    $this->postMetaModel->movePostMeta($id, $fromType, $to);
-                }
+            $this->SQL->Database->runWithTransaction(function () use ($id, $postType, $forceNullDiscussion, $postMeta) {
+                $this->postMetaModel->delete(["recordType" => "discussion", "recordID" => $id]);
+                $this->postMetaModel->updatePostMeta("discussion", $id, $postMeta ?? []);
 
                 $this->setField($id, [
                     "postTypeID" => $postType["postTypeID"],
@@ -5555,13 +5764,19 @@ SQL
                             ? null
                             : ucfirst($postType["baseType"]),
                 ]);
-                $this->SQL->Database->commitTransaction();
-            } catch (Throwable $e) {
-                $this->SQL->Database->rollbackTransaction();
-                throw $e;
-            }
+            });
         } else {
             $this->setField($id, "Type", $to === "Discussion" && $forceNullDiscussion ? null : $to);
         }
+    }
+
+    /**
+     * Get maximum allowed post title length.
+     *
+     * @return int
+     */
+    public static function getPostTitleMaxLength(): int
+    {
+        return (int) Gdn::config("Vanilla.Discussion.Title.MaxLength", self::MAX_TITLE_LENGTH_UPPER_LIMIT);
     }
 }

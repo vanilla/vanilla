@@ -36,7 +36,7 @@ class ImageHtmlProcessorTest extends VanillaTestCase
     private $request;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

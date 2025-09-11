@@ -4,7 +4,7 @@
  */
 
 import React, { ComponentProps } from "react";
-import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
+import { WidgetItemContentType } from "@library/homeWidget/WidgetItemOptions";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
 import QuickLinks from "@library/navigation/QuickLinks";
@@ -28,7 +28,7 @@ export function RSSWidget(props: ComponentProps<typeof HomeWidget>) {
                     ...props.itemOptions,
                     contentType: props.itemOptions?.contentType
                         ? props.itemOptions?.contentType
-                        : HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
+                        : WidgetItemContentType.TitleDescriptionImage,
                 }}
             />
         );

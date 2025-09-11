@@ -15,6 +15,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 class ConversationsTest extends AbstractAPIv2Test
 {
     use UsersAndRolesApiTestTrait;
+    use ConversationApiTestTrait;
 
     protected static $userCounter = 0;
 
@@ -350,5 +351,56 @@ class ConversationsTest extends AbstractAPIv2Test
             $this->expectExceptionCode(403);
             $this->expectExceptionMessage("The site is not configured for moderating conversations.");
         }
+    }
+
+    /**
+     * Test that the insertUserID, and dateInserted can be overwritten.
+     *
+     * @return void
+     */
+    public function testMigratableFields(): void
+    {
+        $this->createUser();
+
+        $this->createConversation([
+            "dateInserted" => "2012-12-21",
+            "insertUserID" => $this->lastUserID,
+        ]);
+        $this->api->get($this->baseUrl . "/" . $this->lastConversationID)->assertJsonObjectLike([
+            "dateInserted" => "2012-12-21T00:00:00+00:00",
+            "insertUserID" => $this->lastUserID,
+        ]);
+    }
+
+    /**
+     * Make sure that users without the `site.manage` permission are not able to set or edit migratable fields.
+     *
+     * @param array $body
+     * @return void
+     * @dataProvider provideMigratablePayload
+     */
+    public function testMigratableFieldsPermissions(array $body): void
+    {
+        $this->runWithPermissions(
+            function () use ($body) {
+                $this->createConversation();
+                $this->createMessage($body);
+
+                $event = $this->api->get($this->baseUrl . "/" . $this->lastConversationID)->getBody();
+                $this->assertNotEquals("2012-12-21T00:00:00+00:00", $event["dateInserted"]);
+                $this->assertNotEquals(1, $event["insertUserID"]);
+            },
+            [
+                "conversations.add" => true,
+            ]
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function provideMigratablePayload(): array
+    {
+        return [[[]], [["dateInserted" => "2012-12-21"]], [["insertUserID" => 1]]];
     }
 }

@@ -31,8 +31,8 @@
                 placeClass      : 'nestable-placeholder', // applied to position we're moving item from
                 noDragClass     : 'js-nestable-nodrag',
                 emptyClass      : 'nestable-empty', // applied to empty list elements
-                expandBtnHTML   : '<button class="nestable-collapse" data-action="expand"><svg class="icon icon-16 icon-chevron-closed" viewBox="0 0 16 16"><use xlink:href="#chevron-closed" /></svg></button>',
-                collapseBtnHTML : '<button class="nestable-collapse" data-action="collapse"><svg class="icon icon-16 icon-chevron-open" viewBox="0 0 16 16"><use xlink:href="#chevron-open" /></svg></button>'
+                expandBtnHTML   : '<button class="nestable-collapse" data-action="expand"><svg class="icon icon-16 icon-chevron-closed" viewBox="0 0 16 16"><use xlink:href="#dash-chevron-closed" /></svg></button>',
+                collapseBtnHTML : '<button class="nestable-collapse" data-action="collapse"><svg class="icon icon-16 icon-chevron-open" viewBox="0 0 16 16"><use xlink:href="#dash-chevron-open" /></svg></button>'
             })
             .on('dragEnd', function(event, items, source, destination, position) {
                 // We're going to get this list item and all its children. Reduce it down to just this list item.
@@ -116,7 +116,7 @@
                 var svgMap = {categories: "nested"};
                 var svg = svgMap[displayAs] || displayAs;
                 var options = '';
-                svg = ' <svg class="icon icon-16 icon-' + svg + '" viewBox="0 0 16 16"><use xlink:href="#' + svg + '" /></svg> ';
+                svg = ' <svg class="icon icon-16 icon-' + svg + '" viewBox="0 0 16 16"><use xlink:href="#dash-' + svg + '" /></svg> ';
                 $('.dropdown-toggle[data-id="' + categoryID + '"]').each(function() {
                     $(this).html(svg);
                     options = $('.js-nestable-item[data-id="' + categoryID + '"] .options').html();

@@ -24,6 +24,7 @@ use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Widgets\Fragments\CategoryItemFragmentMeta;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\WidgetSchemaTrait;
 use Vanilla\Layout\HydrateAwareInterface;
@@ -78,6 +79,14 @@ class CategoryListAsset extends AbstractLayoutAsset implements HydrateAwareInter
     public static function getComponentName(): string
     {
         return "CategoriesWidget";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [CategoryItemFragmentMeta::class];
     }
 
     /**
@@ -172,7 +181,7 @@ class CategoryListAsset extends AbstractLayoutAsset implements HydrateAwareInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -180,7 +189,7 @@ class CategoryListAsset extends AbstractLayoutAsset implements HydrateAwareInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getApiSchema(): Schema
     {

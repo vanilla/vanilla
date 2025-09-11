@@ -9,6 +9,7 @@ import { IUserFragment } from "@library/@types/api/users";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { RecordID } from "@vanilla/utils";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
+import type { VanillaSanitizedHtml } from "@vanilla/dom-utils";
 
 export interface ICommunityManagementRecord {
     recordType: string;
@@ -27,7 +28,7 @@ export interface ICommunityManagementRecord {
     placeRecordUrl: string;
     placeRecordName: string;
     recordDateInserted: string | null;
-    recordHtml: string;
+    recordHtml: VanillaSanitizedHtml;
 }
 
 /**
@@ -51,7 +52,7 @@ export interface IReport extends ICommunityManagementRecord {
     dateUpdated: any;
     updateUserID: any;
     status: string;
-    noteHtml: string;
+    noteHtml: VanillaSanitizedHtml;
     reasons: IReason[];
     isPending: boolean;
     isPendingUpdate: boolean;
@@ -67,6 +68,13 @@ interface IPostReport {
     reasons: IReason[];
     recordType: string;
     recordID: number;
+}
+
+export interface IPatchReportRequestBody {
+    premoderatedRecord?: {
+        body?: string;
+        name?: string;
+    };
 }
 
 /**

@@ -21,13 +21,15 @@ import { embedMenuClasses } from "@library/editor/pieces/embedMenuStyles";
 interface IProps {
     onSave: (meta: IImageMeta) => void;
     className?: string;
-    initialAlt: string;
+    initialAlt?: string;
+    initialTargetUrl?: string;
     onClose: () => void;
     isVisible: boolean;
 }
 
 export interface IImageMeta {
-    alt: string;
+    alt?: string;
+    targetUrl?: string;
 }
 
 /**
@@ -36,13 +38,27 @@ export interface IImageMeta {
 export function ImageEmbedModal(props: IProps) {
     const classes = embedMenuClasses();
     const [alt, setAlt] = useState(props.initialAlt);
+    const [targetUrl, setTargetUrl] = useState(props.initialTargetUrl);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const isImageTargetUrl = !!props.initialTargetUrl;
+
+    // Reset alt state when initialAlt changes
+    useEffect(() => {
+        setAlt(props.initialAlt);
+    }, [props.initialAlt]);
+
+    // Reset targetUrl state when initialTargetUrl changes
+    useEffect(() => {
+        setTargetUrl(props.initialTargetUrl);
+    }, [props.initialTargetUrl]);
 
     const handleTextChange = useCallback((event) => {
         if (event) {
+            const newValue = event.target.value || "";
             event.stopPropagation();
             event.preventDefault();
-            setAlt(event.target.value || "");
+            isImageTargetUrl ? setTargetUrl(newValue) : setAlt(newValue);
         }
     }, []);
 
@@ -51,11 +67,8 @@ export function ImageEmbedModal(props: IProps) {
         inputRef.current?.focus();
     }, []);
 
-    const saveAndClose = () => {
-        setAlt(alt);
-        props.onSave({
-            alt,
-        });
+    const saveAndClose = (value: IImageMeta) => {
+        props.onSave(value);
         props.onClose();
     };
 
@@ -66,25 +79,39 @@ export function ImageEmbedModal(props: IProps) {
             <EditorEventWall>
                 <form className={classes.form}>
                     <Frame
-                        header={<FrameHeader title={t("Alt Text")} titleID={titleID} closeFrame={saveAndClose} />}
+                        header={
+                            <FrameHeader
+                                title={isImageTargetUrl ? t("Link Image to URL") : t("Alt Text")}
+                                titleID={titleID}
+                                closeFrame={() => {
+                                    props.onClose();
+                                }}
+                            />
+                        }
                         body={
                             <FrameBody className={classes.verticalPadding}>
                                 <InputTextBlock
-                                    label={t(
-                                        "Alternative text helps users with accessibility concerns and improves SEO.",
-                                    )}
+                                    label={
+                                        isImageTargetUrl
+                                            ? t("Enter the URL you want this image to link to.")
+                                            : t(
+                                                  "Alternative text helps users with accessibility concerns and improves SEO.",
+                                              )
+                                    }
                                     labelClassName={classes.paragraph}
                                     inputProps={{
                                         required: true,
-                                        value: alt,
+                                        value: isImageTargetUrl ? targetUrl : alt,
                                         onChange: handleTextChange,
                                         inputRef,
-                                        placeholder: t("Example: Image of a Coffee"),
+                                        placeholder: isImageTargetUrl
+                                            ? t("Example: https://example.com")
+                                            : t("Example: https://example.com/image.jpg"),
                                         onKeyPress: (event: React.KeyboardEvent) => {
                                             if (event.key === "Enter") {
                                                 event.preventDefault();
                                                 event.stopPropagation();
-                                                saveAndClose();
+                                                saveAndClose(isImageTargetUrl ? { targetUrl } : { alt: alt || "" });
                                             }
                                         },
                                     }}
@@ -98,7 +125,7 @@ export function ImageEmbedModal(props: IProps) {
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        saveAndClose();
+                                        saveAndClose(isImageTargetUrl ? { targetUrl } : { alt: alt || "" });
                                     }}
                                 >
                                     {t("Save")}

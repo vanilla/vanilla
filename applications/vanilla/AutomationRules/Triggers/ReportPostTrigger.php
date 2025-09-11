@@ -32,7 +32,7 @@ class ReportPostTrigger extends AutomationTrigger
     private ReportModel $reportModel;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -40,7 +40,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -48,7 +48,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -56,7 +56,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -64,7 +64,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function canAddTrigger(): bool
     {
@@ -73,7 +73,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -141,7 +141,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -211,7 +211,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getPrimaryKey(): string
     {
@@ -219,7 +219,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getObjectModel(): ReportModel
     {
@@ -227,7 +227,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {
@@ -237,7 +237,7 @@ class ReportPostTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess($lastRecordId, array $where): iterable
     {

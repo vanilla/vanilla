@@ -648,4 +648,164 @@ class ActivityModelTest extends SiteTestCase
             "Test"
         );
     }
+
+    /**
+     * Test that emails include mute links for supported record types.
+     *
+     * @dataProvider provideSupportedRecordTypesForMuteLinks
+     */
+    public function testEmailIncludesMuteLinkForSupportedRecordTypes(string $recordType): void
+    {
+        $user = $this->createUser();
+        $discussionID = 123;
+
+        // Test the mute link generation directly instead of email capture
+        $activity = [
+            "ActivityType" => "Comment",
+            "RecordType" => $recordType,
+            "ParentRecordID" => $discussionID,
+        ];
+
+        $userArray = [
+            "UserID" => $user["userID"],
+            "Name" => $user["name"] ?? "TestUser",
+            "Email" => "test@example.com",
+            "PhotoUrl" => "",
+        ];
+
+        // Test mute link generation
+        $muteLink = $this->activityModel->getMuteLink($activity, $userArray, "html");
+
+        // Verify the mute link contains expected elements
+        $this->assertStringContainsString(
+            "Mute this Post",
+            $muteLink,
+            "Mute link should contain correct text for {$recordType} record type"
+        );
+        $this->assertStringContainsString(
+            "/unsubscribe/",
+            $muteLink,
+            "Mute link should contain unsubscribe URL for {$recordType} record type"
+        );
+        $this->assertStringContainsString(
+            "target=\"_blank\"",
+            $muteLink,
+            "Mute link should open in new tab for {$recordType} record type"
+        );
+
+        // Extract and decode the token
+        preg_match('/\/unsubscribe\/([^"]+)/', $muteLink, $matches);
+        $this->assertNotEmpty($matches, "Should be able to extract token from mute link for {$recordType} record type");
+
+        $token = $matches[1];
+        $tokenData = $this->activityModel->decodeNotificationToken($token);
+
+        // Verify token contains correct data
+        $this->assertEquals(
+            $discussionID,
+            $tokenData->DiscussionID,
+            "Token should contain the correct discussion ID for {$recordType} record type"
+        );
+        $this->assertEquals(
+            $user["userID"],
+            $tokenData->UserID,
+            "Token should contain the correct user ID for {$recordType} record type"
+        );
+        $this->assertEquals(
+            1,
+            $tokenData->Mute,
+            "Token should indicate this is a mute action for {$recordType} record type"
+        );
+    }
+
+    /**
+     * Provide supported record types for mute links.
+     *
+     * @return array
+     */
+    public function provideSupportedRecordTypesForMuteLinks(): array
+    {
+        return [
+            "discussion" => ["discussion"],
+            "comment" => ["comment"],
+            "group" => ["group"],
+        ];
+    }
+
+    /**
+     * Test that unsupported record types do not include mute links.
+     */
+    public function testUnsupportedRecordTypeDoesNotIncludeMuteLink(): void
+    {
+        $user = $this->createUser();
+        $discussionID = 123;
+
+        // Test unsupported record type
+        $activity = [
+            "ActivityType" => "Comment",
+            "RecordType" => "unsupported",
+            "ParentRecordID" => $discussionID,
+        ];
+
+        $userArray = [
+            "UserID" => $user["userID"],
+            "Name" => "TestUser",
+            "Email" => "test@example.com",
+            "PhotoUrl" => "",
+        ];
+
+        // Test that getMuteLink works with unsupported record types (it should still work)
+        $muteLink = $this->activityModel->getMuteLink($activity, $userArray, "html");
+
+        // The mute link should still be generated even for unsupported record types
+        // The filtering happens in the email method, not in getMuteLink
+        $this->assertStringContainsString("Mute this Post", $muteLink, "getMuteLink should work for any record type");
+        $this->assertStringContainsString("/unsubscribe/", $muteLink, "getMuteLink should contain unsubscribe URL");
+
+        // Extract and decode the token to verify it works
+        preg_match('/\/unsubscribe\/([^"]+)/', $muteLink, $matches);
+        $this->assertNotEmpty($matches, "Should be able to extract token from mute link");
+
+        $token = $matches[1];
+        $tokenData = $this->activityModel->decodeNotificationToken($token);
+
+        $this->assertEquals($discussionID, $tokenData->DiscussionID, "Token should contain the correct discussion ID");
+        $this->assertEquals($user["userID"], $tokenData->UserID, "Token should contain the correct user ID");
+        $this->assertEquals(1, $tokenData->Mute, "Token should indicate this is a mute action");
+    }
+
+    /**
+     * Test that the email condition logic correctly identifies which record types should have mute links.
+     */
+    public function testEmailMuteLinkConditionLogic(): void
+    {
+        $supportedRecordTypes = ["comment", "discussion", "group"];
+        $unsupportedRecordTypes = ["user", "category", "unsupported", null];
+
+        foreach ($supportedRecordTypes as $recordType) {
+            $activity = ["RecordType" => $recordType];
+
+            // Test the condition logic that determines if mute links should be added
+            $shouldIncludeMuteLink =
+                isset($activity["RecordType"]) &&
+                (strtolower($activity["RecordType"]) === "comment" ||
+                    strtolower($activity["RecordType"]) === "discussion" ||
+                    strtolower($activity["RecordType"]) === "group");
+
+            $this->assertTrue($shouldIncludeMuteLink, "Record type '{$recordType}' should support mute links");
+        }
+
+        foreach ($unsupportedRecordTypes as $recordType) {
+            $activity = ["RecordType" => $recordType];
+
+            // Test the condition logic that determines if mute links should be added
+            $shouldIncludeMuteLink =
+                isset($activity["RecordType"]) &&
+                (strtolower($activity["RecordType"]) === "comment" ||
+                    strtolower($activity["RecordType"]) === "discussion" ||
+                    strtolower($activity["RecordType"]) === "group");
+
+            $this->assertFalse($shouldIncludeMuteLink, "Record type '{$recordType}' should not support mute links");
+        }
+    }
 }

@@ -25,7 +25,7 @@ trait AssertLoggingTrait
     protected $resourceName = "n/a";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testDelete()
     {
@@ -34,7 +34,7 @@ trait AssertLoggingTrait
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testPatchFull()
     {

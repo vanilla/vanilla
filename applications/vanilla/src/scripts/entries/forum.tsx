@@ -1,20 +1,20 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { AboutMeWidget } from "@library/aboutMeWidget/AboutMeWidget";
 import { AccountSettings } from "@library/accountSettings/AccountSettings";
-import { CallToAction } from "@library/callToAction/CallToAction";
-import CallToActionWidget from "@library/callToAction/CallToActionWidget";
-import { CategoriesWidget } from "@library/categoriesWidget/CategoriesWidget";
+import { CallToAction } from "@library/widgets/CallToAction";
+import CallToActionWidget from "@library/widgets/CallToActionWidget";
+import { CategoriesWidget } from "@library/widgets/CategoriesWidget";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { EditProfileFields } from "@library/editProfileFields/EditProfileFields";
 import { CollectionRecordTypes } from "@library/featuredCollections/Collections.variables";
 import { CollectionsOptionButton } from "@library/featuredCollections/CollectionsOptionButton";
 import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
 import { DiscussionsWidget } from "@library/features/discussions/DiscussionsWidget";
-import { FollowedContent } from "@library/followedContent/FollowedContent";
+import FollowedContent from "@library/followedContent/FollowedContent";
 import { CategoryPicker } from "@library/forms/select/CategoryPicker";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { LeaderboardWidget } from "@library/leaderboardWidget/LeaderboardWidget";
@@ -32,7 +32,7 @@ import TabWidget from "@library/tabWidget/TabWidget";
 import { UnsubscribePageRoute } from "@library/unsubscribe/unsubscribePageRoutes";
 import { UserSpotlight } from "@library/userSpotlight/UserSpotlight";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
-import { onReady } from "@library/utility/appUtils";
+import { onReady, t } from "@library/utility/appUtils";
 import { addComponent } from "@library/utility/componentRegistry";
 import CategoryFollowDropDown from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import "@vanilla/addon-vanilla/forms/autosave";
@@ -48,6 +48,10 @@ import {
 } from "@vanilla/addon-vanilla/legacy/LegacyAttachments";
 import { TrollComment } from "@vanilla/addon-vanilla/legacy/LegacyTrollComment";
 import { LegacyPostMetaAsset } from "@vanilla/addon-vanilla/legacy/LegacyPostMetaAsset";
+import { DraftsPageRoute } from "@vanilla/addon-vanilla/drafts/DraftsRoutes";
+import { MuteDiscussionModal } from "@library/features/discussions/DiscussionOptionsMute";
+import DiscussionOptionsPostSettings from "@library/features/discussions/DiscussionOptionsPostSettings";
+import { useDiscussionQuery } from "@library/features/discussions/discussionHooks";
 
 registerReducer("forum", forumReducer);
 
@@ -87,7 +91,7 @@ onReady(() => {
     triggerLegacyHashScrolling();
 });
 
-RouterRegistry.addRoutes([UnsubscribePageRoute.route]);
+RouterRegistry.addRoutes([UnsubscribePageRoute.route, DraftsPageRoute.route]);
 
 delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElement) => {
     event.preventDefault();
@@ -107,3 +111,63 @@ delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElemen
         />,
     );
 });
+
+delegateEvent("click", ".js-discussionMute", (event, triggeringElement) => {
+    event.preventDefault();
+    const discussionID = triggeringElement.getAttribute("data-discussionID") || null;
+    if (discussionID === null) {
+        return;
+    }
+    const muted = triggeringElement.getAttribute("data-muted") === "true";
+    const id = parseInt(discussionID, 10);
+    void mountModal(
+        <MuteDiscussionModal
+            discussion={{ discussionID: id, muted }}
+            onSuccess={async (nowMuted) => {
+                triggeringElement.setAttribute("data-muted", String(nowMuted));
+                triggeringElement.textContent = nowMuted ? t("Unmute") : t("Mute");
+            }}
+        />,
+    );
+});
+
+delegateEvent("click", ".js-postSettingsMove", (event, triggeringElement) => {
+    event.preventDefault();
+    const discussionID = triggeringElement.getAttribute("data-discussionID") || null;
+
+    if (discussionID === null) {
+        return;
+    }
+
+    void mountModal(<DiscussionFetch discussionID={discussionID} initialAction={"move"} />);
+});
+
+delegateEvent("click", ".js-postSettingsChange", (event, triggeringElement) => {
+    event.preventDefault();
+    const discussionID = triggeringElement.getAttribute("data-discussionID") || null;
+
+    if (discussionID === null) {
+        return;
+    }
+
+    void mountModal(<DiscussionFetch discussionID={discussionID} initialAction={"change"} />);
+});
+
+/**
+ * Wrapper component to fetch discussion data and render PostSettingsModal
+ */
+function DiscussionFetch({
+    discussionID,
+    initialAction,
+}: {
+    discussionID: string;
+    initialAction?: "move" | "change" | null;
+}) {
+    const { data: discussion, isLoading } = useDiscussionQuery(discussionID, ["postMeta"]);
+
+    if (isLoading || !discussion) {
+        return <></>;
+    }
+
+    return <DiscussionOptionsPostSettings discussion={discussion} initialAction={initialAction} modalOnly />;
+}

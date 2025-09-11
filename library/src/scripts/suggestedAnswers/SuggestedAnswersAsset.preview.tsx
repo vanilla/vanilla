@@ -5,7 +5,7 @@
  */
 
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import SuggestedAnswersAsset from "@library/suggestedAnswers/SuggestedAnswersAsset";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -24,10 +24,10 @@ const queryClient = new QueryClient({
 
 export function SuggestedAnswersAssetPreview() {
     return (
-        <Widget>
+        <LayoutWidget>
             <QueryClientProvider client={queryClient}>
                 <SuggestedAnswersAsset discussion={discussion} isPreview={true} />
             </QueryClientProvider>
-        </Widget>
+        </LayoutWidget>
     );
 }

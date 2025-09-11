@@ -11,6 +11,7 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Rich2\Parser;
+use Vanilla\Utility\HtmlUtils;
 
 class External extends AbstractLeafNode
 {
@@ -20,7 +21,7 @@ class External extends AbstractLeafNode
     private EmbedService $embedService;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function __construct(array $data, string $parseMode = Parser::PARSE_MODE_NORMAL)
     {
@@ -29,29 +30,47 @@ class External extends AbstractLeafNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $node): bool
     {
         return isset($node["type"]) &&
-            in_array($node["type"], [self::TYPE_RICH_EMBED_CARD, self::TYPE_RICH_EMBED_INLINE], true) &&
-            !isset($node["error"]);
+            in_array($node["type"], [self::TYPE_RICH_EMBED_CARD, self::TYPE_RICH_EMBED_INLINE], true);
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderHtmlContent(): string
     {
+        if (isset($this->data["error"])) {
+            $url = $this->getUrl();
+            $attributes = HtmlUtils::attributes([
+                "href" => $url,
+                "rel" => "noopener noreferrer ugc",
+            ]);
+            return "<a $attributes>" . htmlspecialchars($url) . "</a>";
+        }
         if ($this->parseMode === Parser::PARSE_MODE_QUOTE) {
             return $this->renderQuote();
         }
         return $this->getEmbed()->renderHtml();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function renderTextContent(): string
     {
-        return "";
+        return $this->getUrl();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTextEnd(): string
+    {
+        return $this->data["type"] === self::TYPE_RICH_EMBED_CARD ? "\n" : "";
     }
 
     /**
@@ -63,7 +82,7 @@ class External extends AbstractLeafNode
     {
         $embedData = $this->data["embedData"] ?? [];
         $additionalData = [];
-        if ($embedData["embedType"] === "iframe") {
+        if ($embedData["embedType"] ?? null === "iframe") {
             $this->parseMode = Parser::PARSE_MODE_EXTENDED;
             $additionalData = $this->data["frameAttributes"] ?? [];
         }
@@ -101,6 +120,20 @@ class External extends AbstractLeafNode
     }
 
     /**
+     * Get the url for the embed.
+     *
+     * @return string|null
+     */
+    public function getUrl(): ?string
+    {
+        $url = $this->data["embedData"]["url"] ?? ($this->data["url"] ?? null);
+        if ($url) {
+            $url = \Gdn_Format::sanitizeUrl($url);
+        }
+        return $url;
+    }
+
+    /**
      * Render the version of the embed if it is inside a quote embed.
      * E.g. A nested embed.
      *
@@ -108,16 +141,16 @@ class External extends AbstractLeafNode
      */
     public function renderQuote(): string
     {
-        $url = $this->data["embedData"]["url"] ?? ($this->data["url"] ?? null);
+        $url = $this->getUrl();
         if ($url) {
-            $sanitizedUrl = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
+            $sanitizedUrl = htmlspecialchars($url);
             return "<p><a href=\"$sanitizedUrl\">$sanitizedUrl</a></p>";
         }
         return "";
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

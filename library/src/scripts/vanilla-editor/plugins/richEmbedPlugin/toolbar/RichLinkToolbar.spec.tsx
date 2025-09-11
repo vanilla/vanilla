@@ -4,16 +4,19 @@
  * @license gpl-2.0-only
  */
 
-import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { applyAnyFallbackError, mockAPI } from "@library/__tests__/utility";
-import { setMeta } from "@library/utility/appUtils";
-import { insertRichEmbed } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichEmbed";
-import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
-import { createVanillaEditor, LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
-import { getByRole, render, screen, within, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { fireEvent, getByRole, render, screen, within } from "@testing-library/react";
 import { focusEditor, select } from "@udecode/plate-common";
+
+import { LegacyFormVanillaEditorLoadable } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { act } from "react-dom/test-utils";
+import { createVanillaEditor } from "@library/vanilla-editor/createVanillaEditor";
+import { insertRichEmbed } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichEmbed";
+import { setMeta } from "@library/utility/appUtils";
+import userEvent from "@testing-library/user-event";
 
 describe("<RichLinkToolbar />", () => {
     describe("<RichLinkForm />", () => {
@@ -21,8 +24,24 @@ describe("<RichLinkToolbar />", () => {
         mockAdapter.onGet("/users/by-names").reply(200, []);
         applyAnyFallbackError(mockAdapter);
 
+        // Create a query client for the tests
+        const queryClient = new QueryClient({
+            defaultOptions: {
+                queries: {
+                    enabled: false,
+                    retry: false,
+                    staleTime: Infinity,
+                },
+            },
+        });
+
         afterAll(() => {
             mockAdapter.reset();
+        });
+
+        afterEach(() => {
+            // Clean up any meta state that was set during tests
+            setMeta("disableUrlEmbeds", undefined);
         });
 
         it("The toolbar can be triggered with a hotkey to create links. The link form includes an accessible submit button", async () => {
@@ -31,7 +50,9 @@ describe("<RichLinkToolbar />", () => {
 
             render(
                 <TestReduxProvider>
-                    <LegacyFormVanillaEditor editor={editor} />
+                    <QueryClientProvider client={queryClient}>
+                        <LegacyFormVanillaEditorLoadable editor={editor} />
+                    </QueryClientProvider>
                 </TestReduxProvider>,
             );
 
@@ -73,7 +94,9 @@ describe("<RichLinkToolbar />", () => {
 
             render(
                 <TestReduxProvider>
-                    <LegacyFormVanillaEditor editor={editor} />
+                    <QueryClientProvider client={queryClient}>
+                        <LegacyFormVanillaEditorLoadable editor={editor} />
+                    </QueryClientProvider>
                 </TestReduxProvider>,
             );
 
@@ -92,13 +115,15 @@ describe("<RichLinkToolbar />", () => {
             expect(urlInput).toHaveValue("https://test.com");
         });
 
-        it("The appearance options are removed when the disableUrlEmbeds is set", async () => {
+        it("The appearance embed options are removed when the disableUrlEmbeds is set", async () => {
             setMeta("disableUrlEmbeds", true);
             const editor = createVanillaEditor();
 
             render(
                 <TestReduxProvider>
-                    <LegacyFormVanillaEditor editor={editor} />
+                    <QueryClientProvider client={queryClient}>
+                        <LegacyFormVanillaEditorLoadable editor={editor} />
+                    </QueryClientProvider>
                 </TestReduxProvider>,
             );
 
@@ -111,9 +136,11 @@ describe("<RichLinkToolbar />", () => {
             const linkMenu = await screen.findByTestId("rich-link-menu");
             expect(linkMenu).toBeVisible();
             const displayAsText = await screen.queryByRole("menuitem", { name: "Display as Text" });
+            const displayAsButton = await screen.queryByRole("menuitem", { name: "Display as Button" });
             const displayAsRichLink = await screen.queryByRole("menuitem", { name: "Display as Rich Link" });
             const displayAsCard = await screen.queryByRole("menuitem", { name: "Display as Card" });
-            expect(displayAsText).not.toBeInTheDocument();
+            expect(displayAsText).toBeInTheDocument();
+            expect(displayAsButton).toBeInTheDocument();
             expect(displayAsRichLink).not.toBeInTheDocument();
             expect(displayAsCard).not.toBeInTheDocument();
         });

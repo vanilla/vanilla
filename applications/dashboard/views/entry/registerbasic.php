@@ -21,8 +21,8 @@
             <?php if (!$this->data("NoEmail")): ?>
                 <li role="presentation">
                     <?php
-                    echo $this->Form->label("Email", "Email");
-                    echo $this->Form->textBox("Email", ["type" => "email", "Wrap" => true]);
+                    echo $this->Form->label("Email", "Email", ["required" => true]);
+                    echo $this->Form->textBox("Email", ["type" => "email", "Wrap" => true, "required" => true]);
                     echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">' .
                         t("Email Unavailable") .
                         "</span>";
@@ -31,8 +31,8 @@
             <?php endif; ?>
             <li role="presentation">
                 <?php
-                echo $this->Form->label("Username", "Name");
-                echo $this->Form->textBox("Name", ["autocorrect" => "off", "autocapitalize" => "off", "Wrap" => true]);
+                echo $this->Form->label("Username", "Name", ["required" => true]);
+                echo $this->Form->textBox("Name", ["autocorrect" => "off", "autocapitalize" => "off", "Wrap" => true, "required" => true]);
                 echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">' .
                     t("Name Unavailable") .
                     "</span>";
@@ -50,7 +50,7 @@
             <li role="presentation">
                 <?php
                 $passwordDescID = \Vanilla\Utility\HtmlUtils::uniqueElementID("Password");
-                echo $this->Form->label("Password", "Password");
+                echo $this->Form->label("Password", "Password", ["required" => true]);
                 echo wrap(
                     sprintf(t("Your password must be at least %d characters long."), c("Garden.Password.MinLength")) .
                         " " .
@@ -64,13 +64,14 @@
                     "Wrap" => true,
                     "Strength" => true,
                     "aria-describedby" => $passwordDescID,
+                    "required" => true,
                 ]);
                 ?>
             </li>
             <li role="presentation">
                 <?php
-                echo $this->Form->label("Confirm Password", "PasswordMatch");
-                echo $this->Form->input("PasswordMatch", "password", ["Wrap" => true]);
+                echo $this->Form->label("Confirm Password", "PasswordMatch", ["required" => true]);
+                echo $this->Form->input("PasswordMatch", "password", ["Wrap" => true, "required" => true]);
                 echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">' .
                     t("Passwords don't match") .
                     "</span>";
@@ -95,7 +96,9 @@
 
             <li role="presentation">
                 <?php
-                echo $this->Form->checkBox("TermsOfService", "@" . $TermsOfServiceText, ["value" => "1"], false);
+                if (Gdn::config('Garden.Registration.RequireTermsOfService', true)) {
+                    echo $this->Form->checkBox("TermsOfService", "@" . $TermsOfServiceText, ["value" => "1"], false);
+                }
                 echo $this->Form->checkBox("RememberMe", "Remember me on this computer", ["value" => "1"]);
                 ?>
             </li>

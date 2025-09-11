@@ -28,7 +28,7 @@ class MockAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function isActive(): bool
     {
@@ -36,7 +36,7 @@ class MockAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setActive(bool $active)
     {
@@ -62,7 +62,7 @@ class MockAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRegisterUrl()
     {
@@ -70,7 +70,7 @@ class MockAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSignInUrl()
     {
@@ -78,7 +78,7 @@ class MockAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSignOutUrl()
     {
@@ -86,7 +86,7 @@ class MockAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getAuthenticatorTypeInfoImpl(): array
     {
@@ -100,7 +100,7 @@ class MockAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isUnique(): bool
     {
@@ -108,7 +108,7 @@ class MockAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getAuthenticatorInfoImpl(): array
     {
@@ -120,7 +120,7 @@ class MockAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function validateAuthenticationImpl(RequestInterface $request)
     {

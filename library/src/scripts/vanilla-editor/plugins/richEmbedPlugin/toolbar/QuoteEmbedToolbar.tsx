@@ -5,14 +5,15 @@
  */
 
 import { EmbedMenu } from "@library/editor/pieces/EmbedMenu";
-import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
 import { queryRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/queries/queryRichLink";
 import { useFloatingQuoteEdit } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/useFloatingQuoteEdit";
 import Floating, { defaultFloatingOptions } from "@library/vanilla-editor/toolbars/Floating";
-import { useMyEditorState } from "@library/vanilla-editor/typescript";
+import { useMyEditorState } from "@library/vanilla-editor/getMyEditor";
 import { removeNodes } from "@udecode/plate-common";
 import { Icon } from "@vanilla/icons";
 import React, { useRef } from "react";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
 export default function QuoteEmbedToolbar() {
     const editor = useMyEditorState();
@@ -34,7 +35,8 @@ export default function QuoteEmbedToolbar() {
     return (
         <Floating ref={arrowRef} {...floatingResult}>
             <EmbedMenu>
-                <EmbedButton
+                <Button
+                    buttonType={ButtonTypes.ICON}
                     onClick={() => {
                         removeNodes(editor, {
                             at: entry.path,
@@ -42,7 +44,7 @@ export default function QuoteEmbedToolbar() {
                     }}
                 >
                     <Icon icon={"delete"} />
-                </EmbedButton>
+                </Button>
             </EmbedMenu>
         </Floating>
     );

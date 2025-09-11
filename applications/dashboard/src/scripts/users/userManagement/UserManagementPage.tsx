@@ -15,7 +15,7 @@ import { IGetUsersQueryParams, useGetUsers } from "@dashboard/users/userManageme
 import UserManagementColumnsConfig from "@dashboard/users/userManagement/UserManagementColumnsConfig";
 import { UserManagementProvider, useUserManagement } from "@dashboard/users/userManagement/UserManagementContext";
 import UserManagementFilter from "@dashboard/users/userManagement/UserManagementFilter";
-import UserManagementSearchbar from "@dashboard/users/userManagement/UserManagementSearchBar";
+import DashboardSearchBar from "@dashboard/components/search/DashboardSearchBar";
 import UserManagementTableCell, {
     ActionsCell,
     WrappedCell,
@@ -48,11 +48,12 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { useLocalStorage } from "@vanilla/react-utils";
 import { spaceshipCompare } from "@vanilla/utils";
-import qs from "qs";
+import * as qs from "qs-esm";
 import React, { ComponentType, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { useUsersExport } from "./UserManagementExport";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import DashboardListPageClasses from "@dashboard/components/DashboardListPage.classes";
 
 export function UserManagementImpl() {
     const { permissions, RanksWrapperComponent, currentUserID, profileFields, ...rest } = useUserManagement();
@@ -133,7 +134,11 @@ export function UserManagementImpl() {
         return columns;
     }, [profileFields, orderedColumnsFromConfig]);
 
-    const classes = userManagementClasses();
+    const { countUsers, headerActionsContainer } = userManagementClasses.useAsHook();
+
+    const { headerContainer, searchAndActionsContainer, searchAndCountContainer, pagerContainer, pager, table } =
+        DashboardListPageClasses.useAsHook();
+
     const userTableRef = useRef<HTMLDivElement>(null);
 
     const { error: countError, data: countData } = useGetSiteTotalsCount([SiteTotalsCountOption.USER]);
@@ -202,7 +207,7 @@ export function UserManagementImpl() {
                 }}
             />
 
-            <div className={classes.headerContainer} ref={stickyHeaderRef}>
+            <div className={headerContainer} ref={stickyHeaderRef}>
                 {permissions.canAddUsers && (
                     <ConditionalWrap
                         condition={Boolean(RanksWrapperComponent)}
@@ -236,14 +241,13 @@ export function UserManagementImpl() {
                 )}
                 {userExport.cancelDialogue}
 
-                <div className={classes.searchAndActionsContainer}>
-                    <div className={classes.searchAndCountContainer}>
-                        <UserManagementSearchbar
+                <div className={searchAndActionsContainer}>
+                    <div className={searchAndCountContainer}>
+                        <DashboardSearchBar
                             initialValue={query.query ?? ""}
-                            updateQuery={updateQuery}
-                            currentQuery={query}
+                            updateQuery={(newQueryString) => updateQuery({ ...query, query: newQueryString })}
                         />
-                        <div className={classes.countUsers}>
+                        <div className={countUsers}>
                             {countError && <ErrorMessages errors={[countError]} />}
                             {countData?.userCount && data?.countUsers && (
                                 <Translate
@@ -258,7 +262,7 @@ export function UserManagementImpl() {
                             )}
                         </div>
                     </div>
-                    <div className={classes.headerActionsContainer} data-testid="filter-columnsConfig-container">
+                    <div className={headerActionsContainer} data-testid="filter-columnsConfig-container">
                         <UserManagementFilter
                             updateQuery={updateQuery}
                             profileFields={profileFields}
@@ -275,7 +279,7 @@ export function UserManagementImpl() {
                             profileFields={profileFields}
                         />
                     </div>
-                    <div className={classes.pagerContainer}>
+                    <div className={pagerContainer}>
                         {data?.users && countData && (
                             <NumberedPager
                                 {...{
@@ -283,11 +287,10 @@ export function UserManagementImpl() {
                                     currentPage: parseInt(data?.currentPage),
                                     pageLimit: USERS_LIMIT_PER_PAGE,
                                     hasMorePages: countUsersResults ? countUsersResults >= USERS_MAX_PAGE_COUNT : false,
-                                    className: classes.pager,
+                                    className: pager,
                                     showNextButton: false,
                                 }}
                                 onChange={(page: number) => updateQuery({ ...query, page: page })}
-                                isMobile={false}
                             />
                         )}
                     </div>
@@ -322,7 +325,7 @@ export function UserManagementImpl() {
                             },
                         }}
                         actionsColumnWidth={80}
-                        className={classes.table}
+                        className={table}
                     />
                 ) : (
                     !isFetching && <div style={{ padding: 18 }}>{t("No results.")}</div>
@@ -340,7 +343,7 @@ export function UserManagementImpl() {
     );
 }
 
-export function UserManagementPage() {
+export default function UserManagementPage() {
     return (
         <UserManagementProvider>
             <ErrorPageBoundary>
@@ -349,5 +352,3 @@ export function UserManagementPage() {
         </UserManagementProvider>
     );
 }
-
-export default UserManagementPage;

@@ -54,12 +54,13 @@ class UserLeaderQuery implements \JsonSerializable
      * @param int[] $includedRoleIDs
      * @param int[] $excludedRoleIDs
      * @param string|null $leaderboardType
+     * @param string[] $excludedUserIDs
      */
     public function __construct(
         string $slotType,
-        ?int $categoryID,
-        ?string $siteSectionID,
-        ?int $limit,
+        ?int $categoryID = null,
+        ?string $siteSectionID = null,
+        ?int $limit = null,
         ?array $includedRoleIDs = [],
         ?array $excludedRoleIDs = [],
         ?string $leaderboardType = null,

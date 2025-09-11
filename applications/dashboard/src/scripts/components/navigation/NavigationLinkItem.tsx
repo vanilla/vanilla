@@ -4,105 +4,55 @@
  * @license Proprietary
  */
 
-import React, { Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
-import { ITreeItem } from "@library/tree/types";
 import Button from "@library/forms/Button";
-import useNavigationLinkItemStyles from "./NavigationLinkItem.styles";
-import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
-import { ButtonTypes } from "@library/forms/buttonTypes";
-import { t } from "@vanilla/i18n";
-import classNames from "classnames";
-import { useLastValue } from "@vanilla/react-utils";
+import { ButtonType, ButtonTypes } from "@library/forms/buttonTypes";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
+import { DownTriangleIcon, RightTriangleIcon } from "@library/icons/common";
+import { ITreeItem } from "@library/tree/types";
+import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
 import { mountPortal } from "@vanilla/react-utils";
+import classNames from "classnames";
+import React, { useRef } from "react";
+import { DraggableProvided, DraggableStateSnapshot } from "react-beautiful-dnd";
+import useNavigationLinkItemStyles from "./NavigationLinkItem.styles";
+import { Row } from "@library/layout/Row";
+import { TokenItem } from "@library/metas/TokenItem";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import { useRoles } from "@dashboard/roles/roleHooks";
+import UserContent from "@library/content/UserContent";
 
 export const DRAGGING_ITEM_PORTAL_ID = "dragging-item-portal";
 
-function formatUrl(str: string) {
-    str = str.trim();
-    const hasSchema = /^https?:\/\//i.test(str);
-    const isRelative = /^~?\//.test(str);
-    // Prevent javascript execution.
-    if (/javascript:/i.test(str)) {
-        return "/";
-    }
-    // If the url is valid already, return it.
-    const isValid = hasSchema || isRelative;
-    if (isValid) {
-        return str;
-    }
-    // If the first part of the url (before the first /) is a hostname (ex: something.com) add http://
-    const hasHostname = /^[a-z0-9]+[a-z0-9-]*(\.[a-z0-9]+[a-z0-9-]*)+(\/.*)?$/i.test(str);
-    if (hasHostname) {
-        return "http://" + str;
-    }
-    // If the url starts with a tilde add a /
-    const hasTilde = str.startsWith("~");
-    if (hasTilde) {
-        return "~/" + str.slice(1);
-    }
-    // Add a leading /
-    return "/" + str;
-}
-
 interface IProps {
     item: ITreeItem<INavigationVariableItem>;
-    disabled: boolean;
     snapshot: DraggableStateSnapshot;
     provided: DraggableProvided;
     depth: number;
     onDelete(): void;
     onShow(): void;
-    onSave(data: INavigationVariableItem): void;
+    onHide(): void;
     onCollapse(): void;
     onExpand(): void;
-    onStartEditing(): void;
-    onStopEditing(): void;
+    onEdit(): void;
 }
 
-export interface INavigationLinkItemHandle {
-    edit(): void;
-}
-
-export const NavigationLinkItem = React.forwardRef(function NavigationLinkItemImpl(
-    props: IProps,
-    ref: Ref<INavigationLinkItemHandle>,
-) {
+export function NavigationLinkItem(props: IProps) {
     const classes = useNavigationLinkItemStyles();
 
     const selfRef = useRef<HTMLDivElement>();
-    const nameInputRef = useRef<HTMLInputElement>(null);
-    const toInputRef = useRef<HTMLInputElement>(null);
 
     const namePlaceholder = t("(untitled)");
-    const urlPlaceholder = t("Paste or type url");
 
-    const {
-        depth,
-        item,
-        disabled,
-        snapshot,
-        provided,
-        onDelete,
-        onShow,
-        onSave,
-        onCollapse,
-        onExpand,
-        onStartEditing,
-        onStopEditing,
-    } = props;
+    const { depth, item, snapshot, provided, onDelete, onShow, onCollapse, onExpand, onEdit } = props;
 
-    const { data, isExpanded, hasChildren } = item;
+    const { data, isExpanded, children } = item;
+    const hasChildren = children.length > 0;
     const { name, url, isCustom, isHidden } = data;
     const { isDragging } = snapshot;
 
     const isChild = depth > 0;
     const isCombining = Boolean(snapshot.combineTargetFor);
-
-    const [isEditing, setIsEditing] = useState(false);
-    const wasEditing = useLastValue(isEditing);
-    const [editingData, setEditingData] = useState<INavigationVariableItem>(data);
 
     function focusSelf() {
         if (!selfRef.current?.matches(":focus-within")) {
@@ -110,104 +60,17 @@ export const NavigationLinkItem = React.forwardRef(function NavigationLinkItemIm
         }
     }
 
-    function stopEditing() {
-        setIsEditing(false);
-        onStopEditing();
-    }
-
-    function startEditing() {
-        if (!isDragging && !isHidden) {
-            setIsEditing(true);
-            onStartEditing();
-        }
-    }
-
-    function save() {
-        stopEditing();
-        onSave({
-            ...editingData,
-            name: editingData.name.trim(),
-            url: formatUrl(editingData.url),
-        });
-    }
-
-    useImperativeHandle(ref, () => ({
-        edit: startEditing,
-    }));
-
-    useEffect(() => {
-        // Reset editing data when we are switching modes or when we receive new data.
-        setEditingData(data);
-    }, [data, isEditing]);
-
-    useEffect(() => {
-        // Focus the first input when editing.
-        if (isEditing && !wasEditing) {
-            nameInputRef.current?.focus();
-        } else if (!isEditing && wasEditing) {
-            selfRef.current?.focus(); // Preserve focus.
-        }
-    }, [isEditing, wasEditing]);
-
-    function onNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const value = event.target.value;
-        setEditingData((data: INavigationVariableItem) => ({
-            ...data,
-            name: value,
-        }));
-    }
-
-    function onUrlChange(event: React.ChangeEvent<HTMLInputElement>) {
-        const value = event.target.value;
-        setEditingData((data: INavigationVariableItem) => ({
-            ...data,
-            url: value,
-        }));
-    }
-
-    function onStopEditingClick(event: React.MouseEvent) {
-        event.preventDefault();
-        stopEditing();
-    }
-
-    function onSaveClick(event: React.MouseEvent) {
-        event.preventDefault();
-        save();
-    }
-
-    function onStartEditingClick(event: React.MouseEvent) {
-        event.preventDefault();
-        startEditing();
-    }
-
-    function onShowClick(event: React.MouseEvent) {
-        event.preventDefault();
-        onShow();
-    }
-
-    function onDeleteClick(event: React.MouseEvent) {
-        event.preventDefault();
-        onDelete();
-    }
-
     function onKeyDown(event: React.KeyboardEvent) {
         switch (event.key) {
             case "Enter":
-                if (isEditing) {
-                    save();
-                } else {
-                    startEditing();
-                }
-                break;
-            case "Escape":
                 event.preventDefault();
                 event.stopPropagation();
-                stopEditing();
+                props.onEdit();
                 break;
             case "Delete":
-                if (!isEditing) {
-                    onDelete();
-                }
+                event.preventDefault();
+                event.stopPropagation();
+                props.onDelete();
                 break;
         }
     }
@@ -224,15 +87,13 @@ export const NavigationLinkItem = React.forwardRef(function NavigationLinkItemIm
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             onClick={focusSelf}
-            onDoubleClick={startEditing}
+            onDoubleClick={() => props.onEdit()}
             onKeyDown={onKeyDown}
             style={{
                 ...provided.draggableProps.style,
-                pointerEvents: disabled ? "none" : "all",
             }}
             className={classNames(classes.container, {
                 hasChildren,
-                isEditing,
                 isDragging,
                 isCombining,
                 isExpanded,
@@ -240,81 +101,68 @@ export const NavigationLinkItem = React.forwardRef(function NavigationLinkItemIm
                 isHiddenItem: isHidden,
             })}
         >
-            <Button
-                buttonType={ButtonTypes.CUSTOM}
-                className={classes.expandCollapseButton}
-                tabIndex={-1}
-                style={{ visibility: hasChildren ? "visible" : "hidden" }}
-                disabled={isHidden}
-                onClick={() => {
-                    (isExpanded ? onCollapse : onExpand)();
-                }}
-            >
-                {isExpanded && hasChildren ? <DownTriangleIcon /> : <RightTriangleIcon />}
-            </Button>
-            <span className={classes.nameColumn}>
-                {isEditing ? (
-                    <input
-                        ref={nameInputRef}
-                        className={classes.editableInput}
-                        maxLength={255}
-                        type="text"
-                        value={editingData!.name}
-                        placeholder={namePlaceholder}
-                        onChange={onNameChange}
-                    />
-                ) : (
-                    displayName
-                )}
-            </span>
-            {!hasChildren && (
-                <span className={classes.urlColumn}>
-                    {isEditing ? (
-                        <input
-                            ref={toInputRef}
-                            className={classes.editableInput}
-                            maxLength={255}
-                            disabled={!isCustom}
-                            type="text"
-                            value={editingData!.url}
-                            placeholder={urlPlaceholder}
-                            onChange={onUrlChange}
-                        />
-                    ) : (
-                        displayUrl
-                    )}
-                </span>
+            {hasChildren ? (
+                <Button
+                    buttonType={ButtonTypes.ICON_COMPACT}
+                    className={classes.expandCollapseButton}
+                    tabIndex={-1}
+                    disabled={isHidden}
+                    onClick={() => {
+                        (isExpanded ? onCollapse : onExpand)();
+                    }}
+                >
+                    {isExpanded ? <DownTriangleIcon /> : <RightTriangleIcon />}
+                </Button>
+            ) : (
+                <Icon className={classes.linkIcon} icon="editor-link-rich" />
             )}
+            <div style={{ flex: 1 }}>
+                <Row>
+                    <span className={classes.nameColumn}>{displayName}</span>
+                    {!hasChildren && <span className={classes.urlColumn}>{displayUrl}</span>}
+                </Row>
+            </div>
             <span className={classes.spacer} />
             <span className={classes.actions}>
-                {isEditing && (
+                {item.data.roleIDs && item.data.roleIDs.length > 0 && (
+                    <ToolTip label={<RoleToolTipLabel roleIDs={item.data.roleIDs} />}>
+                        <ToolTipIcon>
+                            <Icon icon="visibility-private" />
+                        </ToolTipIcon>
+                    </ToolTip>
+                )}
+                {isHidden && (
+                    <Button buttonType={ButtonTypes.ICON_COMPACT} onClick={props.onShow}>
+                        <Icon icon="show-content" />
+                    </Button>
+                )}
+                {!isHidden && (
                     <>
                         <Button
-                            buttonType={ButtonTypes.TEXT}
-                            className={classes.cancelButton}
-                            onClick={onStopEditingClick}
+                            buttonType={ButtonTypes.ICON_COMPACT}
+                            className={classes.editButton}
+                            onClick={props.onEdit}
                         >
-                            {t("Cancel")}
+                            <Icon icon="edit" />
                         </Button>
-                        <Button buttonType={ButtonTypes.TEXT} className={classes.applyButton} onClick={onSaveClick}>
-                            {t("Apply")}
-                        </Button>
+                        {isCustom ? (
+                            <Button
+                                buttonType={ButtonType.ICON_COMPACT}
+                                className={classes.deleteButton}
+                                onClick={props.onDelete}
+                            >
+                                <Icon icon="delete" />
+                            </Button>
+                        ) : (
+                            <Button
+                                buttonType={ButtonType.ICON_COMPACT}
+                                className={classes.deleteButton}
+                                onClick={props.onHide}
+                            >
+                                <Icon icon="hide-content" />
+                            </Button>
+                        )}
                     </>
-                )}
-                {!isEditing && isHidden && (
-                    <Button buttonType={ButtonTypes.TEXT} className={classes.showButton} onClick={onShowClick}>
-                        {t("Show")}
-                    </Button>
-                )}
-                {!isEditing && !isHidden && (
-                    <Button buttonType={ButtonTypes.TEXT} className={classes.editButton} onClick={onStartEditingClick}>
-                        {t("Edit")}
-                    </Button>
-                )}
-                {!isEditing && !isHidden && (
-                    <Button buttonType={ButtonTypes.TEXT} className={classes.deleteButton} onClick={onDeleteClick}>
-                        {isCustom ? t("Delete") : t("Hide")}
-                    </Button>
                 )}
             </span>
         </div>
@@ -325,4 +173,19 @@ export const NavigationLinkItem = React.forwardRef(function NavigationLinkItemIm
         return mountPortal(content, DRAGGING_ITEM_PORTAL_ID, true) as any;
     }
     return content;
-});
+}
+
+function RoleToolTipLabel(props: { roleIDs: number[] }) {
+    const roles = useRoles();
+
+    return (
+        <div>
+            <p>{t("This link is only visible to the following roles")}</p>
+            <Row gap={6} style={{ marginTop: 6 }}>
+                {props.roleIDs.map((roleID, i) => {
+                    return <TokenItem key={i}>{roles.data?.[roleID]?.name}</TokenItem>;
+                })}
+            </Row>
+        </div>
+    );
+}

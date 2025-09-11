@@ -24,7 +24,7 @@ class AiSuggestionSourceMeta extends SiteMetaExtra
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getValue(): array
     {

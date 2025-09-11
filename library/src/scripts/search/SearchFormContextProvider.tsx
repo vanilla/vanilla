@@ -32,6 +32,7 @@ import QueryString from "@library/routing/QueryString";
 import PageLoader from "@library/routing/PageLoader";
 import { LoadStatus } from "@library/@types/api/core";
 import { Icon } from "@vanilla/icons";
+import { useIsMounted } from "@vanilla/react-utils";
 
 interface IProps<ExtraFormValues extends object = {}> {
     children?: React.ReactNode;
@@ -68,6 +69,7 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
 
     const [currentSource, _setCurrentSource] = useState<ISearchSource | undefined>(initialSource);
 
+    const isMounted = useIsMounted();
     /**
      * This effect is responsible for halting all ongoing network request
      * except for the currently selected source
@@ -96,7 +98,9 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
 
     async function loadDomainsAndSetReady() {
         await currentSource!.loadDomains?.();
-        setReady(true);
+        if (isMounted()) {
+            setReady(true);
+        }
     }
 
     useEffect(() => {
@@ -320,6 +324,10 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
                 const query = buildQuery(form);
                 const result = await currentSource.performSearch(query, form?.pageURL);
 
+                if (!isMounted()) {
+                    return;
+                }
+
                 dispatch(
                     SearchActions.performSearchACs.done({
                         params: form,
@@ -371,6 +379,9 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
                 };
 
                 const result = await currentSource.performSearch(query);
+                if (!isMounted()) {
+                    return;
+                }
 
                 dispatch(
                     SearchActions.performDomainSearchACs.done({
@@ -451,6 +462,9 @@ export function SearchFormContextProvider<ExtraFormValues extends object = {}>(p
 
             setCurrentSource(newSourceKey);
             await nextSource.loadDomains?.();
+            if (!isMounted()) {
+                return;
+            }
             updateForm({
                 domain: nextDomainKey,
             });

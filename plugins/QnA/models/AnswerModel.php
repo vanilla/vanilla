@@ -6,41 +6,60 @@
 
 namespace Vanilla\QnA\Models;
 
+use Exception;
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Models\CommunityNotificationGenerator;
+use Vanilla\QnA\Activity\MyQuestionAnswerAcceptedActivity;
 use Vanilla\QnA\Events\AnswerEvent;
 use Vanilla\Formatting\DateTimeFormatter;
 use Gdn;
 use CategoryModel;
 use ReactionModel;
 use CommentModel;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerAction;
+use Ramsey\Uuid\Uuid;
+use Vanilla\QnA\Activity\BookmarkedAnswerAcceptedActivity;
+use DiscussionModel;
+use UserModel;
+use ActivityModel;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Scheduler\LongRunnerMultiAction;
 
 /**
  * Class AnswerModel
  */
 class AnswerModel implements EventFromRowInterface
 {
-    /** @var CommentModel */
-    private $commentModel;
-
     /** @var bool | array  */
     private $Reactions = false;
-
-    /** @var EventManager */
-    private $eventManager;
 
     /**
      * AnswerModel constructor.
      *
      * @param CommentModel $commentModel
      * @param EventManager $eventManager
+     * @param CommunityNotificationGenerator $notificationGenerator
+     * @param LongRunner $LongRunner
+     * @param DiscussionModel $discussionModel
+     * @param UserModel $userModel
+     * @param ActivityModel $activityModel
+     * @param ConfigurationInterface $configuration
      */
-    public function __construct(CommentModel $commentModel, EventManager $eventManager)
-    {
-        $this->commentModel = $commentModel;
-        $this->eventManager = $eventManager;
+    public function __construct(
+        private CommentModel $commentModel,
+        private EventManager $eventManager,
+        private CommunityNotificationGenerator $notificationGenerator,
+        private LongRunner $LongRunner,
+        private DiscussionModel $discussionModel,
+        private UserModel $userModel,
+        private ActivityModel $activityModel,
+        private ConfigurationInterface $configuration
+    ) {
     }
 
     /**
@@ -92,6 +111,142 @@ class AnswerModel implements EventFromRowInterface
     {
         $countAcceptedAnswers = Gdn::sql()->getCount("Comment", ["InsertUserID" => $userID, "QnA" => "Accepted"]);
         Gdn::userModel()->setField($userID, "CountAcceptedAnswers", $countAcceptedAnswers);
+    }
+
+    /**
+     * Notify users about an accepted answer.
+     *
+     * @param int $commentID
+     * @throws Exception
+     */
+    private function notifyAnswerAccepted(int $commentID): void
+    {
+        // Create the notification action - the notification system will handle finding bookmarked users
+        $action = $this->createAnswerAcceptedLongRunnerAction($commentID);
+
+        if ($action) {
+            $this->LongRunner->runDeferred($action);
+        }
+    }
+
+    /**
+     * Create a long runner action to notify users about the accepted answer.
+     *
+     * @param int $commentID The ID of the comment that is the accepted answer
+     * @return LongRunnerAction|null
+     * @throws Exception
+     */
+    public function createAnswerAcceptedLongRunnerAction(int $commentID): ?LongRunnerAction
+    {
+        // Get the comment details
+        $comment = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
+
+        // Error handling for missing comment
+        if (!$comment) {
+            ErrorLogger::warning(
+                "Attempted to send notification for an accepted answer, but answer did not exist.",
+                ["notifications"],
+                [
+                    "commentID" => $commentID,
+                ]
+            );
+            return null;
+        }
+
+        // Check if the comment is _still_ an accepted answer
+        if (empty($comment["QnA"]) || $comment["QnA"] !== "Accepted") {
+            ErrorLogger::warning(
+                "Attempted to send notification for an accepted answer, but comment was not marked as accepted.",
+                ["notifications"],
+                [
+                    "commentID" => $commentID,
+                    "comment" => $comment,
+                ]
+            );
+            return null;
+        }
+
+        // Get the discussion details
+        $discussionID = $comment["DiscussionID"];
+        $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+        $acceptedByUserID = $comment["AcceptedUserID"];
+
+        // Error handling for missing discussion
+        if (!$discussion) {
+            ErrorLogger::warning(
+                "Attempted to send notification for an accepted answer, but discussion did not exist.",
+                ["notifications"],
+                [
+                    "discussionID" => $discussionID,
+                    "answer" => $comment,
+                ]
+            );
+            return null;
+        }
+
+        $discussionName = $discussion["Name"];
+
+        $bookmarkActivity = [
+            "ActivityType" => BookmarkedAnswerAcceptedActivity::getActivityTypeID(),
+            "ActivityEventID" => str_replace("-", "", Uuid::uuid1()->toString()),
+            "ActivityUserID" => $acceptedByUserID,
+            "HeadlineFormat" => t(BookmarkedAnswerAcceptedActivity::getFullHeadline()),
+            "RecordType" => "Discussion",
+            "RecordID" => $discussionID,
+            "Route" => "/discussion/comment/{$commentID}#Comment_{$commentID}",
+            "Data" => [
+                "Name" => $discussionName,
+                "AcceptedBy" => $this->userModel->getFragmentByID($acceptedByUserID),
+            ],
+            "Ext" => [
+                "Email" => [
+                    "Format" => $comment["Format"] ?? ($comment["format"] ?? "Text"),
+                    "Story" => $comment["Body"] ?? ($comment["body"] ?? ""),
+                ],
+            ],
+        ];
+
+        if (!$this->configuration->get("Vanilla.Email.FullPost")) {
+            $bookmarkActivity["Ext"]["Email"] = $this->activityModel->setStoryExcerpt(
+                $bookmarkActivity["Ext"]["Email"]
+            );
+        }
+
+        $authorActivity = $bookmarkActivity;
+        $authorActivity["ActivityType"] = MyQuestionAnswerAcceptedActivity::getActivityTypeID();
+        $authorActivity["HeadlineFormat"] = MyQuestionAnswerAcceptedActivity::getFullHeadline();
+
+        $discussionUserID = $discussion["InsertUserID"] ?? null;
+        $groupData = [
+            "notifyUserIDs" => [$discussionUserID],
+            "preference" => MyQuestionAnswerAcceptedActivity::getPreference(),
+        ];
+
+        $actions = [
+            new LongRunnerAction(CommunityNotificationGenerator::class, "processNotifications", [
+                $authorActivity,
+                MyQuestionAnswerAcceptedActivity::getActivityReason(),
+                $groupData,
+                $discussion["DiscussionID"],
+            ]),
+        ];
+
+        // Send to all users who have bookmarked this question, using existing bookmark notification system
+        $groupData = [
+            "notifyUsersWhere" => [
+                "Bookmarked" => true,
+            ],
+            "preference" => BookmarkedAnswerAcceptedActivity::getPreference(),
+        ];
+
+        $actions[] = new LongRunnerAction(CommunityNotificationGenerator::class, "processExpensiveNotifications", [
+            $bookmarkActivity,
+            BookmarkedAnswerAcceptedActivity::getActivityReason(),
+            $groupData,
+            $discussionID,
+        ]);
+
+        return new LongRunnerMultiAction($actions);
     }
 
     /**
@@ -160,6 +315,9 @@ class AnswerModel implements EventFromRowInterface
                 case "Accepted":
                     $eventAction = AnswerEvent::ACTION_ANSWER_ACCEPTED;
                     $change = 1;
+
+                    // Send notifications to users who have bookmarked this question
+                    $this->notifyAnswerAccepted($updatedAnswer["commentID"] ?? $updatedAnswer["CommentID"]);
                     break;
 
                 default:

@@ -7,7 +7,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Exception;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ResponseException;
@@ -15,7 +14,6 @@ use Garden\Web\Redirect;
 use Gdn_Upload;
 use Garden\Http\HttpResponse;
 use PHPUnit\Framework\TestCase;
-use Vanilla\Exception\PermissionException;
 use Vanilla\UploadedFile;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Fixtures\TestUploader;
@@ -469,5 +467,56 @@ class MediaTest extends AbstractAPIv2Test
             $response = $e->getResponse();
         }
         $this->assertEquals($media["url"], $response->getUrl());
+    }
+
+    /**
+     * Test that the insertUserID, and dateInserted can be overwritten.
+     *
+     * @return void
+     */
+    public function testMigratableFields(): void
+    {
+        $this->createUser();
+        $media = $this->createMedia([
+            "dateInserted" => "2012-12-21",
+            "insertUserID" => $this->lastUserID,
+        ]);
+        $this->api->get($this->baseUrl . "/" . $media["mediaID"])->assertJsonObjectLike([
+            "dateInserted" => "2012-12-21T00:00:00+00:00",
+            "insertUserID" => $this->lastUserID,
+        ]);
+    }
+
+    /**
+     * Make sure that users without the `site.manage` permission are not able to set or edit migratable fields.
+     *
+     * @param array $body
+     * @return void
+     * @dataProvider provideMigratablePayload
+     */
+    public function testMigratableFieldsPermissions(array $body): void
+    {
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage("Permission Problem");
+
+        $this->runWithPermissions(
+            function () use ($body) {
+                $media = $this->createMedia($body);
+                $event = $this->api->get($this->baseUrl . "/" . $media["mediaID"])->getBody();
+                $this->assertNotEquals("2012-12-21T00:00:00+00:00", $event["dateInserted"]);
+                $this->assertNotEquals(1, $event["insertUserID"]);
+            },
+            [
+                "conversations.add" => true,
+            ]
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function provideMigratablePayload(): array
+    {
+        return [[[]], [["dateInserted" => "2012-12-21"]], [["insertUserID" => 1]]];
     }
 }

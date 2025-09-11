@@ -54,7 +54,7 @@ class InternalResponse extends HttpResponse
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getBody()
     {
@@ -63,7 +63,7 @@ class InternalResponse extends HttpResponse
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRawBody(): string
     {

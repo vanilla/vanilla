@@ -15,66 +15,34 @@ use Vanilla\Site\SiteSectionSchema;
  */
 class MockSiteSection implements SiteSectionInterface
 {
-    /** @var string */
-    private $sectionID;
-
-    /** @var string */
-    private $siteSectionPath;
-
-    /** @var string */
-    private $sectionName;
-
-    /** @var string */
-    private $locale;
-
-    /** @var string */
-    private $sectionGroup;
-
-    /** @var string|int */
-    private $themeID;
-
-    /** @var array $defaultRoute */
-    private $defaultRoute;
-
     /** @var array $apps */
     private $apps;
-
-    /**
-     * @var string
-     */
-    private $bannerImageLink;
 
     /**
      * MockSiteSection constructor.
      *
      * @param string $sectionName
      * @param string $locale
-     * @param string $basePath
+     * @param string $siteSectionPath
      * @param string $sectionID
      * @param string $sectionGroup
      * @param array $defaultRoute
-     * @param string $themeID
+     * @param string|null $themeID
      * @param string $bannerImageLink
+     * @param int $categoryID
      */
     public function __construct(
-        string $sectionName,
-        string $locale,
-        string $basePath,
-        string $sectionID,
-        string $sectionGroup,
-        array $defaultRoute = [],
-        string $themeID = null,
-        string $bannerImageLink = ""
+        private string $sectionName,
+        private string $locale,
+        private string $siteSectionPath,
+        private string $sectionID,
+        private string $sectionGroup,
+        private array $defaultRoute = [],
+        private ?string $themeID = null,
+        private string $bannerImageLink = "",
+        private int $categoryID = -1
     ) {
-        $this->sectionName = $sectionName;
-        $this->locale = $locale;
-        $this->siteSectionPath = $basePath;
-        $this->sectionID = $sectionID;
-        $this->sectionGroup = $sectionGroup;
-        $this->defaultRoute = $defaultRoute;
         $this->apps = ["forum" => true];
-        $this->themeID = $themeID;
-        $this->bannerImageLink = $bannerImageLink;
     }
     /**
      * @inheritdoc
@@ -101,7 +69,7 @@ class MockSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSectionDescription(): ?string
     {
@@ -187,11 +155,11 @@ class MockSiteSection implements SiteSectionInterface
      */
     public function getCategoryID()
     {
-        return -1;
+        return $this->categoryID;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getBannerImageLink(): string
     {
@@ -199,7 +167,7 @@ class MockSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLayoutRecordType(): string
     {
@@ -207,7 +175,7 @@ class MockSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLayoutRecordID(): int|string
     {
@@ -215,7 +183,7 @@ class MockSiteSection implements SiteSectionInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackablePayload(): array
     {

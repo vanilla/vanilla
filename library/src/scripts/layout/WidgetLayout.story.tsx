@@ -7,7 +7,7 @@
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { STORY_WIDGET_ITEMS } from "@library/homeWidget/HomeWidget.storyItems";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
+import { WidgetItemContentType } from "@library/homeWidget/WidgetItemOptions";
 import PanelWidget from "@library/layout/components/PanelWidget";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import SectionTwoColumns from "@library/layout/TwoColumnSection";
@@ -101,7 +101,7 @@ function DummyPanelWidget() {
                             title={"Subcategories"}
                             description={STORY_IPSUM_MEDIUM}
                             itemOptions={{
-                                contentType: HomeWidgetItemContentType.TITLE_BACKGROUND,
+                                contentType: WidgetItemContentType.TitleBackground,
                                 display: { counts: false },
                             }}
                         />

@@ -11,9 +11,10 @@ import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { getComponent, IRegisteredComponent } from "@library/utility/componentRegistry";
 import { logDebug, mergeAndReplaceArrays } from "@vanilla/utils";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { isHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.utils";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
+import { FragmentImplContextProvider } from "@library/utility/FragmentImplContext";
 
 export type IComponentFetcher = (name: string) => IRegisteredComponent | null;
 export type FallbackLayoutWidget = React.ComponentType<IHydratedLayoutWidget>;
@@ -26,6 +27,7 @@ interface IProps<T> {
     layoutRef?: React.Ref<HTMLDivElement>;
     allowInternalProps?: boolean;
     fallback?: React.ReactNode;
+    noSuspense?: boolean; // If true, will not use suspense for loading components
 }
 
 interface ILayoutLookupContext<T> {
@@ -46,7 +48,7 @@ export function LayoutRenderer<T>(props: IProps<T>): React.ReactElement {
     const parentSectionContext = useContext(SectionBehaviourContext);
     const lookupContext = useContext(LayoutLookupContext);
     let content = (
-        <div ref={props.layoutRef}>
+        <div ref={props.layoutRef} style={{ display: "contents" }}>
             <LayoutRendererImpl {...lookupContext} {...props} />
         </div>
     );
@@ -93,14 +95,17 @@ function LayoutRendererImpl<T>(props: IProps<T> & ILayoutLookupContext<T>) {
     return (
         <>
             {layout.map((componentConfig, index) => {
-                const key = `${index}-${layout.length}`;
-                return (
-                    <React.Fragment key={key}>
-                        <React.Suspense fallback={props.fallback ?? <LayoutOverviewSkeleton />}>
-                            {resolveDynamicComponent(componentConfig, layoutRenderContext, key)}
+                let component = resolveDynamicComponent(componentConfig, layoutRenderContext, index);
+
+                if (!props.noSuspense) {
+                    component = (
+                        <React.Suspense key={index} fallback={props.fallback ?? <LayoutOverviewSkeleton />}>
+                            {component}
                         </React.Suspense>
-                    </React.Fragment>
-                );
+                    );
+                }
+
+                return <React.Fragment key={index}>{component}</React.Fragment>;
             })}
         </>
     );
@@ -148,8 +153,6 @@ function resolveDynamicComponent(
             }" cannot be found in the component registry`,
         );
 
-    const key = reactKey ?? "unknownkey";
-
     // Backend middleware allows specifying this device property on all nodes.
     const componentDevice = componentConfig?.$middleware?.visibility?.device;
     if (componentDevice && componentDevice !== LayoutDevice.ALL && componentDevice !== context.device) {
@@ -157,7 +160,7 @@ function resolveDynamicComponent(
         // It was not "all".
         // That device is different than the current device we determined during rendering.
         // Don't render the component.
-        return <React.Fragment />;
+        return <React.Fragment key={reactKey} />;
     }
 
     let result: React.ReactNode = null;
@@ -169,33 +172,32 @@ function resolveDynamicComponent(
 
     // Return an error boundary wrapped component
     if (registeredComponent) {
-        result = React.createElement(
-            LayoutErrorBoundary,
-            { key: String(key), componentName: componentConfig?.$reactComponent },
-            [
-                React.createElement(registeredComponent.Component, {
-                    ...resolveNestedComponents(componentProps, context),
-                    key: key,
-                }),
-            ],
+        result = (
+            <LayoutErrorBoundary componentName={componentConfig?.$reactComponent}>
+                <registeredComponent.Component {...resolveNestedComponents(componentProps, context)} />
+            </LayoutErrorBoundary>
         );
     } else if (context.fallbackWidget) {
-        result = React.createElement(
-            context.fallbackWidget,
-            { ...(componentConfig ?? {}), ...componentProps, key },
-            [],
-        );
+        result = <context.fallbackWidget {...(componentConfig ?? {})} {...componentProps} />;
     } else {
-        result = React.createElement(LayoutError, { componentName: componentConfig?.$reactComponent, key });
+        result = <LayoutError componentName={componentConfig?.$reactComponent} />;
     }
+
+    result = (
+        <FragmentImplContextProvider $fragmentImpls={componentConfig.$fragmentImpls ?? {}}>
+            {result}
+        </FragmentImplContextProvider>
+    );
 
     if (context.componentWrapper) {
-        result = React.createElement(context.componentWrapper, { ...(componentConfig ?? {}), ...componentProps, key }, [
-            result,
-        ]);
+        result = (
+            <context.componentWrapper {...componentProps} {...componentProps}>
+                {result}
+            </context.componentWrapper>
+        );
     }
 
-    return result;
+    return <React.Fragment key={reactKey}>{result}</React.Fragment>;
 }
 
 /**
@@ -212,23 +214,22 @@ function resolveNestedComponents(
         if (!Array.isArray(componentProps) && !isHydratedLayoutWidget(componentProps)) {
             // Loop through each value of the object and resolve it
             return Object.fromEntries(
-                Object.keys(componentProps).map((key, index) => {
-                    return [key, resolveNestedComponents(componentProps[key], context, index)];
+                Object.keys(componentProps).map((property) => {
+                    return [property, resolveNestedComponents(componentProps[property], context)];
                 }),
             );
         }
         // If props is an array, then resolve each array entry
         if (Array.isArray(componentProps)) {
-            return componentProps.map((item, index) =>
-                resolveNestedComponents(item, context, `${index}-${componentProps.length}`),
-            );
+            return componentProps.map((item, index) => resolveNestedComponents(item, context, index));
         }
         // If props is a config, resolve the component
         if (isHydratedLayoutWidget(componentProps)) {
             // This return could be null, if it is, we should return the original object instead of null
             return (
-                resolveDynamicComponent(componentProps, context, key) ??
-                React.createElement(LayoutError, { componentName: componentProps.$reactComponent, key })
+                resolveDynamicComponent(componentProps, context, key) ?? (
+                    <LayoutError componentName={componentProps.$reactComponent} key={key} />
+                )
             );
         }
     }

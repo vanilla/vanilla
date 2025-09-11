@@ -721,6 +721,7 @@ class Gdn_Validation
                 $fields[$fieldName] = $valid;
             }
         }
+
         $this->_ValidationFields = $fields;
         return count($this->_ValidationResults) === 0;
     }

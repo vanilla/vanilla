@@ -8,6 +8,7 @@
 namespace VanillaTests\Forum;
 
 use PermissionNotificationGenerator;
+use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Models\CommunityNotificationGenerator;
 use Vanilla\Scheduler\LongRunnerAction;
 use VanillaTests\DatabaseTestTrait;
@@ -36,6 +37,7 @@ class CommentNotificationsTest extends SiteTestCase
     use DatabaseTestTrait;
 
     public static $addons = ["vanilla"];
+    private CommunityNotificationGenerator $communityNotificationGenerator;
 
     public static function setupBeforeClass(): void
     {
@@ -43,7 +45,14 @@ class CommentNotificationsTest extends SiteTestCase
         /** @var \Gdn_Configuration $configuration */
         $configuration = static::container()->get("Config");
         $configuration->set("Preferences.Popup.ParticipateComment", "1");
+        $configuration->set("Preferences.Email.ParticipateComment", "1");
         $configuration->set(CategoryModel::CONF_CATEGORY_FOLLOWING, true);
+    }
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->communityNotificationGenerator = Gdn::getContainer()->get(CommunityNotificationGenerator::class);
     }
 
     /**
@@ -111,14 +120,13 @@ class CommentNotificationsTest extends SiteTestCase
             ->getWhere("Comment", ["CommentID" => $comment["commentID"]])
             ->resultArray()[0];
 
-        $notificationGenerator = Gdn::getContainer()->get(CommunityNotificationGenerator::class);
         // Make sure we have 2 mentions to pass to the longrunner job.
         $twoMentions = Gdn::formatService()->parseMentions(
             "@{$user1["name"]} and @{$user2["name"]}",
             $commentFromDB["Format"]
         );
         $activity = $this->getCommentActivity($category["name"], $comment, $discussion);
-        $longRunnerAction = $notificationGenerator->processMentionNotifications(
+        $longRunnerAction = $this->communityNotificationGenerator->processMentionNotifications(
             $activity,
             $discussionFromDB,
             $twoMentions
@@ -172,12 +180,10 @@ class CommentNotificationsTest extends SiteTestCase
         $comment1 = $this->runWithUser([$this, "createComment"], $firstCommentUser);
         $comment2 = $this->runWithUser([$this, "createComment"], $secondCommentUser);
 
-        $notificationGenerator = Gdn::getContainer()->get(CommunityNotificationGenerator::class);
-
         $commentActivity = $this->getCommentActivity($category["name"], $comment2, $discussion);
 
         // Process the activity.
-        $longRunnerAction = $notificationGenerator->processParticipatedNotifications(
+        $longRunnerAction = $this->communityNotificationGenerator->processParticipatedNotifications(
             $commentActivity,
             $discussionFromDB
         );
@@ -604,6 +610,7 @@ class CommentNotificationsTest extends SiteTestCase
             "Preferences.Email.Participated" => false,
         ]);
         $userModel->savePreference($notifyUser["userID"], "Popup.ParticipateComment", true);
+        $userModel->savePreference($notifyUser["userID"], "Email.ParticipateComment", false);
         $this->runWithUser(function () {
             $this->createComment();
         }, $otherUser);
@@ -689,5 +696,131 @@ class CommentNotificationsTest extends SiteTestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Test user doesn't get mention notifications when mentions are disabled globally.
+     *
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function testCommentIsNotParsedWhenMentionsAreDisabledGlobally()
+    {
+        $this->setConfig(UserMentionsModel::MENTION_KEY, \UsersApiController::AT_MENTION_DISABLED);
+        $mentionedUser1 = $this->createUser();
+        $mentionedUser2 = $this->createUser();
+        $this->createDiscussion();
+        $this->createComment([
+            "body" => "@{$mentionedUser1["name"]} @{$mentionedUser1["name"]} @{$mentionedUser2["name"]}  comment1",
+        ]);
+        // The user should not receive any notifications because mentions are disabled
+        $this->assertUserHasNoNotifications($mentionedUser1);
+        $this->assertUserHasNoNotifications($mentionedUser2);
+        $this->setConfig(UserMentionsModel::MENTION_KEY, \UsersApiController::AT_MENTION_GLOBAL);
+    }
+
+    /**
+     * Test that muting a discussion prevents notifications.
+     *
+     * @param string $preference
+     * @return void
+     * @dataProvider providePreferencesForMutedTest
+     */
+    public function testMutedDiscussion(string $preference): void
+    {
+        $user = $this->createUser();
+        $discussion = $this->createDiscussion();
+        $this->runWithUser(function () use ($discussion, $user, $preference) {
+            $this->api()->patch("/notification-preferences/{$user["userID"]}", [
+                $preference => ["email" => true, "popup" => true],
+            ]);
+            $this->api()->put("/discussions/{$discussion["discussionID"]}/mute", [
+                "muted" => true,
+            ]);
+        }, $user);
+
+        $this->clearUserNotifications($user);
+
+        $this->createComment(["body" => "I'm mentioning @{$user["name"]}"]);
+        $this->assertUserHasNoNotifications($user);
+    }
+
+    /**
+     * Provide preferences for testing muted discussions.
+     *
+     * @return array[]
+     */
+    public function providePreferencesForMutedTest(): array
+    {
+        return [
+            "Mention" => ["Mention"],
+            "BookMarkComment" => ["BookmarkComment"],
+            "NewComment" => ["NewComment"],
+            "DiscussionComment" => ["DiscussionComment"],
+            "ParticipateComment" => ["ParticipateComment"],
+        ];
+    }
+
+    /**
+     * Test that users who have muted a discussion do not receive notifications for it when they are
+     * set to receive comment notifications for that category.
+     *
+     * @return void
+     */
+    public function testMutedDiscussionWithCategoryFollowing(): void
+    {
+        $user1 = $this->createUser();
+        $user2 = $this->createUser();
+        $commentUser = $this->createUser();
+        $category = $this->createCategory();
+        $discussion = $this->createDiscussion();
+        $comment = $this->runWithUser(function () {
+            return $this->createComment();
+        }, $commentUser);
+
+        // Have the 3 users subscribe to comment notifications for that category.
+        $userMeta = [
+            sprintf("Preferences.Popup.NewComment.%d", $category["categoryID"]) => 1,
+        ];
+        $this->userModel::setMeta($user1["userID"], $userMeta);
+        $this->userModel::setMeta($user2["userID"], $userMeta);
+
+        $this->runWithUser(function () use ($discussion) {
+            $this->api()->put("discussions/{$discussion["discussionID"]}/mute", [
+                "muted" => true,
+            ]);
+        }, $user2);
+
+        // Recreate an activity to process.
+        $activity = $this->getCommentActivity($category["name"], $comment, $discussion);
+
+        // Process the activity.
+        $longRunnerAction = new LongRunnerAction(PermissionNotificationGenerator::class, "notificationGenerator", [
+            $activity,
+            "discussions.view",
+            "NewComment" . "." . $category["categoryID"],
+            0,
+            "Category",
+            $category["categoryID"],
+            false,
+            [],
+            $discussion["discussionID"],
+        ]);
+
+        $this->clearUserNotifications($user1);
+        $this->clearUserNotifications($user2);
+
+        $this->getLongRunner()->runImmediately($longRunnerAction);
+
+        $notification = new ExpectedNotification("Comment", [
+            $commentUser["name"],
+            "commented on",
+            $discussion["name"],
+        ]);
+
+        $this->assertUserHasNotificationsLike($user1, [$notification]);
+        $this->assertUserHasNoNotifications($user2);
     }
 }

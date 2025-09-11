@@ -27,7 +27,7 @@ class ModelFactoryTest extends BootstrapTestCase
     private $factory;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

@@ -12,6 +12,7 @@ import Button from "@library/forms/Button";
 import { getClassForButtonType } from "@library/forms/Button.getClassForButtonType";
 import classNames from "classnames";
 import TitleBarListItem from "@library/headers/mebox/pieces/TitleBarListItem";
+import { useTitleBarParamVarOverrides } from "@library/headers/TitleBar.ParamContext";
 
 export interface ITitleBarNav extends React.AnchorHTMLAttributes<HTMLAnchorElement | HTMLButtonElement> {
     className?: string;
@@ -48,7 +49,8 @@ export const TitleBarNavItem = React.forwardRef(function TitleBarNavItem(
         ...passthru
     } = props;
 
-    const classes = titleBarNavClasses();
+    const varOverrides = useTitleBarParamVarOverrides();
+    const classes = titleBarNavClasses.useAsHook(varOverrides);
     const content = (
         <div
             className={classNames({

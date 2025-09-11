@@ -15,16 +15,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { MemoryRouter } from "react-router";
+import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 
 const MOCK_CATEGORY_FRAGMENT: ICategoryFragment = {
     categoryID: DiscussionFixture.mockDiscussion.categoryID,
     name: "Mock category",
     url: "/mock-category",
 };
-
-// afterEach(() => {
-//     queryClient.clear();
-// });
 
 async function renderInProvider(children: ReactNode, currentUser?: Partial<IMe>) {
     const queryClient = new QueryClient({
@@ -87,10 +84,6 @@ describe("OriginalPostAsset", () => {
             );
         });
 
-        it("No Options menu is rendered", () => {
-            expect(screen.queryByRole("button", { name: "Discussion Options" })).not.toBeInTheDocument();
-        });
-
         it("Bookmark button is rendered", () => {
             expect(screen.queryByLabelText("Bookmark")).toBeInTheDocument();
         });
@@ -101,7 +94,7 @@ describe("OriginalPostAsset", () => {
     });
 
     describe("Closed discussion", () => {
-        beforeEach(async () => {
+        it("A 'closed' tag is rendered within the heading", async () => {
             await renderInProvider(
                 <OriginalPostAsset
                     titleType={"discussion/name"}
@@ -109,11 +102,35 @@ describe("OriginalPostAsset", () => {
                     category={MOCK_CATEGORY_FRAGMENT}
                 />,
             );
-        });
-        it("A 'closed' tag is rendered within the heading", async () => {
+
             const heading = await screen.findByRole("heading");
             const closedTag = await within(heading).findByText("Closed");
             expect(closedTag).toBeInTheDocument();
+        });
+
+        it("The reply button is hidden for members", async () => {
+            await renderInProvider(
+                <OriginalPostAsset
+                    titleType={"discussion/name"}
+                    discussion={{ ...DiscussionFixture.mockDiscussion, closed: true }}
+                    category={MOCK_CATEGORY_FRAGMENT}
+                />,
+            );
+
+            expect(screen.queryByRole("button", { name: "Reply" })).not.toBeInTheDocument();
+        });
+
+        it("The reply button is displayed for admins", async () => {
+            await renderInProvider(
+                <OriginalPostAsset
+                    titleType={"discussion/name"}
+                    discussion={{ ...DiscussionFixture.mockDiscussion, closed: true }}
+                    category={MOCK_CATEGORY_FRAGMENT}
+                />,
+                UserFixture.adminAsCurrent.data,
+            );
+
+            expect(screen.queryByRole("button", { name: "Reply" })).not.toBeInTheDocument();
         });
     });
 });

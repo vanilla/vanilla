@@ -10,7 +10,7 @@ import chalk from "chalk";
  * Log a title of a section.
  */
 export function printSection(name: string) {
-    print(`\n==================== ${name} ====================`);
+    print(`\n=============== ${name} ===============`);
 }
 
 /**

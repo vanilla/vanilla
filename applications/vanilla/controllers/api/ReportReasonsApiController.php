@@ -272,7 +272,7 @@ class ReportReasonsApiController extends \AbstractApiController
         $reason = $this->selectReason($reportReasonID);
         $this->reportReasonModel->joinReasonCounts($reason);
 
-        if ($reason["countReports"] > 0) {
+        if (!$reason["isDeletable"] || $reason["countReports"] > 0) {
             // Soft delete it.
             $this->reportReasonModel->update(set: ["deleted" => true], where: ["reportReasonID" => $reportReasonID]);
         } else {

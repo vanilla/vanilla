@@ -17,7 +17,7 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 class PostSiteTotalProvider implements SiteSectionTotalProviderInterface, AlreadyCachedSiteSectionTotalProviderInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int
     {
@@ -28,7 +28,7 @@ class PostSiteTotalProvider implements SiteSectionTotalProviderInterface, Alread
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTableName(): string
     {
@@ -36,7 +36,7 @@ class PostSiteTotalProvider implements SiteSectionTotalProviderInterface, Alread
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getSiteTotalRecordType(): string
     {

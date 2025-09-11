@@ -74,10 +74,11 @@ class LogController extends DashboardController
     /**
      * Count log items.
      *
+     * @param string $operation Comma-separated list of action types to find.
+     * @throws Exception
      * @since 2.0.?
      * @access public
      *
-     * @param string $operation Comma-separated ist of action types to find.
      */
     public function count($operation)
     {
@@ -88,11 +89,11 @@ class LogController extends DashboardController
             return;
         }
 
-        if ($operation == "edits") {
-            $operation = ["edit", "delete"];
-        } else {
-            $operation = explode(",", $operation);
-        }
+        $operation = match ($operation) {
+            "moderate" => ["Moderate", "Pending"],
+            "edits" => ["Edit", "Delete"],
+            default => explode(",", $operation),
+        };
         array_map("ucfirst", $operation);
 
         $count = $this->LogModel->getCountWhere(["Operation" => $operation]);

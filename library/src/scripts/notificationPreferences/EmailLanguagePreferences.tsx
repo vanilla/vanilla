@@ -62,7 +62,7 @@ export function EmailLanguagePreferencesImpl(props: {
             NotificationLanguage: {
                 type: "string",
                 "x-control": {
-                    label: t("Email Language"),
+                    label: t("Notification Language"),
                     description: t(
                         "This is the language your email notifications and digest will appear in. It won't affect what language posts were created in.",
                     ),

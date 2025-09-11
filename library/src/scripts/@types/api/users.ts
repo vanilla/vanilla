@@ -4,6 +4,8 @@
  */
 
 import { IContributionItem } from "@library/contributionItems/ContributionItem";
+import type { IRoleFragment } from "@dashboard/roles/roleTypes";
+import type { VanillaSanitizedHtml } from "@vanilla/dom-utils";
 
 export interface IUserFragment {
     userID: number;
@@ -12,6 +14,7 @@ export interface IUserFragment {
     photoUrl: string;
     dateLastActive: string | null;
     label?: string;
+    labelHtml?: string;
     title?: string;
     banned?: number;
     private?: boolean;
@@ -22,19 +25,12 @@ export interface IUserFragment {
         }
     >;
     signature?: {
-        body?: string;
+        body?: VanillaSanitizedHtml;
     };
+    canView?: boolean;
 }
 
 export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}
-
-export interface IMe extends IUserFragment {
-    countUnreadNotifications: number;
-    countUnreadConversations: number;
-    isAdmin?: boolean;
-    emailConfirmed?: boolean;
-    suggestAnswers?: boolean;
-}
 
 export interface ICount {
     name: string;
@@ -82,6 +78,14 @@ export interface IUser extends IUserFragment, IUserRoles {
     points?: number;
     suggestAnswers?: boolean;
     pendingEmail?: string;
+}
+
+export interface IMe extends IUser {
+    countUnreadNotifications: number;
+    countUnreadConversations: number;
+    suggestAnswers?: boolean;
+    roles: IRoleFragment[];
+    roleIDs: number[];
 }
 
 export interface IInvitees {

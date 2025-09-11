@@ -47,16 +47,45 @@ vnla docker --service vanilla,logs,mailhog,imgproxy,queue,search
 vnla docker --service vanilla,mailhog
 ```
 
-**The following web services will then be accessible**
+Each service will log out it's available URL after starting.
 
--   https://dev.vanilla.local, https://vanilla.local/OTHER_SITE_SLUGS - Vanilla Sites
--   https://vanilla.local/dev - Same site as the previous
--   https://kibana.vanilla.local - Logs/Kibana instance
--   https://queue.vanilla.local - Dashboard for the queue if you are running with it.
--   https://mail.vanilla.local - All outgoing mail goes here.
--   https://search.vanilla.local - Vanilla search microservice.
--   https://imgproxy.vanilla.local - Image resizing service
--   https://elasticsearch.vanilla.local - ElasticSearch instance for kibana/logs and search service.
+### Service Specific Commands
+
+Each service also exposed their own commands
+
+```shell
+# Start a specific service
+vnla docker:vanilla up
+vnla docker:vanilla start
+
+# Stop a specific service
+vnla docker:vanilla up
+vnla docker:vanilla start
+
+# SSH into the primary container for a specific service
+vnla docker:vanilla ssh
+
+# Run composer commands in the primary container for a specific service
+vnla docker:vanilla composer require <package>
+
+# Run any command in the container
+vnla docker:<service> -- <command> <command-args> --flags-for-command
+
+## For Laravel Service (search,queue,jobber,management)
+
+# Open a PHP repl in the primary container for a specific service
+vnla docker:queue artisan tinker
+
+# Reload the queue PHP processes (faster than restarting the container)
+vnla docker:queue reload-queue
+
+# Run artisan commands in the primary container for a specific service
+vnla docker:queue artisan migrate
+vnla docker:queue artisan horizon:clear
+vnla docker:<service> artisan <artisanCommand>
+
+
+```
 
 ## `vnla spawn-site`
 

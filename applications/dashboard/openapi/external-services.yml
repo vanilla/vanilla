@@ -1,0 +1,28 @@
+openapi: 3.0.2
+info:
+paths:
+    /external-services:
+        x-hidden: true
+        get:
+            summary: Return a list of all external services available.
+            tags:
+                - External Services
+            responses:
+                "200":
+                    description: Success
+    /external-services/{service}/status:
+        x-hidden: true
+        get:
+            parameters:
+                - description: The service we are looking up.
+                  in: query
+                  name: service
+                  required: true
+                  schema:
+                      type: string
+            summary: Return a list of all external services available.
+            tags:
+                - External Services
+            responses:
+                "200":
+                    description: Success

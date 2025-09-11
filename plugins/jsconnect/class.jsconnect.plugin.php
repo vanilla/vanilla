@@ -71,7 +71,7 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
      */
     private static function entryRedirectURL(array $provider): string
     {
-        $target = Gdn::request()->get("Target", Gdn::request()->get("Target"));
+        $target = Gdn::request()->get("Target", Gdn::request()->get("target"));
         if (!$target) {
             $target = "/" . ltrim(Gdn::request()->path());
         }

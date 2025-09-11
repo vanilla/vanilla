@@ -29,7 +29,7 @@ paths:
                       type: array
                       items:
                           type: integer
-                - name: banned
+                - name: isBanned
                   description: Filter by the banned status of a user. Pass true to filter only banned users, and false to exclude banned users.
                   in: query
                   schema:
@@ -170,6 +170,24 @@ paths:
                           - dateLastActive
                           - name
                           - mention
+                - description: >
+                      Specified what we are filtering by category/group/discussion/escalation
+                  in: query
+                  name: recordType
+                  schema:
+                      type: string
+                      enum:
+                          - category
+                          - group
+                          - discussion
+                          - escalation
+
+                - description: >
+                      Specify value of the recordType
+                  in: query
+                  name: recordID
+                  schema:
+                      type: integer
                 - description: |
                       Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
                   in: query
@@ -1137,6 +1155,15 @@ components:
                     description: UserID of the user that invited this user if applicable.
                     type: integer
                     nullable: true
+                label:
+                    description: The label of the user as plaintext.
+                    type: string
+                labelHtml:
+                    description: The label of the user in HTML format.
+                    type: string
+                private:
+                    description: Whether the user profile is private or not.
+                    type: boolean
             required:
                 - userID
                 - name
@@ -1204,6 +1231,23 @@ components:
                 banned:
                     description: Set the banned status of the user.
                     type: boolean
+                dateInserted:
+                    description: When the user was created.
+                    format: date-time
+                    type: string
+                    x-hidden: true
+                dateUpdated:
+                    description: When the user was last updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                    x-hidden: true
+                dateLastActive:
+                    description: Time the user was last active.
+                    format: date-time
+                    nullable: true
+                    type: string
+                    x-hidden: true
         UserPost:
             type: object
             properties:
@@ -1250,6 +1294,23 @@ components:
                     default: false
                 profileFields:
                     $ref: "#/components/schemas/UserProfileFields"
+                dateInserted:
+                    description: When the user was created.
+                    format: date-time
+                    type: string
+                    x-hidden: true
+                dateUpdated:
+                    description: When the user was last updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                    x-hidden: true
+                dateLastActive:
+                    description: Time the user was last active.
+                    format: date-time
+                    nullable: true
+                    type: string
+                    x-hidden: true
             required:
                 - name
                 - email

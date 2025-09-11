@@ -14,8 +14,7 @@ import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedCon
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { EmbedErrorBoundary } from "@library/embeddedContent/components/EmbedErrorBoundary";
 import { embedContainerClasses, embedElementClasses } from "@library/embeddedContent/components/embedStyles";
-import { getEmbedForType } from "@library/embeddedContent/embedService.loadable";
-import { IBaseEmbedData } from "@library/embeddedContent/embedService.register";
+import { getEmbedForType, IBaseEmbedData } from "@library/embeddedContent/embedService.register";
 import { EmbedContext, useEmbedContext } from "@library/embeddedContent/IEmbedContext";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useToast } from "@library/features/toaster/ToastContext";
@@ -25,6 +24,7 @@ import { cx } from "@library/styles/styleShim";
 import { getMeta, t } from "@library/utility/appUtils";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import { setRichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/setRichLinkAppearance";
+import { setRichImagePosition } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/setRichImagePosition";
 import {
     ILegacyEmoji,
     IRichEmbedElement,
@@ -48,6 +48,7 @@ import { LiveMessage } from "react-aria-live";
 import { Transforms } from "slate";
 import { useSelected } from "slate-react";
 import { sprintf } from "sprintf-js";
+import { getTableAbove } from "@udecode/plate-table";
 
 type IProps = PlateRenderElementProps<any, IRichEmbedElement> & { isInline: boolean };
 
@@ -73,6 +74,13 @@ export function RichEmbedElement(props: IProps) {
     const ownPath = findNodePath(editor, element);
     const isSelected = useSelected();
     useComponentDebug({ ownPath, isSelected });
+
+    // to handle some zIndex and overflow concerns
+    const isInRichTable =
+        getMeta("featureFlags.RichTable.Enabled", false) &&
+        element.dataSourceType === "image" &&
+        Boolean(getTableAbove(editor, { at: ownPath }));
+
     const deleteSelf = () => {
         removeNodes(editor, {
             at: ownPath,
@@ -109,6 +117,22 @@ export function RichEmbedElement(props: IProps) {
     const progressEmitterRef = useRef(new ProgressEventEmitter());
 
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (isLoading && (element.embedData || element.error)) {
+            // https://higherlogic.atlassian.net/browse/VNLA-8246
+            // We've actually finished loading and the stored data is available to us.
+            // Notably we may re-render in the meantime between when we set isLoading to true and when slate updates with the new data.
+            setIsLoading(false);
+        }
+    }, [isLoading, element.embedData, element.error]);
+
+    useEffect(() => {
+        if (element.embedData?.displaySize) {
+            setRichImagePosition(editor, element.embedData.displaySize);
+        }
+    }, [element.embedData?.displaySize]);
+
     const [liveMessage, setLiveMessage] = useState<string | null>(null);
     async function loadEmbedData() {
         setIsLoading(true);
@@ -198,8 +222,6 @@ export function RichEmbedElement(props: IProps) {
             }
         } catch (err) {
             syncBackEmbedValues(null, { error: err });
-        } finally {
-            setIsLoading(false);
         }
     }
 
@@ -227,7 +249,7 @@ export function RichEmbedElement(props: IProps) {
     }, [elementUrl, element.url]);
 
     useEffect(() => {
-        if (status !== LoadStatus.PENDING) {
+        if (status !== LoadStatus.PENDING || isLoading) {
             return;
         }
 
@@ -251,6 +273,7 @@ export function RichEmbedElement(props: IProps) {
                         deleteSelf,
                         selectSelf,
                         isNewEditor: true,
+                        isInRichTable,
                         syncBackEmbedValue: syncBackEmbedValues,
                     }}
                 >

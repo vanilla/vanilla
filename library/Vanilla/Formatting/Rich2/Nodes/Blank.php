@@ -20,7 +20,7 @@ class Blank extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $node): bool
     {
@@ -28,7 +28,7 @@ class Blank extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

@@ -12,6 +12,7 @@ export interface IButtonSwitch {
     isLoading?: boolean;
     onClick?: (event: any) => void;
     label: string;
+    renderCheckIcon?: boolean;
 }
 /**
  *
@@ -20,10 +21,10 @@ export default function DropDownSwitchButton(props: IButtonSwitch) {
     const visibilityClasses = visibility();
     const classes = dropdownSwitchButtonClasses();
 
-    const { isLoading, status, onClick, label } = props;
+    const { isLoading, status, onClick, label, renderCheckIcon = true } = props;
     const checkStatus = status ? (
         <>
-            <CheckCompactIcon aria-hidden={true} />
+            {renderCheckIcon && <CheckCompactIcon aria-hidden />}
             <span className={visibilityClasses.visuallyHidden}>{t("on")}</span>
         </>
     ) : (

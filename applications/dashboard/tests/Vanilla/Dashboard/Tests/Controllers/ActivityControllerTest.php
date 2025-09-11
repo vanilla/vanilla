@@ -46,6 +46,109 @@ class ActivityControllerTest extends AbstractAPIv2Test
     }
 
     /**
+     * Test that posting on a public profile wall works normally with the profiles.view permission.
+     */
+    public function testPostOnPublicProfileWall(): void
+    {
+        $commentingUser = $this->createUser();
+        $targetUser = $this->createUser();
+
+        $this->runWithUser(function () use ($targetUser) {
+            // Post on the target user's wall
+            $comment = "Hello from the wall!";
+
+            $result = $this->bessy()->post("/activity/post/{$targetUser["userID"]}", [
+                "Comment" => $comment,
+                "Format" => "Text",
+                "TransientKey" => Gdn::session()->transientKey(),
+            ]);
+
+            $activities = $result->Data["Activities"];
+            $this->assertCount(1, $activities);
+            $this->assertSame($comment, $activities[0]["Story"]);
+        }, $commentingUser);
+    }
+
+    /**
+     * Test that posting on a public profile wall without profiles.view permission is denied.
+     */
+    public function testPostOnPublicProfileWithoutPermission(): void
+    {
+        $targetUser = $this->createUser();
+
+        // Make the target user's profile private
+        $userModel = Gdn::getContainer()->get(\UserModel::class);
+        $userModel->saveAttribute($targetUser["userID"], "Private", 1);
+
+        // Try to post on the private profile wall without personalInfo.view permission
+        $this->expectException(Gdn_UserException::class);
+        $this->expectExceptionMessage('You don\'t have permission to do that.');
+
+        $this->runWithPermissions(
+            function () use ($targetUser) {
+                $this->bessy()->post("/activity/post/{$targetUser["userID"]}", [
+                    "Comment" => "Hello from the wall!",
+                    "Format" => "Text",
+                    "TransientKey" => Gdn::session()->transientKey(),
+                ]);
+            },
+            ["profiles.view" => false]
+        );
+    }
+
+    /**
+     * Test that posting on a private profile wall without personalInfo.view permission is denied.
+     */
+    public function testPostOnPrivateProfileWallWithoutPermission(): void
+    {
+        $postingUser = $this->createUser();
+        $targetUser = $this->createUser();
+
+        // Make the target user's profile private
+        $userModel = Gdn::getContainer()->get(\UserModel::class);
+        $userModel->saveAttribute($targetUser["userID"], "Private", 1);
+
+        // Try to post on the private profile wall without personalInfo.view permission
+        $this->expectException(Gdn_UserException::class);
+        $this->expectExceptionMessage('You don\'t have permission to do that.');
+
+        $this->runWithUser(function () use ($targetUser) {
+            $this->bessy()->post("/activity/post/{$targetUser["userID"]}", [
+                "Comment" => "Hello from the wall!",
+                "Format" => "Text",
+                "TransientKey" => Gdn::session()->transientKey(),
+            ]);
+        }, $postingUser);
+    }
+
+    /**
+     * Test that posting on a private profile wall with personalInfo.view permission is allowed.
+     */
+    public function testPostOnPrivateProfileWallWithPermission(): void
+    {
+        $targetUser = $this->createUser();
+        $userWithPermission = $this->createUser(["roleID" => \RoleModel::MOD_ID]);
+
+        $this->runWithUser(function () use ($targetUser) {
+            // Make the target user's profile private
+            $userModel = Gdn::getContainer()->get(\UserModel::class);
+            $userModel->saveAttribute($targetUser["userID"], "Private", 1);
+
+            // Post on the private profile wall with personalInfo.view permission
+            $comment = "Hello from the wall!";
+            $result = $this->bessy()->post("/activity/post/{$targetUser["userID"]}", [
+                "Comment" => $comment,
+                "Format" => "Text",
+                "TransientKey" => Gdn::session()->transientKey(),
+            ]);
+
+            $activities = $result->Data["Activities"];
+            $this->assertCount(1, $activities);
+            $this->assertSame($comment, $activities[0]["Story"]);
+        }, $userWithPermission);
+    }
+
+    /**
      * Tests that activity feed can only be accessed up to page 500.
      *
      * @return void

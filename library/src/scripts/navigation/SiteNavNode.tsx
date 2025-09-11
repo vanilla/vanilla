@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { siteNavNodeClasses, siteNavNodeDashboardClasses } from "@library/navigation/siteNavStyles";
 import { t } from "@library/utility/appUtils";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import SmartLink from "@library/routing/links/SmartLink";
-import { SiteNavContext } from "@library/navigation/SiteNavContext";
+import { SiteNavContext, useSiteNavContext } from "@library/navigation/SiteNavContext";
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { Hoverable } from "@vanilla/react-utils";
 import { TabHandler } from "@vanilla/dom-utils";
@@ -41,291 +41,26 @@ export interface IActiveRecord {
 /**
  * Recursive component to generate site nav item
  */
-export default class SiteNavNode extends React.Component<IProps> {
-    public static contextType = SiteNavContext;
-    declare context: React.ContextType<typeof SiteNavContext>;
+export default function SiteNavNode(props: IProps) {
+    const context = useSiteNavContext();
+    const { siteNavNodeTypes } = props;
+    const collapsible = props.collapsible && context.categoryRecordType === props.recordType; // blocking collapsible
+    const isActiveRecord =
+        props.activeRecord &&
+        props.recordType === props.activeRecord.recordType &&
+        props.recordID === props.activeRecord.recordID;
 
-    public render() {
-        const { siteNavNodeTypes } = this.props;
-        const collapsible = this.props.collapsible && this.context.categoryRecordType === this.props.recordType; // blocking collapsible
-        const isCurrent = this.isActiveRecord();
-        const isFirstLevel = this.props.depth === 0;
-        const hasChildren = collapsible;
-        const dashboardClasses = siteNavNodeDashboardClasses(isCurrent, isFirstLevel, hasChildren);
-        const normalClasses = siteNavNodeClasses(isCurrent, isFirstLevel, hasChildren);
+    const isCurrent = isActiveRecord;
+    const isFirstLevel = props.depth === 0;
+    const hasChildren = collapsible;
+    const dashboardClasses = siteNavNodeDashboardClasses.useAsHook(isCurrent, isFirstLevel, hasChildren);
+    const normalClasses = siteNavNodeClasses.useAsHook(isCurrent, isFirstLevel, hasChildren);
 
-        const classes =
-            siteNavNodeTypes === SiteNavNodeTypes.DASHBOARD
-                ? {
-                      ...normalClasses,
-                      ...dashboardClasses,
-                  }
-                : normalClasses;
-
-        let linkContents;
-
-        if (this.props.clickableCategoryLabels && collapsible) {
-            linkContents = (
-                <Button
-                    buttonType={ButtonTypes.CUSTOM}
-                    onKeyDownCapture={this.handleKeyDown}
-                    className={classes.link}
-                    onClick={this.handleToggleClick as any}
-                >
-                    <span className={classes.label}>
-                        {this.props.iconPrefix}
-                        <span className={classes.labelText}>{this.props.name}</span>
-                        {this.props.iconSuffix}
-                    </span>
-                </Button>
-            );
-        } else {
-            const linkOrButtonContents = (
-                <span className={cx(classes.label, { [`${classes.activeLink}`]: this.props.isLink })}>
-                    {this.props.iconPrefix}
-                    <span className={classes.labelText}>
-                        {this.props.name}
-                        {this.props.badge && this.props.badge.text && (
-                            <span className={classes.badge}>{this.props.badge.text}</span>
-                        )}
-                    </span>
-                    {this.props.iconSuffix}
-                    {this.props.withCheckMark && <CheckCompactIcon className={siteNavNodeClasses().checkMark} />}
-                </span>
-            );
-            linkContents = (
-                <Hoverable onHover={this.handleHover} duration={50}>
-                    {(provided) => {
-                        return this.props.url ? (
-                            <SmartLink
-                                {...provided}
-                                active={isCurrent}
-                                aria-current={isCurrent ? "page" : undefined}
-                                onKeyDownCapture={this.handleKeyDown}
-                                onClick={this.handleSelect}
-                                className={classes.link}
-                                tabIndex={0}
-                                to={this.props.url!}
-                            >
-                                {linkOrButtonContents}
-                            </SmartLink>
-                        ) : (
-                            <Button
-                                {...provided}
-                                buttonType={ButtonTypes.CUSTOM}
-                                onKeyDownCapture={this.handleKeyDown}
-                                onClick={this.handleSelect}
-                                className={classes.link}
-                                tabIndex={0}
-                            >
-                                {linkOrButtonContents}
-                            </Button>
-                        );
-                    }}
-                </Hoverable>
-            );
+    useEffect(() => {
+        if (isActiveRecord) {
+            openSelfAndParents();
         }
-
-        const childrenContents =
-            collapsible &&
-            this.props.children?.map((child) => {
-                const key = child.recordType + child.recordID;
-                return (
-                    <SiteNavNode
-                        {...child}
-                        activeRecord={this.props.activeRecord}
-                        key={key}
-                        openParent={this.openSelfAndParents}
-                        depth={this.props.depth + 1}
-                        collapsible={collapsible}
-                        onSelectItem={this.props.onSelectItem}
-                        onItemHover={this.props.onItemHover}
-                        clickableCategoryLabels={!!this.props.clickableCategoryLabels}
-                        aria-current="page"
-                        siteNavNodeTypes={siteNavNodeTypes}
-                    />
-                );
-            });
-        return (
-            <li
-                className={cx("siteNavNode", this.props.className, classes.root)}
-                role="treeitem"
-                aria-expanded={this.isOpen}
-            >
-                {collapsible && (this.props.children?.length ?? 0) > 0 ? (
-                    <div
-                        className={cx(classes.buttonOffset, {
-                            hasNoOffset: this.props.depth === 1,
-                        })}
-                    >
-                        <Button
-                            tabIndex={-1}
-                            ariaHidden={true}
-                            title={t("Toggle Category")}
-                            ariaLabel={t("Toggle Category")}
-                            onClick={this.handleToggleClick as any}
-                            buttonType={ButtonTypes.CUSTOM}
-                            className={classes.toggle}
-                        >
-                            {this.isOpen ? (
-                                <DownTriangleIcon title={t("Expand")} />
-                            ) : (
-                                <RightTriangleIcon title={t("Collapse")} />
-                            )}
-                        </Button>
-                    </div>
-                ) : null}
-                <div className={classes.contents}>
-                    {linkContents}
-                    {collapsible && (
-                        <ul
-                            className={cx(classes.children, {
-                                isHidden: collapsible ? !this.isOpen : false,
-                            })}
-                            role="group"
-                        >
-                            {childrenContents}
-                        </ul>
-                    )}
-                </div>
-            </li>
-        );
-    }
-
-    /**
-     * Call the hover callback with the item data.
-     */
-    private handleHover = () => {
-        if (this.props.onItemHover) {
-            this.props.onItemHover(this.props);
-        }
-    };
-
-    private get isOpen(): boolean {
-        const records = this.context.openRecords[this.props.recordType];
-        if (!records) {
-            return false;
-        }
-
-        return records.has(this.props.recordID);
-    }
-
-    /**
-     * Opens node. Optional callback if it's already open.
-     * @param callbackIfAlreadyOpen
-     */
-    private open = (callbackIfAlreadyOpen?: any) => {
-        if (!this.isOpen) {
-            this.context.openItem(this.props.recordType, this.props.recordID);
-        } else {
-            if (callbackIfAlreadyOpen) {
-                callbackIfAlreadyOpen();
-            }
-        }
-    };
-
-    /**
-     * Closes node. Optional callback if already closed.
-     */
-    private close = (callbackIfAlreadyClosed?: any) => {
-        if (this.isOpen) {
-            this.context.closeItem(this.props.recordType, this.props.recordID);
-        } else {
-            if (callbackIfAlreadyClosed) {
-                callbackIfAlreadyClosed();
-            }
-        }
-    };
-
-    /**
-     * Opens self and calls same function on parent. Opens all the way to the root.
-     */
-    private openSelfAndParents = () => {
-        this.open();
-        if (this.props.openParent) {
-            this.props.openParent();
-        }
-    };
-
-    /**
-     * Toggle node
-     */
-    private toggle = () => {
-        this.context.toggleItem(this.props.recordType, this.props.recordID);
-    };
-
-    /**
-     * Handles clicking on the chevron to toggle node
-     * @param e
-     */
-    private handleSelect = (e) => {
-        e.stopPropagation();
-        if (this.props.onSelectItem) {
-            this.props.onSelectItem(this.props);
-        }
-    };
-
-    /**
-     * Handles clicking on the chevron to toggle node
-     * @param e
-     */
-    private handleToggleClick = (e) => {
-        e.stopPropagation();
-        this.toggle();
-    };
-
-    /**
-     * Checks if we're on the current page
-     * Note that this won't work with non-canonical URLs
-     */
-    private isActiveRecord(): boolean | undefined {
-        return (
-            this.props.activeRecord &&
-            this.props.recordType === this.props.activeRecord.recordType &&
-            this.props.recordID === this.props.activeRecord.recordID
-        );
-    }
-
-    /**
-     * When component gets added to DOM, check if we're the current node, if so open recursively up the tree
-     * @param prevProps
-     */
-    public componentDidMount() {
-        if (this.isActiveRecord()) {
-            this.openSelfAndParents();
-        }
-    }
-
-    /**
-     * Select next visible elemnt in tree
-     * @param tabHandler The tab handler handler
-     * @param currentLink The starting point
-     */
-    private next = (tabHandler: TabHandler, currentLink: Element) => {
-        const nextElement = tabHandler.getNext(currentLink, false, false);
-        if (nextElement) {
-            nextElement.focus();
-        }
-    };
-
-    /**
-     * Select prev visible elemnt in tree
-     * @param tabHandler The tab handler handler
-     * @param currentLink The starting point
-     */
-    private prev = (tabHandler: TabHandler, currentLink: Element) => {
-        const prevElement = tabHandler.getNext(currentLink, true, false);
-        if (prevElement) {
-            prevElement.focus();
-        }
-    };
-
-    /**
-     * Keyboard handler for arrow up, arrow down, home and end.
-     * For full accessibility docs, see https://www.w3.org/TR/wai-aria-practices-1.1/examples/treeview/treeview-1/treeview-1a.html
-     * Note that some of the events are on the SiteNavNode
-     * @param event
-     */
+    }, []);
 
     /**
      * Keyboard handler for arrow right and arrow left.
@@ -333,7 +68,7 @@ export default class SiteNavNode extends React.Component<IProps> {
      * Note that some of the events are on SiteNav.tsx
      * @param event
      */
-    private handleKeyDown = (event) => {
+    const handleKeyDown = (event: React.KeyboardEvent) => {
         if (document.activeElement === null) {
             return;
         }
@@ -344,35 +79,241 @@ export default class SiteNavNode extends React.Component<IProps> {
         switch (event.key) {
             case "ArrowRight":
                 /*
-                    When focus is on a closed node, opens the node; focus does not move.
-                    When focus is on a open node, moves focus to the first child node.
-                    When focus is on an end node, does nothing.
-                 */
-                if (this.props.children && this.props.children.length > 0) {
+                When focus is on a closed node, opens the node; focus does not move.
+                When focus is on a open node, moves focus to the first child node.
+                When focus is on an end node, does nothing.
+             */
+                if (props.children && props.children.length > 0) {
                     event.preventDefault();
                     event.stopPropagation();
-                    this.open(() => {
-                        this.next(tabHandler, currentLink);
+                    open(() => {
+                        tabHandler.getNext(currentLink, false, false)?.focus();
                     });
                 }
                 break;
             case "ArrowLeft":
                 /*
-                    When focus is on an open node, closes the node.
-                    When focus is on a child node that is also either an end node or a closed node, moves focus to its parent node.
-                    When focus is on a root node that is also either an end node or a closed node, does nothing.
-                */
+                When focus is on an open node, closes the node.
+                When focus is on a child node that is also either an end node or a closed node, moves focus to its parent node.
+                When focus is on a root node that is also either an end node or a closed node, does nothing.
+            */
 
-                if (this.props.children && this.props.children.length > 0) {
+                if (props.children && props.children.length > 0) {
                     event.preventDefault();
                     event.stopPropagation();
-                    this.close(() => {
-                        this.prev(tabHandler, currentLink);
+                    close(() => {
+                        tabHandler.getNext(currentLink, true, false)?.focus();
                     });
                 } else {
-                    this.prev(tabHandler, currentLink);
+                    tabHandler.getNext(currentLink, true, false)?.focus();
                 }
                 break;
         }
     };
+
+    /**
+     * Call the hover callback with the item data.
+     */
+    const handleHover = () => {
+        if (props.onItemHover) {
+            props.onItemHover(props);
+        }
+    };
+
+    const isOpen = context.openRecords[props.recordType]?.has(props.recordID);
+
+    /**
+     * Opens node. Optional callback if it's already open.
+     * @param callbackIfAlreadyOpen
+     */
+    const open = (callbackIfAlreadyOpen?: any) => {
+        if (!isOpen) {
+            context.openItem(props.recordType, props.recordID);
+        } else {
+            if (callbackIfAlreadyOpen) {
+                callbackIfAlreadyOpen();
+            }
+        }
+    };
+
+    /**
+     * Closes node. Optional callback if already closed.
+     */
+    const close = (callbackIfAlreadyClosed?: any) => {
+        if (isOpen) {
+            context.closeItem(props.recordType, props.recordID);
+        } else {
+            if (callbackIfAlreadyClosed) {
+                callbackIfAlreadyClosed();
+            }
+        }
+    };
+
+    /**
+     * Opens self and calls same function on parent. Opens all the way to the root.
+     */
+    const openSelfAndParents = () => {
+        open();
+        if (props.openParent) {
+            props.openParent();
+        }
+    };
+
+    /**
+     * Toggle node
+     */
+    const toggle = () => {
+        context.toggleItem(props.recordType, props.recordID);
+    };
+
+    /**
+     * Handles clicking on the chevron to toggle node
+     * @param e
+     */
+    const handleSelect = (e: React.SyntheticEvent) => {
+        e.stopPropagation();
+        if (props.onSelectItem) {
+            props.onSelectItem(props);
+        }
+    };
+
+    /**
+     * Handles clicking on the chevron to toggle node
+     * @param e
+     */
+    const handleToggleClick = (e: React.SyntheticEvent) => {
+        e.stopPropagation();
+        toggle();
+    };
+
+    const classes =
+        siteNavNodeTypes === SiteNavNodeTypes.DASHBOARD
+            ? {
+                  ...normalClasses,
+                  ...dashboardClasses,
+              }
+            : normalClasses;
+
+    let linkContents;
+
+    if (props.clickableCategoryLabels && collapsible) {
+        linkContents = (
+            <Button
+                buttonType={ButtonTypes.CUSTOM}
+                onKeyDownCapture={handleKeyDown}
+                className={classes.link}
+                onClick={handleToggleClick}
+            >
+                <span className={classes.label}>
+                    {props.iconPrefix}
+                    <span className={classes.labelText}>{props.name}</span>
+                    {props.iconSuffix}
+                </span>
+            </Button>
+        );
+    } else {
+        const linkOrButtonContents = (
+            <span className={cx(classes.label, { [`${classes.activeLink}`]: props.isLink })}>
+                {props.iconPrefix}
+                <span className={classes.labelText}>
+                    {props.name}
+                    {props.badge && props.badge.text && <span className={classes.badge}>{props.badge.text}</span>}
+                </span>
+                {props.iconSuffix}
+                {props.withCheckMark && <CheckCompactIcon className={siteNavNodeClasses().checkMark} />}
+            </span>
+        );
+        linkContents = (
+            <Hoverable onHover={handleHover} duration={50}>
+                {(provided) => {
+                    return props.url ? (
+                        <SmartLink
+                            {...provided}
+                            active={isCurrent}
+                            aria-current={isCurrent ? "page" : undefined}
+                            onKeyDownCapture={handleKeyDown}
+                            onClick={handleSelect}
+                            className={classes.link}
+                            tabIndex={0}
+                            to={props.url!}
+                        >
+                            {linkOrButtonContents}
+                        </SmartLink>
+                    ) : (
+                        <Button
+                            {...provided}
+                            buttonType={ButtonTypes.CUSTOM}
+                            onKeyDownCapture={handleKeyDown}
+                            onClick={handleSelect}
+                            className={classes.link}
+                            tabIndex={0}
+                        >
+                            {linkOrButtonContents}
+                        </Button>
+                    );
+                }}
+            </Hoverable>
+        );
+    }
+
+    const childrenContents =
+        collapsible &&
+        props.children?.map((child, i) => {
+            const key = i;
+            return (
+                <SiteNavNode
+                    {...child}
+                    activeRecord={props.activeRecord}
+                    key={key}
+                    openParent={openSelfAndParents}
+                    depth={props.depth + 1}
+                    collapsible={collapsible}
+                    onSelectItem={props.onSelectItem}
+                    onItemHover={props.onItemHover}
+                    clickableCategoryLabels={!!props.clickableCategoryLabels}
+                    aria-current="page"
+                    siteNavNodeTypes={siteNavNodeTypes}
+                />
+            );
+        });
+    return (
+        <li className={cx("siteNavNode", props.className, classes.root)} role="treeitem" aria-expanded={isOpen}>
+            {collapsible && (props.children?.length ?? 0) > 0 ? (
+                <div
+                    className={cx(classes.buttonOffset, {
+                        hasNoOffset: props.depth === 1,
+                    })}
+                >
+                    <Button
+                        tabIndex={-1}
+                        ariaHidden={true}
+                        title={t("Toggle Category")}
+                        ariaLabel={t("Toggle Category")}
+                        onClick={handleToggleClick}
+                        buttonType={ButtonTypes.CUSTOM}
+                        className={classes.toggle}
+                    >
+                        {isOpen ? (
+                            <DownTriangleIcon title={t("Expand")} />
+                        ) : (
+                            <RightTriangleIcon title={t("Collapse")} />
+                        )}
+                    </Button>
+                </div>
+            ) : null}
+            <div className={classes.contents}>
+                {linkContents}
+                {collapsible && (
+                    <ul
+                        className={cx(classes.children, {
+                            isHidden: collapsible ? !isOpen : false,
+                        })}
+                        role="group"
+                    >
+                        {childrenContents}
+                    </ul>
+                )}
+            </div>
+        </li>
+    );
 }

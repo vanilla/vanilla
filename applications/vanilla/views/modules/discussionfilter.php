@@ -3,6 +3,7 @@ if (!defined("APPLICATION")) {
     exit();
 }
 
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Utility\HtmlUtils;
 
 if (\Gdn::themeFeatures()->useNewQuickLinks()) {
@@ -25,9 +26,10 @@ $CountDiscussions = 0;
 $CountDrafts = 0;
 
 if ($Session->isValid()) {
+    $contentDraftModel = Gdn::getContainer()->get(ContentDraftModel::class);
     $CountBookmarks = $Session->User->CountBookmarks ?? 0;
     $CountDiscussions = $Session->User->CountDiscussions ?? 0;
-    $CountDrafts = $Session->User->CountDrafts ?? 0;
+    $CountDrafts = $contentDraftModel->draftsWhereCountByUser();
 }
 
 if (!function_exists("FilterCountString")) {

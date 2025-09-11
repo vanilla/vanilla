@@ -60,7 +60,7 @@ class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEv
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -98,7 +98,7 @@ class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEv
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getLogEntry(): LogEntry
     {
@@ -121,7 +121,7 @@ class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEv
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function makeLogMessage(string $action, string $targetName, ?string $username): string
     {

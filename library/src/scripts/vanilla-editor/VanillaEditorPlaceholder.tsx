@@ -13,7 +13,7 @@ export default function VanillaEditorPlaceholder() {
     const editorState = useEditorState();
     const [showPlaceholder, setShowPlaceholder] = useState(true);
 
-    const classes = vanillaEditorClasses();
+    const classes = vanillaEditorClasses.useAsHook();
 
     useEffect(() => {
         if (editorState.children.length === 1 && isElementEmpty(editorState, editorState.children[0] as any)) {
@@ -25,7 +25,7 @@ export default function VanillaEditorPlaceholder() {
 
     return (
         <>
-            <div className={cx(classes.placeholder, { hidden: !showPlaceholder })}>{t("Type... ")}</div>
+            <div className={cx(classes.placeholder, { hidden: !showPlaceholder })}>{t("Type...")}</div>
         </>
     );
 }

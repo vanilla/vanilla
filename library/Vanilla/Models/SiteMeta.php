@@ -17,6 +17,7 @@ use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Forum\Widgets\SiteTotalsWidget;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
@@ -156,6 +157,7 @@ class SiteMeta implements \JsonSerializable
         return array_replace_recursive(
             [
                 "context" => [
+                    "version" => APPLICATION_VERSION,
                     "requestID" => $this->request->getMeta("requestID"),
                     "host" => $this->getAssetPath(), // Notably not the actual host.
                     "basePath" => $this->getBasePath(),
@@ -193,6 +195,15 @@ class SiteMeta implements \JsonSerializable
                     "autoOffsetComments" => boolval($this->config->get("Vanilla.Comments.AutoOffset", true)),
                     "allowSelfDelete" => boolval($this->config->get("Vanilla.Comments.AllowSelfDelete", false)),
                     "isDirectionRTL" => $this->getDirectionRTL(),
+                    "userMentionsEnabled" => boolval(
+                        $this->config->get("Garden.Format.Mentions", \UsersApiController::AT_MENTION_FILTER_LOOSE) !==
+                            "disabled"
+                    ),
+                    "userMentionsFormat" => $this->config->get(
+                        "Garden.Format.Mentions",
+                        \UsersApiController::AT_MENTION_FILTER_LOOSE
+                    ),
+                    "legacyDiscussionListLayout" => $this->config->get("Vanilla.Discussions.Layout", "modern"),
                 ],
                 "search" => [
                     "defaultScope" => $this->config->get("Search.DefaultScope", "site"),
@@ -204,6 +215,11 @@ class SiteMeta implements \JsonSerializable
                         "query" => $this->config->get("Garden.ExternalSearch.Query", false),
                         "resultsInNewTab" => $this->config->get("Garden.ExternalSearch.ResultsInNewTab", false),
                     ],
+                    "shouldAbortDuringAutocomplete" => (bool) $this->config->get(
+                        "Search.ShouldAbortDuringAutocomplete",
+                        false
+                    ),
+                    "autocompleteDebounce" => (int) $this->config->get("Search.AutocompleteDebounce", 500),
                 ],
                 "upload" => [
                     "maxSize" => $this->getMaxUploadSize(),
@@ -217,6 +233,10 @@ class SiteMeta implements \JsonSerializable
                     "enabled" => (bool) $this->config->get("EnabledPlugins.Signatures"),
                     "hideMobile" => (bool) $this->config->get("Signatures.Hide.Mobile"),
                     "imageMaxHeight" => (int) $this->config->get("Signatures.Images.MaxHeight", 0),
+                ],
+
+                "siteTotals" => [
+                    "availableOptions" => SiteTotalsWidget::getRecordOptions(),
                 ],
 
                 // In case there is a some failure here we don't want the site to crash.

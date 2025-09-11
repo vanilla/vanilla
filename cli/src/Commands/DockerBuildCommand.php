@@ -23,7 +23,7 @@ class DockerBuildCommand extends Console\Command\Command
     use InstallDataTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function configure()
     {

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Web\Middleware;
 
+use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\RequestInterface;
@@ -23,27 +24,24 @@ class CircuitBreakerMiddleware
     const NEXT_ATTEMPTS_AT = ".nextAttemptsAt";
     const FAILED_ATTEMPTS = ".failedAttempts";
 
-    protected Gdn_Cache $cache;
-
-    public function __construct(Gdn_Cache $cache)
+    public function __construct(private Gdn_Cache $cache)
     {
-        $this->cache = $cache;
     }
 
     /**
      * Implement the CircuitBreaker pattern to limit the number of calls made when an endpoint fails.
      *
-     * @param RequestInterface $request
+     * @param HttpRequest $request
      * @param callable $next
      * @return HttpResponse
      * @throws ServerException
      */
-    public function __invoke(RequestInterface $request, callable $next)
+    public function __invoke(HttpRequest $request, callable $next)
     {
         $cacheKey = $this->getCacheKey($request);
         $nextAttemptsAt = $this->cache->get($cacheKey . self::NEXT_ATTEMPTS_AT);
         if ($nextAttemptsAt && $nextAttemptsAt > CurrentTimeStamp::get()) {
-            throw new ServerException("Upstream service {$request->getHost()} is having trouble.", 500);
+            throw new ServerException("Upstream service {$request->getUri()->getHost()} is having trouble.", 500);
         }
 
         /** @var HttpResponse $response */
@@ -86,12 +84,12 @@ class CircuitBreakerMiddleware
     /**
      * Generate a cacheKey based on the HostName of the request.
      *
-     * @param RequestInterface $request
+     * @param HttpRequest $request
      * @return string
      */
-    public static function getCacheKey(RequestInterface $request): string
+    public static function getCacheKey(HttpRequest $request): string
     {
-        $cacheKey = "circuit-breaker" . $request->getHost();
+        $cacheKey = "circuit-breaker" . $request->getUri()->getHost();
         $cacheKey = sha1($cacheKey);
         return $cacheKey;
     }

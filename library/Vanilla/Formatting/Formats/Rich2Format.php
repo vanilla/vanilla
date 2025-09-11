@@ -10,6 +10,7 @@ namespace Vanilla\Formatting\Formats;
 use Garden\StaticCacheTranslationTrait;
 use Gdn;
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Contracts\Formatting\FormatParsedInterface;
 use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Contracts\Formatting\HeadingProviderInterface;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
@@ -68,12 +69,15 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     /**
      * @inheritdoc
      */
-    public function parse(string $content)
+    public function parse(string $content, bool $throw = false)
     {
         try {
             $nodeList = $this->parser->parse($content);
             return new Rich2FormatParsed(json_encode($nodeList), $nodeList);
         } catch (\Throwable $e) {
+            if ($throw) {
+                throw new FormattingException($e->getMessage(), $e->getCode(), $e);
+            }
             $this->logBadInput($content);
             $paragraph = new Paragraph(["type" => "paragraph"]);
             $paragraph->addChild(new Text(["text" => self::t(self::RENDER_ERROR_MESSAGE)]));
@@ -117,7 +121,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderHTML($content): string
     {
@@ -126,13 +130,16 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
             $html = $nodeList->render();
             return $this->applyHtmlProcessors($html);
         } catch (\Throwable $e) {
+            if ($content instanceof FormatParsedInterface) {
+                $content = $content->getRawContent();
+            }
             $this->logBadInput($content);
             return $this->renderErrorMessage();
         }
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderPlainText($content): string
     {
@@ -147,7 +154,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderQuote($content): string
     {
@@ -163,7 +170,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function filter($content): string
     {
@@ -177,7 +184,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseAttachments($content): array
     {
@@ -201,7 +208,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseHeadings($content): array
     {
@@ -227,7 +234,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseImageUrls($content): array
     {
@@ -251,7 +258,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseImages($content): array
     {
@@ -278,7 +285,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseMentions($content, bool $skipTaggedContent = true): array
     {
@@ -306,7 +313,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function removeUserPII(string $username, string $body): string
     {
@@ -365,7 +372,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseAllMentions($body): array
     {
@@ -414,7 +421,7 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseDOM(string $content): TextDOMInterface
     {

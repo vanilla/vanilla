@@ -13,7 +13,7 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { percent } from "csx";
 import merge from "lodash-es/merge";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import cloneDeep from "lodash-es/cloneDeep";
 import { defaultTransition } from "@library/styles/styleHelpersAnimation";
 import { shadowHelper } from "@library/styles/shadowHelpers";
@@ -166,14 +166,14 @@ export const generateButtonStyleProperties = (props: {
 
 const generateButtonClass = (
     buttonTypeVars: IButton,
-    options?: { setZIndexOnState?: boolean; debug?: boolean | string },
+    options?: { setZIndexOnState?: boolean; debug?: boolean | string; extra?: CSSObject },
 ) => {
     const { setZIndexOnState = false, debug = false } = options || {};
     const buttonStyles = generateButtonStyleProperties({
         buttonTypeVars,
         setZIndexOnState,
     });
-    const buttonClass = css({ ...buttonStyles, label: `button-${buttonTypeVars.name}` });
+    const buttonClass = css({ ...buttonStyles, ...options?.extra, label: `button-${buttonTypeVars.name}` });
     return buttonClass;
 };
 

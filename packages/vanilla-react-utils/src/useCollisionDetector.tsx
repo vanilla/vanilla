@@ -1,10 +1,10 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { useRef, useDebugValue } from "react";
-import { useMeasure } from "@vanilla/react-utils";
+import { useMeasure } from "./compatUseMeasure";
 
 /**
  * Detect if the edges of 2 measures are overlapping.
@@ -69,6 +69,10 @@ function isEmptyRect(rect: DOMRectReadOnly): boolean {
     return rect.height === 0 || rect.width === 0;
 }
 
+/**
+ * @deprecated
+ * This hook is deprecated and will be removed in a future version.
+ */
 export function useCollisionDetector() {
     const collisionSourceRef = useRef<HTMLDivElement | null>(null);
     let sourceMeasure = useMeasure(collisionSourceRef);

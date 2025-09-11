@@ -14,12 +14,15 @@ use DiscussionModel;
 use Exception;
 use Gdn;
 use Gdn_Database;
+use Gdn_SQLDriver;
 use Generator;
 use PermissionModel;
 use PermissionNotificationGenerator;
 use Ramsey\Uuid\Uuid;
 use UserModel;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Models\UserMentionsModel;
+use Vanilla\Database\CallbackWhereExpression;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
@@ -56,12 +59,13 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         private UserModel $userModel,
         private LongRunner $longRunner,
         private Gdn_Database $database,
-        private PermissionModel $permissionModel
+        private PermissionModel $permissionModel,
+        private \UserDiscussionModel $userDiscussionModel
     ) {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {
@@ -114,7 +118,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
             ),
             "RecordType" => "Discussion",
             "RecordID" => $discussionID,
-            "Route" => discussionUrl($discussion, "", "/"),
+            "Route" => \DiscussionModel::discussionUrl($discussion, "", "/"),
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,
@@ -263,6 +267,9 @@ class CommunityNotificationGenerator implements SystemCallableInterface
             0,
             "Category",
             $categoryID,
+            false,
+            [],
+            $discussionID,
         ]);
 
         // Fire a filter to add notification actions to be taken.
@@ -355,7 +362,8 @@ class CommunityNotificationGenerator implements SystemCallableInterface
      */
     private function getMentions($body, $format): array
     {
-        if (!is_string($body) || !is_string($format)) {
+        $canParseMentions = UserMentionsModel::canParseMentions();
+        if (!is_string($body) || !is_string($format) || !$canParseMentions) {
             return [];
         } else {
             return Gdn::formatService()->parseMentions($body, $format);
@@ -466,7 +474,13 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         $preference = $groupData["preference"] ?? false;
         $options = $groupData["options"] ?? [];
         $options["DisableFloodControl"] = true;
-
+        $mutedUserRecords = $this->userDiscussionModel->select([
+            "Muted" => 1,
+            "DiscussionID" => $discussionID,
+            "UserID >" => $maxNotifiedUserID ?? 0,
+            "UserID" => $notifyUserIDs,
+        ]);
+        $mutedUserIDs = array_column($mutedUserRecords, "UserID");
         $notifyUserIDs = array_unique(
             array_filter($notifyUserIDs, function ($userID) use ($notificationData) {
                 return $userID != $notificationData["ActivityUserID"];
@@ -487,6 +501,11 @@ class CommunityNotificationGenerator implements SystemCallableInterface
 
                 // Check user can still see the discussion.
                 if (!$this->discussionModel->canView($discussionID, $notifyUserID)) {
+                    continue;
+                }
+
+                // Check if user is muted.
+                if (in_array($notifyUserID, $mutedUserIDs)) {
                     continue;
                 }
 
@@ -608,6 +627,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
             ->select("COUNT(*)")
             ->from("UserDiscussion")
             ->where("DiscussionID", $discussionID)
+            ->where("Muted <>", 1)
             ->where($where)
             ->get()
             ->resultArray()[0]["COUNT(*)"];
@@ -623,6 +643,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 ->select("UserID")
                 ->from("UserDiscussion")
                 ->where("DiscussionID", $discussionID)
+                ->where("Muted <>", 1)
                 ->where($where)
                 ->where("UserID >", $maxNotifiedUserID)
                 ->limit(100)

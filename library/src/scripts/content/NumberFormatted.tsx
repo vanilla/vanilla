@@ -31,8 +31,8 @@ function stripTrailingZeros(value: string): string {
 /**
  * Convert number to human readable value.
  *
- * @param value
- * @param precision
+ * @param value The number to format.
+ * @param precision The prevision to format with.
  * @returns string
  */
 export function humanReadableNumber(value: number, precision: number = 1): string {

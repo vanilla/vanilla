@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import ReactDOM from "react-dom";
 import React, { useEffect, useState } from "react";
 import { toastClasses } from "@library/features/toaster/Toast.styles";
 import { cx } from "@library/styles/styleShim";
@@ -26,13 +27,16 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     dismissible?: boolean;
 
     wide?: boolean;
+
+    portal?: boolean;
 }
 
 /**
  * Render a toast component
  */
 export function Toast(props: IProps) {
-    const { children, role, className, visibility, autoCloseDuration, onVisibilityChange, wide, dismissible } = props;
+    const { children, portal, role, className, visibility, autoCloseDuration, onVisibilityChange, wide, dismissible } =
+        props;
 
     const classes = toastClasses();
 
@@ -53,7 +57,7 @@ export function Toast(props: IProps) {
         setDisplay(!!visibility);
     }, [visibility]);
 
-    return (
+    const result = (
         <EntranceAnimation isEntered={display} fromDirection={FromDirection.LEFT}>
             <div
                 className={cx(classes.root, className, wide && classes.wide)}
@@ -69,4 +73,14 @@ export function Toast(props: IProps) {
             </div>
         </EntranceAnimation>
     );
+
+    if (props.portal) {
+        const target = document.getElementById("portaled-toasts");
+        if (!target) {
+            return <></>;
+        }
+        return ReactDOM.createPortal(result, target as HTMLElement);
+    } else {
+        return result;
+    }
 }

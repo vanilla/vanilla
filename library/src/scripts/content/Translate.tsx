@@ -11,7 +11,7 @@ import { sprintf } from "sprintf-js";
 
 type TranslateCallback = (contents: string) => React.ReactNode;
 
-interface IProps {
+interface ITranslateProps {
     source: string;
     shortSource?: string;
     errorHandler?: (...values) => void;
@@ -52,14 +52,14 @@ const SPRINTF_PLACEHOLDER_REGEX = /%(?:\d+\$)?[dfsu]/g;
  * <Translate source="Visit <0>our site</0> for help." c0={content => <a href="http://site.com">{content}</a>}/>"
  *   -> Visit <a href="http://site.com">our site</a> for help.
  */
-export default class Translate extends React.Component<IProps> {
-    public static defaultProps: Partial<IProps> = {
+export default class Translate extends React.Component<ITranslateProps> {
+    public static defaultProps: Partial<ITranslateProps> = {
         errorHandler: logError,
         translateFunction: t,
     };
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public render(): React.ReactNode {
         if (this.translatedSource.match(/<([\d ]+)\/?>/)) {

@@ -7,6 +7,7 @@
 import { useThemeCache } from "@library/styles/themeCache";
 import { css } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const actsAsCheckboxClasses = useThemeCache(() => {
     const label = css({
@@ -15,6 +16,11 @@ export const actsAsCheckboxClasses = useThemeCache(() => {
         }),
         cursor: "pointer",
         lineHeight: 0,
+
+        "&:has(input:focus-visible)": {
+            boxShadow: `0 0 0 2px var(${ColorVar.Primary})`,
+            borderRadius: "2px",
+        },
     });
 
     const checkbox = css({

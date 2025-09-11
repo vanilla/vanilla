@@ -4,6 +4,14 @@ paths:
     /roles:
         get:
             parameters:
+                - description: |
+                      Include roles in which membbership is personal information.
+                  in: query
+                  name: personalInfo
+                  required: false
+                  schema:
+                      type: boolean
+                      default: true
                 - description: >
                       Expand associated records using one or more valid field names. A
                       value of "all" will expand all expandable fields.

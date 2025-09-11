@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { t } from "@vanilla/i18n";
 import NavigationLinks from "./NavigationLinks";
 import Button from "@library/forms/Button";
@@ -19,6 +19,9 @@ import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { ItemID, ITreeData, ITreeItem } from "@library/tree/types";
 import { uuidv4 } from "@vanilla/utils";
 import { navigationLinksModalClasses } from "@dashboard/components/navigation/NavigationLinksModal.styles";
+import type { IFormControl } from "@library/json-schema-forms";
+import { FramedModal } from "@library/modal/FramedModal";
+import ModalConfirm from "@library/modal/ModalConfirm";
 
 const sanitizeData = (data: INavigationVariableItem) => ({
     ...data,
@@ -27,7 +30,6 @@ const sanitizeData = (data: INavigationVariableItem) => ({
 });
 
 interface IProps {
-    isVisible: boolean;
     onCancel(): void;
     navigationItems: INavigationVariableItem[];
     onSave(items: INavigationVariableItem[]): void;
@@ -95,11 +97,16 @@ const makeVariableItems = (
     }, []);
 
 export function NavigationLinksModal(props: IProps) {
-    const { onCancel, isVisible, navigationItems, onSave, isNestingEnabled: isExpandable, title, description } = props;
+    const { onCancel, navigationItems, onSave, isNestingEnabled: isExpandable, title, description } = props;
     const classes = navigationLinksModalClasses();
+    const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [treeData, setTreeData] = useState(makeTreeData(navigationItems));
+    const [isDirty, setIsDirty] = useState(false);
+    const [treeData, _setTreeData] = useState(makeTreeData(navigationItems));
+    const setTreeData = useCallback((newTreeData: ITreeData<INavigationVariableItem>) => {
+        _setTreeData(newTreeData);
+        setIsDirty(true);
+    }, []);
 
     function saveData() {
         const { items, rootId } = treeData;
@@ -107,55 +114,50 @@ export function NavigationLinksModal(props: IProps) {
         onSave(flatData);
     }
 
-    function cancel() {
-        if (isEditing) {
-            return;
-        }
-        setTreeData(makeTreeData(navigationItems));
-        onCancel();
-    }
-
     useEffect(() => {
         setTreeData(makeTreeData(navigationItems));
     }, [navigationItems]);
 
+    function handleClose() {
+        if (isDirty) {
+            setShowDiscardConfirm(true);
+        } else {
+            props.onCancel();
+        }
+    }
+
     return (
-        <Modal isVisible={isVisible} size={ModalSizes.LARGE} exitHandler={cancel}>
-            <Frame
-                header={<FrameHeader closeFrame={cancel} title={t(title)} />}
-                body={
-                    <FrameBody>
-                        {description && <p className={classes.modalDescription}>{description}</p>}
-                        <NavigationLinks
-                            isNestingEnabled={isExpandable}
-                            treeData={treeData}
-                            onChangeTreeData={setTreeData}
-                            onStartEditing={() => setIsEditing(true)}
-                            onStopEditing={() => setIsEditing(false)}
-                        />
-                    </FrameBody>
-                }
-                footer={
-                    <FrameFooter justifyRight={true}>
-                        <Button
-                            className={classes.modalButton}
-                            buttonType={ButtonTypes.TEXT}
-                            onClick={cancel}
-                            disabled={isEditing}
-                        >
-                            {t("Cancel")}
-                        </Button>
-                        <Button
-                            className={classes.modalButton}
-                            buttonType={ButtonTypes.TEXT_PRIMARY}
-                            onClick={saveData}
-                            disabled={isEditing}
-                        >
-                            {t("Apply")}
-                        </Button>
-                    </FrameFooter>
-                }
-            />
-        </Modal>
+        <FramedModal
+            title={t(title)}
+            size={ModalSizes.LARGE}
+            onClose={handleClose}
+            footer={
+                <>
+                    <Button className={classes.modalButton} buttonType={ButtonTypes.TEXT} onClick={handleClose}>
+                        {t("Cancel")}
+                    </Button>
+                    <Button className={classes.modalButton} buttonType={ButtonTypes.TEXT_PRIMARY} onClick={saveData}>
+                        {t("Apply")}
+                    </Button>
+                </>
+            }
+        >
+            {description && <p className={classes.modalDescription}>{description}</p>}
+            <NavigationLinks isNestingEnabled={isExpandable} treeData={treeData} onChangeTreeData={setTreeData} />
+            <ModalConfirm
+                isVisible={showDiscardConfirm}
+                onCancel={() => {
+                    setShowDiscardConfirm(false);
+                }}
+                onConfirm={() => {
+                    setShowDiscardConfirm(false);
+                    onCancel();
+                }}
+                title={t("Unsaved Changes")}
+                confirmTitle={t("Discard")}
+            >
+                <p>{t("Are you sure you want to discard your changes? Any unapplied changes will be lost.")}</p>
+            </ModalConfirm>
+        </FramedModal>
     );
 }

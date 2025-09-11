@@ -1,0 +1,23 @@
+<svg width="120" height="100" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="14" cy="32" r="4.65" stroke="#555A62" stroke-width="0.7" />
+    <circle cx="13.9999" cy="31.5" r="1.65" stroke="#555A62" stroke-width="0.7" />
+    <path
+        d="M10.7499 35.2501C11.0832 34.9167 12.3999 34.2501 13.9999 34.2501C15.5999 34.2501 16.7499 34.9167 17.2499 35.2501"
+        stroke="#555A62" stroke-width="0.7" />
+    <rect x="22.4445" y="27.3333" width="25.037" height="3.85185" fill="#ADB2BB" />
+    <rect x="8.96301" y="14" width="25.037" height="3.85185" fill="#ADB2BB" />
+    <rect x="22.4445" y="35.037" width="46.2222" height="1.92593" fill="#ADB2BB" />
+    <path d="M8.27083 22.1111H111.729" stroke="#ADB2BB" stroke-width="0.5" stroke-linecap="square" />
+    <rect x="50" y="27" width="12.5185" height="3.85185" rx="1" stroke="#979797" stroke-width="0.4" />
+    <rect x="9" y="42" width="101" height="4" fill="#ADB2BB" />
+    <rect x="9" y="49.1667" width="95" height="3" fill="#ADB2BB" />
+    <rect x="9" y="55" width="101" height="3" fill="#ADB2BB" />
+    <rect x="9" y="61" width="87" height="3" fill="#ADB2BB" />
+    <rect x="9" y="67" width="48" height="3" fill="#ADB2BB" />
+    <rect x="9" y="77" width="4" height="4" rx="1" stroke="#979797" stroke-width="0.4" />
+    <rect x="15" y="77" width="4" height="4" rx="1" stroke="#979797" stroke-width="0.4" />
+    <rect x="21" y="77" width="4" height="4" rx="1" stroke="#979797" stroke-width="0.4" />
+    <rect x="27" y="77" width="4" height="4" rx="1" stroke="#979797" stroke-width="0.4" />
+    <rect x="33" y="77" width="4" height="4" rx="1" stroke="#979797" stroke-width="0.4" />
+    <rect x="107.519" y="14" width="4" height="4" rx="2" stroke="#979797" stroke-width="0.4" />
+</svg>

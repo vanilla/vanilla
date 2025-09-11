@@ -7,7 +7,6 @@
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { AppearanceNav } from "@dashboard/components/navigation/AppearanceNav";
 import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
-import { useCollisionDetector } from "@vanilla/react-utils";
 
 type IProps = Omit<
     React.ComponentProps<typeof AdminLayout>,
@@ -16,8 +15,7 @@ type IProps = Omit<
 
 export function AppearanceAdminLayout(props: IProps) {
     const device = useTitleBarDevice();
-    const { hasCollision } = useCollisionDetector();
-    const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
+    const isCompact = device === TitleBarDevices.COMPACT;
 
     return (
         <AdminLayout

@@ -172,7 +172,7 @@ export class SchemaFormBuilder {
         });
     }
 
-    public staticText(label: string) {
+    public staticText(label: ICommonControl["label"]) {
         return this.custom(`staticText`, {
             type: "null",
             "x-control": {
@@ -226,7 +226,7 @@ export class SchemaFormBuilder {
 
     public dropdown(
         property: string,
-        label: string,
+        label: ICommonControl["label"],
         description: string | null,
         options: IPickerOption[],
         disabled?: boolean,
@@ -261,6 +261,7 @@ export class SchemaFormBuilder {
         description: string | null,
         lookup: Select.LookupApi,
         isMulti?: boolean,
+        placeholder?: string,
     ) {
         const control: ISelectControl = {
             inputType: "select",
@@ -268,6 +269,7 @@ export class SchemaFormBuilder {
             description,
             optionsLookup: lookup,
             multiple: isMulti,
+            placeholder: placeholder,
         };
         if (isMulti) {
             return this.custom(property, {
@@ -287,7 +289,7 @@ export class SchemaFormBuilder {
 
     public selectStatic(
         property: string,
-        label: string,
+        label: ICommonControl["label"],
         description: string | null,
         options: Select.Option[],
         isMulti?: boolean,
@@ -372,12 +374,12 @@ class PropertySpecificBuilder<T extends ICommonControl = ICommonControl> extends
         return this;
     }
 
-    public withDescription(description: string): this {
+    public withDescription(description: ICommonControl["description"]): this {
         this.currentPropertySchema["x-control"].description = description;
         return this;
     }
 
-    public withTooltip(tooltip: string): this {
+    public withTooltip(tooltip: ICommonControl["tooltip"]): this {
         this.currentPropertySchema["x-control"].tooltip = tooltip;
         return this;
     }

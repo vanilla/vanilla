@@ -6,7 +6,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Vanilla\CurrentTimeStamp;
 use Vanilla\Models\ContentDraftModel;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
@@ -19,7 +18,7 @@ class DraftsTest extends AbstractResourceTest
 
     use CommunityApiTestTrait;
 
-    protected bool $useFeatureFlag = false;
+    protected bool $useFeatureFlag = true;
 
     protected $baseUrl = "/drafts";
     protected $record = [
@@ -30,17 +29,13 @@ class DraftsTest extends AbstractResourceTest
             "format" => "Markdown",
         ],
     ];
-    protected $patchFields = ["parentRecordID", "attributes"];
+    protected $patchFields = ["parentRecordID", "attributes", "recordType"];
 
     public function setUp(): void
     {
         parent::setUp();
         $this->disableFeature("customLayout.createPost");
-        if ($this->useFeatureFlag) {
-            $this->enableFeature(ContentDraftModel::FEATURE);
-        } else {
-            $this->disableFeature(ContentDraftModel::FEATURE);
-        }
+        self::disableFeature("DraftScheduling");
     }
 
     /**

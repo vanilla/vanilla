@@ -126,6 +126,12 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Comment"
                     description: Success
+                "202":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "/discussions.yml#/components/schemas/PostPremoderation"
+                    description: Premoderation
             tags:
                 - Comments
             requestBody:
@@ -350,6 +356,12 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Comment"
                     description: Success
+                "202":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "/discussions.yml#/components/schemas/PostPremoderation"
+                    description: Premoderation
             tags:
                 - Comments
             requestBody:
@@ -772,6 +784,11 @@ components:
                 insertUserID:
                     description: The user that created the comment.
                     type: integer
+                updateUserID:
+                    description: The user that last updated the comment.
+                    type: integer
+                    nullable: true
+                    x-hidden: true
                 reactions:
                     type: array
                     items:
@@ -905,6 +922,23 @@ components:
                 insertUserID:
                     description: The user that created the comment.
                     type: integer
+                    x-hidden: true
+                dateInserted:
+                    description: When the comment was created.
+                    format: date-time
+                    type: string
+                    x-hidden: true
+                dateUpdated:
+                    description: When the comment was last updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                    x-hidden: true
+                updateUserID:
+                    description: The user that last updated the comment.
+                    type: integer
+                    nullable: true
+                    x-hidden: true
             type: object
         CommentThreadStructureItem:
             oneOf:

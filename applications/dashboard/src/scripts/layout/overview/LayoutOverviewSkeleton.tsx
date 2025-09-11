@@ -17,7 +17,7 @@ import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { SectionFullWidth } from "@library/layout/SectionFullWidth";
 import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import PanelWidget from "@library/layout/components/PanelWidget";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 
 export function LayoutOverviewSkeleton() {
@@ -111,8 +111,8 @@ function RandomWidget(props: { heights?: number[] }) {
     }, []);
     const height = heights[heightIndex];
     return (
-        <Widget>
+        <LayoutWidget>
             <LoadingRectangle height={height} width={"100%"} />
-        </Widget>
+        </LayoutWidget>
     );
 }

@@ -36,7 +36,7 @@ class InstantScheduler extends DeferredScheduler
     private $scheduledJobs = [];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function clear(): void
     {

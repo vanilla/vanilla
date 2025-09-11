@@ -124,8 +124,8 @@ function ReportHistoryListItem(props: { report: IReport; isActive: boolean; setA
                         </ToolTip>
                     ))}
                 </div>
-                {report.noteHtml && report.noteHtml !== "<p></p>" && (
-                    <UserContent className={classes.noteContent} content={report.noteHtml} />
+                {report.noteHtml && (report.noteHtml as string) !== "<p></p>" && (
+                    <UserContent className={classes.noteContent} vanillaSanitizedHtml={report.noteHtml} />
                 )}
                 <span className={classes.profileLine}>
                     <ProfileLink className={classes.userLink} userFragment={report.insertUser ?? deletedUserFragment()}>

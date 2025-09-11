@@ -39,4 +39,12 @@ abstract class AbstractLayoutAsset implements
     {
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Assets";
+    }
 }

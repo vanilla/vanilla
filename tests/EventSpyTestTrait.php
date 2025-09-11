@@ -326,7 +326,7 @@ trait EventSpyTestTrait
             }
 
             if ($matchAll) {
-                $matchPayloadFields = array_keys($event->getPayload()[$event->getType()]);
+                $matchPayloadFields = array_keys($event->getPayload()[$event->getType()] ?? []);
             }
 
             foreach ($matchPayloadFields as $matchPayloadField) {

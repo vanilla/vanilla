@@ -553,8 +553,8 @@ if (!function_exists("followButton")):
 
             $output = TwigStaticRenderer::renderReactModule("CategoryFollowDropDown", [
                 "userID" => $userID,
-                "categoryID" => $categoryID,
-                "categoryName" => $category["Name"],
+                "recordID" => $categoryID,
+                "name" => $category["Name"],
                 "isFollowed" => $following,
                 "notificationPreferences" => $cleanNotificationPreferences,
                 "emailDigestEnabled" => $emailDigestEnabled,

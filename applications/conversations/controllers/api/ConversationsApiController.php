@@ -133,41 +133,36 @@ class ConversationsApiController extends AbstractApiController
      */
     private function fullSchema()
     {
-        /** @var Schema $schema */
-        static $schema;
+        $schemaDefinition = [
+            "conversationID:i" => "The ID of the conversation.",
+            "name:s" => "The name of the conversation.",
+            "body:s" => "The most recent unread message in the conversation.",
+            "excerpt:s?" => "An excerpt of the most recent unread message.",
+            "url:s" => "The URL of the conversation.",
+            "dateInserted:dt" => "When the conversation was created.",
+            "insertUserID:i" => "The user that created the conversation.",
+            "insertUser:o?" => $this->getUserFragmentSchema(),
+            "countParticipants:i" => "The number of participants on the conversation.",
+            "participants?" => $this->getParticipantsSchema(),
+            "countMessages:i" => "The number of messages on the conversation.",
+            "unread:bool?" => "Whether the conversation has an unread indicator.",
+            "countUnread:int?" => "The number of unread messages.",
+            "lastMessage:o?" => [
+                "insertUserID:i" => "The author of the your most recent message.",
+                "dateInserted:dt" => "The date of the message.",
+                "insertUser" => $this->getUserFragmentSchema(),
+            ],
+            //                'countReadMessages:n|i?' => 'The number of unread messages by the current user on the conversation.',
+            //                'dateLastViewed:n|dt?' => 'When the conversation was last viewed by the current user.',
+        ];
 
-        if ($schema === null) {
-            $schemaDefinition = [
-                "conversationID:i" => "The ID of the conversation.",
-                "name:s" => "The name of the conversation.",
-                "body:s" => "The most recent unread message in the conversation.",
-                "excerpt:s?" => "An excerpt of the most recent unread message.",
-                "url:s" => "The URL of the conversation.",
-                "dateInserted:dt" => "When the conversation was created.",
-                "insertUserID:i" => "The user that created the conversation.",
-                "insertUser:o?" => $this->getUserFragmentSchema(),
-                "countParticipants:i" => "The number of participants on the conversation.",
-                "participants?" => $this->getParticipantsSchema(),
-                "countMessages:i" => "The number of messages on the conversation.",
-                "unread:bool?" => "Whether the conversation has an unread indicator.",
-                "countUnread:int?" => "The number of unread messages.",
-                "lastMessage:o?" => [
-                    "insertUserID:i" => "The author of the your most recent message.",
-                    "dateInserted:dt" => "The date of the message.",
-                    "insertUser" => $this->getUserFragmentSchema(),
-                ],
-                //                'countReadMessages:n|i?' => 'The number of unread messages by the current user on the conversation.',
-                //                'dateLastViewed:n|dt?' => 'When the conversation was last viewed by the current user.',
-            ];
-
-            // We unset to preserve the order of the parameters.
-            if (!$this->config->get("Conversations.Subjects.Visible", false)) {
-                unset($schemaDefinition["name:s?"]);
-            }
-
-            // Name this schema so that it can be read by swagger.
-            $schema = $this->schema($schemaDefinition, "Conversation");
+        // We unset to preserve the order of the parameters.
+        if (!$this->config->get("Conversations.Subjects.Visible", false)) {
+            unset($schemaDefinition["name:s?"]);
         }
+
+        // Name this schema so that it can be read by swagger.
+        $schema = $this->schema($schemaDefinition, "Conversation");
 
         return $schema;
     }
@@ -475,22 +470,23 @@ class ConversationsApiController extends AbstractApiController
      */
     public function postSchema($type)
     {
-        static $postSchema;
-
-        if ($postSchema === null) {
-            $inSchema = [
-                "participantUserIDs:a" => [
-                    "items" => [
-                        "type" => "integer",
-                    ],
-                    "minLength" => 2,
-                    "description" => "List of userID of the participants.",
+        $inSchema = [
+            "participantUserIDs:a" => [
+                "items" => [
+                    "type" => "integer",
                 ],
-                "initialBody?",
-                "initialFormat?" => new \Vanilla\Models\FormatSchema(),
-            ];
-            $postSchema = $this->schema(Schema::parse($inSchema)->add($this->fullSchema()), "ConversationPost");
-        }
+                "minLength" => 2,
+                "description" => "List of userID of the participants.",
+            ],
+            "initialBody?",
+            "initialFormat?" => new \Vanilla\Models\FormatSchema(),
+        ];
+        $postSchema = $this->schema(
+            Schema::parse($inSchema)
+                ->merge(new MigratableSchema(["insertUserID:i?"]))
+                ->add($this->fullSchema()),
+            "ConversationPost"
+        );
 
         return $this->schema($postSchema, $type);
     }

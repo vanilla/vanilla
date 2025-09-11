@@ -7,7 +7,7 @@
 import React from "react";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
-import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
+import { WidgetItemContentType } from "./WidgetItemOptions";
 
 const testSrcSet = {
     100: "100.file-ext",
@@ -53,7 +53,7 @@ describe("HomeWidgetItem", () => {
                 to="/"
                 name={"test"}
                 imageUrl="/icon-url.file-ext"
-                options={{ contentType: HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION }}
+                options={{ contentType: WidgetItemContentType.TitleBackgroundDescription }}
             />,
         );
         const imageNodes = container.querySelectorAll("img");
@@ -68,7 +68,7 @@ describe("HomeWidgetItem", () => {
                 name={"test"}
                 imageUrl="/icon-url.file-ext"
                 imageUrlSrcSet={testSrcSet}
-                options={{ contentType: HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION }}
+                options={{ contentType: WidgetItemContentType.TitleBackgroundDescription }}
             />,
         );
         const imageNodes = container.querySelectorAll("img");

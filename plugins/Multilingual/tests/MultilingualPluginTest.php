@@ -31,7 +31,7 @@ class MultilingualPluginTest extends SiteTestCase
     public function testStickyLocales()
     {
         // Add a fr language locale.
-        $testLocaleAddon = new Addon("/tests/fixtures/locales/test-fr");
+        $testLocaleAddon = new Addon("/tests/fixtures/locales/vf_fr");
         \Gdn::addonManager()->add($testLocaleAddon);
         $addonModel = $this->container()->get(AddonModel::class);
         $addonModel->enable($testLocaleAddon);

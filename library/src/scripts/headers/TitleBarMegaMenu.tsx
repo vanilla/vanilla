@@ -14,6 +14,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { useHistory } from "react-router";
+import ScrollLock from "react-scrolllock";
 
 /** How much time is elapsed before the menu is hidden, either from loss of focus or mouseout. */
 const HIDE_TIMEOUT_MS = 250;
@@ -67,7 +68,15 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
 
     const containerRef = useRef<HTMLElement>(null);
 
-    const containerDimensions = useMeasure(containerRef, false, true);
+    const containerDimensions = useMeasure(containerRef, { watchRef: true });
+    const [shouldFocusFirstItem, setShouldFocusFirstItem] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (shouldFocusFirstItem) {
+            containerRef.current?.querySelector<HTMLElement>(`.${classes.menuItemChild} a`)?.focus();
+            setShouldFocusFirstItem(false);
+        }
+    }, [shouldFocusFirstItem]);
 
     const menuHeight = containerDimensions.height;
     const yBounds = getCalcedHashOffset() + menuHeight;
@@ -97,8 +106,7 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
 
     useImperativeHandle(ref, () => ({
         focusFirstItem: () => {
-            const firstItem = containerRef.current?.querySelector<HTMLElement>(`.${classes.menuItemChild} a`);
-            firstItem?.focus();
+            setShouldFocusFirstItem(true);
         },
     }));
 
@@ -234,49 +242,51 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
     }
 
     return (
-        <div
-            className={classes.wrapper}
-            style={{
-                top: getCalcedHashOffset(),
-                height: isExpanded ? menuHeight : 0,
-                display: isHidden ? "none" : undefined,
-            }}
-            onFocus={() => setIsFocusWithin(true)}
-            onBlur={() => setIsFocusWithin(false)}
-            onClick={(e) => {
-                // Ensure that the focus state is reset after a user clicks a menu item.
-                setIsFocusWithin(false);
-                e.stopPropagation();
-            }}
-        >
-            <Container
-                ref={containerRef}
+        <ScrollLock isActive={isExpanded}>
+            <div
+                className={classes.wrapper}
                 style={{
-                    paddingLeft: calculateContainerOffset(),
+                    top: getCalcedHashOffset(),
+                    height: isExpanded ? menuHeight : 0,
+                    display: isHidden ? "none" : undefined,
                 }}
-                className={classes.container}
-                ignoreContext
-                fullGutter
+                onFocus={() => setIsFocusWithin(true)}
+                onBlur={() => setIsFocusWithin(false)}
+                onClick={(e) => {
+                    // Ensure that the focus state is reset after a user clicks a menu item.
+                    setIsFocusWithin(false);
+                    e.stopPropagation();
+                }}
             >
-                {expanded?.children?.map((item, key) =>
-                    item.children?.length ? (
-                        <div key={key} className={classes.menuItem}>
-                            <span className={classes.menuItemTitle} role="heading">
-                                {item.name}
-                            </span>
-                            {item.children && generateMegaMenuList(item.children)}
-                        </div>
+                <Container
+                    ref={containerRef}
+                    style={{
+                        paddingLeft: calculateContainerOffset(),
+                    }}
+                    className={classes.container}
+                    ignoreContext
+                    fullGutter
+                >
+                    {expanded?.children?.map((item, key) =>
+                        item.children?.length ? (
+                            <div key={key} className={classes.menuItem}>
+                                <span className={classes.menuItemTitle} role="heading">
+                                    {item.name}
+                                </span>
+                                {item.children && generateMegaMenuList(item.children)}
+                            </div>
+                        ) : (
+                            <React.Fragment key={key} />
+                        ),
+                    )}
+                    {itemsWithNoChildren.length ? (
+                        <div className={classes.menuItem}>{generateMegaMenuList(itemsWithNoChildren)}</div>
                     ) : (
-                        <React.Fragment key={key} />
-                    ),
-                )}
-                {itemsWithNoChildren.length ? (
-                    <div className={classes.menuItem}>{generateMegaMenuList(itemsWithNoChildren)}</div>
-                ) : (
-                    <React.Fragment />
-                )}
-            </Container>
-        </div>
+                        <React.Fragment />
+                    )}
+                </Container>
+            </div>
+        </ScrollLock>
     );
 }
 export const TitleBarMegaMenuChild = React.forwardRef(TitleBarMegaMenuChildImpl);

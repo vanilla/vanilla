@@ -71,6 +71,7 @@ function DigestSettingsForm(props: {
                 }
             }
         },
+        validateOnChange: false,
         validate: () => {
             const result = schemaFormRef?.current?.validate();
             const mappedErrors = mapValidationErrorsToFormikErrors(result?.errors ?? []);

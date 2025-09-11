@@ -38,6 +38,9 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 import { ErrorIcon } from "@library/icons/common";
 import Message from "@library/messages/Message";
 import { css } from "@emotion/css";
+import { getMeta } from "@library/utility/appUtils";
+import { useCurrentUser } from "@library/features/users/userHooks";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 interface IProps {
     escalationType: "report" | "record";
@@ -153,6 +156,21 @@ const errorMessageSpacing = css({
 export function EscalateModal(props: IProps) {
     const { escalationType, report, record, recordType, recordID, isVisible, onClose } = props;
 
+    const permissions = usePermissionsContext();
+    const hasMemberRestrictions = getMeta("moderation.restrictMemberFilterUI", false);
+    const communityModerate = permissions.hasPermission("community.moderate");
+    const siteManage = permissions.hasPermission("site.manage");
+    const currentUser = useCurrentUser();
+
+    // AIDEV-NOTE: Show member filters unless restricted by config AND user lacks required permissions
+    const shouldShowMemberFilters = !hasMemberRestrictions || communityModerate || siteManage;
+
+    // Create restricted options for assignee when member filters are restricted
+    const restrictedAssigneeOptions = {
+        "-4": "Unassigned",
+        [currentUser.userID.toString()]: "Assigned to Me",
+    };
+
     const [values, setValues] = useState<EscalateForm>(initialFormValues);
     const [serverErrors, setServerErrors] = useState<IServerError | null>(null);
     const toast = useToast();
@@ -175,6 +193,29 @@ export function EscalateModal(props: IProps) {
     }, [escalationType, report, recordType, record, isVisible]);
 
     const schema = useMemo(() => {
+        let baseSchema = { ...ESCALATE_SCHEMA };
+
+        // AIDEV-NOTE: Restrict assignee options when member filters are disabled
+        if (!shouldShowMemberFilters) {
+            baseSchema = {
+                ...baseSchema,
+                properties: {
+                    ...baseSchema.properties,
+                    assignee: {
+                        type: "string",
+                        default: "",
+                        "x-control": {
+                            label: t("Assignee"),
+                            inputType: "dropDown",
+                            choices: {
+                                staticOptions: restrictedAssigneeOptions,
+                            },
+                        },
+                    },
+                },
+            };
+        }
+
         if (escalationType === "record") {
             const reasonProperty: PartialSchemaDefinition<EscalateForm> = {
                 type: "array",
@@ -196,18 +237,18 @@ export function EscalateModal(props: IProps) {
                 },
             };
 
-            const keyValues = Object.entries(ESCALATE_SCHEMA.properties);
+            const keyValues = Object.entries(baseSchema.properties);
             keyValues.splice(2, 0, ["reportReasonIDs", reasonProperty]);
             const newProperties = Object.fromEntries(keyValues);
 
             return {
-                ...ESCALATE_SCHEMA,
+                ...baseSchema,
                 properties: newProperties,
-                required: [...ESCALATE_SCHEMA.required, "reportReasonIDs"],
+                required: [...baseSchema.required, "reportReasonIDs"],
             };
         }
-        return ESCALATE_SCHEMA;
-    }, [escalationType]);
+        return baseSchema;
+    }, [escalationType, shouldShowMemberFilters, restrictedAssigneeOptions]);
 
     const createEscalation = useMutation<IEscalation, IApiError, EscalateForm>({
         mutationFn: async (escalation) => {

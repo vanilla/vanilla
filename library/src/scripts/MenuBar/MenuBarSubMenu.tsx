@@ -1,11 +1,10 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
 import React, { useContext, useRef } from "react";
-import { useMenuBarContext } from "@library/MenuBar/MenuBarContext";
 import ReactDOM from "react-dom";
 
 const RealMenuBarSubMenuContext = React.createContext({

@@ -11,7 +11,6 @@ export class TagFixture {
         tagID: 0,
         name: "Mock Tag",
         urlcode: "mock-tag",
-        parentTagID: null,
         countDiscussions: 0,
         type: "User",
     };

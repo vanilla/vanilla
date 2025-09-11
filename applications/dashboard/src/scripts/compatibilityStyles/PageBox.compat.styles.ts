@@ -9,7 +9,6 @@ import { MixinsFoundation } from "@library/styles/MixinsFoundation";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Mixins } from "@library/styles/Mixins";
 import { oneColumnVariables } from "@library/layout/Section.variables";
-import { percent } from "csx/lib/units";
 import { extendItemContainer } from "@library/styles/styleHelpers";
 import { injectGlobal } from "@emotion/css";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
@@ -47,7 +46,7 @@ export const pageBoxCompatStyles = useThemeCache(() => {
             },
 
             ".PageTitle": {
-                width: percent(100),
+                width: "100%",
             },
 
             [allHeadings]: {

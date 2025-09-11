@@ -23,7 +23,7 @@ const ActsAsCheckbox: FunctionComponent<IProps> = ({
     children,
     disabled: _disabled,
 }) => {
-    const classes = actsAsCheckboxClasses();
+    const classes = actsAsCheckboxClasses.useAsHook();
 
     const [disabled, setDisabled] = useState(!!_disabled);
     async function handleChange() {

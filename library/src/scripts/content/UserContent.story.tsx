@@ -10,6 +10,7 @@ import { STORY_CONTENT_RICH, STORY_CONTENT_LEGACY, STORY_CONTENT_TABLES } from "
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { legacyCssDecorator } from "@dashboard/__tests__/legacyCssDecorator";
 import { TableStyle } from "@library/content/UserContent.variables";
+import { blessStringAsSanitizedHtml } from "@vanilla/dom-utils";
 
 export default {
     title: "User Content/Content",
@@ -18,7 +19,7 @@ export default {
 export function CodeblockPython() {
     return (
         <UserContent
-            content={`<pre class="code codeBlock" spellcheck="false">
+            vanillaSanitizedHtml={blessStringAsSanitizedHtml(`<pre class="code codeBlock" spellcheck="false">
 /*
 Runtime: 2 ms, faster than 100.00% of Java online submissions for Median of Two Sorted Arrays.
 Memory Usage: 43 MB, less than 98.54% of Java online submissions for Median of Two Sorted Arrays.
@@ -53,7 +54,7 @@ def kth(self, a, b, k):
             return self.kth(a[:ia], b, k)
         else:
             return self.kth(a, b[:ib], k)
-            </pre>`}
+            </pre>`)}
         />
     );
 }
@@ -61,7 +62,7 @@ def kth(self, a, b, k):
 export function CodeblockSwift() {
     return (
         <UserContent
-            content={`<pre class="code codeBlock" spellcheck="false">
+            vanillaSanitizedHtml={blessStringAsSanitizedHtml(`<pre class="code codeBlock" spellcheck="false">
 /*
 Runtime: 2 ms, faster than 100.00% of Java online submissions for Median of Two Sorted Arrays.
 Memory Usage: 43 MB, less than 98.54% of Java online submissions for Median of Two Sorted Arrays.
@@ -105,7 +106,7 @@ class Solution {
         return median
     }
 }
-            </pre>`}
+            </pre>`)}
         />
     );
 }
@@ -113,7 +114,7 @@ class Solution {
 export function CodeblockJava() {
     return (
         <UserContent
-            content={`<pre class="code codeBlock" spellcheck="false">
+            vanillaSanitizedHtml={blessStringAsSanitizedHtml(`<pre class="code codeBlock" spellcheck="false">
 /*
 Runtime: 2 ms, faster than 100.00% of Java online submissions for Median of Two Sorted Arrays.
 Memory Usage: 43 MB, less than 98.54% of Java online submissions for Median of Two Sorted Arrays.
@@ -168,7 +169,7 @@ class Solution {
         return 0.0;
     }
 }
-        </pre>`}
+        </pre>`)}
         />
     );
 }
@@ -176,7 +177,7 @@ class Solution {
 export function CSS() {
     return (
         <UserContent
-            content={`<pre class="code codeBlock" spellcheck="false">
+            vanillaSanitizedHtml={blessStringAsSanitizedHtml(`<pre class="code codeBlock" spellcheck="false">
 .userContent div.Spoiler div.SpoilerText,.UserContent div.Spoiler div.SpoilerText{
     border-left-width:0;
     margin:0;
@@ -209,17 +210,17 @@ export function CSS() {
 .userContent p .codeBlock,.UserContent p .codeBlock,.userContent p code,.UserContent p code{
     background-color:#f7f7f8;
 }
-            </pre>`}
+            </pre>`)}
         />
     );
 }
 
 export function Rich() {
-    return <UserContent content={STORY_CONTENT_RICH} />;
+    return <UserContent vanillaSanitizedHtml={STORY_CONTENT_RICH} />;
 }
 
 export const Legacy = storyWithConfig({}, () => {
-    return <UserContent content={STORY_CONTENT_LEGACY} />;
+    return <UserContent vanillaSanitizedHtml={STORY_CONTENT_LEGACY} />;
 });
 
 Legacy.decorators = [legacyCssDecorator];
@@ -236,7 +237,7 @@ function makeTableStory(tableStyle: TableStyle) {
             },
         },
         () => {
-            return <UserContent content={STORY_CONTENT_TABLES} />;
+            return <UserContent vanillaSanitizedHtml={STORY_CONTENT_TABLES} />;
         },
     );
     storyFn.parameters = {

@@ -25,7 +25,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     public string $affectedRecordType = "Discussion";
     private int $discussionID;
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -33,7 +33,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -41,7 +41,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -49,7 +49,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -57,7 +57,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -70,7 +70,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -124,7 +124,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function addWhereArray(array $where, array $actionValue): array
     {
@@ -133,7 +133,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {
@@ -145,7 +145,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setDiscussionID(int $discussionID): void
     {
@@ -153,7 +153,7 @@ class BumpDiscussionAction extends AutomationAction implements DiscussionInterfa
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getDiscussionID(): int
     {

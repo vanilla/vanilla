@@ -37,6 +37,8 @@ import { hasUserViewPermission } from "@library/features/users/modules/hasUserVi
 import { LeavingPageRoute } from "@library/leavingPage/LeavingPageRoutes";
 import { ReactionListModule } from "@library/reactions/ReactionListModule";
 import { RouterRegistry } from "@library/Router.registry";
+import { PrivateFieldIndicator } from "@dashboard/userProfiles/components/ProfileFieldVisibilityIcon";
+import { LegacyTitleBarTransparentContextProvider } from "@library/headers/TitleBar.TransparentContext";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -45,6 +47,8 @@ addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true })
 addComponent("tokensInputInLegacyForm", TokensInputInLegacyForm, { overwrite: true });
 addComponent("datepickerInLegacyForm", DatePickerInLegacyForm, { overwrite: true });
 addComponent("ReactionListModule", ReactionListModule, { overwrite: true });
+
+addComponent("PrivateFieldIndicator", PrivateFieldIndicator, { overwrite: true });
 
 // Redux
 registerReducer("auth", authReducer);
@@ -57,7 +61,9 @@ RouterRegistry.addRoutes(
 applySharedPortalContext((props) => {
     return (
         <AppContext variablesOnly noWrap errorComponent={ErrorPage}>
-            <SectionProvider type={SectionTypes.THREE_COLUMNS}>{props.children}</SectionProvider>
+            <LegacyTitleBarTransparentContextProvider>
+                <SectionProvider type={SectionTypes.THREE_COLUMNS}>{props.children}</SectionProvider>
+            </LegacyTitleBarTransparentContextProvider>
         </AppContext>
     );
 });

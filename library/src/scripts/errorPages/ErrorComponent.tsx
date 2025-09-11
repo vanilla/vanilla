@@ -16,6 +16,7 @@ import {
 } from "@library/errorPages/CoreErrorMessages";
 import PanelWidgetVerticalPadding from "@library/layout/components/PanelWidgetVerticalPadding";
 import PanelWidget from "@library/layout/components/PanelWidget";
+import TitleBar from "@library/headers/TitleBar";
 
 interface IProps extends IErrorMessageProps {}
 
@@ -28,6 +29,7 @@ export function ErrorPage(props: IProps) {
 
     return (
         <DocumentTitle title={message}>
+            <TitleBar />
             <Container className={classes.inheritHeight} tag={"main"}>
                 <PanelWidgetVerticalPadding className={classes.inheritHeight}>
                     <PanelWidget className={classes.inheritHeight}>

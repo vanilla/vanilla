@@ -9,8 +9,8 @@ namespace APIv2;
 
 use Garden\Web\Exception\ClientException;
 use Vanilla\FeatureFlagHelper;
-use Vanilla\Forum\Models\PostFieldModel;
 use Vanilla\Forum\Models\PostTypeModel;
+use Vanilla\Logging\AuditLogModel;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -27,17 +27,15 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
     private $discussionModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getAddons(): array
     {
-        $addons = parent::getAddons();
-        $addons[] = "qna";
-        return $addons;
+        return array_merge(parent::getAddons(), ["qna", "ideation"]);
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -328,6 +326,7 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
      */
     public function testConvertPostType()
     {
+        $this->setConfig("auditLog.enabled", true);
         $commonPostField = $this->createPostField(["isRequired" => true]);
         $originOnlyPostField = $this->createPostField(["visibility" => "private"]);
         $fromPostType = $this->createPostType([
@@ -361,6 +360,19 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
                 "postMeta.{$commonPostField["postFieldID"]}" => "my custom post field",
             ])
             ->getBody();
+
+        $this->assertLogMessage(
+            "Discussion post type changed from `{$fromPostType["postTypeID"]}` to `{$toPostType["postTypeID"]}`"
+        );
+
+        $auditLogModel = $this->container()->get(AuditLogModel::class);
+        $logs = $auditLogModel->select(["eventType" => "discussion_post_type_change"]);
+        $this->assertCount(1, $logs);
+        $context = $logs[0]["context"];
+        $this->assertEquals($fromPostType["postTypeID"], $context["previousPostTypeID"]);
+        $this->assertEquals($toPostType["postTypeID"], $context["postTypeID"]);
+        $this->assertEquals($discussion["discussionID"], $context["discussionID"]);
+        $this->setConfig("auditLog.enabled", false);
     }
 
     /**
@@ -373,14 +385,18 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
         // Make sure question post type is active.
         $this->api()->patch("/post-types/question", ["isActive" => true]);
 
-        $category = $this->createCategory(["hasRestrictedPostTypes" => true, "allowedPostTypeIDs" => ["question"]]);
+        $category = $this->createCategory([
+            "name" => "Restricted Cat",
+            "hasRestrictedPostTypes" => true,
+            "allowedPostTypeIDs" => ["question"],
+        ]);
         $discussion = $this->createDiscussion(["postTypeID" => "question"]);
 
         $discussionPostType = $this->createPostType(["parentPostType" => "discussion"]);
 
         $this->expectException(ClientException::class);
         $this->expectExceptionMessage(
-            "Category #{$category["categoryID"]} doesn't allow for {$discussionPostType["postTypeID"]} type records"
+            "Category 'Restricted Cat' does not allow for '{$discussionPostType["postTypeID"]}' type records."
         );
 
         $this->api()->put("/discussions/{$discussion["discussionID"]}/type", [
@@ -395,13 +411,18 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
      */
     public function testMoveWithPostType()
     {
+        $this->setConfig("auditLog.enabled", true);
+        $this->resetTable("auditLog");
         $commonPostField = $this->createPostField(["isRequired" => true]);
         $originOnlyPostField = $this->createPostField(["visibility" => "internal"]);
         $fromPostType = $this->createPostType([
             "postFieldIDs" => [$commonPostField["postFieldID"], $originOnlyPostField["postFieldID"]],
         ]);
 
-        $category = $this->createCategory();
+        $originalCategory = $this->createCategory([
+            "hasRestrictedPostTypes" => true,
+            "allowedPostTypeIDs" => [$fromPostType["postTypeID"]],
+        ]);
 
         $discussion = $this->createDiscussion([
             "postTypeID" => $fromPostType["postTypeID"],
@@ -415,17 +436,22 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
             "postFieldIDs" => [$commonPostField["postFieldID"]],
         ]);
 
+        $targetCategory = $this->createCategory([
+            "hasRestrictedPostTypes" => true,
+            "allowedPostTypeIDs" => [$toPostType["postTypeID"]],
+        ]);
+
         $this->api()->patch("/discussions/move", [
             "discussionIDs" => [$discussion["discussionID"]],
-            "categoryID" => $category["categoryID"],
+            "categoryID" => $targetCategory["categoryID"],
             "postTypeID" => $toPostType["postTypeID"],
+            "postMeta" => [$commonPostField["postFieldID"] => "test"],
         ]);
 
         $commonExpected = [
-            "categoryID" => $category["categoryID"],
+            "categoryID" => $targetCategory["categoryID"],
             "postTypeID" => $toPostType["postTypeID"],
-            "postMeta.{$commonPostField["postFieldID"]}" => "my custom post field",
-            "postMeta." . PostFieldModel::INTERNAL_DATA_FIELD_ID => "{$originOnlyPostField["label"]}: my internal data",
+            "postMeta.{$commonPostField["postFieldID"]}" => "test",
         ];
 
         $this->api()
@@ -441,5 +467,113 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
             ->get("/discussions/{$discussion["discussionID"]}/edit")
             ->assertJsonObjectLike($commonExpected)
             ->getBody();
+
+        $this->assertLogMessage(
+            "Discussion post type changed from `{$fromPostType["postTypeID"]}` to `{$toPostType["postTypeID"]}`"
+        );
+
+        $auditLogModel = $this->container()->get(AuditLogModel::class);
+        $logs = $auditLogModel->select(["eventType" => "discussion_post_type_change"]);
+        $this->assertCount(1, $logs);
+        $context = $logs[0]["context"];
+        $this->assertEquals($fromPostType["postTypeID"], $context["previousPostTypeID"]);
+        $this->assertEquals($toPostType["postTypeID"], $context["postTypeID"]);
+        $this->assertEquals($discussion["discussionID"], $context["discussionID"]);
+        $this->setConfig("auditLog.enabled", false);
+    }
+
+    /**
+     * Test converting a discussion with a Promote reaction to an idea type.
+     *
+     * @return void
+     */
+    public function testConvertToIdeaWithReactions(): void
+    {
+        // Create a discussion
+        $discussion = $this->createDiscussion();
+
+        // React to the discussion with Promote
+        $this->api()->post("/discussions/{$discussion["discussionID"]}/reactions", [
+            "reactionType" => "Promote",
+        ]);
+
+        // Verify the discussion has the expected initial score
+        $discussionAfterReaction = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}")
+            ->getBody();
+        $this->assertEquals(
+            5,
+            $discussionAfterReaction["score"],
+            "Discussion should have a score of 5 after Promote reaction"
+        );
+
+        // Verify only the Promote reaction exists
+        $reactions = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}/reactions", ["reactionType" => "Promote"])
+            ->getBody();
+        $this->assertCount(1, $reactions, "Discussion should have exactly one reaction");
+        $this->assertEquals("Promote", $reactions[0]["reactionType"]["urlcode"], "The only reaction should be Promote");
+
+        // Convert to idea type
+        $convertedDiscussion = $this->api()
+            ->put("/discussions/{$discussion["discussionID"]}/type", [
+                "postTypeID" => "idea",
+            ])
+            ->assertJsonObjectLike([
+                "postTypeID" => "idea",
+                "type" => "idea",
+            ])
+            ->getBody();
+
+        // Verify the discussion has a score of 0 after conversion
+        $discussionAfterConversion = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}")
+            ->getBody();
+        $this->assertEquals(
+            0,
+            $discussionAfterConversion["score"],
+            "Discussion should have a score of 0 after conversion to idea"
+        );
+
+        // Verify there are no reactions after conversion
+        $reactionsAfterConversion = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}/reactions")
+            ->getBody();
+        $this->assertCount(
+            0,
+            $reactionsAfterConversion,
+            "Discussion should have no reactions after conversion to idea"
+        );
+    }
+    /**
+     * Test moving a legacy post to a category with type conversion.
+     *
+     * @return void
+     */
+    public function testMoveFromLegacyPost()
+    {
+        // Simulate a legacy discussion that only has `Type` column.
+        $category = $this->createCategory();
+        $discussionID = $this->discussionModel->save([
+            "Name" => "Test Post",
+            "CategoryID" => $category["categoryID"],
+            "Type" => "Idea",
+            "Body" => "Test post",
+            "Format" => "Html",
+        ]);
+
+        $targetCategory = $this->createCategory();
+        $this->api()
+            ->patch("/discussions/move", [
+                "discussionIDs" => [$discussionID],
+                "categoryID" => $targetCategory["categoryID"],
+                "postTypeID" => "question",
+            ])
+            ->assertSuccess()
+            ->assertJsonObjectLike(["status" => "success"]);
+
+        $this->api()
+            ->get("/discussions/{$discussionID}")
+            ->assertJsonObjectLike(["postTypeID" => "question", "categoryID" => $targetCategory["categoryID"]]);
     }
 }

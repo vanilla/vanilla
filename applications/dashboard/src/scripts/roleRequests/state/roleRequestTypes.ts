@@ -38,7 +38,7 @@ export interface IRoleRequestMeta {
     name: string;
     body: string;
     format: Format;
-    attributesSchema: AnyObject;
+    attributesSchema: Record<string, any>;
 }
 
 /**

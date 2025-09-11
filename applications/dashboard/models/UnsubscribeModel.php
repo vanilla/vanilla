@@ -9,6 +9,7 @@ namespace Vanilla\Dashboard\Models;
 
 use ActivityModel;
 use CategoryModel;
+use DiscussionModel;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn;
@@ -39,6 +40,9 @@ class UnsubscribeModel
     /** @var ActivityModel */
     private $activityModel;
 
+    /** @var \DiscussionModel */
+    private $discussionModel;
+
     /**
      * Constructor
      *
@@ -47,19 +51,22 @@ class UnsubscribeModel
      * @param CategoryModel $categoryModel
      * @param UserModel $userModel
      * @param ActivityModel $activityModel
+     * @param \DiscussionModel $discussionModel
      */
     public function __construct(
         UserMetaModel $userMetaModel,
         ActivityService $activityService,
         CategoryModel $categoryModel,
         UserModel $userModel,
-        ActivityModel $activityModel
+        ActivityModel $activityModel,
+        DiscussionModel $discussionModel
     ) {
         $this->userMetaModel = $userMetaModel;
         $this->activityService = $activityService;
         $this->categoryModel = $categoryModel;
         $this->userModel = $userModel;
         $this->activityModel = $activityModel;
+        $this->discussionModel = $discussionModel;
     }
 
     /**
@@ -87,6 +94,16 @@ class UnsubscribeModel
             );
         }
         return $followedCategory;
+    }
+
+    public function muteDiscussion(array $unsubscribeInfo): bool
+    {
+        $muted = $this->discussionModel->mute(
+            $unsubscribeInfo["discussionID"],
+            $unsubscribeInfo["userID"],
+            $unsubscribeInfo["mute"]
+        );
+        return $muted;
     }
 
     /**
@@ -136,7 +153,9 @@ class UnsubscribeModel
             [],
             "Preferences."
         );
-        $activityInfo["data"] = (array) $activityInfo["data"];
+
+        $data = $activityInfo["data"] ?? [];
+        $activityInfo["data"] = (array) $data;
 
         if (isset($activityInfo["data"]["category"]) && ($key = array_search("advanced", $reasons)) !== false) {
             unset($reasons[$key]);
@@ -186,6 +205,14 @@ class UnsubscribeModel
                     }
                 }
             }
+        }
+        $payload = (array) $payload;
+        if (isset($payload["Mute"])) {
+            $result["mute"] = [
+                "discussionID" => $payload["DiscussionID"],
+                "mute" => $enabled,
+                "userID" => $user["UserID"],
+            ];
         }
         return $result;
     }

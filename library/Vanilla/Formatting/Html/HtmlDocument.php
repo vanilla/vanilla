@@ -194,7 +194,7 @@ HTML;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function stringify(): FormatText
     {
@@ -203,7 +203,7 @@ HTML;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderHTML(): string
     {
@@ -211,7 +211,7 @@ HTML;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFragments(): array
     {

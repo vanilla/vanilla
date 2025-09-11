@@ -11,19 +11,20 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Vanilla\Forum\Modules\DiscussionWidgetModule;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Widgets\Fragments\PostItemFragmentMeta;
 use Vanilla\Widgets\React\FilterableWidgetTrait;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
  * Class DiscussionDiscussionsWidget
  */
-class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements ReactWidgetInterface
+class DiscussionDiscussionsWidget extends DiscussionWidgetModule
 {
     use DiscussionsWidgetSchemaTrait;
     use FilterableWidgetTrait;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -31,7 +32,15 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [PostItemFragmentMeta::class];
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -39,7 +48,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -55,7 +64,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -69,7 +78,7 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getApiSchema(): Schema
     {

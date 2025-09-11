@@ -7,7 +7,6 @@
 import { cx } from "@emotion/css";
 import FlyoutToggle from "@library/flyouts/FlyoutToggle";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { CloseCompactIcon, CloseIcon } from "@library/icons/common";
 import {
     BlockquoteIcon,
     CodeBlockIcon,
@@ -30,14 +29,15 @@ import { MenuBarSubMenuItemGroup } from "@library/MenuBar/MenuBarSubMenuItemGrou
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { getSelectedBlockBoundingClientRect } from "@library/vanilla-editor/queries/getSelectedBlockBoundingClientRect";
-import { MyEditor, useMyPlateEditorState } from "@library/vanilla-editor/typescript";
+import { MyEditor } from "@library/vanilla-editor/typescript";
+import { useMyPlateEditorState } from "../getMyEditor";
 import { vanillaEditorClasses } from "@library/vanilla-editor/VanillaEditor.classes";
 import { useVanillaEditorBounds } from "@library/vanilla-editor/VanillaEditorBoundsContext";
 import { VanillaEditorFormatter } from "@library/vanilla-editor/VanillaEditorFormatter";
-import { focusEditor, getSelectionText, isRangeAcrossBlocks, useEventPlateId, useHotkeys } from "@udecode/plate-common";
+import { getSelectionText, isRangeAcrossBlocks, useEventPlateId, useHotkeys } from "@udecode/plate-common";
 import { Icon } from "@vanilla/icons";
 import { EMPTY_RECT } from "@vanilla/react-utils";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 
 interface IElementToolbarProps {
     renderAbove?: boolean;
@@ -46,14 +46,14 @@ interface IElementToolbarProps {
 }
 
 export function ElementToolbar(props: IElementToolbarProps) {
-    const classes = vanillaEditorClasses();
+    const classes = vanillaEditorClasses.useAsHook();
     const id = useUniqueID("elementToolbar");
     const contentID = useUniqueID("elementToolbar-content");
     const [ownIsVisible, setOwnIsVisible] = useState(props.isVisible ?? false);
 
     const isEdgeCase = useIsElementToolbarEdgeCase();
 
-    const classesMenuBar = menuBarClasses();
+    const classesMenuBar = menuBarClasses.useAsHook();
 
     return (
         <FlyoutToggle
@@ -161,7 +161,10 @@ export function FloatingElementToolbar(props: IFloatingElementToolbarProps) {
     useHotkeys(
         "ctrl+shift+p",
         (e) => {
-            setOpen(true);
+            const elementToolbarButton = document.querySelector('[id*="elementToolbar"]') as HTMLElement;
+            if (elementToolbarButton) {
+                elementToolbarButton.focus();
+            }
         },
         {
             enabled: !isEdgeCase || editorRect === EMPTY_RECT || selectionRect === EMPTY_RECT,
@@ -195,8 +198,8 @@ export function FloatingElementToolbar(props: IFloatingElementToolbarProps) {
 }
 
 function TopLevelIcon() {
-    const { headingIcon, listIcon, otherIcon } = useTabIcons();
-    return headingIcon ?? listIcon ?? otherIcon ?? <PilcrowIcon />;
+    const { headingIcon, listIcon, calloutIcon, otherIcon } = useTabIcons();
+    return headingIcon ?? listIcon ?? calloutIcon ?? otherIcon ?? <PilcrowIcon />;
 }
 
 function useTabIcons() {
@@ -226,6 +229,15 @@ function useTabIcons() {
         }
     })();
 
+    const calloutIcon = (() => {
+        if (formatter.isCallout()) {
+            const appearance = formatter.calloutAppearance();
+            return <Icon icon={`callout-${appearance}`} style={{ width: 24, height: 18 }} />;
+        } else {
+            return null;
+        }
+    })();
+
     const otherIcon = (() => {
         if (formatter.isBlockquote()) {
             return <BlockquoteIcon />;
@@ -238,7 +250,7 @@ function useTabIcons() {
         }
     })();
 
-    return { headingIcon, listIcon, otherIcon };
+    return { headingIcon, listIcon, calloutIcon, otherIcon };
 }
 
 /**
@@ -251,7 +263,7 @@ function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement> & { clo
     const editor = useMyPlateEditorState(useEventPlateId());
     const formatter = new VanillaEditorFormatter(editor);
 
-    const { headingIcon, listIcon, otherIcon } = useTabIcons();
+    const { headingIcon, listIcon, calloutIcon, otherIcon } = useTabIcons();
 
     const handleOnActivate = (format: keyof VanillaEditorFormatter) => {
         formatter[format]();
@@ -335,9 +347,9 @@ function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement> & { clo
                 </MenuBarSubMenuItemGroup>
             </MenuBarItem>
             <MenuBarItem
-                active={otherIcon !== null}
+                active={calloutIcon !== null || otherIcon !== null}
                 accessibleLabel={t("Toggle Special Formats Menu")}
-                icon={otherIcon ?? <BlockquoteIcon />}
+                icon={calloutIcon ?? otherIcon ?? <BlockquoteIcon />}
             >
                 <MenuBarSubMenuItemGroup>
                     <MenuBarSubMenuItem
@@ -360,6 +372,15 @@ function FixedElementToolbar(props: React.HTMLAttributes<HTMLDivElement> & { clo
                         icon={<SpoilerIcon />}
                     >
                         {t("Spoiler")}
+                    </MenuBarSubMenuItem>
+                    <MenuBarSubMenuItem
+                        active={formatter.isCallout()}
+                        onActivate={() => handleOnActivate("callout")}
+                        icon={
+                            <Icon icon={`callout-${formatter.calloutAppearance()}`} style={{ width: 24, height: 18 }} />
+                        }
+                    >
+                        {t("Callout")}
                     </MenuBarSubMenuItem>
                 </MenuBarSubMenuItemGroup>
             </MenuBarItem>

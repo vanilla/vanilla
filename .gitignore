@@ -20,7 +20,11 @@
 !/build/package-include.txt
 !/build/package-exclude.txt
 !/build/README.md
-!/build/webpack.aliases.js
+!/build/*.js
+!/build/*.ts
+!/build/*.mts
+!/build/*.cjs
+!/build/*.tsx
 /cache/*
 .cache
 !/cache/.htaccess
@@ -87,6 +91,7 @@
 !/themes/mobile/
 /uploads/*
 !/uploads/.gitkeep
+packages/*/dist
 *vanillaforums*
 *.kpf
 .DS_Store
@@ -107,7 +112,6 @@ tsconfig.tsbuildinfo
 .idea/*
 .awcache
 /nbproject/
-/vendor/
 node_modules/
 bower_components/
 npm-debug.log
@@ -124,6 +128,7 @@ phpcs-diff.json
 /cli/composer.lock
 /coverage
 /legacy-dist
+/vendor/*
 
 # Yarn
 yarn-error.log
@@ -136,3 +141,4 @@ yarn-error.log
 !.yarn/sdks
 !.yarn/versions
 applications/dashboard/.yarn/*
+

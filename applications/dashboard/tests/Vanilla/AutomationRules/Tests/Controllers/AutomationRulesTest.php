@@ -196,11 +196,12 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "x-control" => [
                         "description" => "",
                         "label" => "Post Type",
-                        "inputType" => "dropDown",
+                        "inputType" => "select",
                         "placeholder" => "",
-                        "choices" => [
-                            "staticOptions" => [
-                                "discussion" => "Discussion",
+                        "options" => [
+                            [
+                                "value" => "discussion",
+                                "label" => "Discussion",
                             ],
                         ],
                         "multiple" => true,
@@ -222,16 +223,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 "x-control" => [
                     "description" => "",
                     "label" => "Category",
-                    "inputType" => "dropDown",
+                    "inputType" => "select",
                     "placeholder" => "",
-                    "choices" => [
-                        "api" => [
-                            "searchUrl" => "/api/v2/categories/search?query=%s&limit=30",
-                            "singleUrl" => "/api/v2/categories/%s",
-                            "valueKey" => "categoryID",
-                            "labelKey" => "name",
-                            "extraLabelKey" => null,
-                        ],
+                    "optionsLookup" => [
+                        "searchUrl" => "/categories/search?query=%s&limit=30",
+                        "singleUrl" => "/categories/%s",
+                        "valueKey" => "categoryID",
+                        "labelKey" => "name",
+                        "extraLabelKey" => null,
                     ],
                     "multiple" => true,
                     "tooltip" => "",
@@ -270,16 +269,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 "x-control" => [
                     "description" => "Select one or more tags",
                     "label" => "Tag",
-                    "inputType" => "dropDown",
+                    "inputType" => "select",
                     "placeholder" => "",
-                    "choices" => [
-                        "api" => [
-                            "searchUrl" => "/api/v2/tags?type=User&limit=30&query=%s",
-                            "singleUrl" => "/api/v2/tags/%s",
-                            "valueKey" => "tagID",
-                            "labelKey" => "name",
-                            "extraLabelKey" => null,
-                        ],
+                    "optionsLookup" => [
+                        "searchUrl" => "/tags?type=User&limit=30&query=%s",
+                        "singleUrl" => "/tags/%s",
+                        "valueKey" => "tagID",
+                        "labelKey" => "name",
+                        "extraLabelKey" => null,
                     ],
                     "multiple" => true,
                     "tooltip" => "",
@@ -324,17 +321,15 @@ class AutomationRulesTest extends AbstractAPIv2Test
                                 "description" =>
                                     "Dropdown (Single-, Multi-, or Numeric) and Single Checkbox profile field types are eligible for automation.",
                                 "label" => "Profile Field",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" =>
-                                            "/api/v2/profile-fields?enabled=true&formType[]=dropdown&formType[]=tokens&formType[]=checkbox",
-                                        "singleUrl" => "/api/v2/profile-fields/%s",
-                                        "valueKey" => "apiName",
-                                        "labelKey" => "label",
-                                        "extraLabelKey" => null,
-                                    ],
+                                "optionsLookup" => [
+                                    "searchUrl" =>
+                                        "/profile-fields?enabled=true&formType[]=dropdown&formType[]=tokens&formType[]=checkbox",
+                                    "singleUrl" => "/profile-fields/%s",
+                                    "valueKey" => "apiName",
+                                    "labelKey" => "label",
+                                    "extraLabelKey" => null,
                                 ],
                                 "multiple" => false,
                                 "tooltip" => "",
@@ -406,6 +401,20 @@ class AutomationRulesTest extends AbstractAPIv2Test
                 ],
                 "contentType" => "users",
             ],
+            "timeSinceLastActiveTrigger" => [
+                "triggerType" => "timeSinceLastActiveTrigger",
+                "name" => "Time since Last Active",
+                "triggerActions" => ["addRemoveRoleAction"],
+                "schema" => [
+                    "type" => "object",
+                    "properties" => [
+                        "triggerTimeDelay" => $triggerTimeDelaySchema,
+                        "additionalSettings" => $triggerAdditionalSettingsSchema,
+                    ],
+                    "required" => ["triggerTimeDelay", "additionalSettings"],
+                ],
+                "contentType" => "users",
+            ],
             "discussionReachesScoreTrigger" => [
                 "triggerType" => "discussionReachesScoreTrigger",
                 "name" => "Post receives a minimum of points",
@@ -446,11 +455,12 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "",
                                 "label" => "Post Type",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "staticOptions" => [
-                                        "discussion" => "Discussion",
+                                "options" => [
+                                    [
+                                        "label" => "Discussion",
+                                        "value" => "discussion",
                                     ],
                                 ],
                                 "multiple" => true,
@@ -466,16 +476,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "",
                                 "label" => "Category",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/categories/search?query=%s&limit=30",
-                                        "singleUrl" => "/api/v2/categories/%s",
-                                        "valueKey" => "categoryID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
+                                "optionsLookup" => [
+                                    "searchUrl" => "/categories/search?query=%s&limit=30",
+                                    "singleUrl" => "/categories/%s",
+                                    "valueKey" => "categoryID",
+                                    "labelKey" => "name",
+                                    "extraLabelKey" => null,
                                 ],
                                 "multiple" => true,
                                 "tooltip" => "",
@@ -518,16 +526,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "Select one or more tags",
                                 "label" => "Tags",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/tags?type=User&limit=30&query=%s",
-                                        "singleUrl" => "/api/v2/tags/%s",
-                                        "valueKey" => "tagID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
+                                "optionsLookup" => [
+                                    "searchUrl" => "/tags?type=User&limit=30&query=%s",
+                                    "singleUrl" => "/tags/%s",
+                                    "valueKey" => "tagID",
+                                    "labelKey" => "name",
+                                    "extraLabelKey" => null,
                                 ],
                                 "multiple" => true,
                                 "tooltip" => "",
@@ -566,16 +572,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "",
                                 "label" => "Category",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/categories",
-                                        "singleUrl" => "/api/v2/categories/%s",
-                                        "valueKey" => "categoryID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
+                                "optionsLookup" => [
+                                    "searchUrl" => "/categories",
+                                    "singleUrl" => "/categories/%s",
+                                    "valueKey" => "categoryID",
+                                    "labelKey" => "name",
+                                    "extraLabelKey" => null,
                                 ],
                                 "multiple" => true,
                                 "tooltip" => "",
@@ -619,15 +623,28 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "",
                                 "label" => "Report Reason",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "staticOptions" => [
-                                        "spam" => "Spam / Solicitation",
-                                        "deceptive-misleading" => "Deceptive / Misleading",
-                                        "inappropriate" => "Inappropriate",
-                                        "rule-breaking" => "Breaks Community Rules",
-                                        "abuse" => "Abuse",
+                                "options" => [
+                                    [
+                                        "label" => "Abuse",
+                                        "value" => "abuse",
+                                    ],
+                                    [
+                                        "label" => "Deceptive / Misleading",
+                                        "value" => "deceptive-misleading",
+                                    ],
+                                    [
+                                        "label" => "Inappropriate",
+                                        "value" => "inappropriate",
+                                    ],
+                                    [
+                                        "label" => "Breaks Community Rules",
+                                        "value" => "rule-breaking",
+                                    ],
+                                    [
+                                        "label" => "Spam / Solicitation",
+                                        "value" => "spam",
                                     ],
                                 ],
                                 "multiple" => true,
@@ -661,16 +678,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "x-control" => [
                         "description" => "Select one or more collections.",
                         "label" => $label,
-                        "inputType" => "dropDown",
+                        "inputType" => "select",
                         "placeholder" => "",
-                        "choices" => [
-                            "api" => [
-                                "searchUrl" => "/api/v2/collections",
-                                "singleUrl" => "/api/v2/collections/%s",
-                                "valueKey" => "collectionID",
-                                "labelKey" => "name",
-                                "extraLabelKey" => null,
-                            ],
+                        "optionsLookup" => [
+                            "searchUrl" => "/collections",
+                            "singleUrl" => "/collections/%s",
+                            "valueKey" => "collectionID",
+                            "labelKey" => "name",
+                            "extraLabelKey" => null,
                         ],
                         "multiple" => true,
                         "tooltip" => "",
@@ -703,16 +718,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                     "x-control" => [
                         "description" => $description,
                         "label" => $label,
-                        "inputType" => "dropDown",
+                        "inputType" => "select",
                         "placeholder" => "",
-                        "choices" => [
-                            "api" => [
-                                "searchUrl" => "/api/v2/categories/search?query=%s&limit=30&displayAs[]=Discussions",
-                                "singleUrl" => "/api/v2/categories/%s",
-                                "valueKey" => "categoryID",
-                                "labelKey" => "name",
-                                "extraLabelKey" => null,
-                            ],
+                        "optionsLookup" => [
+                            "searchUrl" => "/categories/search?query=%s&limit=30&displayAs[]=Discussions",
+                            "singleUrl" => "/categories/%s",
+                            "valueKey" => "categoryID",
+                            "labelKey" => "name",
+                            "extraLabelKey" => null,
                         ],
                         "multiple" => $multiple,
                         "tooltip" => "",
@@ -802,16 +815,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "Select one or more tags",
                                 "label" => "Tags to add",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/tags?type=User&limit=30&query=%s",
-                                        "singleUrl" => "/api/v2/tags/%s",
-                                        "valueKey" => "tagID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
+                                "optionsLookup" => [
+                                    "searchUrl" => "/tags?type=User&limit=30&query=%s",
+                                    "singleUrl" => "/tags/%s",
+                                    "valueKey" => "tagID",
+                                    "labelKey" => "name",
+                                    "extraLabelKey" => null,
                                 ],
                                 "multiple" => true,
                                 "tooltip" => "",
@@ -851,7 +862,12 @@ class AutomationRulesTest extends AbstractAPIv2Test
             "addRemoveRoleAction" => [
                 "actionType" => "addRemoveRoleAction",
                 "name" => "Assign/Remove role",
-                "actionTriggers" => ["emailDomainTrigger", "profileFieldTrigger", "timeSinceUserRegistrationTrigger"],
+                "actionTriggers" => [
+                    "emailDomainTrigger",
+                    "profileFieldTrigger",
+                    "timeSinceUserRegistrationTrigger",
+                    "timeSinceLastActiveTrigger",
+                ],
                 "schema" => [
                     "type" => "object",
                     "properties" => [
@@ -860,16 +876,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "",
                                 "label" => "Assign Role",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/roles",
-                                        "singleUrl" => "/api/v2/roles/%s",
-                                        "valueKey" => "roleID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
+                                "optionsLookup" => [
+                                    "searchUrl" => "/roles",
+                                    "singleUrl" => "/roles/%s",
+                                    "valueKey" => "roleID",
+                                    "labelKey" => "name",
+                                    "extraLabelKey" => null,
                                 ],
                                 "multiple" => false,
                                 "tooltip" => "",
@@ -881,16 +895,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "",
                                 "label" => "Remove Role (optional)",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/roles",
-                                        "singleUrl" => "/api/v2/roles/%s",
-                                        "valueKey" => "roleID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
+                                "optionsLookup" => [
+                                    "searchUrl" => "/roles",
+                                    "singleUrl" => "/roles/%s",
+                                    "valueKey" => "roleID",
+                                    "labelKey" => "name",
+                                    "extraLabelKey" => null,
                                 ],
                                 "multiple" => false,
                                 "tooltip" => "",
@@ -933,16 +945,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "Select what moderator escalations should be assigned to",
                                 "label" => "Assign Moderator",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/users$qs",
-                                        "singleUrl" => "/api/v2/users/%s",
-                                        "valueKey" => "userID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
+                                "optionsLookup" => [
+                                    "searchUrl" => "/users$qs",
+                                    "singleUrl" => "/users/%s",
+                                    "valueKey" => "userID",
+                                    "labelKey" => "name",
+                                    "extraLabelKey" => null,
                                 ],
                                 "multiple" => false,
                                 "tooltip" => "",
@@ -1011,16 +1021,14 @@ class AutomationRulesTest extends AbstractAPIv2Test
                             "x-control" => [
                                 "description" => "Select what moderator escalations should be assigned to",
                                 "label" => "Assign Moderator",
-                                "inputType" => "dropDown",
+                                "inputType" => "select",
                                 "placeholder" => "",
-                                "choices" => [
-                                    "api" => [
-                                        "searchUrl" => "/api/v2/users$qs",
-                                        "singleUrl" => "/api/v2/users/%s",
-                                        "valueKey" => "userID",
-                                        "labelKey" => "name",
-                                        "extraLabelKey" => null,
-                                    ],
+                                "optionsLookup" => [
+                                    "searchUrl" => "/users$qs",
+                                    "singleUrl" => "/users/%s",
+                                    "valueKey" => "userID",
+                                    "labelKey" => "name",
+                                    "extraLabelKey" => null,
                                 ],
                                 "multiple" => false,
                                 "tooltip" => "",
@@ -1891,24 +1899,11 @@ class AutomationRulesTest extends AbstractAPIv2Test
      */
     public function testCreateDefaultAutomationRule()
     {
-        $this->resetTable("automationRule");
-        $this->resetTable("automationRuleRevision");
-        $this->runWithConfig(
-            [
-                "Feature.AutomationRules.Enabled" => true,
-                "Feature.CommunityManagementBeta.Enabled" => true,
-                "Feature.escalations.Enabled" => true,
-            ],
-            function () {
-                AutomationRuleModel::structure(\Gdn::database());
-                $automationRules = $this->automationRuleModel->select([
-                    "status" => AutomationRuleModel::STATUS_INACTIVE,
-                ]);
-                $this->assertCount(3, $automationRules);
-                $defaultAutomationRules = \Gdn::config()->get("Preferences.AutomationRules.Defaults");
-                $defaultAutomationRules = json_decode($defaultAutomationRules, true);
-                $this->assertCount(3, $defaultAutomationRules);
-            }
-        );
+        AutomationRuleModel::structure(\Gdn::database());
+        $automationRules = $this->automationRuleModel->select([
+            "status" => AutomationRuleModel::STATUS_INACTIVE,
+            "systemInitialRuleID IS NOT NULL" => null,
+        ]);
+        $this->assertCount(3, $automationRules);
     }
 }

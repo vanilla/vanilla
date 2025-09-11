@@ -7,19 +7,13 @@
 
 namespace Vanilla\Layout\Section;
 
-use Vanilla\Web\TwigRenderTrait;
-use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
-use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
-use Vanilla\Widgets\React\ReactWidgetInterface;
+use Vanilla\Widgets\React\ReactWidget;
 
 /**
  * Interface representing a layout section.
  */
-abstract class AbstractLayoutSection implements ReactWidgetInterface, CombinedPropsWidgetInterface
+abstract class AbstractLayoutSection extends ReactWidget
 {
-    use CombinedPropsWidgetTrait;
-    use TwigRenderTrait;
-
     /**
      * Render out an array of reach children as SEO HTML.
      * @param array<array{"reactComponent": string, "$reactProps": array, "$seoContent"?: string}> $children The array of react children
@@ -58,5 +52,21 @@ abstract class AbstractLayoutSection implements ReactWidgetInterface, CombinedPr
     public static function getAllowedSectionIDs(): array
     {
         return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Sections";
     }
 }

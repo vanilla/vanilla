@@ -17,7 +17,7 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
         height: 48,
         position: "sticky",
         top: 0,
-        zIndex: 1051,
+        zIndex: 1061,
     });
 
     const flexContainer = css({
@@ -87,7 +87,9 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "center",
         color: ColorsUtils.colorOut(globalVars.elementaryColors.white),
-        flexBasis: 180,
+        textWrap: "nowrap",
+        paddingLeft: 40,
+        paddingRight: 40,
         borderRight: "1px solid rgba(0, 0, 0, 0.125)",
 
         "&.active, &:hover, &:focus": {
@@ -101,10 +103,6 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
     });
 
     const linkLabel = css({});
-
-    const meBox = css({
-        width: 240,
-    });
 
     const iconWrapper = css({
         ...Mixins.margin({ left: -4, right: 4 }),
@@ -126,7 +124,6 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
         nav,
         link,
         linkLabel,
-        meBox,
         iconWrapper,
     };
 });

@@ -12,12 +12,12 @@ use Vanilla\Community\Schemas\AbstractTabSearchFormSchema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 
 /**
  * Widget to search by tag.
  */
-class SearchWidgetModule extends AbstractReactModule
+class SearchWidgetModule extends LegacyReactModule
 {
     /** @var string|null */
     private $title = null;

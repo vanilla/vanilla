@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -8,6 +8,7 @@ import { getDashboardUserManagementRoutes } from "@dashboard/users/userManagemen
 import RouteHandler from "@library/routing/RouteHandler";
 import { getAutomationRulesRoutes } from "@dashboard/automationRules/AutomationRules.routes";
 import { getPostTypeSettingsRoutes } from "@dashboard/postTypes/postTypeRoutes";
+import { getTaggingSettingsRoutes } from "@dashboard/tagging/taggingRoutes";
 
 const RoleApplicationsRoute = new RouteHandler(
     () => import("@dashboard/roleRequests/pages/RoleApplicationsPage"),
@@ -27,6 +28,7 @@ export function getDashboardRoutes() {
         ...getDashboardUserManagementRoutes(),
         ...getAutomationRulesRoutes(),
         ...getPostTypeSettingsRoutes(),
+        ...getTaggingSettingsRoutes(),
         AuditLogsRoute.route,
     ];
 }

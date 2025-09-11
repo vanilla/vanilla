@@ -68,7 +68,7 @@ describe("Embed Flyout", () => {
         const createIframe = vitest.fn();
 
         // Boilerplate to render the flyout
-        const { container } = render(<EmbedFlyout createEmbed={(url) => {}} createIframe={createIframe} />);
+        render(<EmbedFlyout createEmbed={(url) => {}} createIframe={createIframe} />);
 
         const insertMediaButton = screen.getByRole("button", {
             name: "Insert Media",
@@ -77,7 +77,7 @@ describe("Embed Flyout", () => {
         expect(insertMediaButton).toBeInTheDocument();
         fireEvent.click(insertMediaButton);
 
-        const urlInput = container.getElementsByTagName("textarea")[0];
+        const urlInput = document.getElementsByTagName("textarea")[0];
 
         await waitFor(() => {
             expect(urlInput).toBeInTheDocument();

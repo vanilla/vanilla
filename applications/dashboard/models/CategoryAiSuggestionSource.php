@@ -36,7 +36,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -44,7 +44,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getExclusionDropdownChoices(): ?FormChoicesInterface
     {
@@ -57,7 +57,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getToggleLabel(): string
     {
@@ -65,7 +65,7 @@ class CategoryAiSuggestionSource implements AiSuggestionSourceInterface, LoggerA
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getExclusionLabel(): ?string
     {

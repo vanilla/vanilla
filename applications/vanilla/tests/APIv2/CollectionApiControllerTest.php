@@ -46,7 +46,7 @@ class CollectionApiControllerTest extends AbstractResourceTest
     protected $patchFields = ["name", "records"];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -764,7 +764,7 @@ class CollectionApiControllerTest extends AbstractResourceTest
     //skip all non required tests
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testMainImageField()
     {
@@ -772,7 +772,7 @@ class CollectionApiControllerTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testPostBadFormat(): void
     {
@@ -780,7 +780,7 @@ class CollectionApiControllerTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function testGetEdit($record = null)
     {

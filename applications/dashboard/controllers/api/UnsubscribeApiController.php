@@ -7,6 +7,7 @@
 
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\UnsubscribeModel;
 use Vanilla\Web\Controller;
 
@@ -47,14 +48,15 @@ class UnsubscribeApiController extends Controller
         $follow = $result["FollowedCategory"] ?? [];
         // Check for any follow content from plugins
         $followContent = $result["followContent"] ?? [];
-        unset($result["FollowedCategory"], $result["followContent"]);
+        $mute = $result["mute"] ?? [];
+        unset($result["FollowedCategory"], $result["followContent"], $result["mute"]);
         $result = array_values($result);
         // Unset permissions if there is only 1 reason for email notification.
         if ($count == 1) {
             if (count($follow) > 0) {
                 $follow["enabled"] = "0";
                 $follow = $this->unsubscribeModel->unfollowCategory($follow);
-            } else {
+            } elseif (!empty($result)) {
                 $result[0] = $this->unsubscribeModel->updateNotificationPreferences($result[0], "0");
             }
         }
@@ -62,6 +64,11 @@ class UnsubscribeApiController extends Controller
         $data = [
             "preferences" => $result,
         ];
+        if (!empty($mute)) {
+            $data["mute"] = array_merge($mute, [
+                "mute" => $this->unsubscribeModel->muteDiscussion($mute),
+            ]);
+        }
         if (!empty($followContent)) {
             $data["followContent"] = $followContent;
         } else {
@@ -87,16 +94,25 @@ class UnsubscribeApiController extends Controller
         }
         $count = count($result);
         $follow = $result["FollowedCategory"] ?? [];
-        unset($result["FollowedCategory"]);
+        $mute = $result["mute"] ?? [];
+        unset($result["FollowedCategory"], $result["mute"]);
         $result = array_values($result);
         // Unset permissions if there is only 1 reason for email notification.
         if ($count == 1) {
             if (count($follow) > 0) {
                 $follow["enabled"] = "1";
                 $follow = $this->unsubscribeModel->unfollowCategory($follow);
-            } else {
+            } elseif (!empty($result)) {
                 $result[0] = $this->unsubscribeModel->updateNotificationPreferences($result[0], "1");
             }
+        }
+
+        if (!empty($mute)) {
+            $muteData["mute"] = array_merge($mute, [
+                "mute" => $this->unsubscribeModel->muteDiscussion($mute),
+            ]);
+
+            return $muteData;
         }
 
         return ["preferences" => $result, "followCategory" => $follow];
@@ -130,6 +146,7 @@ class UnsubscribeApiController extends Controller
             [
                 "preferences:a?" => ["preference:s", "enabled:s"],
                 "followCategory:o?" => ["categoryID:i", "preference:s", "name:s?", "enabled:s"],
+                "mute:b?",
             ],
             ["UnsubscribePatch", "in"]
         )->setDescription("Update a notification.");
@@ -138,7 +155,14 @@ class UnsubscribeApiController extends Controller
         $data = [];
         $sentPreferences = $body["preferences"] ?? null;
         $followCategory = $body["followCategory"] ?? null;
+        $mute = $body["mute"] ?? null;
         $follow = $reasons["FollowedCategory"] ?? [];
+        if ($mute !== null) {
+            $reasons["mute"]["mute"] = $mute;
+            $data["mute"] = array_merge($reasons["mute"], [
+                "mute" => $this->unsubscribeModel->muteDiscussion($reasons["mute"]),
+            ]);
+        }
         if (!empty($body["followContent"])) {
             $followContent = $body["followContent"];
             $data = $this->getEventManager()->fireFilter("unsubscribe_patch", $data, $followContent);

@@ -13,7 +13,7 @@ namespace Vanilla\Formatting\Quill\Blots\Embeds;
 class EmojiBlot extends AbstractInlineEmbedBlot
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getInsertKey(): string
     {
@@ -21,7 +21,7 @@ class EmojiBlot extends AbstractInlineEmbedBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getContainerHTMLTag(): string
     {
@@ -29,7 +29,7 @@ class EmojiBlot extends AbstractInlineEmbedBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getContainerHMTLAttributes(): array
     {

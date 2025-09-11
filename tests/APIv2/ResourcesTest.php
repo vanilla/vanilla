@@ -18,7 +18,7 @@ class ResourcesTest extends AbstractAPIv2Test
     use TestCrawlTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getAddons(): array
     {
@@ -52,6 +52,11 @@ class ResourcesTest extends AbstractAPIv2Test
             [
                 "recordType" => "comment",
                 "url" => "https://vanilla.test/resourcestest/api/v2/resources/comment",
+                "crawlable" => true,
+            ],
+            [
+                "recordType" => "customPage",
+                "url" => "https://vanilla.test/resourcestest/api/v2/resources/customPage",
                 "crawlable" => true,
             ],
         ];

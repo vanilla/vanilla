@@ -39,6 +39,33 @@ paths:
                   schema:
                       type: boolean
                   style: form
+                - name: scope
+                  in: query
+                  schema:
+                      type: object
+                      properties:
+                          categoryIDs:
+                              description: "Filter by specific categoryIDs this tag is scoped to."
+                              type: array
+                              items:
+                                  type: integer
+
+                          siteSectionIDs:
+                              description: "Filter by specific siteSectionIDs this tag is scoped to."
+                              type: array
+                              items:
+                                  type: string
+                - name: scopeType
+                  description: Filter by scope type. Can include 'global', 'scoped', or both.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - global
+                              - scoped
+                  style: form
                 - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: Desired number of tags per page.
                   in: query
@@ -67,7 +94,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Tag"
+                            $ref: "#/components/schemas/TagPost"
             responses:
                 "200":
                     description: Success.
@@ -110,7 +137,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Tag"
+                            $ref: "#/components/schemas/TagPatch"
             responses:
                 "200":
                     description: Success.
@@ -141,6 +168,24 @@ paths:
                                 $ref: "../../dashboard/openapi/responses.yml#/components/schemas/BasicError"
 components:
     schemas:
+        TagScope:
+            type: object
+            description: Scoping information for a tag.
+            properties:
+                categoryIDs:
+                    type: array
+                    items:
+                        type: integer
+                siteSectionIDs:
+                    type: array
+                    items:
+                        type: string
+        TagScopeType:
+            type: string
+            description: Scope type for a tag.
+            enum:
+                - global
+                - scoped
         TagFragment:
             description: A tag that can be applied to content.
             type: object
@@ -175,7 +220,55 @@ components:
                           nullable: true
                           default: null
                           description: The tag type.
+                      scope:
+                          $ref: "#/components/schemas/TagScope"
                 - $ref: "../../dashboard/openapi/columns.yaml#/components/schemas/InsertInfo"
+        TagPost:
+            properties:
+                name:
+                    type: string
+                    description: The full name of the tag.
+                urlcode:
+                    type: string
+                    description: The URL slug of the tag.
+                parentTagID:
+                    type: integer
+                    description: The parent ID of the tag.
+                    nullable: true
+                type:
+                    type: string
+                    nullable: true
+                    default: null
+                    description: The tag type.
+                scopeType:
+                    $ref: "#/components/schemas/TagScopeType"
+                scope:
+                    $ref: "#/components/schemas/TagScope"
+            required:
+                - name
+            type: object
+        TagPatch:
+            properties:
+                name:
+                    type: string
+                    description: The full name of the tag.
+                urlcode:
+                    type: string
+                    description: The URL slug of the tag.
+                parentTagID:
+                    type: integer
+                    description: The parent ID of the tag.
+                    nullable: true
+                type:
+                    type: string
+                    nullable: true
+                    default: null
+                    description: The tag type.
+                scopeType:
+                    $ref: "#/components/schemas/TagScopeType"
+                scope:
+                    $ref: "#/components/schemas/TagScope"
+            type: object
 
         LegacyTag:
             description: A backwards compatible tag.

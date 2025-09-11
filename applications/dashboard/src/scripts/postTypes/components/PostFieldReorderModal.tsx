@@ -97,7 +97,7 @@ export default function PostFieldsReorderModal(props: IProps) {
                 }}
             >
                 <Frame
-                    header={<FrameHeader closeFrame={cancel} title={t("Reorder Profile Fields")} />}
+                    header={<FrameHeader closeFrame={cancel} title={t("Reorder Post Fields")} />}
                     body={
                         <FrameBody hasVerticalPadding>
                             {values && (

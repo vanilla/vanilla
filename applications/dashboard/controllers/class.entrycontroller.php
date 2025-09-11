@@ -206,7 +206,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 // Attempt to authenticate.
                 try {
                     if (!$this->Request->isAuthenticatedPostBack() && !c("Garden.Embed.Allow")) {
-                        $this->Form->addError("Please try again.");
+                        $this->Form->addError(t("An error has occurred, please try again."));
                         $reaction = $authenticator->failedResponse();
                     } else {
                         $authenticationResponse = $authenticator->authenticate();
@@ -503,7 +503,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             if (debug()) {
                 $this->Form->addError($ex);
             } else {
-                $this->Form->addError("There was an error fetching the connection data.");
+                $this->Form->addError(t("There was an error fetching the connection data."));
             }
 
             $this->render("ConnectError");
@@ -717,6 +717,28 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             // Get the email and decide if we can safely find a match.
             $submittedEmail = $this->Form->getFormValue("Email");
             $canMatchEmail = strlen($submittedEmail) > 0 && !UserModel::noEmail();
+
+            // This prevents account takeover regardless of AutoConnect settings
+            // Only enforce when email confirmation is required by configuration
+            if ($submittedEmail && count($existingUsers) > 0 && c("Garden.Registration.ConfirmEmail", false)) {
+                foreach ($existingUsers as $row) {
+                    if (strcasecmp($submittedEmail, $row["Email"]) === 0 && !$row["Confirmed"]) {
+                        $this->logger->error("SSO blocked - attempted connection to unconfirmed email account", [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_TAGS => ["entry", "connect", "security"],
+                            "SSO_Email" => $submittedEmail,
+                            "TargetUserID" => $row["UserID"],
+                            "Provider" => $this->Form->getFormValue("Provider"),
+                        ]);
+
+                        // Redirect to sign-in page with error message as URL parameter
+                        $errorMessage =
+                            "Account connection via SSO requires email verification. Please verify your email first.";
+                        redirectTo("/entry/signin?error=" . urlencode($errorMessage));
+                        return;
+                    }
+                }
+            }
 
             // Check to automatically link the user.
             if (
@@ -1036,10 +1058,10 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                                 if (!$passwordChecked) {
                                     if ($connectNameEntered) {
                                         $this->addCredentialErrorToForm(
-                                            "The username you entered has already been taken."
+                                            t("The username you entered has already been taken.")
                                         );
                                     } else {
-                                        $this->addCredentialErrorToForm("The password you entered is incorrect.");
+                                        $this->addCredentialErrorToForm(t("Invalid password."));
                                     }
                                 } else {
                                     // Update their info.
@@ -1062,7 +1084,10 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                         }
                     }
                 } else {
-                    $this->Form->addError("The site does not allow you connect with an existing user.", "UserSelect");
+                    $this->Form->addError(
+                        t("The site does not allow you to connect with an existing user."),
+                        "UserSelect"
+                    );
                     $user = null;
                 }
             } elseif ($this->Form->errorCount() == 0) {
@@ -1157,7 +1182,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                             ->getPermissions()
                             ->has("Garden.SignIn.Allow")
                     ) {
-                        $this->Form->addError("Permission Problem");
+                        $this->Form->addError(t("PermissionErrorTitle", "Permission Problem"));
                         Gdn::session()->end();
                         $this->render();
 
@@ -1224,7 +1249,11 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             /* Token input values is expected to be an array but is certain cases it gets converted into comma seperated string or a single string,
                 in such situations we need to covert the string back to array
             */
-            if ($profileField["formType"] == "tokens" && is_string($formData[$profileField["apiName"]])) {
+            if (
+                $profileField["formType"] == "tokens" &&
+                isset($formData[$profileField["apiName"]]) &&
+                is_string($formData[$profileField["apiName"]])
+            ) {
                 $tokenData = explode(",", $formData[$profileField["apiName"]]);
                 $formData[$profileField["apiName"]] = is_array($tokenData) ? $tokenData : [$tokenData];
             }
@@ -1320,9 +1349,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
         // Get the profile fields and save them
         $profileFields = ($data["Profile"] ?? []) + ($this->Data["nonVisibleFields"] ?? []);
-        $userProfileFieldsSchema = $this->profileFieldModel->getUserProfileFieldSchema(false);
         try {
-            $userProfileFieldsSchema->validate($profileFields);
+            $profileFields = $this->validateProfileFields($profileFields, isConnectPage: true);
         } catch (\Garden\Schema\ValidationException $ex) {
             foreach ($ex->getValidation()->getErrors() as $error) {
                 if ($this->getShowConnectSynchronizeErrors()) {
@@ -1495,6 +1523,12 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         // Add open graph description in case a restricted page is shared.
         $this->description(Gdn::config("Garden.Description"));
 
+        // Check for error message from SSO security check
+        $errorMessage = $this->Request->get("error");
+        if ($errorMessage) {
+            $this->Form->addError(urldecode($errorMessage));
+        }
+
         $this->Form->addHidden("Target", $this->target());
         $this->Form->addHidden("ClientHour", date("Y-m-d H:00")); // Use the server's current hour as a default.
 
@@ -1523,7 +1557,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                         "event" => "legacy_embed_signin",
                     ]);
                 } else {
-                    $this->Form->addError("Please try again.");
+                    $this->Form->addError(t("An error has occurred, please try again."));
                     Gdn::session()->ensureTransientKey();
                 }
             }
@@ -1532,38 +1566,38 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             if ($this->Form->errorCount() == 0) {
                 $email = $this->Form->getFormValue("Email");
                 $user = Gdn::userModel()->getByEmail($email);
-                if (!$user) {
-                    $user = Gdn::userModel()->getByUsername($email);
-                }
 
-                if (!$user) {
-                    $this->addCredentialErrorToForm($this->getCredentialErrorString());
-                    $auditEvent = new UserSignInFailedEvent($email, "User not found.");
-                    AuditLogger::log($auditEvent);
+                try {
+                    Gdn::userModel()->rateLimit($user);
 
-                    $this->fireEvent("BadSignIn", [
-                        "Email" => $email,
-                        "Password" => $this->Form->getFormValue("Password"),
-                        "Reason" => "NotFound",
-                    ]);
-                } else {
-                    // Check if the account is suspended, and also try to clear it based on elapsed time.
-                    if (Gdn::userModel()->isSuspendedAndResetBasedOnTime($user->UserID)) {
-                        Gdn::userModel()->incrementLoginAttempt($user->UserID);
-                        $this->addCredentialErrorToForm(Gdn::userModel()->suspendedErrorMessage());
+                    if (!$user) {
+                        $user = Gdn::userModel()->getByUsername($email);
+                    }
+
+                    if (!$user) {
+                        $this->addCredentialErrorToForm($this->getCredentialErrorString());
+                        $auditEvent = new UserSignInFailedEvent($email, "User not found.");
+                        AuditLogger::log($auditEvent);
+
+                        $this->fireEvent("BadSignIn", [
+                            "Email" => $email,
+                            "Password" => $this->Form->getFormValue("Password"),
+                            "Reason" => "NotFound",
+                        ]);
                     } else {
-                        // Check the password.
-                        $passwordHash = new Gdn_PasswordHash();
-                        $password = $this->Form->getFormValue("Password");
-                        try {
+                        // Check if the account is suspended, and also try to clear it based on elapsed time.
+                        if (Gdn::userModel()->isSuspendedAndResetBasedOnTime($user->UserID)) {
+                            Gdn::userModel()->incrementLoginAttempt($user->UserID);
+                            $this->addCredentialErrorToForm(Gdn::userModel()->suspendedErrorMessage());
+                        } else {
+                            // Check the password.
+                            $passwordHash = new Gdn_PasswordHash();
+                            $password = $this->Form->getFormValue("Password");
                             $passwordChecked = $passwordHash->checkPassword(
                                 $password,
                                 val("Password", $user),
                                 val("HashMethod", $user)
                             );
-
-                            // Rate limiting
-                            Gdn::userModel()->rateLimit($user);
 
                             if ($passwordChecked) {
                                 // Update weak passwords
@@ -1589,21 +1623,21 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                                 if (BanModel::isBanned($user->Banned, BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)) {
                                     AuditLogger::log(new UserSignInFailedEvent($user->Email, "User is banned."));
                                     // If account has been banned manually or by a ban rule.
-                                    $this->Form->addError("This account has been banned.");
+                                    $this->Form->addError(t("This account has been banned."));
                                     Gdn::session()->end();
                                 } elseif (BanModel::isBanned($user->Banned, BanModel::BAN_WARNING)) {
                                     // If account has been banned by the "Warnings and notes" plugin or similar.
                                     AuditLogger::log(
                                         new UserSignInFailedEvent($user->Email, "User is temporarily banned.")
                                     );
-                                    $this->Form->addError("This account has been temporarily banned.");
+                                    $this->Form->addError(t("This account has been temporarily banned."));
                                     Gdn::session()->end();
                                 } elseif (!Gdn::session()->checkPermission("Garden.SignIn.Allow")) {
                                     // If account does not have the sign in permission
                                     AuditLogger::log(
                                         new UserSignInFailedEvent($user->Email, "Account cannot be accessed.")
                                     );
-                                    $this->Form->addError("Sorry, permission denied. This account cannot be accessed.");
+                                    $this->Form->addError(t("PermissionErrorTitle", "Permission Problem"));
                                     Gdn::session()->end();
                                 } else {
                                     $clientHour = $this->Form->getFormValue("ClientHour");
@@ -1641,10 +1675,10 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                                     "Reason" => "Password",
                                 ]);
                             }
-                        } catch (Gdn_UserException $ex) {
-                            $this->Form->addError($ex);
                         }
                     }
+                } catch (Gdn_UserException $ex) {
+                    $this->Form->addError($ex);
                 }
             }
         } else {
@@ -1781,11 +1815,13 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             // Add validation rules that are not enforced by the model
             $this->UserModel->defineSchema();
             $this->UserModel->Validation->applyRule("Name", "Username", $this->UsernameError);
-            $this->UserModel->Validation->applyRule(
-                "TermsOfService",
-                "Required",
-                t("You must agree to the terms of service.")
-            );
+            if (Gdn::config("Garden.Registration.RequireTermsOfService", true)) {
+                $this->UserModel->Validation->applyRule(
+                    "TermsOfService",
+                    "Required",
+                    t("You must agree to the terms of service.")
+                );
+            }
             $this->UserModel->Validation->applyRule("Password", "Required");
             $this->UserModel->Validation->applyRule("Password", "Strength");
             $this->UserModel->Validation->applyRule("Password", "Match");
@@ -1863,15 +1899,16 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             // Add validation rules that are not enforced by the model
             $this->UserModel->defineSchema();
             $this->UserModel->Validation->applyRule("Name", "Username", $this->UsernameError);
-            $this->UserModel->Validation->applyRule(
-                "TermsOfService",
-                "Required",
-                t("You must agree to the terms of service.")
-            );
+            if (Gdn::config("Garden.Registration.RequireTermsOfService", true)) {
+                $this->UserModel->Validation->applyRule(
+                    "TermsOfService",
+                    "Required",
+                    t("You must agree to the terms of service.")
+                );
+            }
             $this->UserModel->Validation->applyRule("Password", "Required");
             $this->UserModel->Validation->applyRule("Password", "Strength");
             $this->UserModel->Validation->applyRule("Password", "Match");
-            // $this->UserModel->Validation->applyRule('DateOfBirth', 'MinimumAge');
 
             $this->fireEvent("RegisterValidation");
 
@@ -2000,7 +2037,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             ->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$invitation) {
-            $this->Form->addError("Invitation not found.", "Code");
+            $this->Form->addError(t("Invitation not found."), "Code");
         } else {
             if ($expires = val("DateExpires", $invitation)) {
                 $expires = Gdn_Format::toTimestamp($expires);
@@ -2019,11 +2056,13 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             // Add validation rules that are not enforced by the model
             $this->UserModel->defineSchema();
             $this->UserModel->Validation->applyRule("Name", "Username", $this->UsernameError);
-            $this->UserModel->Validation->applyRule(
-                "TermsOfService",
-                "Required",
-                t("You must agree to the terms of service.")
-            );
+            if (Gdn::config("Garden.Registration.RequireTermsOfService", true)) {
+                $this->UserModel->Validation->applyRule(
+                    "TermsOfService",
+                    "Required",
+                    t("You must agree to the terms of service.")
+                );
+            }
             $this->UserModel->Validation->applyRule("Password", "Required");
             $this->UserModel->Validation->applyRule("Password", "Strength");
             $this->UserModel->Validation->applyRule("Password", "Match");
@@ -2120,7 +2159,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     if (!$this->UserModel->passwordRequest($email)) {
                         $this->Form->setValidationResults($this->UserModel->validationResults());
                     } else {
-                        $this->Form->addError("Success!");
+                        $this->Form->addError(t("Success!"));
                         $this->View = "passwordrequestsent";
                     }
                 } catch (Exception $ex) {
@@ -2178,7 +2217,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
             hash_equals($this->UserModel->getAttribute($userID, "PasswordResetKey", ""), $passwordResetKey) === false
         ) {
             $this->Form->addError(
-                "Failed to authenticate your password reset request. Try using the reset request form again."
+                t("Failed to authenticate your password reset request. Try using the reset request form again.")
             );
             AuditLogger::log(
                 new PasswordResetFailedEvent($user["Name"], $userID, "Failed to authenticate password reset.")
@@ -2550,6 +2589,16 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 }
             }
 
+            $isRequired = $field["registrationOptions"] === ProfileFieldModel::REGISTRATION_REQUIRED;
+            $labelAttributes = [];
+            if ($isRequired) {
+                $labelAttributes["required"] = true;
+            }
+
+            if ($field["visibility"] === ProfileFieldModel::VISIBILITY_PRIVATE) {
+                $labelAttributes["afterHtml"] = '<span data-react="PrivateFieldIndicator"></span>';
+            }
+
             if ($formType == "CheckBox") {
                 $result .= wrap(
                     ($description ?? "") . $this->Form->{$formType}($name, $field["label"], $attributes),
@@ -2568,7 +2617,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     "class" => "form-group",
                 ]);
             } else {
-                $label = $this->Form->label(htmlspecialchars($field["label"]), $name);
+                $label = $this->Form->label(htmlspecialchars($field["label"]), attributes: $labelAttributes);
                 if ($description) {
                     $label .= $description;
                 }
@@ -2591,10 +2640,35 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
      */
     public function applyValidationOnCustomProfileFields(bool $isConnectPage = false)
     {
+        $profileFormFields = $this->Form->formValues()["Profile"] ?? [];
+
+        try {
+            return $this->validateProfileFields($profileFormFields, $isConnectPage);
+        } catch (\Garden\Schema\ValidationException $ex) {
+            $this->UserModel->Validation->addResults($ex);
+        } catch (Exception $ex) {
+            ErrorLogger::error($ex, ["profileFields", "validation", "error"]);
+            // This is not a validation exception, just do general error messaging
+            $this->UserModel->Validation->addValidationResult(
+                "",
+                $ex->getMessage() ?? t("There was an error registering the user.")
+            );
+        }
+    }
+
+    /**
+     * Massages profile field data before validating and returning the validated profile field data.
+     *
+     * @param $profileFormFields
+     * @param bool $isConnectPage
+     * @return array
+     */
+    private function validateProfileFields($profileFormFields, bool $isConnectPage = false): array
+    {
         // Get all enabled profile fields
         $profileFields = $this->profileFieldModel->getProfileFields(["enabled" => 1]) ?? [];
-        $userProfileFieldsSchema = $this->profileFieldModel->getUserProfileFieldSchema(false);
-        $profileFormFields = $this->Form->formValues()["Profile"] ?? [];
+        $userProfileFieldsSchema = $this->profileFieldModel->getUserProfileFieldSchema();
+
         // We need to get profile fields that are checkboxes which may not have been selected
         $checkboxFields = $this->Form->formValues()["Checkboxes"] ?? [];
         if (!empty($checkboxFields)) {
@@ -2607,63 +2681,55 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                 }, $checkboxFields)
             );
         }
-
-        try {
-            $requiredFields = [];
-            // If there is dataType/formType validation error from schema, this will fail, so we should not complete the registration
-            foreach ($profileFields as $field) {
-                // We need to decode token input values and reformat  it to array of strings instead of tokens value/label format
-                if ($field["formType"] === "tokens" && isset($profileFormFields[$field["apiName"]])) {
-                    $profileFormFields[$field["apiName"]] = $this->convertTokenValueToArray(
-                        $profileFormFields[$field["apiName"]]
-                    );
-                }
-
-                // we need to filter out any internal or hidden fields if at all the form has those fields
-                // (Can happen if someone tried to manipulate form fields deliberately)
-                $isHiddenOrInternalField =
-                    $field["registrationOptions"] === ProfileFieldModel::REGISTRATION_HIDDEN ||
-                    $field["visibility"] === ProfileFieldModel::VISIBILITY_INTERNAL;
-
-                if (!$isConnectPage && isset($profileFormFields[$field["apiName"]]) && $isHiddenOrInternalField) {
-                    // Strip off hidden/internal fields when we aren't on the connect page.
-                    // The connect workflow takes care of ensuring these fields come through and are trusted.
-                    unset($this->Form->_FormValues["Profile"][$field["apiName"]]);
-                    unset($profileFormFields[$field["apiName"]]);
-                }
-                // Check for required only if the form contains the specific field
-                // All other form fields type can be accepted/Open on registration forms even if the editing is restricted
-                if ($field["registrationOptions"] === "required" && isset($profileFormFields[$field["apiName"]])) {
-                    $userProfileFieldsSchema->setField("properties.{$field["apiName"]}.minItems", 1);
-                    $userProfileFieldsSchema->setField("properties.{$field["apiName"]}.minLength", 1);
-                    $requiredFields[] = $field["apiName"];
-                }
-                // Check for required checkboxes that are not in the form
-                if (
-                    !empty($checkboxProfileFields) &&
-                    $field["formType"] === "checkbox" &&
-                    in_array($field["apiName"], $checkboxProfileFields) &&
-                    !array_key_exists($field["apiName"], $profileFormFields) &&
-                    $field["registrationOptions"] === "required"
-                ) {
-                    $this->UserModel->Validation->addValidationResult(
-                        $field["apiName"],
-                        t(sprintf("%s is required.", $field["label"]))
-                    );
-                }
+        $requiredFields = [];
+        // If there is dataType/formType validation error from schema, this will fail, so we should not complete the registration
+        foreach ($profileFields as $field) {
+            // We need to decode token input values and reformat  it to array of strings instead of tokens value/label format
+            if (
+                $field["formType"] === "tokens" &&
+                isset($profileFormFields[$field["apiName"]]) &&
+                is_string($profileFormFields[$field["apiName"]])
+            ) {
+                $profileFormFields[$field["apiName"]] = $this->convertTokenValueToArray(
+                    $profileFormFields[$field["apiName"]]
+                );
             }
-            $userProfileFieldsSchema->setField("required", $requiredFields);
-            $userProfileFieldsSchema->validate($profileFormFields);
-        } catch (\Garden\Schema\ValidationException $ex) {
-            $this->UserModel->Validation->addResults($ex);
-        } catch (Exception $ex) {
-            ErrorLogger::error($ex, ["profileFields", "validation", "error"]);
-            // This is not a validation exception, just do general error messaging
-            $this->UserModel->Validation->addValidationResult(
-                "",
-                $ex->getMessage() ?? t("There was an error registering the user.")
-            );
+
+            // we need to filter out any internal or hidden fields if at all the form has those fields
+            // (Can happen if someone tried to manipulate form fields deliberately)
+            $isHiddenOrInternalField =
+                $field["registrationOptions"] === ProfileFieldModel::REGISTRATION_HIDDEN ||
+                $field["visibility"] === ProfileFieldModel::VISIBILITY_INTERNAL;
+
+            if (!$isConnectPage && isset($profileFormFields[$field["apiName"]]) && $isHiddenOrInternalField) {
+                // Strip off hidden/internal fields when we aren't on the connect page.
+                // The connect workflow takes care of ensuring these fields come through and are trusted.
+                unset($this->Form->_FormValues["Profile"][$field["apiName"]]);
+                unset($profileFormFields[$field["apiName"]]);
+            }
+            // Check for required only if the form contains the specific field
+            // All other form fields type can be accepted/Open on registration forms even if the editing is restricted
+            if ($field["registrationOptions"] === "required" && isset($profileFormFields[$field["apiName"]])) {
+                $userProfileFieldsSchema->setField("properties.{$field["apiName"]}.minItems", 1);
+                $userProfileFieldsSchema->setField("properties.{$field["apiName"]}.minLength", 1);
+                $requiredFields[] = $field["apiName"];
+            }
+            // Check for required checkboxes that are not in the form
+            if (
+                !empty($checkboxProfileFields) &&
+                $field["formType"] === "checkbox" &&
+                in_array($field["apiName"], $checkboxProfileFields) &&
+                !array_key_exists($field["apiName"], $profileFormFields) &&
+                $field["registrationOptions"] === "required"
+            ) {
+                $this->UserModel->Validation->addValidationResult(
+                    $field["apiName"],
+                    t(sprintf("%s is required.", $field["label"]))
+                );
+            }
         }
+        $userProfileFieldsSchema->setField("required", $requiredFields);
+        return $userProfileFieldsSchema->validate($profileFormFields);
     }
 
     /**

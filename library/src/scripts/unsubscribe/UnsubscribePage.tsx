@@ -1,6 +1,6 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -27,328 +27,314 @@ import SmartLink from "@library/routing/links/SmartLink";
 import "@library/theming/reset";
 import { unsubscribePageClasses } from "@library/unsubscribe/UnsubscribePage.classes";
 import {
-    useGetUnsubscribe,
+    useUnsubscribeData,
     useSaveUnsubscribe,
     useUndoUnsubscribe,
-    usePreferenceLink,
+    useGetPreferenceLink,
 } from "@library/unsubscribe/unsubscribePageHooks";
 import { t } from "@library/utility/appUtils";
 import { useFormik } from "formik";
 import isEmpty from "lodash-es/isEmpty";
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { IUnsubscribeData, IUnsubscribeToken } from "@library/unsubscribe/unsubscribePage.types";
 
-interface IProps {
-    token: IUnsubscribeToken;
-}
+function UnsubscribePageMultipleReasonsForm(props: {
+    onSubmit: (data: IUnsubscribeData) => Promise<any>;
+    data: IUnsubscribeData;
+}) {
+    const { onSubmit, data } = props;
+    const { user, isUnfollowContent, preferences, followedContent } = data;
 
-interface IPageContent {
-    title?: string;
-    body?: ReactElement;
-    error?: IError;
-}
+    const getPreferenceLink = useGetPreferenceLink();
 
-const PAGE_LOADING = {
-    title: t("Processing Request"),
-    body: <Loader />,
-};
-
-/**
- * Page the user is directed to from email to unsubscribe from notifications
- */
-export function UnsubscribePageImpl(props: IProps) {
-    const { token } = props;
-    const getPreferenceLink = usePreferenceLink();
-    const { isLoading: getLoading, mutateAsync: getUnsubscribe } = useGetUnsubscribe(token);
-    const { isLoading: undoLoading, mutateAsync: undoUnsubscribe } = useUndoUnsubscribe(token);
-    const { isLoading: saveLoading, mutateAsync: saveUnsubscribe } = useSaveUnsubscribe(token);
-    const selfRef = useRef<HTMLDivElement | null>(null);
-    const { isFullWidth } = useSection();
+    const prefLink = getPreferenceLink(user, isUnfollowContent);
     const classes = unsubscribePageClasses();
-    const [unsubscribeData, setUnsubscribeData] = useState<Partial<IUnsubscribeData>>({});
-    const [pageContent, setPageContent] = useState<IPageContent>(PAGE_LOADING);
-    const saveBtnRef = useRef<HTMLButtonElement | null>(null);
 
-    const { submitForm, setValues, values, setFieldValue } = useFormik({
-        initialValues: {},
+    const tmpSettingsList = [...preferences];
+    if (followedContent) {
+        tmpSettingsList.push(followedContent);
+    }
+
+    const initialValues = Object.fromEntries(tmpSettingsList.map(({ optionID, enabled }) => [optionID, enabled]));
+
+    const { submitForm, values, setFieldValue, dirty, isSubmitting } = useFormik<typeof initialValues>({
+        initialValues,
         onSubmit: async (newValues) => {
-            const tmpPreferences = unsubscribeData.preferences?.map((pref) => ({
-                ...pref,
-                enabled: newValues[pref.optionID],
-            }));
-            const tmpFollowedContent = unsubscribeData.followedContent
-                ? {
-                      ...unsubscribeData.followedContent,
-                      enabled: newValues[unsubscribeData.followedContent.optionID],
-                  }
-                : null;
-
-            const newData = {
-                ...unsubscribeData,
-                preferences: tmpPreferences,
-                followedContent: tmpFollowedContent,
-            } as IUnsubscribeData;
-
-            await saveUnsubscribe(newData, {
-                onError: (error: IError) => {
-                    setPageContent({ error });
-                },
-                onSettled: (data: IUnsubscribeData, error: IError) => {
-                    setUnsubscribeData(newData);
-                    setPageContent({
-                        title: t("Unsubscribe Successful"),
-                        body: (
-                            <>
-                                <p className={classes.info}>
-                                    {t("You will no longer receive email notifications for")}:
-                                </p>
-                                {newData.preferences.filter(({ enabled }) => !enabled).map(({ label }) => label)}
-                                {!newData.followedContent?.enabled && newData.followedContent?.label}
-                            </>
-                        ),
-                        error,
-                    });
-                },
-            });
+            await onSubmit({
+                ...data,
+                preferences: preferences?.map((pref) => ({
+                    ...pref,
+                    enabled: newValues[pref.optionID],
+                })),
+                followedContent: followedContent
+                    ? {
+                          ...followedContent,
+                          enabled: newValues[followedContent.optionID],
+                      }
+                    : null,
+            } as IUnsubscribeData);
         },
         enableReinitialize: true,
     });
 
-    useEffect(() => {
-        if (saveBtnRef.current) {
-            saveBtnRef.current.disabled = Object.values(values).filter((val) => !val).length === 0;
-        }
-    }, [values, saveBtnRef]);
+    return (
+        <>
+            <p className={classes.info}>
+                {t(
+                    "You are subscribed to the following email notifications, which are related to the notification you received.",
+                )}
+            </p>
+            <p>{t("Uncheck the notifications you no longer want to recieve.")}</p>
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    void submitForm();
+                }}
+                className={classes.multipleOptions}
+            >
+                <CheckboxGroup className={classes.checkboxGroup}>
+                    {tmpSettingsList.map(({ label, optionID }) => (
+                        <CheckBox
+                            key={optionID}
+                            label={label}
+                            labelBold={false}
+                            id={optionID}
+                            defaultChecked
+                            checked={values[optionID]}
+                            onChange={(event) => {
+                                const { id, checked } = event.target;
+                                void setFieldValue(id, checked);
+                            }}
+                        />
+                    ))}
+                </CheckboxGroup>
+                <Button
+                    buttonType={ButtonTypes.PRIMARY}
+                    className={classes.saveButton}
+                    submit
+                    disabled={!dirty || isSubmitting}
+                >
+                    {t("Save Changes")}
+                </Button>
+            </form>
+            <p>
+                <Translate
+                    source="Further customize all notification settings on the <0>notification preferences page</0>."
+                    c0={(content) => <SmartLink to={prefLink}>{content}</SmartLink>}
+                />
+            </p>
+        </>
+    );
+}
 
-    const handleUndo = async () => {
-        await undoUnsubscribe(token, {
-            onError: (error: IError) => {
-                setPageContent({ error });
-            },
-            onSettled: (data: IUnsubscribeData, error: IError) => {
-                setUnsubscribeData(data);
-                setPageContent({
-                    error,
-                    title: t("Notification Settings Restored"),
-                    body: <p className={classes.info}>{t("Your email notifications have been restored.")}</p>,
-                });
-            },
-        });
-    };
+/**
+ * Page the user is directed to from email to unsubscribe from notifications
+ */
+export function UnsubscribePageContent(props: { data: IUnsubscribeData }) {
+    const {
+        data: {
+            user,
+            isUnfollowContent,
+            isAlreadyProcessed,
+            isEmailDigest,
+            followedContent,
+            preferences,
+            mutedContent,
+        },
+    } = props;
 
-    const fetchData = async () => {
-        await getUnsubscribe(token, {
-            onError: (error: IError) => {
-                setPageContent({ error });
-            },
-            onSettled: (data: IUnsubscribeData, error: IError) => {
-                if (!data) {
-                    const pageError = error || { message: t("Unsubscribe token is invalid.") };
-                    setPageContent({ error: pageError });
-                    return;
-                }
+    const getPreferenceLink = useGetPreferenceLink();
 
-                let title: string = "";
-                let body: ReactElement = <></>;
-                const prefLink = getPreferenceLink(data.user, data.isUnfollowContent);
+    const classes = unsubscribePageClasses();
+    const prefLink = getPreferenceLink(user, isUnfollowContent);
 
-                const undoContent = (
-                    <p className={classes.actions}>
-                        {t("Change your mind?")}
-                        <Button
-                            buttonType={ButtonTypes.TEXT_PRIMARY}
-                            className={classes.undoButton}
-                            onClick={handleUndo}
-                        >
-                            {t("Undo")}
-                        </Button>
-                    </p>
-                );
-
-                // Unsubscribe/Unfollow request has already been processed
-                if (data.isAllProcessed) {
-                    title = t("Request Processed");
-                    body = (
-                        <>
-                            <p className={classes.info}>
-                                {t("Your request to unsubscribe has already been processed.")}
-                            </p>
-                            <p>
-                                <Translate
-                                    source="Further customize all notification settings on the <0>notification preferences page</0>."
-                                    c0={(content) => <SmartLink to={prefLink}>{content}</SmartLink>}
-                                />
-                            </p>
-                        </>
-                    );
-                }
-                // Render Email Digest landing page
-                else if (data.isEmailDigest) {
-                    title = t("Unsubscribe Successful");
-                    body = (
-                        <>
-                            <p className={classes.digestInfo}>{t("You will no longer receive the email digest.")}</p>
-                            {undoContent}
-                        </>
-                    );
-                }
-                // Render Unfollow Content landing page
-                else if (data.followedContent && data.followedContent.preferenceName.toLowerCase() === "follow") {
-                    title = t("Unfollow Successful");
-                    body = (
-                        <>
-                            <p className={classes.infoLight}>{data.followedContent.label}</p>
-                            {undoContent}
-                        </>
-                    );
-                }
-                // Render Digest Hide Content landing page
-                else if (data.followedContent && data.followedContent.preferenceName.toLowerCase() === "digest") {
-                    title = t("Email Digest Preferences Updated");
-                    body = (
-                        <>
-                            <p className={classes.infoLight}>
-                                {t("This content will no longer appear in your email digest.")}
-                            </p>
-                            {data.followedContent.label}
-                            {undoContent}
-                        </>
-                    );
-                }
-                // Render multiple reasons as checkboxes
-                else if (data.hasMultiple) {
-                    const tmpSettingsList = [...data.preferences];
-                    if (data.followedContent) {
-                        tmpSettingsList.push(data.followedContent);
-                    }
-
-                    const tmpSettings = Object.fromEntries(
-                        tmpSettingsList.map(({ optionID, enabled }) => [optionID, enabled]),
-                    );
-
-                    void setValues(tmpSettings);
-
-                    const togglePreference = (event) => {
-                        const { id, checked } = event.target;
-                        void setFieldValue(id, checked);
-                    };
-
-                    title = t("Unsubscribe");
-                    body = (
-                        <>
-                            <p className={classes.info}>
-                                {t(
-                                    "You are subscribed to the following email notifications, which are related to the notification you received.",
-                                )}
-                            </p>
-                            <p>{t("Uncheck the notifications you no longer want to recieve.")}</p>
-                            <form
-                                onSubmit={(event) => {
-                                    event.preventDefault();
-                                    void submitForm();
-                                }}
-                                className={classes.multipleOptions}
-                            >
-                                <CheckboxGroup className={classes.checkboxGroup}>
-                                    {tmpSettingsList.map(({ label, optionID }) => (
-                                        <CheckBox
-                                            key={optionID}
-                                            label={label}
-                                            labelBold={false}
-                                            id={optionID}
-                                            defaultChecked
-                                            checked={values[optionID]}
-                                            onChange={togglePreference}
-                                        />
-                                    ))}
-                                </CheckboxGroup>
-                                <Button
-                                    buttonType={ButtonTypes.PRIMARY}
-                                    className={classes.saveButton}
-                                    submit
-                                    disabled
-                                    ref={saveBtnRef}
-                                >
-                                    {t("Save Changes")}
-                                </Button>
-                            </form>
-                            <p>
-                                <Translate
-                                    source="Further customize all notification settings on the <0>notification preferences page</0>."
-                                    c0={(content) => <SmartLink to={prefLink}>{content}</SmartLink>}
-                                />
-                            </p>
-                        </>
-                    );
-                }
-                // Simple notification with single reason
-                else {
-                    title = t("Unsubscribe Successful");
-                    body = (
-                        <>
-                            <p className={classes.info}>{t("You will no longer receive email notifications for")}:</p>
-                            {data.followedContent?.label ?? data.preferences[0].label}
-                            {undoContent}
-                        </>
-                    );
-                }
-
-                setUnsubscribeData(data);
-                setPageContent({
-                    title,
-                    body,
-                });
-            },
-        });
-    };
-
-    useEffect(() => {
-        if (token && isEmpty(unsubscribeData)) {
-            void fetchData();
-        }
-    }, [token]);
-
-    useEffect(() => {
-        if (getLoading || undoLoading || saveLoading) {
-            setPageContent(PAGE_LOADING);
-        }
-    }, [getLoading, undoLoading, saveLoading]);
-
-    if (pageContent.error) {
-        return <ErrorPage error={pageContent.error} />;
+    // Unsubscribe/Unfollow request has already been processed
+    if (isAlreadyProcessed) {
+        return (
+            <>
+                <p className={classes.info}>{t("Your request to unsubscribe has already been processed.")}</p>
+                <p>
+                    <Translate
+                        source="Further customize all notification settings on the <0>notification preferences page</0>."
+                        c0={(content) => <SmartLink to={prefLink}>{content}</SmartLink>}
+                    />
+                </p>
+            </>
+        );
+    }
+    // Render Email Digest landing page
+    else if (isEmailDigest) {
+        return <p className={classes.digestInfo}>{t("You will no longer receive the email digest.")}</p>;
+    }
+    // Render Unfollow Content landing page
+    else if (followedContent && followedContent.preferenceName.toLowerCase() === "follow") {
+        return <div className={classes.infoLight}>{followedContent.label}</div>;
+    }
+    // Render Digest Hide Content landing page
+    else if (followedContent && followedContent.preferenceName.toLowerCase() === "digest") {
+        return (
+            <>
+                <div className={classes.infoLight}>{t("This content will no longer appear in your email digest.")}</div>
+                {followedContent.label}
+            </>
+        );
     }
 
+    // Simple notification with single reason
+    else {
+        if (mutedContent?.label || followedContent?.label || preferences.length > 0) {
+            return (
+                <>
+                    <p className={classes.info}>{t("You will no longer receive email notifications for")}:</p>
+                    {mutedContent?.label ?? followedContent?.label ?? preferences?.[0]?.label}
+                </>
+            );
+        }
+
+        return null;
+    }
+}
+
+export function UnsubscribePageImpl(props: { token: IUnsubscribeToken }) {
+    const { token } = props;
+    const [error, setError] = useState<IError | undefined>(undefined);
+
+    const { isFullWidth } = useSection();
+    const getPreferenceLink = useGetPreferenceLink();
+
+    const handleError = setError;
+
+    const [undone, setUndone] = useState(false);
+
+    const { mutateAsync: undoUnsubscribe, isLoading: undoLoading } = useUndoUnsubscribe(token);
+
+    async function handleUndo() {
+        try {
+            await undoUnsubscribe(token);
+            setUndone(true);
+        } catch (error) {
+            setUndone(false);
+            handleError(error);
+        }
+    }
+
+    const { data, error: dataError, isLoading: unsubscribeDataLoading } = useUnsubscribeData(token);
+
+    const { mutateAsync: saveUnsubscribe, isSuccess: unsubscribeSucceeded } = useSaveUnsubscribe(token);
+
+    if (dataError || error) {
+        <ErrorPage error={dataError ?? error} />;
+    }
+
+    if (!data) {
+        return null;
+    }
+
+    const {
+        isAlreadyProcessed: isAlreadyProcessed,
+        followedContent,
+        hasMultiple,
+        user,
+        isUnfollowContent,
+        preferences,
+        mutedContent,
+    } = data;
+
+    const isLoading = unsubscribeDataLoading || undoLoading;
+
+    let title: string;
+
+    if (undone) {
+        title = t("Notification Settings Restored");
+    } else {
+        if (mutedContent) {
+            title = t("Post Successfully Muted");
+        } else if (isAlreadyProcessed) {
+            title = t("Request Processed");
+        } else if (followedContent && followedContent.preferenceName.toLowerCase() === "follow") {
+            title = t("Unfollow Successful");
+        } else if (followedContent && followedContent.preferenceName.toLowerCase() === "digest") {
+            title = t("Email Digest Preferences Updated");
+        } else if (hasMultiple) {
+            title = unsubscribeSucceeded ? t("Unsubscribe Successful") : t("Unsubscribe");
+        } else if (isLoading) {
+            title = t("Processing Request");
+        } else {
+            title = t("Unsubscribe Successful");
+        }
+        if (undone) {
+            title = t("Notification Settings Restored");
+        }
+    }
+
+    const classes = unsubscribePageClasses();
+
     const userFragment = {
-        userID: unsubscribeData.user?.userID ?? 0,
-        name: unsubscribeData.user?.name ?? "",
+        userID: user?.userID ?? 0,
+        name: user?.name ?? "",
     };
 
-    const userInfoContent = isEmpty(unsubscribeData) ? null : (
+    const userInfoContent = isEmpty(data) ? null : (
         <div className={classes.userInfo}>
             <ProfileLink userFragment={userFragment} isUserCard>
-                <UserPhoto
-                    userInfo={unsubscribeData.user}
-                    size={UserPhotoSize.MEDIUM}
-                    styleType={UserIconTypes.DEFAULT}
-                />
+                <UserPhoto userInfo={user} size={UserPhotoSize.MEDIUM} styleType={UserIconTypes.DEFAULT} />
             </ProfileLink>
             <div className={classes.username}>
                 <ProfileLink userFragment={userFragment} isUserCard className={classes.usernameLink} />
-                {unsubscribeData.user?.email}
+                {user?.email}
             </div>
         </div>
     );
-
-    const manageNotificationBtn = isEmpty(unsubscribeData) ? null : (
+    const manageNotificationBtn = isEmpty(data) ? null : (
         <LinkAsButton
-            to={getPreferenceLink(unsubscribeData.user, unsubscribeData.isUnfollowContent)}
+            to={getPreferenceLink(user, isUnfollowContent)}
             buttonType={ButtonTypes.STANDARD}
             className={classes.manageButton}
         >
-            {unsubscribeData.isUnfollowContent ? t("Manage Followed Content") : t("Manage All Notifications")}
+            {isUnfollowContent ? t("Manage Followed Content") : t("Manage All Notifications")}
         </LinkAsButton>
     );
+
+    let content = (
+        <>
+            <UnsubscribePageContent data={data} />
+            {!isAlreadyProcessed && (
+                <p className={classes.actions}>
+                    {t("Change your mind?")}
+                    <Button buttonType={ButtonTypes.TEXT_PRIMARY} className={classes.undoButton} onClick={handleUndo}>
+                        {t("Undo")}
+                    </Button>
+                </p>
+            )}
+        </>
+    );
+    if (hasMultiple) {
+        content = unsubscribeSucceeded ? (
+            <>
+                <p className={classes.info}>{t("You will no longer receive email notifications for")}:</p>
+                {preferences.filter(({ enabled }) => !enabled).map(({ label }) => label)}
+                {!followedContent?.enabled && followedContent?.label}
+            </>
+        ) : (
+            <UnsubscribePageMultipleReasonsForm
+                onSubmit={async (values) => {
+                    try {
+                        await saveUnsubscribe(values);
+                    } catch (error) {
+                        handleError(error);
+                    }
+                }}
+                data={data}
+            />
+        );
+    }
+    if (undone) {
+        content = <p className={classes.info}>{t("Your email notifications have been restored.")}</p>;
+    }
+    if (isLoading) {
+        content = <Loader />;
+    }
 
     return (
         <DocumentTitle title={t("Unsubscribe")}>
@@ -356,20 +342,16 @@ export function UnsubscribePageImpl(props: IProps) {
             <TitleBar onlyLogo />
             <Container>
                 <SectionTwoColumns
-                    contentRef={selfRef}
                     mainTop={
                         <>
                             {!isFullWidth && userInfoContent}
                             <div className={classes.header}>
-                                <Heading depth={1} title={pageContent.title} className={classes.title} />
+                                <Heading depth={1} title={title} className={classes.title} />
                                 {isFullWidth && manageNotificationBtn}
                             </div>
                             <div className={classes.content}>
-                                {pageContent.body}
-                                {!isFullWidth &&
-                                    !unsubscribeData?.hasMultiple &&
-                                    !unsubscribeData?.isAllProcessed &&
-                                    manageNotificationBtn}
+                                {content}
+                                {!isFullWidth && !hasMultiple && !isAlreadyProcessed && manageNotificationBtn}
                             </div>
                         </>
                     }

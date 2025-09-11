@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -9,9 +9,21 @@ import { PostField, PostType } from "@dashboard/postTypes/postType.types";
 import apiv2 from "@library/apiv2";
 import { RecordID } from "@vanilla/utils";
 import { ICategory } from "../categories/categoriesTypes";
+import SimplePagerModel from "@library/navigation/SimplePagerModel";
+import { createContext, useContext } from "react";
 
 export namespace DiscussionsApi {
-    export interface IndexParams {}
+    export type Discussion = IDiscussion;
+
+    export interface IndexParams {
+        postTypeID?: PostType["postTypeID"];
+        categoryID?: ICategory["categoryID"];
+        discussionID?: Array<IDiscussion["discussionID"]>;
+        insertUserID?: Array<IDiscussion["insertUserID"]>;
+        sortDirection?: "asc" | "desc";
+        limit?: number;
+        page?: number;
+    }
 
     export interface GetParams {
         expand?: string[];
@@ -21,19 +33,36 @@ export namespace DiscussionsApi {
         insertUserID?: RecordID;
     }
 
+    export interface MuteParams {
+        muted?: boolean;
+    }
+
     export interface DismissParams {
         dismissed?: boolean;
     }
 
     export interface MoveParams {
         discussionIDs: Array<IDiscussion["discussionID"]>;
-        postTypeID: PostType["postTypeID"];
         categoryID: ICategory["categoryID"];
+        postTypeID?: PostType["postTypeID"];
+        postMeta?: Record<string, any>;
         addRedirects: boolean;
     }
 }
 
 export const DiscussionsApi = {
+    index: async (apiParams: DiscussionsApi.IndexParams) => {
+        const result = await apiv2.get<IDiscussion[]>("/discussions", {
+            params: apiParams,
+        });
+
+        const paging = SimplePagerModel.parseHeaders(result.headers);
+        return {
+            data: result.data,
+            paging,
+        };
+    },
+
     get: async (
         discussionID: IDiscussion["discussionID"],
         apiParams: DiscussionsApi.GetParams,
@@ -65,6 +94,11 @@ export const DiscussionsApi = {
         return result.data;
     },
 
+    mute: async (discussionID: IDiscussion["discussionID"], apiParams: DiscussionsApi.MuteParams) => {
+        const result = await apiv2.put<{ muted: boolean }>(`/discussions/${discussionID}/mute`, apiParams);
+        return result.data;
+    },
+
     bump: async (discussionID: IDiscussion["discussionID"]) => {
         const result = await apiv2.patch<IDiscussion>(`/discussions/${discussionID}/bump`);
         return result.data;
@@ -74,3 +108,19 @@ export const DiscussionsApi = {
         await apiv2.patch(`/discussions/move`, apiParams);
     },
 };
+
+interface IDiscussionsApiContext {
+    api: typeof DiscussionsApi;
+}
+
+export const DiscussionsApiContext = createContext<IDiscussionsApiContext>({
+    api: DiscussionsApi,
+});
+
+export function useDiscussionsApiContext() {
+    return useContext<IDiscussionsApiContext>(DiscussionsApiContext);
+}
+
+export function useDiscussionsApi() {
+    return useDiscussionsApiContext().api;
+}

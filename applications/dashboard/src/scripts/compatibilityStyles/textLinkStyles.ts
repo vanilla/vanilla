@@ -43,8 +43,8 @@ export const textLinkCSS = () => {
         `,
     );
     mixinClickInput(`
-        .userContent a,
-        .UserContent a
+        .userContent a:not(.Button),
+        .UserContent a:not(.Button)
     `);
     mixinClickInput(".BreadcrumbsBox .Breadcrumbs a", {
         default: globalVars.links.colors.default,

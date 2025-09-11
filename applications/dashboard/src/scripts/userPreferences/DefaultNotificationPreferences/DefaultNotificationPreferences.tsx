@@ -1,12 +1,11 @@
 /**
  * @author Mihran Abrahamian <mabrahamian@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import UserPreferencesClasses from "@dashboard/userPreferences/UserPreferences.classes";
-import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Frame from "@library/layout/frame/Frame";
@@ -21,7 +20,6 @@ import { ITabData, Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { t } from "@vanilla/i18n";
 import React, { ComponentProps, useState } from "react";
-
 import { DashboardFormControl } from "@dashboard/forms/DashboardFormControl";
 import { DashboardCheckGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { useToast } from "@library/features/toaster/ToastContext";
@@ -31,7 +29,7 @@ import { INotificationPreferences, utils } from "@library/notificationPreference
 import { ISectionProps, JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { useFormik } from "formik";
 import { defaultNotificationPreferencesFormClasses } from "@dashboard/userPreferences/DefaultNotificationPreferences/DefaultNotificationPreferences.classes";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { translateDescription } from "@library/notificationPreferences/utils";
 import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";

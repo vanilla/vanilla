@@ -1,13 +1,14 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { ColorVar } from "@library/styles/CssVar";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { extendItemContainer } from "@library/styles/styleHelpers";
@@ -30,7 +31,9 @@ export const metaItemStyle = useThemeCache(() => {
     const vars = metasVariables();
     return {
         ...Mixins.font(vars.font),
+        color: ColorsUtils.varOverride(ColorVar.Meta, vars.font.color),
         display: "inline-block",
+        verticalAlign: "middle",
         ...Mixins.margin(vars.spacing),
         "& > a": {
             fontSize: "inherit",
@@ -50,8 +53,10 @@ export const metaLinkItemStyle = useThemeCache(() => {
 
     const styles: CSSObject = {
         ...Mixins.font(vars.linkFont),
+        color: ColorsUtils.varOverride(ColorVar.Meta, vars.font.color),
         "&:hover, &:focus, &:active, &.focus-visible": {
             ...Mixins.font(vars.linkFontState),
+            color: ColorsUtils.varOverride(ColorVar.Primary, vars.font.color),
         },
     };
 
@@ -83,12 +88,7 @@ export const metasClasses = useThemeCache(() => {
     const metaStyle = css({
         display: "inline-block",
         fontSize: styleUnit(vars.font.size),
-        color: ColorsUtils.colorOut(vars.font.color),
-    });
-
-    const draftStatus = css({
-        flexGrow: 1,
-        textAlign: "start",
+        color: ColorsUtils.varOverride(ColorVar.Meta, vars.font.color),
     });
 
     const noUnderline = css({
@@ -110,8 +110,8 @@ export const metasClasses = useThemeCache(() => {
         ...Mixins.margin(vars.spacing),
     });
 
-    const alignVerticallyInMetaItem = useThemeCache((height: number) =>
-        css(Mixins.verticallyAlignInContainer(height, vars.font.lineHeight as number)),
+    const alignVerticallyInMetaItem = useThemeCache((height: number, smallerThanContainer = false) =>
+        css(Mixins.verticallyAlignInContainer(height, vars.font.lineHeight as number, smallerThanContainer)),
     );
 
     const iconButton = css({
@@ -137,7 +137,6 @@ export const metasClasses = useThemeCache(() => {
         itemSpacing,
         metaLink,
         metaStyle,
-        draftStatus,
         noUnderline,
         inlineBlock,
         alignVerticallyInMetaItem,

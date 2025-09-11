@@ -8,10 +8,11 @@ import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import NotificationsContents from "@library/headers/mebox/pieces/NotificationsContents";
 import type NotificationsContentsImpl from "@library/headers/mebox/pieces/NotificationsContentsImpl";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { useTitleBarParamVarOverrides } from "@library/headers/TitleBar.ParamContext";
+import { titleBarClasses } from "@library/headers/TitleBar.classes";
 import { getMeta } from "@library/utility/appUtils";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import React from "react";
+import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
+import React, { useState } from "react";
 import { sprintf } from "sprintf-js";
 
 interface IProps extends React.ComponentProps<typeof NotificationsContentsImpl> {
@@ -19,55 +20,31 @@ interface IProps extends React.ComponentProps<typeof NotificationsContentsImpl> 
     userSlug: string;
 }
 
-interface IState {
-    open: boolean;
-}
-
 /**
  * Implements Notifications menu for header
  */
-export default class NotificationsDropDown extends React.Component<IProps, IState> {
-    private id = uniqueIDFromPrefix("notificationsDropDown");
+export default function NotificationsDropDown(props: IProps) {
+    const varOverrides = useTitleBarParamVarOverrides();
+    const classesHeader = titleBarClasses.useAsHook(varOverrides);
+    const [open, setOpen] = useState(false);
+    const id = useUniqueID();
 
-    public state: IState = {
-        open: false,
-    };
+    const { userSlug } = props;
 
-    /**
-     * Get the React component to added to the page.
-     *
-     * @returns A DropDown component, configured to display notifications.
-     */
-    public render() {
-        const { userSlug } = this.props;
-        const classesHeader = titleBarClasses();
-
-        return (
-            <DropDown
-                contentID={this.id + "-content"}
-                handleID={this.id + "-handle"}
-                name={sprintf("Notifications: %s", this.props.countUnread)}
-                renderLeft={!getMeta("ui.isDirectionRTL", false)}
-                buttonClassName={classesHeader.button}
-                contentsClassName={classesHeader.dropDownContents}
-                buttonContents={<NotificationsCount open={this.state.open} compact={false} />}
-                onVisibilityChange={this.setOpen}
-                flyoutType={FlyoutType.FRAME}
-                onHover={NotificationsContents.preload}
-            >
-                <NotificationsContents userSlug={userSlug} />
-            </DropDown>
-        );
-    }
-
-    /**
-     * Assign the open (visibile) state of this component.
-     *
-     * @param open Is this menu open and visible?
-     */
-    private setOpen = (open) => {
-        this.setState({
-            open,
-        });
-    };
+    return (
+        <DropDown
+            contentID={id + "-content"}
+            handleID={id + "-handle"}
+            name={sprintf("Notifications: %s", props.countUnread)}
+            renderLeft={!getMeta("ui.isDirectionRTL", false)}
+            buttonClassName={classesHeader.button}
+            contentsClassName={classesHeader.dropDownContents}
+            buttonContents={<NotificationsCount open={open} compact={false} />}
+            onVisibilityChange={setOpen}
+            flyoutType={FlyoutType.FRAME}
+            onHover={NotificationsContents.preload}
+        >
+            <NotificationsContents userSlug={userSlug} />
+        </DropDown>
+    );
 }

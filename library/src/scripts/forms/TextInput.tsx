@@ -7,11 +7,16 @@ import React from "react";
 import { inputClasses } from "@library/forms/inputStyles";
 import { cx } from "@emotion/css";
 
-interface IProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    value?: string | number;
+export namespace TextInput {
+    export interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
+        value?: string | number;
+    }
 }
 
-export const TextInput = React.forwardRef(function TextInputImpl(props: IProps, ref: React.Ref<HTMLInputElement>) {
+export const TextInput = React.forwardRef(function TextInputImpl(
+    props: TextInput.Props,
+    ref: React.ForwardedRef<HTMLInputElement>,
+) {
     const { className, value, ...rest } = props;
 
     let actualValue = value;

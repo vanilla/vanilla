@@ -64,7 +64,7 @@ export const followDropdownClasses = useThemeCache((params: IFollowClassParams) 
                     backgroundColor: buttonColor,
                 },
             }),
-            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+            color: `var(--vnla-follow-menu-foreground-color, ${ColorsUtils.colorOut(globalVars.mainColors.primary)})`,
             // Override from props
             ...(textColor && {
                 color: textColor,

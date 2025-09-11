@@ -97,7 +97,7 @@ class StatusFieldProcessor implements Processor
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function handle(Operation $operation, callable $stack)
     {

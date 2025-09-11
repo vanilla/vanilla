@@ -27,7 +27,7 @@ class AkismetPreModerationTest extends SiteTestCase
     use UsersAndRolesApiTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

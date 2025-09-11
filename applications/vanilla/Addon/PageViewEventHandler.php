@@ -8,25 +8,25 @@
 namespace Vanilla\Forum\Addon;
 
 use Garden\PsrEventHandlersInterface;
+use Gdn;
+use Gdn_Session;
+use UserDiscussionModel;
 use Vanilla\Community\Events\PageViewEvent;
 
 class PageViewEventHandler implements PsrEventHandlersInterface
 {
-    /** @var \DiscussionModel */
-    private $discussionModel;
-
     /**
      * DI.
-     *
-     * @param \DiscussionModel $discussionModel
      */
-    public function __construct(\DiscussionModel $discussionModel)
-    {
-        $this->discussionModel = $discussionModel;
+    public function __construct(
+        private \DiscussionModel $discussionModel,
+        private UserDiscussionModel $userDiscussionModel,
+        private Gdn_Session $session
+    ) {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPsrEventHandlerMethods(): array
     {
@@ -45,6 +45,10 @@ class PageViewEventHandler implements PsrEventHandlersInterface
         $discussionID = $payload["discussionID"] ?? null;
         if (!is_null($discussionID)) {
             $this->discussionModel->addView($discussionID);
+            // Record a userDiscussion row if the user is logged in.
+            if ($this->session->isValid()) {
+                $this->userDiscussionModel->setWatch($discussionID);
+            }
         }
         return $event;
     }

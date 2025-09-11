@@ -17,3 +17,8 @@ export async function mountAllEmbeds(root: HTMLElement = document.body) {
     }
     await Promise.all(promises);
 }
+
+export async function ensureBuiltinEmbeds() {
+    const mod = await import("./embedService.loadable");
+    mod.ensureBuiltinEmbedsSync();
+}

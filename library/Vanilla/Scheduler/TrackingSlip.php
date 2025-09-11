@@ -78,7 +78,7 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface
         $this->logger = $logger;
         $this->config = $config;
 
-        $this->trackingID = uniqid((gethostname() ?: "unknown") . "::", true);
+        $this->trackingID = $driverSlip->getTrackingID() ?? uniqid((gethostname() ?: "unknown") . "::", true);
         $this->driverSlip->setTrackingID($this->trackingID);
     }
 

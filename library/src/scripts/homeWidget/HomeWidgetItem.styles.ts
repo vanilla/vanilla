@@ -7,59 +7,27 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { BorderType, flexHelper } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
-import { ISimpleBorderStyle, IFont, IBackground, IBoxOptions, ISpacing } from "@library/styles/cssUtilsTypes";
+import { ISimpleBorderStyle, IFont, IBackground, ISpacing } from "@library/styles/cssUtilsTypes";
 import { Variables } from "@library/styles/Variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { activeSelector, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
-import { percent, ColorHelper, calc, color, rgba } from "csx";
+import { CSSObject } from "@emotion/serialize";
+import { percent, calc, color, rgba } from "csx";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { LocalVariableMapping } from "@library/styles/VariableMapping";
 import { DeepPartial } from "redux";
-
 import defaultIcon from "./widgetDefaultIcon.svg";
-
-export enum HomeWidgetItemContentType {
-    TITLE = "title",
-    TITLE_DESCRIPTION = "title-description",
-    TITLE_DESCRIPTION_IMAGE = "title-description-image",
-    TITLE_DESCRIPTION_ICON = "title-description-icon",
-    TITLE_BACKGROUND = "title-background",
-    TITLE_BACKGROUND_DESCRIPTION = "title-background-description",
-    TITLE_CHAT_BUBBLE = "title-chat-bubble",
-}
-
-export interface IHomeWidgetItemOptions {
-    box: IBoxOptions;
-    contentType: HomeWidgetItemContentType;
-    fg: string | ColorHelper;
-    display: {
-        name: boolean;
-        description: boolean;
-        counts: boolean;
-        cta: boolean;
-    };
-    verticalAlignment: "top" | "middle" | "bottom" | string;
-    alignment: "center" | "left";
-    viewMore: {
-        labelCode: string;
-        buttonType: ButtonTypes;
-    };
-    defaultIconUrl: string | undefined;
-    defaultImageUrl: string | undefined;
-    imagePlacement: "top" | "left";
-    imagePlacementMobile: "top" | "left";
-    callToActionText: string;
-    fallbackIcon?: string;
-    fallbackImage?: string;
-    /** @deprecated */
-    iconProps?: any;
-}
+import {
+    IHomeWidgetItemOptions,
+    WidgetImageType,
+    WidgetItemContentType,
+    widgetItemContentTypeToImageType,
+} from "@library/homeWidget/WidgetItemOptions";
 
 export const homeWidgetItemVariables = useThemeCache(
     (optionOverrides?: DeepPartial<IHomeWidgetItemOptions>, itemVars?: IThemeVariables) => {
@@ -104,7 +72,7 @@ export const homeWidgetItemVariables = useThemeCache(
                  * @type string
                  * @enum title-description | title-description-image | title-description-icon | title-background |title-background-description
                  */
-                contentType: HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
+                contentType: WidgetItemContentType.TitleDescriptionIcon,
                 /**
                  * @varGroup homeWidgetItem.options.display
                  * @description Hide and show different parts of the widget.
@@ -197,13 +165,11 @@ export const homeWidgetItemVariables = useThemeCache(
             optionOverrides,
         );
 
-        const hasImage = options.contentType === HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE;
-        const hasBackground = [
-            HomeWidgetItemContentType.TITLE_BACKGROUND,
-            HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
-        ].includes(options.contentType);
-        const hasIcon = options.contentType === HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON;
-        const hasChatBubble = options.contentType === HomeWidgetItemContentType.TITLE_CHAT_BUBBLE;
+        const imageType = widgetItemContentTypeToImageType(options.contentType);
+        const hasImage = imageType === WidgetImageType.Image;
+        const hasBackground = imageType === WidgetImageType.Background;
+        const hasIcon = imageType === WidgetImageType.Icon;
+        const hasChatBubble = options.contentType === WidgetItemContentType.TitleChatBubble;
 
         options = makeVars(
             "options",
@@ -467,7 +433,9 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
     const boxHasBorder = Variables.boxHasOutline(vars.options.box);
     const borderTypeIsSeparator = vars.options.box.borderType === BorderType.SEPARATOR;
 
-    const hasChatBubble = vars.options.contentType === HomeWidgetItemContentType.TITLE_CHAT_BUBBLE;
+    const imageType = widgetItemContentTypeToImageType(vars.options.contentType);
+
+    const hasChatBubble = vars.options.contentType === WidgetItemContentType.TitleChatBubble;
     // const hasBubbleShadow = hasChatBubble && vars.options.box.borderType === BorderType.SHADOW;
 
     const bubbleTriangle: CSSObject =
@@ -718,9 +686,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
             },
         },
         textAlignment,
-        [HomeWidgetItemContentType.TITLE_BACKGROUND, HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION].includes(
-            vars.options.contentType,
-        ) && {
+        imageType === WidgetImageType.Background && {
             "&&": {
                 // Get our horizontal paddings.
                 ...Mixins.box(vars.options.box, { onlyPaddings: true }),

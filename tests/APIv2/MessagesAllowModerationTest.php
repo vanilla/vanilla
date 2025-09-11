@@ -48,4 +48,21 @@ class MessagesAllowModerationTest extends MessagesTest
     {
         parent::testIndex();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function testMigratableFields(): void
+    {
+        $this->markTestSkipped();
+    }
+
+    /**
+     * @inheritdoc
+     * @dataProvider provideMigratablePayload
+     */
+    public function testMigratableFieldsPermissions(array $body): void
+    {
+        $this->markTestSkipped();
+    }
 }

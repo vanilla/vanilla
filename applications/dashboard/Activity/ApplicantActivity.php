@@ -13,7 +13,7 @@ namespace Vanilla\Dashboard\Activity;
 class ApplicantActivity extends Activity
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityTypeID(): string
     {
@@ -21,7 +21,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreference(): string
     {
@@ -29,7 +29,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceDescription(): string
     {
@@ -37,7 +37,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getGroupClass(): string
     {
@@ -45,7 +45,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function allowsComments(): bool
     {
@@ -53,7 +53,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getProfileHeadline(): ?string
     {
@@ -61,7 +61,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getFullHeadline(): ?string
     {
@@ -69,7 +69,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPluralHeadline(): ?string
     {
@@ -77,7 +77,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isNotificationType(): bool
     {
@@ -85,7 +85,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isPublicActivity(): bool
     {
@@ -93,7 +93,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getNotificationPermissions(): array
     {
@@ -101,7 +101,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getNotificationRequiredSettings(): array
     {
@@ -109,7 +109,7 @@ class ApplicantActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityReason(): ?string
     {

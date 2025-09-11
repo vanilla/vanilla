@@ -5,7 +5,11 @@
  */
 
 import { LayoutEditorContents, LayoutEditorPath } from "@dashboard/layout/editor/LayoutEditorContents";
-import { ILayoutEditorPath, ILayoutEditorWidgetPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import {
+    ILayoutEditorPath,
+    ILayoutEditorWidgetPath,
+    type ILayoutEditorSpecialWidgetPath,
+} from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import clamp from "lodash-es/clamp";
 
 export enum LayoutEditorDirection {
@@ -156,7 +160,11 @@ export class LayoutEditorSelection extends LayoutEditorSelectionState {
     public moveSelectionTo(newPath: ILayoutEditorPath, newMode: LayoutEditorSelectionMode): LayoutEditorSelectionState {
         let newState = this.setPath(newPath).setMode(newMode);
 
-        if (newMode === LayoutEditorSelectionMode.WIDGET && !LayoutEditorPath.isWidgetPath(newPath)) {
+        if (
+            newMode === LayoutEditorSelectionMode.WIDGET &&
+            !LayoutEditorPath.isWidgetPath(newPath) &&
+            !LayoutEditorPath.isSpecialWidgetPath(newPath)
+        ) {
             // If we are moving into the widget mode but only have a section path
             // Select the first widget in that section.
 
@@ -178,11 +186,36 @@ export class LayoutEditorSelection extends LayoutEditorSelectionState {
      * @param treatAddAsWidget Set to true if we should treat the "add widget" button as a valid path.
      */
     public getWidgetPathInDirection(
-        fromPath: ILayoutEditorWidgetPath,
+        fromPath: ILayoutEditorWidgetPath | ILayoutEditorSpecialWidgetPath,
         direction: LayoutEditorDirection,
         treatAddAsWidget = false,
-    ): ILayoutEditorWidgetPath | null {
+    ): ILayoutEditorWidgetPath | ILayoutEditorSpecialWidgetPath | null {
         const { contents } = this;
+
+        if (LayoutEditorPath.isSpecialWidgetPath(fromPath)) {
+            if (fromPath === "TitleBar" && direction === LayoutEditorDirection.DOWN) {
+                // We can only move down
+                // Move into the first section
+
+                const fromPath = LayoutEditorPath.widget(-1, "children", 0);
+                const firstSectionPath = LayoutEditorPath.section(0);
+                const nextSection = contents.getSection(firstSectionPath);
+                const nextSectionInfo = contents.getSectionInfo(firstSectionPath);
+                if (!nextSection || !nextSectionInfo) {
+                    // Nowhere to move.
+                    return null;
+                }
+
+                const newWidgetPath = contents.getValidPath(
+                    LayoutEditorPath.widget(0, "children", 0),
+                    nextSectionInfo,
+                    fromPath,
+                );
+
+                return newWidgetPath;
+            }
+            return null;
+        }
 
         switch (direction) {
             case LayoutEditorDirection.DOWN: {
@@ -225,7 +258,8 @@ export class LayoutEditorSelection extends LayoutEditorSelectionState {
                     const previousSectionInfo = contents.getSectionInfo(newPath);
                     if (!previousSection || !previousSectionInfo) {
                         // There is no previous section.
-                        return null;
+                        // Move up to the titlebar.
+                        return "TitleBar";
                     }
                     newPath = contents.getValidPath(newPath, previousSectionInfo, fromPath);
 
@@ -301,7 +335,7 @@ export class LayoutEditorSelection extends LayoutEditorSelectionState {
             return this.state;
         }
 
-        if (!LayoutEditorPath.isWidgetPath(this.path)) {
+        if (!LayoutEditorPath.isWidgetPath(this.path) && !LayoutEditorPath.isSpecialWidgetPath(this.path)) {
             return this.state;
         }
 
@@ -327,17 +361,28 @@ export class LayoutEditorSelection extends LayoutEditorSelectionState {
             return this.state;
         }
 
-        if (this.path == null) {
+        const currentPath = this.path;
+
+        if (currentPath == null) {
             return this.state.setPath(LayoutEditorPath.section(0)).setMode(LayoutEditorSelectionMode.SECTION_ADD);
+        }
+
+        if (LayoutEditorPath.isSpecialWidgetPath(currentPath)) {
+            // The only option is to move down to the first section.
+            if (direction === LayoutEditorDirection.DOWN) {
+                return this.state.setPath(LayoutEditorPath.section(0)).setMode(LayoutEditorSelectionMode.SECTION_ADD);
+            } else {
+                return this.state;
+            }
         }
 
         const isModeSectionAdd = this.mode === LayoutEditorSelectionMode.SECTION_ADD;
         const isModeSection = this.mode === LayoutEditorSelectionMode.SECTION;
-        const isFirstSection = this.path.sectionIndex === 0;
-        const isLastSection = this.path.sectionIndex === contents.getSectionCount();
+        const isFirstSection = currentPath.sectionIndex === 0;
+        const isLastSection = currentPath.sectionIndex === contents.getSectionCount();
 
         const incrementSectionIndex = (increment: number): LayoutEditorSelectionState => {
-            const result = clamp(this.path.sectionIndex + increment, 0, contents.getSectionCount());
+            const result = clamp(currentPath.sectionIndex + increment, 0, contents.getSectionCount());
             return this.state.setPath(LayoutEditorPath.section(result));
         };
 
@@ -357,8 +402,8 @@ export class LayoutEditorSelection extends LayoutEditorSelectionState {
             case LayoutEditorDirection.UP: {
                 if (isModeSectionAdd) {
                     if (isFirstSection) {
-                        // Already at the top.
-                        return this.state;
+                        // Move up to the titleBar
+                        return this.state.setPath("TitleBar").setMode(LayoutEditorSelectionMode.WIDGET);
                     }
                     return incrementSectionIndex(-1).setMode(LayoutEditorSelectionMode.SECTION);
                 } else if (isModeSection) {

@@ -6,8 +6,10 @@
 
 namespace Vanilla\Forum\Layout\View;
 
+use CategoryModel;
 use Garden\Schema\Schema;
 use Gdn;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Widgets\CategoryFollowAsset;
@@ -39,7 +41,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -47,7 +49,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -55,7 +57,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTemplateID(): string
     {
@@ -63,7 +65,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamInputSchema(): Schema
     {
@@ -71,7 +73,7 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamResolvedSchema(): Schema
     {
@@ -79,24 +81,22 @@ class CategoryListLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {
         $pageHead->setSeoTitle(t("Categories"), false);
-
+        $category = $paramInput["category"];
         $seoDescription = Gdn::config()->get("Garden.Description", "");
         $seoDescription = $seoDescription != "" ? t("Categories") . " - " . $seoDescription : "";
-
+        if (!CategoryModel::checkPermission($category["categoryID"], "Vanilla.Discussions.View")) {
+            throw new PermissionException("Vanilla.Discussions.View");
+        }
         $pageHead->setSeoDescription(\Gdn::formatService()->renderPlainText($seoDescription, HtmlFormat::FORMAT_KEY));
 
-        $url = isset($paramInput["page"])
-            ? $paramInput["category"]["url"] . "/p{$paramInput["page"]}"
-            : $paramInput["category"]["url"];
+        $url = isset($paramInput["page"]) ? $category["url"] . "/p{$paramInput["page"]}" : $category["url"];
         $pageHead->setCanonicalUrl($url);
-        $crumbs = $this->breadcrumbModel->getForRecord(
-            new ForumCategoryRecordType($paramInput["category"]["categoryID"])
-        );
+        $crumbs = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($category["categoryID"]));
         $pageHead->setSeoBreadcrumbs($crumbs);
 
         return $paramInput + ["layoutViewType" => $this->getType()];

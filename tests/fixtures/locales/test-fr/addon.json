@@ -1,7 +1,0 @@
-{
-  "key": "test-fr",
-  "name": "Test Locale",
-  "type": "locale",
-  "locale": "fr",
-  "description": "A locale for testing addon functionality."
-}

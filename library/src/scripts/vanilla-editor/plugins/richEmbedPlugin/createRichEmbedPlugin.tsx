@@ -13,12 +13,14 @@ import { onKeyDownRichEmbed } from "@library/vanilla-editor/plugins/richEmbedPlu
 import RichLinkToolbar from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/RichLinkToolbar";
 import {
     ELEMENT_LEGACY_EMOJI,
+    ELEMENT_LINK_AS_BUTTON,
     ELEMENT_RICH_EMBED_CARD,
     ELEMENT_RICH_EMBED_INLINE,
 } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 import { withRichEmbeds } from "@library/vanilla-editor/plugins/richEmbedPlugin/withRichEmbeds";
 import { MyValue } from "@library/vanilla-editor/typescript";
 import { createPluginFactory, withProps } from "@udecode/plate-common";
+import { RichLinkAsButtonElement } from "@library/vanilla-editor/plugins/richEmbedPlugin/elements/RichLinkAsButtonElement";
 
 export const createRichEmbedPlugin = createPluginFactory<any, MyValue>({
     key: "rich_embed",
@@ -40,6 +42,16 @@ export const createRichEmbedPlugin = createPluginFactory<any, MyValue>({
             isInline: true,
             isVoid: true,
             component: withProps(RichEmbedElement, { isInline: true }),
+            handlers: {
+                onKeyDown: onKeyDownRichEmbed,
+            },
+        },
+        {
+            key: ELEMENT_LINK_AS_BUTTON,
+            isInline: true,
+            isVoid: true,
+            isElement: true,
+            component: RichLinkAsButtonElement,
             handlers: {
                 onKeyDown: onKeyDownRichEmbed,
             },

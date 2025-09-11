@@ -4,7 +4,10 @@
  * @license Proprietary
  */
 
-import { ILegacyCategoryPreferences, IFollowedCategory } from "@dashboard/userPreferences/DefaultCategoriesModal";
+import {
+    ILegacyCategoryPreferences,
+    IFollowedCategory,
+} from "@dashboard/userPreferences/DefaultFollowedCategories/DefaultCategoriesModal";
 import {
     CategoryDisplayAs,
     CategoryPostNotificationType,
@@ -55,12 +58,13 @@ export class CategoryPreferencesFixture {
             customPermissions: false,
             isArchived: false,
             urlcode: "/",
-            displayAs: CategoryDisplayAs.DEFAULT,
+            displayAs: CategoryDisplayAs.Default,
             countCategories: 1,
             countDiscussions: 10,
             countComments: 10,
             countAllDiscussions: 10,
             countAllComments: 10,
+            countFollowers: 0,
             followed: false,
             depth: 0,
             children: [],

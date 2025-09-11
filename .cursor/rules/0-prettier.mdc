@@ -1,0 +1,9 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+Code in this codebase is formatted with prettier.
+
+A file can be formatted by running `yarn prettier --write PATH_TO_FILE`.
+Only format files with prettier after you complete all edits.

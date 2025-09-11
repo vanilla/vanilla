@@ -5,3 +5,6 @@
 // Disable Captcha checks for tests.
 $Configuration['Garden']['Registration']['SkipCaptcha'] = true;
 $Configuration["auditLog"]["enabled"] = false;
+
+$Configuration["Garden"]["User"]["ValidationLength"] = "{3,60}";
+$Configuration["Garden"]["User"]["ValidationRegex"] = "\p{N}\p{L}\p{M}\p{P}\p{Zs}";

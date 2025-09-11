@@ -18,7 +18,7 @@ use Vanilla\Logging\LoggerUtils;
 class CategoryEvent extends ResourceEvent implements LoggableEventInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {

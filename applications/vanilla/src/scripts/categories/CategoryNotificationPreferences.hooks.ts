@@ -1,43 +1,18 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
+import { FollowedContentNotificationPreferences } from "@library/followedContent/FollowedContent.types";
 import {
     INotificationPreferences,
     NotificationType,
 } from "@library/notificationPreferences/NotificationPreferences.types";
-import { createContext, useContext } from "react";
 
-interface ICategoryNotificationPreferencesContextValue {
-    preferences: ICategoryPreferences;
-    setPreferences: (preferences: ICategoryPreferences) => Promise<ICategoryPreferences>;
-}
-
-export const CategoryNotificationPreferencesContext = createContext<ICategoryNotificationPreferencesContextValue>({
-    preferences: {} as ICategoryPreferences,
-    setPreferences: async function (_preferences) {
-        return {} as ICategoryPreferences;
-    },
-});
-
-export function useCategoryNotificationPreferencesContext() {
-    return useContext(CategoryNotificationPreferencesContext);
-}
-
-export type ICategoryPreferences = {
-    [Property in keyof typeof CATEGORY_NOTIFICATION_TYPES as `preferences.email.${string & Property}`]:
-        | boolean
-        | undefined;
-} & {
-    [Property in keyof typeof CATEGORY_NOTIFICATION_TYPES as `preferences.popup.${string & Property}`]:
-        | boolean
-        | undefined;
-} & {
-    "preferences.followed": boolean;
-    "preferences.email.digest"?: boolean;
-};
+export type IFollowedCategoryNotificationPreferences = FollowedContentNotificationPreferences<
+    typeof CATEGORY_NOTIFICATION_TYPES
+>;
 
 export const CATEGORY_NOTIFICATION_TYPES: Record<string, NotificationType> = {
     comments: {
@@ -68,8 +43,8 @@ export function registerCategoryNotificationType(id: string, type: NotificationT
 
 export function getDefaultCategoryNotificationPreferences(
     userPreferences?: INotificationPreferences,
-): ICategoryPreferences {
-    let defaults: ICategoryPreferences = {
+): IFollowedCategoryNotificationPreferences {
+    let defaults: IFollowedCategoryNotificationPreferences = {
         "preferences.followed": false,
         "preferences.email.digest": false,
     };
@@ -77,7 +52,7 @@ export function getDefaultCategoryNotificationPreferences(
     Object.values(CATEGORY_NOTIFICATION_TYPES).forEach((type) => {
         defaults = {
             ...defaults,
-            ...type.getDefaultPreferences?.(userPreferences),
+            ...type.getDefaultPreferences(userPreferences),
         };
     });
 

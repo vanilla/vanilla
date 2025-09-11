@@ -27,7 +27,7 @@ class DigestOptInTest extends SiteTestCase
     private UserNotificationPreferencesModel $userPrefsModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

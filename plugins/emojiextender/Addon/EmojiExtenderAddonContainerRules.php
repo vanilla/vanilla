@@ -17,7 +17,7 @@ use Vanilla\EmojiExtender\ExtendedEmoji;
 class EmojiExtenderAddonContainerRules extends AddonContainerRules
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function configureContainer(ContainerConfigurationInterface $container): void
     {

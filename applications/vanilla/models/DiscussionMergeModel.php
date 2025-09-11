@@ -10,6 +10,8 @@ namespace Vanilla\Forum\Models;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn;
+use MediaModel;
+use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Scheduler\LongRunnerFailedID;
 use Vanilla\Scheduler\LongRunnerNextArgs;
@@ -231,9 +233,26 @@ class DiscussionMergeModel implements SystemCallableInterface
         ]);
         $comment["DiscussionID"] = $destinationDiscussion["DiscussionID"];
         $comment["parentRecordID"] = $destinationDiscussion["DiscussionID"];
-        $commentID = $this->commentModel->save($comment);
+        $commentID = $this->commentModel->save($comment, ["skipNotification" => true]);
         ModelUtils::validationResultToValidationException($this->commentModel);
         $comment["CommentID"] = $commentID;
+
+        $comment = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
+        $senderUserID = $comment["UpdateUserID"];
+        $senderFragment = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
+        $commentEvent = $this->commentModel->eventFromRow($comment, CommentEvent::ACTION_MOVE, $senderFragment);
+        $commentEvent->setSourceDiscussionID($sourceDiscussion["DiscussionID"]);
+        $commentEvent->setDestinationDiscussionID($destinationDiscussion["DiscussionID"]);
+        $this->commentModel->getEventManager()->dispatch($commentEvent);
+
+        // Reassign media from the source discussion to the new comment.
+        $mediaModel = new MediaModel();
+        $mediaModel->reassign(
+            val("DiscussionID", $sourceDiscussion),
+            "discussion",
+            val("CommentID", $comment),
+            "comment"
+        );
 
         // This is an old event and handlers expect a pluggable, so we have to use the legacy event firing system.
         $eventSource = $this->discussionModel;
@@ -276,7 +295,7 @@ class DiscussionMergeModel implements SystemCallableInterface
             "Closed" => true,
         ];
 
-        $this->discussionModel->save($modifiedDiscussion);
+        $this->discussionModel->save($modifiedDiscussion, ["skipEvents" => true]);
         ModelUtils::validationResultToValidationException($this->discussionModel);
     }
 
@@ -300,12 +319,23 @@ class DiscussionMergeModel implements SystemCallableInterface
             ->column("CommentID");
 
         foreach ($sourceCommentIDs as $sourceCommentID) {
-            $this->commentModel->save([
-                "CommentID" => $sourceCommentID,
-                "DiscussionID" => $destinationDiscussionID,
-                "parentRecordID" => $destinationDiscussionID,
-            ]);
+            $this->commentModel->save(
+                [
+                    "CommentID" => $sourceCommentID,
+                    "DiscussionID" => $destinationDiscussionID,
+                    "parentRecordID" => $destinationDiscussionID,
+                ],
+                ["skipNotification" => true]
+            );
             ModelUtils::validationResultToValidationException($this->commentModel);
+
+            $comment = $this->commentModel->getID($sourceCommentID, DATASET_TYPE_ARRAY);
+            $senderUserID = $comment["UpdateUserID"];
+            $senderFragment = $senderUserID ? Gdn::userModel()->getFragmentByID($senderUserID) : null;
+            $commentEvent = $this->commentModel->eventFromRow($comment, CommentEvent::ACTION_MOVE, $senderFragment);
+            $commentEvent->setSourceDiscussionID($sourceDiscussionID);
+            $commentEvent->setDestinationDiscussionID($destinationDiscussionID);
+            $this->commentModel->getEventManager()->dispatch($commentEvent);
             yield;
         }
     }

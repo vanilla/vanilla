@@ -22,7 +22,7 @@ class TextFormatTest extends AbstractFormatTestCase
     use UserMentionTestTraits;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function prepareFormatter(): FormatInterface
     {
@@ -30,7 +30,7 @@ class TextFormatTest extends AbstractFormatTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function prepareFixtures(): array
     {

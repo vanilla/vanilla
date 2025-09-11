@@ -4,11 +4,9 @@
  */
 
 import React, { ReactNode } from "react";
-import {
-    IHomeWidgetItemOptions,
-    HomeWidgetItemContentType,
-    homeWidgetItemVariables,
-} from "@library/homeWidget/HomeWidgetItem.styles";
+import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
+import { IHomeWidgetItemOptions } from "./WidgetItemOptions";
+import { WidgetItemContentType } from "./WidgetItemOptions";
 import {
     IHomeWidgetContainerOptions,
     homeWidgetContainerVariables,
@@ -65,12 +63,14 @@ export function HomeWidget(props: IProps) {
 
     let extraSpacerItemCount = 0;
     if (
-        [
-            HomeWidgetItemContentType.TITLE_BACKGROUND,
-            HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
-            HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
-            HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
-        ].includes(itemOptions.contentType) &&
+        (
+            [
+                WidgetItemContentType.TitleBackground,
+                WidgetItemContentType.TitleBackgroundDescription,
+                WidgetItemContentType.TitleDescriptionIcon,
+                WidgetItemContentType.TitleDescriptionImage,
+            ] as WidgetItemContentType[]
+        ).includes(itemOptions.contentType) &&
         props.itemData.length < containerOptions.maxColumnCount! &&
         !containerOptions.isCarousel &&
         containerOptions.displayType !== WidgetContainerDisplayType.CAROUSEL

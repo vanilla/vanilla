@@ -72,8 +72,9 @@ class TranslationModel extends PipelineModel
         string $translationString
     ): bool {
         $sourceLocale = $this->config->get("Garden.Locale");
-        if ($locale !== $sourceLocale) {
-            $this->validateLocale($locale, $sourceLocale);
+        if ($locale !== $sourceLocale && !$this->validateLocale($locale)) {
+            // This locale is not supported.
+            return false;
         }
 
         $translation = $this->get([
@@ -102,22 +103,16 @@ class TranslationModel extends PipelineModel
 
     /**
      * Validate a locale exists.
-     *
      * @param string $locale
-     * @param string $sourceLocale
-     * @throws ClientException
+     * @return bool
      */
-    protected function validateLocale(string $locale, string $sourceLocale)
+    protected function validateLocale(string $locale): bool
     {
         $locales = $this->localesApiController->index();
         $availableLocales = array_column($locales, "localeKey");
         $availableRegionalLocales = array_column($locales, "regionalKey");
 
-        $valid = in_array($locale, $availableLocales) || in_array($locale, $availableRegionalLocales);
-
-        if (!$valid) {
-            throw new ClientException("Locale '" . $locale . "' is not available");
-        }
+        return in_array($locale, $availableLocales) || in_array($locale, $availableRegionalLocales);
     }
 
     /**

@@ -58,7 +58,7 @@ import { IFieldError } from "@vanilla/json-schema-forms";
 import { useLastValue } from "@vanilla/react-utils";
 import { stableObjectHash } from "@vanilla/utils";
 import { useFormik } from "formik";
-import isEqual from "lodash/isEqual";
+import isEqual from "lodash-es/isEqual";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 

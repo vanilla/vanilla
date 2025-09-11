@@ -21,7 +21,6 @@ use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\DateFilterSchema;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Search\UserSearchType;
 use Vanilla\ImageResizer;
 use Vanilla\Models\CrawlableRecordSchema;
@@ -61,6 +60,11 @@ class UsersApiController extends AbstractApiController
     const FULL_USER_VIEW_PERMISSIONS = 1;
     const BASIC_USER_VIEW_PERMISSIONS = 0;
     const NO_USER_VIEW_PERMISSIONS = -1;
+
+    const AT_MENTION_GLOBAL = "global";
+    const AT_MENTION_FILTER_LOOSE = "filter-loose";
+    const AT_MENTION_FILTER_STRICT = "filter-strict";
+    const AT_MENTION_DISABLED = "disabled";
 
     /** @var ActivityModel */
     private $activityModel;
@@ -315,11 +319,11 @@ class UsersApiController extends AbstractApiController
         $row = $this->normalizeOutput($row, $expand);
 
         $showEmail = $row["showEmail"] ?? false;
-        if (!$showEmail && !$showFullSchema) {
+        if (!$showEmail && $showFullSchema < 1) {
             unset($row["email"]);
         }
 
-        if (!$showFullSchema) {
+        if ($showFullSchema < 1) {
             $this->userModel->filterPrivateUserRecord($row);
         }
         if (ModelUtils::isExpandOption("reactionsReceived", $expand)) {
@@ -416,16 +420,14 @@ class UsersApiController extends AbstractApiController
     public function index_byNames(array $query)
     {
         $this->permission();
+        $mentionSettings = Gdn::config("Garden.Format.Mentions", self::AT_MENTION_GLOBAL);
 
         $in = $this->schema(
             [
                 "name:s" =>
                     "Filter for username. Supports full or partial matching with appended wildcard (e.g. User*).",
-                "order:s?" => [
-                    "description" => "Sort method for results.",
-                    "enum" => ["countComments", "dateLastActive", "name", "mention"],
-                    "default" => "name",
-                ],
+                "recordType:s?" => "Specified what we are filtering by category/group/discussion/escalation",
+                "recordID:i?" => "Specify value of the recordType ",
                 "page:i?" => [
                     "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
                     "default" => 1,
@@ -433,13 +435,16 @@ class UsersApiController extends AbstractApiController
                 ],
                 "limit:i?" => [
                     "description" => "Desired number of items per page.",
-                    "default" => 30,
+                    "default" => 100,
                     "minimum" => 1,
                     "maximum" => ApiUtils::getMaxLimit(),
                 ],
             ],
             "in"
-        )->setDescription("Search for users by full or partial name matching.");
+        )
+            ->setDescription("Search for users by full or partial name matching.")
+            ->addFilter("", SchemaUtils::onlyTogether(["recordType", "recordID"]));
+
         $out = $this->schema(
             [
                 ":a" => $this->getUserFragmentSchema(),
@@ -449,25 +454,26 @@ class UsersApiController extends AbstractApiController
 
         $query = $in->validate($query);
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
-
-        if ($query["order"] == "mention") {
-            [$sortField, $sortDirection] = $this->userModel->getMentionsSort();
-        } else {
-            $sortField = $query["order"];
-            switch ($sortField) {
-                case "countComments":
-                case "dateLastActive":
-                    $sortDirection = "desc";
-                    break;
-                case "name":
-                default:
-                    $sortDirection = "asc";
-            }
+        $roleIDs = [];
+        if (($query["recordType"] ?? "") === "escalation") {
+            $roles = $this->roleModel->getByPermission("Garden.Moderation.Manage")->resultArray();
+            $roleIDs = array_column($roles, "RoleID");
+            $query["recordType"] = "";
         }
 
         $rows = $this->userModel
-            ->searchByName($query["name"], $sortField, $sortDirection, $limit, $offset)
+            ->searchByNameWithDocument(
+                $query["name"],
+                ($query["recordType"] ?? "") === "discussion" ? $query["recordID"] : 0,
+                $roleIDs,
+                $limit,
+                $offset
+            )
             ->resultArray();
+
+        if (!empty($query["recordType"] ?? "")) {
+            $rows = $this->filterUserMentions($rows, $query, $mentionSettings);
+        }
 
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
@@ -479,6 +485,73 @@ class UsersApiController extends AbstractApiController
         $paging = ApiUtils::morePagerInfo($result, "/api/v2/users/names", $query, $in);
 
         return new Data($result, ["paging" => $paging]);
+    }
+
+    /**
+     * Filter user mentions based on the provided query and mention settings.
+     *
+     * @param array $rows The rows of users to filter.
+     * @param array $query The query parameters.
+     * @param string $mentionSettings The mention settings (e.g., "mode2", "mode3").
+     * @return array Filtered rows of users.
+     */
+    public function filterUserMentions(array $rows, array $query, string $mentionSettings): array
+    {
+        $discussionID = $categoryID = $groupID = 0;
+        $groupModel = null;
+        switch ($query["recordType"]) {
+            case "category":
+                $categoryID = $query["recordID"] ?? 0;
+                break;
+            case "discussion":
+                $discussionID = $query["recordID"] ?? 0;
+                break;
+            case "group":
+                if (class_exists(GroupModel::class)) {
+                    $groupID = $query["recordID"] ?? 0;
+                    $groupModel = new GroupModel();
+                }
+                break;
+            case "escalation":
+                // No specific handling for escalation, just continue.
+                break;
+            default:
+                throw new ClientException("Invalid record type specified for user mentions.");
+        }
+        if ($categoryID > 0 || $discussionID > 0 || $groupID > 0) {
+            $rows = array_column($rows, null, "userID");
+            $discussionModel = gdn::getContainer()->get(DiscussionModel::class);
+
+            foreach ($rows as $id => &$row) {
+                if ($categoryID > 0 || $discussionID > 0) {
+                    $canView = $discussionModel->canView(
+                        $discussionID > 0 ? $discussionID : ["CategoryID" => $categoryID],
+                        $row["UserID"]
+                    );
+                } else {
+                    $canView = $groupModel->hasGroupViewPermission($groupID, $row["UserID"]);
+                }
+                if (
+                    $canView ||
+                    $mentionSettings === self::AT_MENTION_FILTER_LOOSE ||
+                    checkPermission("Garden.Moderation.Manage")
+                ) {
+                    $row["canView"] = $canView;
+                } else {
+                    unset($rows[$id]);
+                }
+            }
+            $rows = array_values($rows);
+            //Sort to put all entries that can't see the content at the bottom.
+            usort($rows, function ($a, $b) {
+                return $b["canView"] <=> $a["canView"];
+            });
+        } elseif (!checkPermission("Garden.Moderation.Manage")) {
+            throw new ClientException(
+                "record type and recordID are required for current level of user mentions filtering."
+            );
+        }
+        return $rows;
     }
 
     /**
@@ -545,35 +618,40 @@ class UsersApiController extends AbstractApiController
 
         $in = $this->schema([], "in")->setDescription("Get information about the current user.");
         $out = $this->schema(
-            Schema::parse([
-                "userID",
-                "name",
-                "photoUrl",
-                "email:s|n" => ["default" => null],
-                "emailConfirmed:b" => [
-                    "default" => false,
-                ],
-                "dateLastActive",
-                "isAdmin:b",
-                "isSysAdmin:b",
-                "isSuperAdmin:b",
-                "countUnreadNotifications" => [
-                    "description" => "Total number of unread notifications for the current user.",
-                    "type" => "integer",
-                ],
-                "countUnreadConversations" => [
-                    "description" => "Total number of unread conversations for the current user.",
-                    "type" => "integer",
-                ],
-                "permissions" => [
-                    "description" => "Global permissions available to the current user.",
-                    "items" => [
-                        "type" => "string",
+            SchemaUtils::composeSchemas(
+                $this->userSchema(),
+                Schema::parse([
+                    "email:s|n" => ["default" => null],
+                    "emailConfirmed:b" => [
+                        "default" => false,
                     ],
-                    "type" => "array",
-                ],
-                "suggestAnswers:b?",
-            ])->add($this->getUserFragmentSchema()),
+                    "isAdmin:b" => ["default" => false],
+                    "isSysAdmin:b" => ["default" => false],
+                    "isSuperAdmin:b" => ["default" => false],
+                    "countUnreadNotifications" => [
+                        "description" => "Total number of unread notifications for the current user.",
+                        "type" => "integer",
+                    ],
+                    "countUnreadConversations" => [
+                        "description" => "Total number of unread conversations for the current user.",
+                        "type" => "integer",
+                    ],
+                    "permissions" => [
+                        "description" => "Global permissions available to the current user.",
+                        "items" => [
+                            "type" => "string",
+                        ],
+                        "type" => "array",
+                    ],
+                    "roles:a",
+                    "roleIDs:a" => [
+                        "items" => [
+                            "type" => "integer",
+                        ],
+                    ],
+                    "suggestAnswers:b?",
+                ])
+            ),
             "out"
         );
 
@@ -583,7 +661,22 @@ class UsersApiController extends AbstractApiController
             $user = (array) $this->getSession()->User;
             $user = $this->normalizeOutput($user);
         } else {
-            $user = $this->getGuestFragment();
+            $user = [
+                "UserID" => UserModel::GUEST_USER_ID,
+                "Name" => t("Guest"),
+                "Photo" => UserModel::getDefaultAvatarUrl(),
+                "DateLastActive" => null,
+                "Confirmed" => false,
+                "Verified" => false,
+                "Admin" => 0,
+                "Roles" => $this->roleModel->getByType(RoleModel::TYPE_GUEST)->resultArray(),
+                "Banned" => 0,
+                "DateInserted" => "2000-01-01 00:00:00",
+                "DateUpdated" => "2000-01-01 00:00:00",
+                "ShowEmail" => false,
+                "Points" => 0,
+            ];
+            $user = $this->normalizeOutput($user);
         }
 
         // Expand permissions for the current user.
@@ -649,6 +742,9 @@ class UsersApiController extends AbstractApiController
         $result = $this->tryWithUserSearch($query);
         if ($result instanceof Data) {
             return $result;
+        } elseif (isset($query["query"]) && self::isIpAddress($query["query"])) {
+            $query["ipAddresses"] = [$query["query"]];
+            unset($query["query"]);
         }
         $this->permission(Permissions::BAN_ROLE_TOKEN);
         $showFullSchema = $this->checkUserPermissionMode(null, false);
@@ -692,6 +788,7 @@ class UsersApiController extends AbstractApiController
                         "type" => "string",
                     ],
                     "x-filter" => ["field" => "ipAddresses"],
+                    "style" => "form",
                 ],
                 "emailConfirmed:b?" => [
                     "x-filter" => ["field" => "u.Confirmed"],
@@ -868,8 +965,10 @@ class UsersApiController extends AbstractApiController
         ]);
         $searchFilters = ArrayUtils::arrayToDotNotation($searchFilters);
 
-        // If we don't have any search-only filters, break out of here.
+        // If we don't have any search-only filters or we're searching an ipaddress, break out of here.
         if (empty($searchFilters)) {
+            return null;
+        } elseif (isset($searchFilters["query"]) && self::isIpAddress($searchFilters["query"])) {
             return null;
         }
 
@@ -1018,6 +1117,7 @@ class UsersApiController extends AbstractApiController
         if ($id == $this->getSession()->UserID) {
             $in->merge(Schema::parse(["passwordConfirmation:s?"]));
         }
+        $in->addValidator("name", $this->createUserNameValidator());
         $in->addValidator("roleID", $this->createRoleIDValidator($id));
         $in->addValidator("profileFields", $this->profileFieldModel->validateEditable($id));
 
@@ -1080,6 +1180,7 @@ class UsersApiController extends AbstractApiController
         $this->permission("Garden.Users.Add");
 
         $in = $this->schema($this->userPostSchema(), "in")->setDescription("Add a user.");
+        $in->addValidator("name", $this->createUserNameValidator());
         $in->addValidator("roleID", $this->createRoleIDValidator());
         $in->addValidator("profileFields", $this->profileFieldModel->validateEditable());
         $out = $this->schema($this->userSchema(), "out");
@@ -1093,18 +1194,17 @@ class UsersApiController extends AbstractApiController
             "ValidateName" => false,
         ];
         $id = $this->userModel->save($userData, $settings);
-        if ($id && $body["sendWelcomeEmail"] ?? true) {
+        $this->validateModel($this->userModel);
+        if (!$id) {
+            throw new ServerException("Unable to add user.", 500);
+        }
+
+        if ($body["sendWelcomeEmail"] ?? true) {
             $this->userModel->sendWelcomeEmail($id, $userData["Password"] ?? "");
         }
         // Add default preferences for the new user
         $userNotificationPrefsModel = Gdn::getContainer()->get(UserNotificationPreferencesModel::class);
         $userNotificationPrefsModel->setInitialDefaults($id, true);
-
-        $this->validateModel($this->userModel);
-
-        if (!$id) {
-            throw new ServerException("Unable to add user.", 500);
-        }
 
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
@@ -1531,6 +1631,25 @@ class UsersApiController extends AbstractApiController
     }
 
     /**
+     * Returns a validator that checks if the current user name is valid
+     *
+     * @return Closure
+     */
+    private function createUserNameValidator(): Closure
+    {
+        return function (string $userName, ValidationField $field) {
+            if (!empty($userName) && !validateUsername($userName)) {
+                $field->addError(
+                    t(
+                        "UsernameError",
+                        "Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long."
+                    )
+                );
+            }
+        };
+    }
+
+    /**
      * Get a user by its numeric ID.
      *
      * @param int $id The user ID.
@@ -1575,6 +1694,7 @@ class UsersApiController extends AbstractApiController
                 ],
                 "profileFields:o?" => $this->profileFieldModel->getUserProfileFieldSchema(true),
             ])
+                ->merge(new MigratableSchema(["dateLastActive:dt|n?", "dateFirstVisit:dt|n?"]))
                 ->add($this->fullSchema())
                 ->addValidator("", SchemaUtils::onlyOneOf(["password", "resetPassword"]))
                 ->addValidator("banned", function ($banned, \Garden\Schema\ValidationField $field) {
@@ -1638,10 +1758,11 @@ class UsersApiController extends AbstractApiController
                 ],
                 "private?",
                 "profileFields:o?" => $this->profileFieldModel->getUserProfileFieldSchema(true),
-            ])->add($this->fullSchema()),
+            ])
+                ->merge(new MigratableSchema(["dateLastActive:dt|n?", "dateFirstVisit:dt|n?"]))
+                ->add($this->fullSchema()),
             "UserPost"
         );
-
         return $schema;
     }
 
@@ -1653,9 +1774,7 @@ class UsersApiController extends AbstractApiController
      */
     public function userSchema($type = "")
     {
-        if ($this->userSchema === null) {
-            $this->userSchema = $this->schema($this->userModel->readSchema(), "User");
-        }
+        $this->userSchema = $this->schema($this->userModel->readSchema(), "User");
         return $this->schema($this->userSchema, $type);
     }
 
@@ -1703,6 +1822,7 @@ class UsersApiController extends AbstractApiController
                 "countDiscussions?",
                 "countComments?",
                 "label:s?",
+                "labelHtml:s?",
                 "banned:i?",
                 "private:b?" => ["default" => false],
                 "countVisits:i?",
@@ -1767,18 +1887,13 @@ class UsersApiController extends AbstractApiController
 
         $normalizedUser = $this->userModel->normalizeRow($user);
 
-        // Password confirmation is only required if one of these fields was passed and has changed.
-        $fieldsRequiredOnChange = ["name", "email"];
-        $fieldsRequiredAlways = ["password"];
+        // Password confirmation is required if any of these fields are present in the request.
+        $fieldsRequiringPassword = ["name", "email", "password"];
         $needsPasswordConfirmation = false;
-        foreach ($fieldsRequiredOnChange as $fieldName) {
-            if (isset($body[$fieldName]) && $normalizedUser[$fieldName] !== $body[$fieldName]) {
-                $needsPasswordConfirmation = true;
-            }
-        }
-        foreach ($fieldsRequiredAlways as $fieldName) {
+        foreach ($fieldsRequiringPassword as $fieldName) {
             if (isset($body[$fieldName])) {
                 $needsPasswordConfirmation = true;
+                break;
             }
         }
 
@@ -1944,5 +2059,16 @@ class UsersApiController extends AbstractApiController
             new LongRunnerAction(UserModel::class, "usersRolesIterator", [$validatedRoleAssignments])
         );
         return $result;
+    }
+
+    /**
+     * Determine if a value is an IP address.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function isIpAddress(string $value): bool
+    {
+        return filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6) !== false;
     }
 }

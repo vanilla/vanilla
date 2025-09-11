@@ -9,6 +9,7 @@ namespace Vanilla\Forum\Widgets;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Widgets\Fragments\PostItemFragmentMeta;
 use Vanilla\Widgets\TabWidgetModule;
 use Vanilla\Widgets\TabWidgetTabService;
 
@@ -28,6 +29,14 @@ class TabsWidget extends TabWidgetModule implements HydrateAwareInterface
     /**
      * @inheritdoc
      */
+    public static function getFragmentClasses(): array
+    {
+        return [PostItemFragmentMeta::class];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function getWidgetID(): string
     {
         return "tabs";
@@ -38,7 +47,15 @@ class TabsWidget extends TabWidgetModule implements HydrateAwareInterface
      */
     public static function getWidgetName(): string
     {
-        return "Tabs";
+        return "Tabbed Posts";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
     }
 
     /**

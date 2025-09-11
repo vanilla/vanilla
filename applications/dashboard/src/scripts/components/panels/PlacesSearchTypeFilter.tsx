@@ -111,4 +111,8 @@ onReady(() => {
         label: t("Categories"),
         values: ["category"],
     });
+    PlacesSearchTypeFilter.addSearchTypes({
+        label: t("Pages"),
+        values: ["customPage"],
+    });
 });

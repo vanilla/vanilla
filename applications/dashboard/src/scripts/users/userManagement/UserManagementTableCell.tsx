@@ -29,6 +29,7 @@ import TruncatedText from "@library/content/TruncatedText";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import { formatDateStringIgnoringTimezone } from "@library/editProfileFields/utils";
 import moment from "moment";
+import DashboardListPageClasses from "@dashboard/components/DashboardListPage.classes";
 
 interface IProps {
     data: IUser;
@@ -264,10 +265,11 @@ interface IRegularCellProps {
 export function RegularCell(props: IRegularCellProps) {
     const { label, content, component, wrappedVersion, permission } = props;
     const classes = userManagementClasses();
+    const { alignRight } = DashboardListPageClasses.useAsHook();
 
     if (permission) {
         return (
-            <div className={cx({ [classes.alignRight]: props.alignRight && !wrappedVersion })}>
+            <div className={cx({ [alignRight]: props.alignRight && !wrappedVersion })}>
                 {wrappedVersion && <span className={classes.wrappedColumnLabel}>{`${t(label)}: `}</span>}
                 {content ?? component ?? ""}
             </div>
@@ -306,6 +308,7 @@ interface IProfileFieldCellProps {
 export function ProfileFieldCell(props: IProfileFieldCellProps) {
     const { profileFields, userProfileFields, columnName, wrappedVersion } = props;
     const classes = userManagementClasses();
+    const { alignRight } = DashboardListPageClasses.useAsHook();
     const profileFieldByColumn = profileFields?.filter((field) => field.label === columnName);
 
     if (
@@ -366,7 +369,7 @@ export function ProfileFieldCell(props: IProfileFieldCellProps) {
         return (
             <div
                 className={cx(classes.multipleValuesCellContent, {
-                    [classes.alignRight]: dataType === CreatableFieldDataType.NUMBER && !wrappedVersion,
+                    [alignRight]: dataType === CreatableFieldDataType.NUMBER && !wrappedVersion,
                 })}
             >
                 {wrappedVersion && <span className={classes.wrappedColumnLabel}>{`${columnName}: `}</span>}
@@ -403,6 +406,7 @@ export function WrappedCell(props: IWrappedCellProps) {
 
 export function ActionsCell(props: { data: IUser }) {
     const classes = userManagementClasses();
+    const { tableActionButtons, alignRight } = DashboardListPageClasses.useAsHook();
     const { permissions, currentUserID, RanksWrapperComponent, ...rest } = useUserManagement();
     const { canEditUsers, canDeleteUsers, canSpoofUsers } = permissions;
     const notSelfOrSystem = currentUserID !== props.data?.userID && !props.data.isSysAdmin && !props.data.isSuperAdmin;
@@ -414,7 +418,7 @@ export function ActionsCell(props: { data: IUser }) {
     };
 
     return (
-        <div className={cx(classes.tableActionButtons, classes.alignRight)} data-testid="action-buttons-container">
+        <div className={cx(tableActionButtons, alignRight)} data-testid="action-buttons-container">
             {canEditUsers && (
                 <ConditionalWrap
                     condition={Boolean(RanksWrapperComponent)}

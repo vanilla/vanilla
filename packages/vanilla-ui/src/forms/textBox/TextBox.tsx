@@ -28,7 +28,7 @@ export const TextBox = React.forwardRef(function TextBoxImpl(
         <input
             tabIndex={0}
             {...otherProps}
-            value={value ?? ""}
+            value={"onChange" in otherProps ? value ?? "" : value}
             ref={forwardedRef}
             type="text"
             className={cx(classes.input, props.className)}

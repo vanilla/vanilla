@@ -6,7 +6,7 @@
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { IImage } from "@library/@types/api/core";
-import { IUserFragment } from "@library/@types/api/users";
+import { IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
@@ -16,6 +16,7 @@ import { RecordID } from "@vanilla/utils";
 import { IReason } from "@dashboard/moderation/CommunityManagementTypes";
 import { PostType, type PostField } from "@dashboard/postTypes/postType.types";
 import type { IPostWarning } from "@vanilla/addon-vanilla/contentItem/ContentItemWarning";
+import type { VanillaSanitizedHtml } from "@vanilla/dom-utils";
 
 export interface IDiscussion {
     discussionID: RecordID;
@@ -26,7 +27,8 @@ export interface IDiscussion {
     dateInserted: string;
     insertUserID: number;
     lastUserID?: number;
-    dateUpdated?: string;
+    dateUpdated?: string | null;
+    updateUserID?: number | null;
     dateLastComment?: string;
     image?: IImage;
 
@@ -38,17 +40,19 @@ export interface IDiscussion {
     resolved?: boolean;
     countViews: number;
     countComments: number;
+    countDiscussions?: number;
+    countReactions?: number;
     attributes?: any;
 
     // expands
-    lastUser?: IUserFragment; // expand;
-    insertUser?: IUserFragment; // expand;
-    updateUser?: IUserFragment; // expand;
+    lastUser?: IUserFragment | IUserFragmentAndRoles; // expand;
+    insertUser?: IUserFragment | IUserFragmentAndRoles; // expand;
+    updateUser?: IUserFragment | IUserFragmentAndRoles; // expand;
     breadcrumbs?: ICrumb[];
     categoryID: number;
     category?: ICategoryFragment;
     excerpt?: string;
-    body?: string;
+    body?: VanillaSanitizedHtml;
     tags?: ITag[];
     warning?: IPostWarning;
 
@@ -59,6 +63,7 @@ export interface IDiscussion {
     countUnread?: number;
     bookmarked?: boolean;
     dismissed?: boolean;
+    muted?: boolean;
 
     reactions?: IReaction[];
     statusID: number;

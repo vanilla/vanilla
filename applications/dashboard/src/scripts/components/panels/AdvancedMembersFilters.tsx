@@ -139,7 +139,7 @@ export default function AdvancedMembersFilters(props: IProps) {
                     <Frame
                         header={<FrameHeader titleID={titleID} closeFrame={exitHandler} title={title} />}
                         body={
-                            <FrameBody className={classes.root}>
+                            <FrameBody>
                                 <div className={classesFrameBody.contents}>
                                     <p className={classes.description}>
                                         {t(

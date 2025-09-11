@@ -15,7 +15,7 @@ class Blockquote extends AbstractNode
     const TYPE_KEY = "blockquote";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -28,7 +28,7 @@ class Blockquote extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -39,7 +39,7 @@ class Blockquote extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {
@@ -47,7 +47,7 @@ class Blockquote extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getExclusiveChildTypes(): array
     {

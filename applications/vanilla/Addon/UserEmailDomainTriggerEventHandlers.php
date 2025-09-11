@@ -174,7 +174,10 @@ class UserEmailDomainTriggerEventHandlers implements PsrEventHandlersInterface
             );
             foreach ($activeAutomationRules as $automationRule) {
                 $triggerEmailDomains = $automationRule["triggerValue"]["emailDomain"] ?? [];
-                $triggerEmailDomains = array_map(fn($v) => trim(strtolower($v)), explode(",", $triggerEmailDomains));
+                $triggerEmailDomains = array_map(
+                    fn($v) => trim(strtolower(str_replace("@", "", $v))),
+                    explode(",", $triggerEmailDomains)
+                );
                 $userEmailDomain = strtolower(substr(strrchr($email, "@"), 1));
                 if (!in_array($userEmailDomain, $triggerEmailDomains)) {
                     continue;

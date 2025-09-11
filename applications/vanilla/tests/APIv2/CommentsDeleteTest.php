@@ -32,7 +32,7 @@ class CommentsDeleteTest extends SiteTestCase
     private LogModel $logModel;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

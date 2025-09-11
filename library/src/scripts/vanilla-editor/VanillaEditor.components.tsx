@@ -4,9 +4,12 @@
  * @license gpl-2.0-only
  */
 
-import { userContentClasses } from "@library/content/UserContent.styles";
 import { useHLJS } from "@library/content/code";
 import { ELEMENT_BLOCKQUOTE_ITEM } from "@library/vanilla-editor/plugins/blockquotePlugin/createBlockquotePlugin";
+import {
+    ELEMENT_CALLOUT_ITEM,
+    ELEMENT_CALLOUT,
+} from "@library/vanilla-editor/plugins/calloutPlugin/createCalloutPlugin";
 import { MentionInputElement } from "@library/vanilla-editor/plugins/mentionPlugin/MentionInputElement";
 import { RichLinkElement } from "@library/vanilla-editor/plugins/richEmbedPlugin/elements/RichLinkElement";
 import {
@@ -44,15 +47,26 @@ import { ELEMENT_MENTION_INPUT } from "@udecode/plate-mention";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { ELEMENT_TABLE, ELEMENT_TD, ELEMENT_TH, ELEMENT_TR } from "@udecode/plate-table";
 import { t } from "@vanilla/i18n";
-import { Icon } from "@vanilla/icons";
+import { Icon, IconType } from "@vanilla/icons";
 import debounce from "lodash-es/debounce";
 import "prismjs/components/prism-php";
-import React, { ElementType, useCallback, useEffect } from "react";
+import { ElementType, useCallback, useEffect, useRef } from "react";
 import { Node } from "slate";
+import {
+    RichTableElement,
+    RichTableCellElement,
+    RichTableHeaderCellElement,
+    RichTableRowElement,
+} from "@library/vanilla-editor/plugins/tablePlugin/elements/RichTableElements";
+import { getMeta } from "@library/utility/appUtils";
+import { userContentClasses } from "@library/content/UserContent.styles";
+import { CalloutToolbar } from "@library/vanilla-editor/plugins/calloutPlugin/CalloutToolbar";
 
 export const ELEMENT_IMAGE = "img";
 
 type HLJS = typeof import("@library/content/highlightJs").default;
+
+const isRichTableEnabled = getMeta("featureFlags.RichTable.Enabled", false);
 
 export const createVanillaEditorComponents = () => {
     const components = {
@@ -77,20 +91,22 @@ export const createVanillaEditorComponents = () => {
         [ELEMENT_SPOILER]: SpoilerElement,
         [ELEMENT_SPOILER_CONTENT]: withProps(SimpleElement, { as: "div", className: "spoiler-content" }),
         [ELEMENT_SPOILER_ITEM]: withProps(SimpleElement, { as: "p", className: "spoiler-line" }),
-        [ELEMENT_TABLE]: TableElement,
+        [ELEMENT_TABLE]: isRichTableEnabled ? RichTableElement : TableElement,
         [ELEMENT_CAPTION]: withProps(SimpleElement, { as: "caption" }),
         [ELEMENT_TBODY]: withProps(SimpleElement, { as: "tbody" }),
         [ELEMENT_THEAD]: withProps(SimpleElement, { as: "thead" }),
         [ELEMENT_TFOOT]: withProps(SimpleElement, { as: "tfoot" }),
-        [ELEMENT_TD]: withProps(SimpleElement, { as: "td" }),
-        [ELEMENT_TH]: withProps(SimpleElement, { as: "th" }),
-        [ELEMENT_TR]: withProps(SimpleElement, { as: "tr" }),
+        [ELEMENT_TD]: isRichTableEnabled ? RichTableCellElement : withProps(SimpleElement, { as: "td" }),
+        [ELEMENT_TH]: isRichTableEnabled ? RichTableHeaderCellElement : withProps(SimpleElement, { as: "th" }),
+        [ELEMENT_TR]: isRichTableEnabled ? RichTableRowElement : withProps(SimpleElement, { as: "tr" }),
         [MARK_BOLD]: withProps(SimpleElement, { as: "strong" }),
         [MARK_CODE]: withProps(SimpleElement, { as: "code", className: "code codeInline" }),
         [MARK_ITALIC]: withProps(SimpleElement, { as: "em" }),
         [MARK_STRIKETHROUGH]: withProps(SimpleElement, { as: "s" }),
         [MARK_UNDERLINE]: withProps(SimpleElement, { as: "u" }),
         [ELEMENT_MENTION_INPUT]: MentionInputElement,
+        [ELEMENT_CALLOUT]: CalloutElement,
+        [ELEMENT_CALLOUT_ITEM]: withProps(SimpleElement, { as: "p", className: "callout-line" }),
     };
 
     return components;
@@ -173,6 +189,25 @@ const SpoilerElement = (props: PlateRenderElementProps<any, TCodeBlockElement>) 
                 </button>
             </div>
             {children}
+        </div>
+    );
+};
+
+/**
+ * Callout Element.
+ */
+const CalloutElement = (props: PlateRenderElementProps<any, TCodeBlockElement>) => {
+    const { attributes, children, nodeProps } = props;
+
+    return (
+        <div {...attributes} {...nodeProps} className={`callout ${props.element.appearance}`}>
+            <Icon
+                icon={
+                    props.element.appearance ? (`callout-${props.element.appearance}` as IconType) : "callout-neutral"
+                }
+                className="callout-icon"
+            />
+            <div>{children}</div>
         </div>
     );
 };

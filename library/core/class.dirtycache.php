@@ -35,7 +35,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function addContainer($options)
     {
@@ -43,7 +43,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function add($key, $value, $options = [])
     {
@@ -55,7 +55,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function store($key, $value, $options = [])
     {
@@ -71,7 +71,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function exists($key)
     {
@@ -79,7 +79,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function get($key, $options = [])
     {
@@ -112,7 +112,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function remove($key, $options = [])
     {
@@ -121,7 +121,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function replace($key, $value, $options = [])
     {
@@ -130,7 +130,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function increment($key, $amount = 1, $options = [])
     {
@@ -149,7 +149,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function decrement($key, $amount = 1, $options = [])
     {
@@ -168,7 +168,7 @@ class Gdn_Dirtycache extends Gdn_Cache
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function flush()
     {

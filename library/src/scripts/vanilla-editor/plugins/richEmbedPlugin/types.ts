@@ -11,6 +11,7 @@ import { TElement } from "@udecode/plate-common";
 export const ELEMENT_RICH_EMBED_CARD = "rich_embed_card";
 export const ELEMENT_RICH_EMBED_INLINE = "rich_embed_inline";
 export const ELEMENT_LEGACY_EMOJI = "legacy_emoji_image";
+export const ELEMENT_LINK_AS_BUTTON = "link_as_button";
 
 export interface IRichLinkEmbedDataSource {
     dataSourceType: "url";
@@ -44,6 +45,7 @@ export enum RichLinkAppearance {
     LINK = "link",
     INLINE = "inline",
     CARD = "card",
+    BUTTON = "button",
 }
 
 export type ILegacyEmoji = TElement & {

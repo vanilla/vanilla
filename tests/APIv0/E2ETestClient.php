@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv0;
 
+use Exception;
 use Garden\Container\Container;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
@@ -16,6 +17,7 @@ use PDO;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Utility\UrlUtils;
+use VanillaTests\Fixtures\FileUtils;
 use VanillaTests\TestDatabase;
 
 /**
@@ -44,6 +46,8 @@ class E2ETestClient extends HttpClient
     /** @var string */
     private string $configPath;
 
+    public string $dbPrefix = "test_";
+
     /** @var bool */
     private bool $useSystemTokenOnNextRequest = false;
 
@@ -67,13 +71,38 @@ class E2ETestClient extends HttpClient
         // Cleanup from any previous tests.
         $client->uninstall();
         $client->install($siteSlug, false);
-        sleep(2);
+
+        $installed = false;
+        $maxIterations = 500;
+        $i = 0;
+        while (!$installed) {
+            $directConfig = $client->loadConfigDirect();
+            $installed = $directConfig["Garden"]["InstallationID"] ?? false;
+            usleep(5000);
+            $i++;
+
+            if ($i > $maxIterations) {
+                throw new \Exception(
+                    "Failed to detect vanilla as installed after utility/update. Config path: {$client->getConfigPath()}"
+                );
+            }
+        }
+
+        $client->saveToConfig(["Garden.Installed" => true]);
 
         // Setup the addons.
         foreach ($withAddons as $addon) {
             $client->enableAddon($addon);
-            sleep(1);
         }
+
+        // Update the system user to be our test user.
+        $client->getPDO(true)->exec(
+            <<<SQL
+UPDATE GDN_User
+SET Name = 'test', Password = 'test', HashMethod = 'text'
+WHERE Name = 'System'
+SQL
+        );
 
         return $client;
     }
@@ -81,16 +110,16 @@ class E2ETestClient extends HttpClient
     /**
      * APIv0 constructor.
      */
-    public function __construct(?string $e2eSlug = null)
+    public function __construct(?string $e2eSlug = null, string $hostname = "e2e-tests.vanilla.local")
     {
         parent::__construct();
         $this->setThrowExceptions(true);
         $this->dbName = $e2eSlug;
 
         if ($e2eSlug) {
-            $baseUrl = "http://e2e-tests.vanilla.local/$e2eSlug";
+            $baseUrl = "http://$hostname/$e2eSlug";
             $this->setBaseUrl($baseUrl);
-            $this->configPath = PATH_CONF . "/e2e-tests.vanilla.local/$e2eSlug.php";
+            $this->configPath = PATH_CONF . "/$hostname/$e2eSlug.php";
         } else {
             $this->setBaseUrl(getenv("TEST_BASEURL"));
             $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
@@ -136,7 +165,7 @@ class E2ETestClient extends HttpClient
     public function getDbName()
     {
         if ($this->dbName) {
-            return "test_" . $this->dbName;
+            return $this->dbPrefix . $this->dbName;
         }
         $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
 
@@ -288,6 +317,12 @@ class E2ETestClient extends HttpClient
 
         // Touch the config file because hhvm runs as root and we don't want the config file to have those permissions.
         $configPath = $this->getConfigPath();
+
+        $dirName = dirname($configPath);
+        if (!file_exists($dirName)) {
+            mkdir($dirName, recursive: true);
+        }
+
         touch($configPath);
         chmod($configPath, 0777);
         $apiKey = sha1(random_bytes(16));
@@ -295,27 +330,53 @@ class E2ETestClient extends HttpClient
             "Garden.Errors.StackTrace" => true,
             "Garden.Embed.Allow" => true,
             "Test.APIKey" => $apiKey,
-            "EnabledPlugins.ideation" => false,
-            "EnabledPlugins.QnA" => false,
+            "EnabledApplications.Dashboard" => "Dashboard",
+            "EnabledApplications.Vanilla" => "Vanilla",
+            "EnabledPlugins" => [
+                "ideation" => false,
+                "QnA" => false,
+                "FederatedSearch" => false,
+                "ElasticSearch" => false,
+                "stubcontent" => false,
+            ],
+            "Database" => [
+                "Host" => $this->getDbHost(),
+                "Name" => $this->getDbName(),
+                "User" => $this->getDbUser(),
+                "Password" => $this->getDbPassword(),
+            ],
+            "Garden.Title" => $title ?: "Vanilla Tests",
+            "Garden.Installed" => null,
+            "Debug" => true,
+            "Context.Secret" => randomString(40),
+            "Garden.Cookie.Salt" => randomString(40),
         ]);
         self::setAPIKey($apiKey);
 
-        // Install Vanilla via cURL.
-        $post = [
-            "Database-dot-Host" => $this->getDbHost(),
-            "Database-dot-Name" => $this->getDbName(),
-            "Database-dot-User" => $this->getDbUser(),
-            "Database-dot-Password" => $this->getDbPassword(),
-            "Garden-dot-Title" => $title ?: "Vanilla Tests",
-            "Email" => "test@example.com",
-            "Name" => "test",
-            "Password" => "test",
-            "PasswordMatch" => "test",
-        ];
+        $r = $this->post("/utility/update.json");
+        if (!$r["Success"]) {
+            throw new \Exception("Utility update failed.");
+        }
 
-        $r = $this->post("/dashboard/setup.json", $post);
-        if (!$r["Installed"]) {
-            throw new \Exception("Vanilla did not install.");
+        // This can be flaky in docker.
+        // Give some time for configs to propagate back.
+        $gardenInstalledWritten = false;
+        $maxLoops = 20;
+        $loopCounter = 0;
+        while (!$gardenInstalledWritten) {
+            sleep(1);
+            $this->saveToConfig([
+                "Garden.Installed" => true,
+            ]);
+
+            $gardenInstalledWritten = $this->getGdnConfig()->get("Garden.Installed") === true;
+            $loopCounter++;
+
+            if ($loopCounter > $maxLoops) {
+                throw new Exception(
+                    "Failed to write Garden.Installed in into the sites config at {$this->getConfigPath()} $maxLoops times."
+                );
+            }
         }
 
         if ($bootstrap) {
@@ -361,21 +422,16 @@ class E2ETestClient extends HttpClient
         $request = parent::createRequest($method, $uri, $body, $headers, $options);
 
         if ($this->useSystemTokenOnNextRequest) {
-            $index = 0;
-            do {
+            try {
                 $systemToken = $this->getConfig(\AccessTokenModel::CONFIG_SYSTEM_TOKEN, null);
-                if ($systemToken) {
-                    break;
+                if (!$systemToken) {
+                    throw new \Exception("Site did not have a system access token configured.");
                 }
-                sleep(1);
-                $index++;
-            } while ($index < 5);
-            if (!$systemToken) {
-                throw new \Exception("Site did not have a system access token configured.");
-            }
 
-            $request->setHeader("Authorization", "Bearer {$systemToken}");
-            $this->useSystemTokenOnNextRequest = false;
+                $request->setHeader("Authorization", "Bearer {$systemToken}");
+            } finally {
+                $this->useSystemTokenOnNextRequest = false;
+            }
         }
 
         $uri = Http::createFromString($request->getUrl());
@@ -592,7 +648,7 @@ class E2ETestClient extends HttpClient
 
         // Delete the database.
         $dbname = $this->getDbName();
-        $pdo->query("drop database if exists `$dbname`");
+        $pdo->exec("drop database if exists `$dbname`");
     }
 
     /**
@@ -725,7 +781,7 @@ class E2ETestClient extends HttpClient
         // Create the database for Vanilla.
         $pdo = $this->getPDO(false);
         $dbname = $this->getDbName();
-        $pdo->query("create database `$dbname`");
+        $pdo->query("create database IF NOT EXISTS `$dbname`");
         $pdo->query("use `$dbname`");
     }
 

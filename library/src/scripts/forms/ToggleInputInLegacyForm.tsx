@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { t } from "@vanilla/i18n";
 import ModalConfirm from "@library/modal/ModalConfirm";

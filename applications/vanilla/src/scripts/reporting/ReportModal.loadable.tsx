@@ -19,7 +19,6 @@ import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
-import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import Modal from "@library/modal/Modal";
@@ -68,7 +67,6 @@ interface IReportReason {
  */
 export default function ReportModalLoadable(props: ReportModalProps) {
     const { isVisible, onVisibilityChange, recordID, recordType, isLegacyPage } = props;
-    const classesFrameBody = frameBodyClasses();
     const classFrameFooter = frameFooterClasses();
     const classes = reportModalClasses();
     const { addToast } = useToast();
@@ -256,7 +254,7 @@ export default function ReportModalLoadable(props: ReportModalProps) {
                             />
                         }
                         body={
-                            <FrameBody className={classesFrameBody.root}>
+                            <FrameBody>
                                 <div className={classes.layout}>
                                     <>
                                         <ErrorMessages errors={[error].filter(notEmpty)} />

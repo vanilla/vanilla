@@ -10,14 +10,20 @@ import get from "lodash-es/get";
 import set from "lodash-es/set";
 import { useState } from "react";
 
-export function CategoryDropdown(_props: INestedSelectProps) {
+export function CategoryDropdown(
+    _props: INestedSelectProps & {
+        searchUrlFilterByDiscussionsType?: boolean;
+    },
+) {
     const { prefix = "category-select", onInputChange, ...props } = _props;
     const [inputValue, setInputValue] = useState<string>(props.inputValue ?? "");
 
     const optionsLookup: Select.LookupApi = {
-        searchUrl: "/categories/search?query=%s",
+        searchUrl: `/categories/search?query=%s${
+            props.searchUrlFilterByDiscussionsType ? "&displayAs[]=Discussions" : ""
+        }`,
         singleUrl: "/categories/%s",
-        defaultListUrl: "/categories?outputFormat=flat&limit=50",
+        defaultListUrl: `/categories?outputFormat=flat&limit=500`,
         labelKey: "name",
         valueKey: "categoryID",
         processOptions: inputValue.length ? getFilteredNestedOptions : getDefaultNestedOptions,

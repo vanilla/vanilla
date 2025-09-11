@@ -26,16 +26,29 @@ import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { mountReact } from "@vanilla/react-utils";
 import { logWarning } from "@vanilla/utils";
 import { EmbedContext } from "./IEmbedContext";
-import { EmbedComponentType, registeredEmbeds, IBaseEmbedProps, registerEmbed } from "./embedService.register";
+import { getEmbedForType, IBaseEmbedProps, registerEmbed } from "./embedService.register";
 
 const EMBED_DESCRIPTION_ID = uniqueIDFromPrefix("embed-description");
-
-export function getEmbedForType(embedType: string): EmbedComponentType | null {
-    return registeredEmbeds.get(embedType) || null;
-}
+const PROCESSED_ATTRIBUTE = "data-embed-processed";
 
 export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps, inEditor: boolean) {
-    ensureBuiltinEmbeds();
+    if (!inEditor && mountPoint.hasAttribute(PROCESSED_ATTRIBUTE)) {
+        // This embed was already processed, don't mount it again
+        logWarning(`Attempted to mount embed more than once`, mountPoint);
+        return Promise.resolve();
+    }
+
+    // Only mark as processed when not in editor mode
+    if (!inEditor) {
+        mountPoint.setAttribute(PROCESSED_ATTRIBUTE, "true");
+
+        const fallbackAnchors = mountPoint.querySelectorAll("a:not([class])");
+        fallbackAnchors.forEach((anchor) => {
+            (anchor as HTMLElement).style.display = "none";
+        });
+    }
+
+    ensureBuiltinEmbedsSync();
     return new Promise<void>((resolve, reject) => {
         const type = data.embedType || null;
         if (type === null) {
@@ -79,7 +92,6 @@ export async function mountEmbed(mountPoint: HTMLElement, data: IBaseEmbedProps,
             </EmbedErrorBoundary>,
             mountPoint,
             !isAsync ? onMountComplete : undefined,
-            { bypassPortalManager: true },
         );
     });
 }
@@ -108,7 +120,7 @@ let builtinsRegistered = false;
 /**
  * Mount the built-in embeds if they aren't already.
  */
-export function ensureBuiltinEmbeds() {
+export function ensureBuiltinEmbedsSync() {
     if (builtinsRegistered) {
         return;
     }

@@ -8,6 +8,7 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Events\ResourceEvent;
+use Vanilla\Models\CollectionModel;
 use Vanilla\Scheduler\Driver\LocalDriverSlip;
 use Vanilla\Scheduler\Job\JobExecutionProgress;
 use Vanilla\Scheduler\Job\LongRunnerJob;
@@ -63,7 +64,22 @@ class DiscussionsDeleteTest extends SiteTestCase
         $comment3 = $this->createComment();
 
         $allIDs = [$discussion["discussionID"], $comment["commentID"], $comment2["commentID"], $comment3["commentID"]];
-
+        $collection = $this->container()->get(CollectionModel::class);
+        $record = [
+            "recordID" => $this->lastInsertedDiscussionID,
+            "recordType" => "discussion",
+        ];
+        $collectionID = $collection->saveCollection([
+            "name" => "Test Collection",
+            "records" => [$record],
+        ]);
+        $collections = $collection->getCollectionsByRecord($record);
+        $recordCollectionIDs = array_column($collections, "collectionID");
+        $this->assertEquals(
+            $collectionID,
+            $recordCollectionIDs[0],
+            "The collectionID should be the same as the one we just created."
+        );
         $result = $this->getLongRunner()
             ->setMaxIterations(2)
             ->runImmediately(
@@ -95,6 +111,8 @@ class DiscussionsDeleteTest extends SiteTestCase
         $transactionIDs = array_column($loggedRecords, "TransactionLogID");
         $this->assertCount(1, array_unique($transactionIDs), "All log items should share a transactionID.");
         $this->assertNull($result->getCallbackPayload());
+        $collections = $collection->getCollectionsByRecord($record);
+        $this->assertCount(0, $collections);
     }
 
     /**

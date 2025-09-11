@@ -9,10 +9,8 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
-import { useMeasure } from "@vanilla/react-utils";
 import { DropDownArrow } from "@vanilla/ui/src/forms/shared/DropDownArrow";
-import { useState, useRef, useMemo } from "react";
-import { useSpring, animated } from "react-spring";
+import { useMemo, useRef, useState } from "react";
 
 interface IProps {
     toggleButtonContent: React.ReactNode;
@@ -21,18 +19,14 @@ interface IProps {
     contentClassName?: string;
     isExpanded?: boolean;
     onExpandChange?: (isExpanded: boolean) => void;
+    lazy?: boolean;
 }
 
 export function TableAccordion(props: IProps) {
-    const { toggleButtonContent, onExpandChange } = props;
-    const [isExpanded, setIsExpanded] = useState(props.isExpanded ?? false);
+    const { toggleButtonContent, onExpandChange, lazy } = props;
+    const [isExpanded, setIsExpanded] = useState(props.isExpanded);
 
     const ref = useRef<HTMLDivElement>(null);
-    const measurements = useMeasure(ref);
-
-    const { height: animatedHeight } = useSpring({
-        height: isExpanded ? measurements.height + 8 : 0,
-    });
 
     const title = isExpanded ? t("Collapse") : t("Expand");
 
@@ -59,16 +53,15 @@ export function TableAccordion(props: IProps) {
                     {toggleButtonContent}
                 </Button>
             </div>
-            <animated.div
-                id={contentID}
-                style={{
-                    height: props.isExpanded ? (isExpanded ? measurements.height + 8 : 0) : animatedHeight,
-                }}
-                className={cx(classes.accordionContentContainer, props.contentClassName)}
-                aria-expanded={isExpanded}
-            >
-                <div ref={ref}>{props.children}</div>
-            </animated.div>
+            {(!lazy || isExpanded) && (
+                <div
+                    id={contentID}
+                    className={cx(classes.accordionContentContainer, { isExpanded }, props.contentClassName)}
+                    aria-expanded={isExpanded}
+                >
+                    <div ref={ref}>{props.children}</div>
+                </div>
+            )}
         </div>
     );
 }
@@ -93,8 +86,18 @@ const classes = {
     },
     accordionContentContainer: css({
         position: "relative",
-        display: "block",
+        display: "grid",
+        gridTemplateRows: "0fr",
+        transition: "grid-template-rows 0.3s",
         overflow: "hidden",
         paddingLeft: 18, // account for the accordion size and gap.
+
+        "&.isExpanded": {
+            gridTemplateRows: "1fr",
+        },
+        "& > *": {
+            // Needed so the grid collapsed to 0fr
+            minHeight: 0,
+        },
     }),
 };

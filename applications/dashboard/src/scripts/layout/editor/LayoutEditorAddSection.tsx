@@ -10,18 +10,22 @@ import { LayoutEditorPath } from "@dashboard/layout/editor/LayoutEditorContents"
 import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
 import { LayoutThumbnailsModal } from "@dashboard/layout/editor/thumbnails/LayoutThumbnailsModal";
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
-import { ILayoutEditorPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import {
+    ILayoutEditorPath,
+    type ILayoutEditorSectionPath,
+} from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { cx } from "@emotion/css";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Container from "@library/layout/components/Container";
+import { ClearThemeOverrideContext } from "@library/theming/ThemeOverrideContext";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { useFocusOnActivate } from "@vanilla/react-utils";
 import React, { useRef, useState } from "react";
 
 interface IProps {
-    path: ILayoutEditorPath;
+    path: ILayoutEditorSectionPath;
     className?: string;
 }
 
@@ -29,7 +33,7 @@ export const LayoutEditorAddSection = React.forwardRef(function LayoutEditorAddS
     props: IProps,
     ref: React.RefObject<HTMLButtonElement | null>,
 ) {
-    const classes = layoutEditorClasses();
+    const classes = layoutEditorClasses.useAsHook();
     const { editorContents, editorSelection, layoutViewType } = useLayoutEditor();
     const catalog = useLayoutCatalog(layoutViewType);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,23 +71,25 @@ export const LayoutEditorAddSection = React.forwardRef(function LayoutEditorAddS
                     </div>
                 </Button>
             </Container>
-            <LayoutThumbnailsModal
-                title={t("Choose the Type of Section")}
-                exitHandler={() => {
-                    setIsModalOpen(false);
-                    editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.SECTION_ADD);
-                }}
-                sections={catalog?.sections ?? {}}
-                onAddSection={(sectionID) => {
-                    setIsModalOpen(false);
-                    editorContents.insertSection(props.path.sectionIndex, {
-                        $hydrate: sectionID,
-                    });
-                    editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.SECTION);
-                }}
-                isVisible={isModalOpen}
-                itemType="sections"
-            />
+            <ClearThemeOverrideContext>
+                <LayoutThumbnailsModal
+                    title={t("Choose the Type of Section")}
+                    exitHandler={() => {
+                        setIsModalOpen(false);
+                        editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.SECTION_ADD);
+                    }}
+                    sections={catalog?.sections ?? {}}
+                    onAddSection={(sectionID) => {
+                        setIsModalOpen(false);
+                        editorContents.insertSection(props.path.sectionIndex, {
+                            $hydrate: sectionID,
+                        });
+                        editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.SECTION);
+                    }}
+                    isVisible={isModalOpen}
+                    itemType="sections"
+                />
+            </ClearThemeOverrideContext>
         </>
     );
 });

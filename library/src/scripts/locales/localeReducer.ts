@@ -19,7 +19,7 @@ export const INITIAL_LOCALE_STATE = {
     },
 };
 
-export const localeReducer = produce(
+export const localeReducer: any = produce(
     reducerWithInitialState<ILocaleState>(INITIAL_LOCALE_STATE)
         .case(getAllLocalesACs.started, (nextState, payload) => {
             nextState.locales.status = LoadStatus.LOADING;

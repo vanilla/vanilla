@@ -13,19 +13,27 @@ use QnaModel;
 use Vanilla\Forum\Modules\QnAWidgetModule;
 use Vanilla\Forum\Widgets\DiscussionsWidgetSchemaTrait;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Widgets\Fragments\PostItemFragmentMeta;
 use Vanilla\Widgets\React\FilterableWidgetTrait;
-use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
  * Class DiscussionQuestionsWidget
  */
-class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetInterface
+class DiscussionQuestionsWidget extends QnAWidgetModule
 {
     use DiscussionsWidgetSchemaTrait;
     use FilterableWidgetTrait;
 
     /**
-     * @inheridoc
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [PostItemFragmentMeta::class];
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -33,7 +41,7 @@ class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetIn
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -41,7 +49,7 @@ class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetIn
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -57,7 +65,7 @@ class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetIn
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -70,7 +78,7 @@ class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetIn
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getApiSchema(): Schema
     {

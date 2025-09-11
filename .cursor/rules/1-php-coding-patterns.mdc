@@ -1,0 +1,82 @@
+---
+description:
+globs: *.php
+alwaysApply: false
+---
+## Application Structrure & Addons
+
+An addon is a toggleable piece of functionality in the application. Even some core functionality is represented through addons.
+
+Utility/framework type code lives in the /library/Vanilla folder (\Vanilla namespace) and tests should go in /tests
+
+Otherwise functionality will fall into an addon.
+
+- /applications/dashboard (namespace Vanilla\Dashboard)
+  This addon contains core functionality of the application such as users, roles, permissions, Automation, styleguides/themes, layouts, emails,
+- /applications/vanilla (namespace Vanilla\Forum)
+  Contains the community forum part of the application such as categories, posts, comments, tags, and moderation
+
+_Code under the cloud directory is proprietary. Things outside of the cloud directory should never have a dependency on the cloud directory._
+
+- /cloud/applications/groups (namespace Vanilla\Groups)
+  This addon contains groups and events functionality.
+- /cloud/plugins/knowledge (namespace Vanilla\Knowledge)
+  Contains Knowledge Bases, knowledge categories, and articles.
+
+There are many more addons in /plugins and /cloud/plugins. Try to avoid having dependencies between addons. If something is needed to be shared put it in library or dashboard.
+
+## Dependency Injection
+
+This codebase uses dependency injection. Most classes such as controllers, models, services, etc should be dependency injected in their constructor. This is done by adding a property in the construct typed as the required class.
+
+For example
+
+```php
+class MyClass {
+
+    public function __construct(private DependencyOne $dep1, private Dependency2 $dep2) {
+    }
+}
+```
+
+In the case of interfaces, the dependency injection container must be configured with a concrete implementation.
+
+In the case of global configurations this is done in [Bootstrap.php](mdc:library/Vanilla/Bootstrap.php) (preferred) or [bootstrap.php](mdc:bootstrap.php) (not prefererred, but some existing configurations are here).
+
+For tests use [Bootstrap.php](mdc:tests/Bootstrap.php) instead.
+
+For addons, in which case the dependency injection wireup would be done in the addon's [AddonContainerRules.php](mdc:library/Vanilla/AddonContainerRules.php) file. See [DashboardContainerRules.php](mdc:applications/dashboard/Addon/DashboardContainerRules.php) for an example.
+
+
+## Namespaces and use statements
+
+- Prefer to add a `use` statement rather than using fully qualified PHP classnames.
+
+## PHP Docblocks and methods
+
+Always prefer to use a actual type in a method declaration, rather than just a type in the docblock.
+
+## Writing Tests
+
+There are a few types of tests in the applicatin.
+
+- Pure unit tests (extend [VanillaTestCase.php](mdc:tests/VanillaTestCase.php))
+- Unit tests with minimal dependency injection (extends [BootstrapTestCase.php](mdc:tests/BootstrapTestCase.php))
+- Integration tests that use an actual test database (extends [SiteTestCase.php](mdc:tests/SiteTestCase.php))
+- E2E test cases that use a fully functional site. These tend to be bespoke Don't worry about writing them.
+
+Preference is to write integration tests for anything that is not a pure function.
+
+When writing these tests, there are various traits available to easily create data.
+
+- [CommunityApiTestTrait.php](mdc:applications/vanilla/tests/Utils/CommunityApiTestTrait.php)
+- [UsersAndRolesApiTestTrait.php](mdc:tests/UsersAndRolesApiTestTrait.php)
+  - Highlights are createUser() runWithUser() and runWithPermissions()
+- [GroupsAndEventsApiTestTrait.php](mdc:applications/groups/tests/Utils/GroupsAndEventsApiTestTrait.php)
+- [KbApiTestTrait.php](mdc:cloud/plugins/knowledge/tests/Utils/KbApiTestTrait.php)
+
+There are more tests traits following this naming.
+
+When writing integration tests, it is preferable to test through the API.
+
+[SiteTestTrait.php](mdc:tests/SiteTestTrait.php) exposes and ->api() method to return an http client. For example after inserting or modifying data, you can fetch that resource back through the API (documentation avaiable in the various /openapi directories) and make assertions about the resulting [TestHttpResponse.php](mdc:tests/Http/TestHttpResponse.php) with the methods provided.

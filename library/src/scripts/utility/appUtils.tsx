@@ -17,6 +17,23 @@ export { t, translate } from "@vanilla/i18n";
 // Absolute path pattern
 const ABSOLUTE_PATH_REGEX = /^\s*(mailto:|((https?:)?\/\/))/i;
 
+export function isDevSite(): boolean {
+    const devHostnames = ["dev.vanilla.local", "test.vanilla.local", "vanilla.local"];
+
+    return devHostnames.includes(window.location.hostname);
+}
+
+export function isQASite(): boolean {
+    const qaHostnames = [
+        "qa1.vanilla.community",
+        "qa2.vanilla.community",
+        "qa3.vanilla.community",
+        "qa-1.vanillatesting.com",
+        "qa-2.vanillatesting.com",
+        "qa-3.vanillatesting.com",
+    ];
+    return qaHostnames.includes(window.location.hostname);
+}
 /**
  * Get a piece of metadata passed from the server.
  *
@@ -24,6 +41,9 @@ const ABSOLUTE_PATH_REGEX = /^\s*(mailto:|((https?:)?\/\/))/i;
  * @param defaultValue - A fallback value in case the key cannot be found.
  *
  * @returns Returns a meta value or the default value.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
  */
 export function getMeta(key: string, defaultValue?: any) {
     if (!gdn.meta) {
@@ -114,6 +134,9 @@ export interface ISiteSection {
 
 /**
  * Get the current site section.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
  */
 export function getSiteSection(): ISiteSection {
     return getMeta("siteSection");
@@ -163,6 +186,45 @@ export function formatUrl(path: string, withDomain: boolean = false): string {
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
     const urlBase = withDomain ? window.location.origin + siteRoot : siteRoot;
     return urlBase + path;
+}
+
+/**
+ * Builds a URL from a string, either external or relative.
+ *
+ * @param str - The string to build from.
+ * @param withDomain - If true, we'll return full URL even for relative paths.
+ *
+ * @returns Returns a valid URL.
+ */
+
+export function buildUrl(str: string, withDomain: boolean = false) {
+    const siteBaseUrl = window.location.origin + getMeta("context.basePath", "");
+    str = str.trim();
+    const hasSchema = /^https?:\/\//i.test(str);
+    const isRelative = /^~?\//.test(str);
+    // Prevent javascript execution.
+    if (/javascript:/i.test(str)) {
+        return "/";
+    }
+    // If the url is valid already, return it.
+    if (hasSchema) {
+        return str;
+    } else if (isRelative) {
+        return withDomain ? siteBaseUrl + str : str;
+    }
+
+    // If the first part of the url (before the first /) is a hostname (ex: something.com) add http://
+    const hasHostname = /^[a-z0-9]+[a-z0-9-]*(\.[a-z0-9]+[a-z0-9-]*)+(\/.*)?$/i.test(str);
+    if (hasHostname) {
+        return "http://" + str;
+    }
+    // If the url starts with a tilde add a /
+    const hasTilde = str.startsWith("~");
+    if (hasTilde) {
+        return "~/" + str.slice(1);
+    }
+    // Add a leading /
+    return withDomain ? siteBaseUrl + "/" + str : "/" + str;
 }
 
 /**
@@ -404,6 +466,12 @@ export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
     return { execute: (siteKey) => window.grecaptcha.execute(siteKey) };
 }
 
+declare global {
+    interface Window {
+        grecaptcha: IRecaptcha;
+    }
+}
+
 /**
  * Translation helper for accessible labels, because <Translate/> doesn't return as string
  * @param template - the template for the string (must be translated ahead of time)
@@ -418,6 +486,9 @@ export type ImageSourceSet = Record<RecordID, string>;
 /**
  * This function creates a source set value from an object where the key indicates the
  * the width and the corresponding values are the image URL.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
  */
 export function createSourceSetValue(sourceSet: ImageSourceSet): string {
     return (

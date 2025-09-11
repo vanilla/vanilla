@@ -13,7 +13,7 @@ use Vanilla\Community\Events\PageViewEvent;
 class PageViewEventProvider implements EventProviderInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEvent(array $body): object
     {
@@ -24,7 +24,7 @@ class PageViewEventProvider implements EventProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canHandleRequest(array $body): bool
     {
@@ -45,6 +45,16 @@ class PageViewEventProvider implements EventProviderInterface
             ],
             "referrer:s?" => [
                 "description" => "URL of referrer",
+            ],
+            "pageName:s?" => [
+                "description" => "Document title of the current page",
+                "filter" => function ($value, $field = null) {
+                    if (!is_string($value)) {
+                        return null;
+                    }
+                    // First strip HTML tags, then escape any remaining special characters
+                    return htmlspecialchars(strip_tags($value));
+                },
             ],
             "type:s?" => [
                 "description" => "The type of page view event (i.e. page_view, discussion_view)",

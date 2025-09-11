@@ -4,19 +4,28 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { NavLink, NavLinkProps } from "react-router-dom";
 import { makeLocationDescriptorObject, useLinkContext } from "@library/routing/links/LinkContextProvider";
-import { sanitizeUrl } from "@vanilla/utils";
+
 import { LocationDescriptor } from "history";
+import React from "react";
+import { cx } from "@emotion/css";
+import { metasClasses } from "@library/metas/Metas.styles";
+import { sanitizeUrl } from "@vanilla/utils";
 import { siteUrl } from "@library/utility/appUtils";
 
-export interface ISmartLinkProps extends NavLinkProps {
+// export interface ISmartLinkProps extends NavLinkProps {
+export interface ISmartLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
     tabIndex?: number;
     to: LocationDescriptor;
     disabled?: boolean;
     className?: string;
     active?: boolean;
+    asMeta?: boolean;
+    /** Force the link to open in a new tab */
+    openInNewTab?: boolean;
+    /** Pulling these in from react router so that we can compile fragment type definitions */
+    replace?: boolean | undefined;
 }
 
 /**
@@ -36,7 +45,7 @@ export interface ISmartLinkProps extends NavLinkProps {
  * Result = https://test.com/root/someUrl/deeper/nested (full refresh)
  */
 export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: React.Ref<HTMLAnchorElement>) {
-    const { replace, active = false, to, ...passthru } = props;
+    const { replace, asMeta, active = false, to, openInNewTab = false, ...passthru } = props;
     const context = useLinkContext();
 
     // Filter out undefined props
@@ -46,33 +55,42 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
         }
     }
 
+    const classesMeta = metasClasses.useAsHook();
+    const className = cx(asMeta && classesMeta.metaLink, props.className);
+
     let href = context.makeHref(to);
 
     const tabIndex = context.areLinksDisabled ? -1 : props.tabIndex ?? 0;
+    const shouldOpenInNewTab = openInNewTab || props.target === "_blank";
+
     if (context.isDynamicNavigation(href)) {
         return (
             <NavLink
-                rel={props.target === "_blank" ? "noopener ugc" : undefined}
+                rel={shouldOpenInNewTab ? "noopener ugc" : undefined}
+                target={shouldOpenInNewTab ? "_blank" : props.target}
                 {...passthru}
                 innerRef={ref}
                 to={makeLocationDescriptorObject(to, href)}
                 tabIndex={tabIndex}
                 replace={replace}
                 data-link-type="modern"
+                className={className}
             />
         );
     } else {
         const isForeign = !href.startsWith(siteUrl(""));
+        const targetBlank = shouldOpenInNewTab || isForeign;
         return (
             <a
                 aria-current={active ? "page" : false}
                 ref={ref}
                 href={sanitizeUrl(href)}
-                target={isForeign ? "_blank" : undefined}
-                rel={isForeign ? "noopener" : props.rel}
+                target={targetBlank ? "_blank" : props.target}
+                rel={targetBlank ? "noopener" : props.rel}
                 {...(passthru as any)}
                 tabIndex={tabIndex}
                 data-link-type="legacy"
+                className={className}
             />
         );
     }

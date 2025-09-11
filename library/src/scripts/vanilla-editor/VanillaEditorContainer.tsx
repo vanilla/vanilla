@@ -11,8 +11,8 @@ import React from "react";
  */
 
 export function VanillaEditorContainer(props: { children: React.ReactNode; className?: string; boxShadow?: boolean }) {
-    const globalVars = globalVariables();
-    const inputVars = inputVariables();
+    const globalVars = globalVariables.useAsHook();
+    const inputVars = inputVariables.useAsHook();
     const { boxShadow = false } = props;
     const baseStyles = css({
         display: "flex",

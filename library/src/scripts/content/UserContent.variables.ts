@@ -167,6 +167,26 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
              */
             borders: tableInit.borders,
         },
+        /**
+         * @varGroup userContent.tables.header
+         * @title UserContent - Tables - Header
+         */
+        header: {
+            /**
+             * @var userContent.tables.header.bgColor
+             * @title Background
+             * @type string
+             * @format hex-color
+             */
+            bgColor: undefined,
+            /**
+             * @var userContent.tables.header.fgColor
+             * @title Text Color
+             * @type string
+             * @format hex-color
+             */
+            fgColor: undefined,
+        },
     });
 
     const blocks = makeThemeVars("blocks", {
@@ -319,6 +339,95 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
         base: 2 * Math.ceil((globalVars.spacer.size * 5) / 8),
     });
 
+    /**
+     * @varGroup userContent.callout
+     * @title User Content - Callout
+     * @commonDescription Applies only to callout elements.
+     */
+    const callout = makeThemeVars("callout", {
+        /**
+         * @var userContent.callout.borderRadius
+         * @type string|number
+         */
+        borderRadius: globalVars.border.radius,
+
+        neutral: {
+            /**
+             * @var userContent.callout.neutral.bg
+             * @title Background
+             * @type string
+             * @format hex-color
+             */
+            bg: "#EEEEEF",
+
+            /**
+             * @varGroup userContent.callout.neutral.font
+             * @title Font
+             * @expand font
+             */
+            font: Variables.font({
+                size: globalVars.fonts.size.large,
+            }),
+        },
+
+        info: {
+            /**
+             * @var userContent.callout.info.bg
+             * @title Background
+             * @type string
+             * @format hex-color
+             */
+            bg: "#E5F4FB",
+
+            /**
+             * @varGroup userContent.callout.info.font
+             * @title Font
+             * @expand font
+             */
+            font: Variables.font({
+                size: globalVars.fonts.size.large,
+            }),
+        },
+
+        alert: {
+            /**
+             * @var userContent.callout.alert.bg
+             * @title Background
+             * @type string
+             * @format hex-color
+             */
+            bg: "#FFF3D4",
+
+            /**
+             * @varGroup userContent.callout.alert.font
+             * @title Font
+             * @expand font
+             */
+            font: Variables.font({
+                size: globalVars.fonts.size.large,
+            }),
+        },
+
+        warning: {
+            /**
+             * @var userContent.callout.warning.bg
+             * @title Background
+             * @type string
+             * @format hex-color
+             */
+            bg: "#FBE8E8",
+
+            /**
+             * @varGroup userContent.callout.warning.font
+             * @title Font
+             * @expand font
+             */
+            font: Variables.font({
+                size: globalVars.fonts.size.large,
+            }),
+        },
+    });
+
     return {
         fonts,
         list,
@@ -329,5 +438,6 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
         embeds,
         spacing,
         tables,
+        callout,
     };
 });

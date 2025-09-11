@@ -34,7 +34,7 @@ class BuildCommand extends Console\Command\Command
     private bool $isVerbose = false;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function configure()
     {
@@ -108,13 +108,13 @@ class BuildCommand extends Console\Command\Command
         $command = [];
         if ($this->isDev) {
             // Dev build.
-            $command[] = "yarn vite --config ./build/vite.devConfig.ts";
+            $command[] = "VITE_CJS_IGNORE_WARNING=true yarn vite --config ./build/vite.devConfig.ts";
             if ($this->isVerbose) {
                 $command[] = "--debug";
             }
         } else {
             // Prod build
-            $command[] = "node -r esbuild-register ./build/vite.buildProd.ts";
+            $command[] = "VITE_CJS_IGNORE_WARNING=true node -r esbuild-register ./build/vite.buildProd.ts";
             if ($this->isAnalyze) {
                 $env["BUILD_ANALYZE"] = "true";
             }

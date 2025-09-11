@@ -2,14 +2,10 @@ import { IUserFragment } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
 import { MyMentionElement, MyValue } from "@library/vanilla-editor/typescript";
 import { useQuery } from "@tanstack/react-query";
-import {
-    PlateRenderElementProps,
-    findNodePath,
-    getHandler,
-    withoutNormalizing,
-    withoutSavingHistory,
-} from "@udecode/plate-common";
-import { useEffect } from "react";
+import { PlateRenderElementProps, getHandler, withoutNormalizing, withoutSavingHistory } from "@udecode/plate-common";
+import { useEffect, useState } from "react";
+import { Node, Path } from "slate";
+import { getSiteSection } from "@library/utility/appUtils";
 
 export interface MentionElementProps extends PlateRenderElementProps<MyValue, MyMentionElement> {
     prefix?: string;
@@ -27,35 +23,61 @@ export const MentionElement = (props: MentionElementProps) => {
         queryKey: ["searchUser", userName],
         queryFn: async ({ queryKey }) => {
             const [_, name] = queryKey;
-            const response = await apiv2.get<IUserFragment[]>("/users/by-names", { params: { name } });
+            const siteSectionID = getSiteSection().sectionID;
+            const response = await apiv2.get<IUserFragment[]>("/users/by-names", {
+                params: { name, siteSectionID },
+            });
             return response.data;
         },
         enabled: !element.userID,
         refetchOnMount: false,
     });
 
-    useEffect(() => {
-        // the mention does have an ID so we need to see if it's an actual user
-        if (!element.userID && data) {
-            // get the path of the current node
-            const path = findNodePath(editor, element);
-            // If the user name matches, there will be only one result and so we need to update with user info
-            if (data.length === 1) {
-                withoutSavingHistory(editor, () => {
-                    editor.setNodes({ ...element, ...data[0] }, { at: path });
-                });
-            }
-            // the user name does not match, let's replace the node with a text node
-            else {
-                withoutSavingHistory(editor, () => {
-                    editor.insertNodes({ text: prefix + userName }, { at: path });
-                });
-                withoutNormalizing(editor, () => {
-                    editor.unsetNodes("type", { at: path });
-                });
+    function hasId(node: any): node is { id: string } {
+        return typeof node.id === "string";
+    }
+
+    function findNodePathById(editor, id: string): Path | undefined {
+        for (const [node, path] of Node.nodes(editor)) {
+            if (hasId(node) && node.id === id) {
+                return path;
             }
         }
-    }, [data, element]);
+        return undefined;
+    }
+    const [shouldUpdateMention, setShouldUpdateMention] = useState(false);
+
+    useEffect(() => {
+        if (!element.userID && data) {
+            setShouldUpdateMention(true);
+        }
+    }, [data, element.userID]);
+
+    useEffect(() => {
+        if (shouldUpdateMention) {
+            // get the path of the current node
+            const path = typeof element.id === "string" ? findNodePathById(editor, element.id) : undefined;
+
+            if (path && data) {
+                // If the user name matches, there will be only one result and so we need to update with user info
+                if (data.length === 1) {
+                    withoutSavingHistory(editor, () => {
+                        editor.setNodes({ ...element, ...data[0] }, { at: path });
+                    });
+                }
+                // the user name does not match, let's replace the node with a text node
+                else {
+                    withoutSavingHistory(editor, () => {
+                        editor.insertNodes({ text: prefix + userName }, { at: path });
+                    });
+                    withoutNormalizing(editor, () => {
+                        editor.unsetNodes("type", { at: path });
+                    });
+                }
+            }
+            setShouldUpdateMention(false);
+        }
+    }, [shouldUpdateMention]);
 
     return (
         <a {...attributes} {...nodeProps} href={href} className="atMention">

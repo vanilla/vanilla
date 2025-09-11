@@ -35,7 +35,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
     protected $conversationModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

@@ -54,7 +54,7 @@ class JsConnectAuthenticatorTypeProvider implements AuthenticatorTypeInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAuthenticatorType(): array
     {

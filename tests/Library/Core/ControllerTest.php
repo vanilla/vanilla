@@ -10,7 +10,6 @@ namespace VanillaTests\Library\Core;
 use VanillaTests\SharedBootstrapTestCase;
 use Gdn_Controller;
 use stdClass;
-
 class ControllerTest extends SharedBootstrapTestCase
 {
     /**

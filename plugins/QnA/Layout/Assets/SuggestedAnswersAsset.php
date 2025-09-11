@@ -49,7 +49,7 @@ class SuggestedAnswersAsset extends AbstractLayoutAsset implements HydrateAwareI
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -57,7 +57,7 @@ class SuggestedAnswersAsset extends AbstractLayoutAsset implements HydrateAwareI
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -65,7 +65,7 @@ class SuggestedAnswersAsset extends AbstractLayoutAsset implements HydrateAwareI
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): ?string
     {
@@ -73,7 +73,7 @@ class SuggestedAnswersAsset extends AbstractLayoutAsset implements HydrateAwareI
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -81,7 +81,7 @@ class SuggestedAnswersAsset extends AbstractLayoutAsset implements HydrateAwareI
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -89,7 +89,7 @@ class SuggestedAnswersAsset extends AbstractLayoutAsset implements HydrateAwareI
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {

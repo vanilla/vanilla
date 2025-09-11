@@ -55,7 +55,7 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -63,7 +63,7 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -71,7 +71,7 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -79,7 +79,7 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -108,7 +108,7 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -152,7 +152,7 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function execute(): bool
     {
@@ -285,7 +285,7 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
@@ -295,7 +295,7 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -334,7 +334,7 @@ class UserFollowCategoryAction extends AutomationAction implements UserInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {

@@ -198,15 +198,17 @@ HTML
     public function testHydrateNewPostWidgetWithPostTypes()
     {
         $this->enableFeature(PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS);
-        $postType1 = $this->createPostType();
-        $postType2 = $this->createPostType();
+        $postType1 = $this->createPostType(["postTypeID" => "post-type-a", "name" => "post-type-a"]);
+        $postType2 = $this->createPostType(["postTypeID" => "post-type-b", "name" => "post-type-b"]);
+        $postType3 = $this->createPostType(["postTypeID" => "post-type-c", "name" => "post-type-c"]);
         $category = $this->createCategory([
             "hasRestrictedPostTypes" => true,
-            "allowedPostTypeIDs" => [$postType1["postTypeID"], $postType2["postTypeID"]],
+            "allowedPostTypeIDs" => [$postType1["postTypeID"], $postType2["postTypeID"], $postType3["postTypeID"]],
         ]);
         $spec = [
             '$hydrate' => "react.newpost",
             '$reactTestID' => "newpost",
+            "excludedButtons" => [$postType3["postTypeID"]],
         ];
 
         $expected = self::markForSparseComparision([

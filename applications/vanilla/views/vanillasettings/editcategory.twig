@@ -80,6 +80,9 @@ dashboardHeading({
     {% if featureEnabled(constant("Vanilla\\Forum\\Models\\PostTypeModel::FEATURE_POST_TYPES_AND_POST_FIELDS")) %}
         {{ form.react("allowedPostTypeIDs", "CategoryPostTypes", postTypeProps) }}
     {% endif %}
+
+    {{ firePluggableEchoEvent(pluggable, 'afterAllowedPostType') }}
+
     {% if _ExtendedFields is defined %}
         {{ form.simple(_ExtendedFields, []) }}
     {% endif %}

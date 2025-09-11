@@ -17,10 +17,25 @@ use Vanilla\Cli\Docker\KibanaHttpClient;
  */
 class VanillaMailhogService extends AbstractService
 {
-    const SERVICE_NAME = "mailhog";
+    const SERVICE_ID = "mailhog";
 
     /**
-     * @inheritDoc
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(
+            new ServiceDescriptor(
+                serviceID: self::SERVICE_ID,
+                label: "Local Mail",
+                containerName: "localmail",
+                url: "https://mail.vanilla.local"
+            )
+        );
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getEnv(): array
     {
@@ -31,31 +46,7 @@ class VanillaMailhogService extends AbstractService
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getName(): string
-    {
-        return "Mailhog";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTargetDirectory(): string
-    {
-        return DockerCommand::VNLA_DOCKER_CWD;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getHostname(): string
-    {
-        return "mail.vanilla.local";
-    }
-
-    /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getVanillaConfigDefaults(): array
     {

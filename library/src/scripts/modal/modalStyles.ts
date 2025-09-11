@@ -16,8 +16,9 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent } from "csx";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const modalVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -150,8 +151,8 @@ export const modalClasses = useThemeCache(() => {
         maxWidth: percent(100),
         maxHeight: styleUnit(vars.sizing.height),
         zIndex: 1,
-        backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
-        color: ColorsUtils.colorOut(vars.colors.fg),
+        backgroundColor: ColorsUtils.varOverride(ColorVar.ModalBackground, ColorVar.Background, vars.colors.bg),
+        color: ColorsUtils.varOverride(ColorVar.ModalForeground, ColorVar.Foreground, vars.colors.fg),
         position: "fixed",
         bottom: "initial",
         overflow: "hidden",
@@ -186,9 +187,15 @@ export const modalClasses = useThemeCache(() => {
                 height: percent(100),
                 maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
             },
+
             "&.isLarge": {
                 width: styleUnit(vars.sizing.large),
                 maxWidth: calc(`100% - ${styleUnit(vars.spacing.horizontalMargin)}`),
+            },
+            "&.isXL, &.isXXL": {
+                "& .frame": {
+                    maxHeight: "100vh",
+                },
             },
             "&.isMedium": {
                 width: styleUnit(vars.sizing.medium),
@@ -234,6 +241,7 @@ export const modalClasses = useThemeCache(() => {
             "&.isShadowed": {
                 ...shadows.dropDown(),
                 ...Mixins.border(globalVars.borderType.modals),
+                borderColor: ColorsUtils.varOverride(ColorVar.Border, globalVars.borderType.modals.color),
             },
             "&.noTransform": {
                 transform: "none !important",
@@ -253,6 +261,7 @@ export const modalClasses = useThemeCache(() => {
         maxHeight: percent(100),
         overflow: "auto",
         scrollPaddingTop: 80,
+        position: "relative",
     });
 
     const content = style("content", shadows.modal());

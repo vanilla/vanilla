@@ -15,7 +15,7 @@ use Traversable;
 class IterableArray extends DumbArray implements \IteratorAggregate
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getIterator(): Traversable
     {

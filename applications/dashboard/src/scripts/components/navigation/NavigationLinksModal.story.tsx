@@ -87,7 +87,6 @@ function NavigationLinksModalWrapper() {
                         setData(data);
                         setIsOpen(false);
                     }}
-                    isVisible
                     onCancel={() => {
                         setIsOpen(false);
                     }}

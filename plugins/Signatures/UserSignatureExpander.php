@@ -35,7 +35,7 @@ class UserSignatureExpander extends AbstractApiExpander
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getPermission(): ?string
     {

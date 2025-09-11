@@ -20,28 +20,36 @@ import {
 import { ContainerContextReset } from "@library/layout/components/Container";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { LinkContext } from "@library/routing/links/LinkContextProvider";
 import { IRegisteredComponent } from "@library/utility/componentRegistry";
-import React, { useMemo } from "react";
+import React, { Suspense, useMemo } from "react";
 import { MemoryRouter } from "react-router-dom";
+import { QueryLoader } from "@library/loaders/QueryLoader";
+import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 
 interface IProps {
     layoutID: ILayoutDetails["layoutID"];
 }
 
-const _overviewComponents: Record<string, IRegisteredComponent> = {};
+declare global {
+    interface Window {
+        _layout_editor_overviews_: Record<string, IRegisteredComponent>;
+    }
+}
+
+window._layout_editor_overviews_ = window._layout_editor_overviews_ ?? {};
 
 export function registerWidgetOverviews(widgets: Record<string, React.ComponentType<any>>) {
     for (const [widgetName, widget] of Object.entries(widgets)) {
-        _overviewComponents[widgetName.toLowerCase()] = {
+        window._layout_editor_overviews_[widgetName.toLowerCase()] = {
             Component: widget,
         };
     }
 }
 
 export const fetchOverviewComponent: IComponentFetcher = (componentName) => {
-    return _overviewComponents[componentName.toLowerCase()] ?? null;
+    return window._layout_editor_overviews_[componentName.toLowerCase()] ?? null;
 };
 
 // These need to be replaced with the widget previews
@@ -49,15 +57,15 @@ export const fetchOverviewComponent: IComponentFetcher = (componentName) => {
 export const FauxWidget = (props: React.ComponentProps<FallbackLayoutWidget> & { isFullWidth?: boolean }) => {
     const classes = layoutOverviewClasses();
     return (
-        <Widget
-            withContainer={props.isFullWidth}
+        <LayoutWidget
+            interWidgetSpacing={props.isFullWidth ? "none" : "standard"}
             tabIndex={-1}
             className={props.isFullWidth ? classes.fauxWidgetFullWidth : classes.fauxWidget}
         >
             <div className={classes.fauxWidgetContent}>
                 <p>{props.$reactComponent}</p>
             </div>
-        </Widget>
+        </LayoutWidget>
     );
 };
 
@@ -78,9 +86,17 @@ export function LayoutOverview(props: IProps) {
         return new LayoutEditorContents(jsonLoadable.data, catalog);
     }, [catalog, jsonLoadable]);
 
+    const classes = layoutOverviewClasses.useAsHook();
+
+    if (jsonLoadable.status === LoadStatus.ERROR) {
+        return <CoreErrorMessages error={jsonLoadable.error} />;
+    }
+
     if (jsonLoadable.status === LoadStatus.LOADING || !contents) {
         return <LayoutOverviewSkeleton />;
     }
+
+    const hydratedContent = contents.hydrate();
 
     return (
         <DeviceProvider>
@@ -107,7 +123,25 @@ export function LayoutOverview(props: IProps) {
                                     propEnhancer,
                                 }}
                             >
-                                <LayoutRenderer layout={contents.hydrate().layout} />
+                                <div className={classes.root}>
+                                    <Suspense fallback={<LayoutOverviewSkeleton />}>
+                                        <LayoutRenderer
+                                            noSuspense={true}
+                                            allowInternalProps
+                                            layout={[
+                                                {
+                                                    $reactComponent: "TitleBar",
+                                                    $fragmentImpls: hydratedContent.titleBar.$fragmentImpls as any,
+                                                    $reactProps: {
+                                                        ...hydratedContent.titleBar,
+                                                        $editorPath: "TitleBar",
+                                                    },
+                                                },
+                                            ]}
+                                        />
+                                        <LayoutRenderer noSuspense={true} layout={hydratedContent.layout} />
+                                    </Suspense>
+                                </div>
                             </LayoutLookupContext.Provider>
                         </LinkContext.Provider>
                     </MemoryRouter>

@@ -17,7 +17,7 @@ import {
 } from "@library/MenuBar/MenuBarContext";
 import { useMenuBarSubMenuContext } from "@library/MenuBar/MenuBarSubMenu";
 import { useUniqueID } from "@library/utility/idUtils";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 type IProps = IMenuBarContextItem & {
     accessibleLabel: string;
@@ -26,6 +26,7 @@ type IProps = IMenuBarContextItem & {
     buttonType?: ButtonTypes;
     className?: string;
     iconClassName?: string;
+    onSubMenuVisibilityChange?: (isOpen: boolean) => void;
 } & (
         | {
               icon: React.ReactNode;
@@ -44,6 +45,10 @@ export const MenuBarItem = function MenuBarItem(props: IProps) {
     const hasSubMenu = !!props.children;
     const classes = menuBarClasses();
     const submenuID = useUniqueID("submenu");
+
+    useEffect(() => {
+        props.onSubMenuVisibilityChange?.(isSubMenuOpen);
+    }, [isSubMenuOpen]);
 
     const handleActivate = (event: React.SyntheticEvent<HTMLSpanElement>) => {
         event.preventDefault();

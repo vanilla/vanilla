@@ -72,6 +72,12 @@ trait LayoutTestTrait
 
         // Strip off seoHtml. We'll assert against these separately.
         $expected = $this->getLayoutService()->stripSeoHtmlFromHydratedLayout($expected);
+
+        if (isset($actual["titleBar"]) && !isset($expected["titleBar"])) {
+            // The assertion wasn't actually making assertions about the titlebar.
+            unset($actual["titleBar"]);
+        }
+
         // See things as an API client sees things.
         $expected = ApiUtils::jsonFilter($expected);
         $expected = ArrayUtils::jsonNormalizeArray($expected);
@@ -247,6 +253,8 @@ trait LayoutTestTrait
                         [
                             '$reactComponent' => "DiscussionsWidget",
                             '$reactProps' => [
+                                "titleType" => "none",
+                                "descriptionType" => "none",
                                 "apiParams" => [
                                     "featuredImage" => false,
                                     "sort" => "-dateLastComment",
@@ -258,6 +266,7 @@ trait LayoutTestTrait
                                     "expand" => ["all", "-body"],
                                     "excludeHiddenCategories" => true,
                                 ],
+                                "isAsset" => true,
                                 "discussions" => [],
                                 "initialPaging" => [
                                     "nextURL" => null,
@@ -272,7 +281,6 @@ trait LayoutTestTrait
                                 "noCheckboxes" => false,
                                 "containerOptions" => [],
                                 "discussionOptions" => [],
-                                "isAsset" => true,
                                 "defaultSort" => "-dateLastComment",
                             ],
                         ],

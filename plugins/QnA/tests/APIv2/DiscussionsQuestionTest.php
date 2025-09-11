@@ -125,18 +125,6 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
     }
 
     /**
-     * Run a basic test of a question's HTML.
-     */
-    public function testGetQuestionHtml()
-    {
-        $row = $this->testPostQuestion();
-        $discussionID = $row["discussionID"];
-
-        $dom = $this->bessy()->getHtml("/discussion/{$discussionID}/xxx", [], ["deliveryType" => DELIVERY_TYPE_ALL]);
-        $dom->assertCssSelectorExists('.dropdown-menu-link[href*="/discussion/qnaoptions"]');
-    }
-
-    /**
      * Verify a question can be created with the `discussions` API endpoint.
      */
     public function testPostQuestion()
@@ -292,10 +280,15 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
         $this->createQuestionsStatus(1, "accepted");
         $this->createQuestionsStatus(1, "unanswered");
         $this->createQuestionsStatus(1, "answered");
-        $acceptedQuestions = count($this->api->get("discussions", ["status" => "accepted"])->getBody());
+
+        $accepted = $this->api->get("discussions", ["status" => "accepted"])->getBody();
+
         $answeredQuestions = count($this->api->get("discussions", ["status" => "answered"])->getBody());
         $unansweredQuestions = count($this->api->get("discussions", ["status" => "unanswered"])->getBody());
-        $this->assertEquals(1, $acceptedQuestions);
+
+        $this->assertCount(1, $accepted);
+        $this->assertArrayHasKey("labelCodes", $accepted[0]);
+        $this->assertSame([0 => "Accepted"], $accepted[0]["labelCodes"]);
         $this->assertEquals(1, $answeredQuestions);
         $this->assertEquals(1, $unansweredQuestions);
     }

@@ -49,7 +49,7 @@ function PostTypeEditImpl(props: IProps) {
     } = usePostTypeEdit();
     const history = useHistory();
 
-    const classes = postTypeSettingsClasses();
+    const classes = postTypeSettingsClasses.useAsHook();
 
     const [shouldCreateApiLabel, setShouldCreateApiLabel] = useState(mode === "new");
     const [showConfirmExit, setShowConfirmExit] = useState(false);
@@ -131,7 +131,7 @@ function PostTypeEditImpl(props: IProps) {
                             <div>
                                 <Button
                                     buttonType={ButtonTypes.OUTLINE}
-                                    onClick={() => handleSubmit()}
+                                    onClick={async () => await handleSubmit()}
                                     disabled={isSaving || isLoading}
                                 >
                                     {isSaving ? <ButtonLoader /> : t("Save")}

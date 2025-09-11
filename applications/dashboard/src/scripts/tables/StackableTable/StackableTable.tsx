@@ -23,6 +23,7 @@ export interface ColumnConfig {
     sortDirection?: StackableTableSortOption;
     columnID?: string; //this one is mainly for profile fields, for static columns this does not exist as key/name is already the id
     width?: number;
+    label?: string;
 }
 
 export interface CellRendererProps {
@@ -97,6 +98,7 @@ const StackableTableHeader = (props: IStackableTableHeaderProps) => {
         <thead className={headerClassNames}>
             <tr className={cx(tableClasses().row, classes.tableRow, rowClassNames)} role="row">
                 {headers.map((header, key) => {
+                    const label = columnsConfiguration[header] ? columnsConfiguration[header]?.label ?? header : "";
                     const wrappedColumn = columnsConfiguration[header] && columnsConfiguration[header].wrapped;
                     const sortDirection = columnsConfiguration[header] && columnsConfiguration[header].sortDirection;
                     const isSortable = !!sortDirection;
@@ -104,6 +106,7 @@ const StackableTableHeader = (props: IStackableTableHeaderProps) => {
                     const customWidth = columnsConfiguration[header] && columnsConfiguration[header].width;
                     return !wrappedColumn ? (
                         <th
+                            id={header}
                             key={key}
                             className={cx(tableClasses().head)}
                             role="columnheader"
@@ -140,7 +143,7 @@ const StackableTableHeader = (props: IStackableTableHeaderProps) => {
                                         condition={hiddenHeaders?.includes(header) ?? false}
                                         component={ScreenReaderContent}
                                     >
-                                        {t(header)}
+                                        {t(label)}
                                     </ConditionalWrap>
                                     {isSortable && sortDirection !== StackableTableSortOption.NO_SORT ? (
                                         <span>
@@ -192,6 +195,7 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
                         <td
                             key={key}
                             role="cell"
+                            aria-describedby={columnName}
                             style={
                                 columnsConfiguration[columnName].width
                                     ? {
@@ -233,6 +237,7 @@ const StackableTableRows = (props: IStackableTableRowsProps) => {
                             <td
                                 key={key}
                                 role="cell"
+                                aria-describedby={columnName}
                                 style={
                                     customWidth
                                         ? { minWidth: `${customWidth}px`, width: `${customWidth}px` }

@@ -18,13 +18,12 @@ export const navigationLinksModalClasses = () => {
         marginLeft: 24,
     });
     const modalDescription = css({
+        textWrap: "pretty",
         ...Mixins.margin({
             vertical: 20,
         }),
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("medium"),
-            weight: metasVars.font.weight,
-            color: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.7)),
         }),
         ...{
             "a[href]": {

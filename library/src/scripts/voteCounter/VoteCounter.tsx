@@ -18,22 +18,25 @@ export interface IProps {
     onToggleDownvoted?: () => Promise<void>;
     score?: number;
     className?: string;
+    direction: "horizontal" | "vertical";
 }
 
-const VoteCounter: FunctionComponent<IProps> = ({
-    upvoted = false,
-    onToggleUpvoted,
-    downvoted = false,
-    onToggleDownvoted,
-    score = 0,
-    className,
-}) => {
-    const { root, count, icon, iconChecked } = voteCounterClasses();
+const VoteCounter: FunctionComponent<IProps> = (props) => {
+    const {
+        upvoted = false,
+        onToggleUpvoted,
+        downvoted = false,
+        onToggleDownvoted,
+        score = 0,
+        className,
+        direction,
+    } = props;
+    const { root, count, icon, iconChecked } = voteCounterClasses(direction);
 
     {
         /* FIXME: truncate in case of long number */
     }
-    const countElement = <span className={count}>{score}</span>;
+    const countElement = <span className={cx(count, "voteCounter__count")}>{score}</span>;
 
     let upvote: JSX.Element = <></>;
 

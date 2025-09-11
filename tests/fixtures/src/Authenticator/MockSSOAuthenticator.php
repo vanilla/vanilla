@@ -74,7 +74,7 @@ class MockSSOAuthenticator extends SSOAuthenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function sso(RequestInterface $request): SSOData
     {
@@ -90,7 +90,7 @@ class MockSSOAuthenticator extends SSOAuthenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getAuthenticatorTypeInfoImpl(): array
     {
@@ -104,7 +104,7 @@ class MockSSOAuthenticator extends SSOAuthenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isUnique(): bool
     {
@@ -112,7 +112,7 @@ class MockSSOAuthenticator extends SSOAuthenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getAuthenticatorInfoImpl(): array
     {

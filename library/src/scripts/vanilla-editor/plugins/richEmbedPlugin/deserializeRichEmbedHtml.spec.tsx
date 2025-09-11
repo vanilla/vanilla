@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { deserializeHtml } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { deserializeHtml } from "@library/vanilla-editor/deserializeHtml";
 
 // rendered image embed html
 const MOCK_IMAGE_EMBED_HTML = `<div class="embedExternal embedImage display-small float-left" data-embedjson="{&quot;url&quot;:&quot;https://dev.vanilla.local/uploads/U2X2FLFYL7F3/ai-generated-7702851-340.png&quot;,&quot;name&quot;:&quot;ai-generated-7702851__340.png&quot;,&quot;type&quot;:&quot;image/png&quot;,&quot;size&quot;:137995,&quot;width&quot;:340,&quot;height&quot;:340,&quot;displaySize&quot;:&quot;small&quot;,&quot;float&quot;:&quot;left&quot;,&quot;embedType&quot;:&quot;image&quot;}">

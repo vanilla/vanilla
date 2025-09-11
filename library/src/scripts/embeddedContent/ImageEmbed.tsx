@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,6 +11,7 @@ import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register"
 import { useEmbedContext } from "@library/embeddedContent/IEmbedContext";
 import { ImageEmbedModal } from "@library/embeddedContent/ImageEmbedModal";
 import { AccessibleImageMenuIcon } from "@library/icons/common";
+import { useToast } from "@library/features/toaster/ToastContext";
 import {
     AlignCenterIcon,
     FloatLeftIcon,
@@ -22,10 +23,14 @@ import {
 import { MenuBarItem } from "@library/MenuBar/MenuBarItem";
 import { MenuBarSubMenuItem } from "@library/MenuBar/MenuBarSubMenuItem";
 import { MenuBarSubMenuItemGroup } from "@library/MenuBar/MenuBarSubMenuItemGroup";
-import { accessibleLabel } from "@library/utility/appUtils";
+import { accessibleLabel, buildUrl, formatUrl } from "@library/utility/appUtils";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { Icon } from "@vanilla/icons";
+import { iconClasses } from "@library/icons/iconStyles";
+import { css } from "@emotion/css";
+
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
     size: number;
@@ -33,8 +38,9 @@ interface IProps extends IBaseEmbedProps {
     name: string;
     width?: number;
     height?: number;
-    displaySize?: "small" | "medium" | "large";
+    displaySize?: "small" | "medium" | "large" | "inline";
     float?: "left" | "right" | "none";
+    targetUrl?: string;
 }
 
 /**
@@ -43,8 +49,10 @@ interface IProps extends IBaseEmbedProps {
 export function ImageEmbed(props: IProps) {
     const { displaySize = "large", float = "none", embedType } = props;
     const contentRef = useRef<HTMLDivElement>(null);
-    const [isOpen, setIsOpen] = useState(false);
+    const [isAltTextModalOpen, setIsAltTextModalOpen] = useState(false);
+    const [isCustomUrlModalOpen, setIsCustomUrlModalOpen] = useState(false);
     const { descriptionID } = useEmbedContext();
+    const toast = useToast();
 
     function setValue(value) {
         if (props.syncBackEmbedValue) props.syncBackEmbedValue(value);
@@ -56,7 +64,13 @@ export function ImageEmbed(props: IProps) {
         right: { icon: <FloatRightIcon />, label: t("Float Right") },
     };
 
+    const classesRichEditor = iconClasses();
+
     const displayOptions = {
+        inline: {
+            icon: <Icon icon="editor-resize-inline" className={classesRichEditor.standard} />,
+            label: t("Inline"),
+        },
         small: { icon: <ResizeSmallIcon />, label: t("Small") },
         medium: { icon: <ResizeMediumIcon />, label: t("Medium") },
         large: { icon: <ResizeLargeIcon />, label: t("Large") },
@@ -69,29 +83,39 @@ export function ImageEmbed(props: IProps) {
             className={classNames("embedImage", `display-${displaySize}`, `float-${float}`)}
         >
             <EmbedContent
+                ref={contentRef}
+                positionBelow={displaySize === "inline"}
                 type={embedType}
                 embedActions={
                     <>
                         <MenuBarItem accessibleLabel={floatOptions[float].label} icon={floatOptions[float].icon}>
                             <MenuBarSubMenuItemGroup>
-                                {Object.entries(floatOptions).map(([value, option]) => (
-                                    <MenuBarSubMenuItem
-                                        key={value}
-                                        icon={option.icon}
-                                        active={float === value}
-                                        onActivate={() =>
-                                            setValue({
-                                                float: value,
-                                                displaySize:
-                                                    displaySize === "large" && value !== "none"
-                                                        ? "medium"
-                                                        : displaySize,
-                                            })
-                                        }
-                                    >
-                                        {option.label}
-                                    </MenuBarSubMenuItem>
-                                ))}
+                                {displaySize === "inline" ? (
+                                    <div className={classes.inlineImagePositionMessage}>
+                                        {t(
+                                            "Inline images can't be positioned. Change the size to see position options here.",
+                                        )}
+                                    </div>
+                                ) : (
+                                    Object.entries(floatOptions).map(([value, option]) => (
+                                        <MenuBarSubMenuItem
+                                            key={value}
+                                            icon={option.icon}
+                                            active={float === value}
+                                            onActivate={() =>
+                                                setValue({
+                                                    float: value,
+                                                    displaySize:
+                                                        displaySize === "large" && value !== "none"
+                                                            ? "medium"
+                                                            : displaySize,
+                                                })
+                                            }
+                                        >
+                                            {option.label}
+                                        </MenuBarSubMenuItem>
+                                    ))
+                                )}
                             </MenuBarSubMenuItemGroup>
                         </MenuBarItem>
 
@@ -118,8 +142,38 @@ export function ImageEmbed(props: IProps) {
                             </MenuBarSubMenuItemGroup>
                         </MenuBarItem>
                         <MenuBarItem
+                            accessibleLabel={t("Link Image to URL")}
+                            onActivate={() => setIsCustomUrlModalOpen(true)}
+                            icon={<Icon icon="copy-link" />}
+                        />
+                        <MenuBarItem
+                            accessibleLabel={t("Copy Image")}
+                            onActivate={async () => {
+                                const imageToPaste = `<img src="${props.url}" alt="${
+                                    props.name || ""
+                                }" data-display-size="${props.displaySize}" data-float="${props.float}" />`;
+
+                                try {
+                                    if (navigator.clipboard && navigator.clipboard.write) {
+                                        const clipboardItem = new ClipboardItem({
+                                            "text/html": new Blob([imageToPaste], { type: "text/html" }),
+                                            "text/plain": new Blob([imageToPaste], { type: "text/plain" }),
+                                        });
+                                        await navigator.clipboard.write([clipboardItem]);
+                                        toast.addToast({
+                                            autoDismiss: true,
+                                            body: <>{t("Image copied to clipboard.")}</>,
+                                        });
+                                    }
+                                } catch (error) {
+                                    console.error("Failed to copy image to clipboard:", error);
+                                }
+                            }}
+                            icon={<Icon icon="copy" />}
+                        />
+                        <MenuBarItem
                             accessibleLabel={t("Accessibility")}
-                            onActivate={() => setIsOpen(true)}
+                            onActivate={() => setIsAltTextModalOpen(true)}
                             icon={<AccessibleImageMenuIcon />}
                         />
                     </>
@@ -137,7 +191,7 @@ export function ImageEmbed(props: IProps) {
                 </div>
             </EmbedContent>
             <ImageEmbedModal
-                isVisible={isOpen}
+                isVisible={isAltTextModalOpen}
                 onSave={(newValue) => {
                     setValue({
                         name: newValue.alt,
@@ -146,7 +200,26 @@ export function ImageEmbed(props: IProps) {
                 }}
                 initialAlt={props.name}
                 onClose={() => {
-                    setIsOpen(false);
+                    setIsAltTextModalOpen(false);
+                    setTimeout(() => {
+                        props.selectSelf?.();
+                    }, 0);
+                }}
+            />
+            <ImageEmbedModal
+                isVisible={isCustomUrlModalOpen}
+                onSave={(newValue) => {
+                    setValue({
+                        targetUrl:
+                            newValue.targetUrl && newValue.targetUrl !== ""
+                                ? buildUrl(newValue.targetUrl, true)
+                                : props.url,
+                    });
+                    props.selectSelf && props.selectSelf();
+                }}
+                initialTargetUrl={props.targetUrl ?? props.url}
+                onClose={() => {
+                    setIsCustomUrlModalOpen(false);
                     setTimeout(() => {
                         props.selectSelf?.();
                     }, 0);
@@ -155,3 +228,7 @@ export function ImageEmbed(props: IProps) {
         </EmbedContainer>
     );
 }
+
+const classes = {
+    inlineImagePositionMessage: css({ maxWidth: 140, padding: 8 }),
+};

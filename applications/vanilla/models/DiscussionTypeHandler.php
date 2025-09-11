@@ -6,10 +6,7 @@
 
 namespace Vanilla;
 
-use CategoryModel;
-use DiscussionModel;
-use Garden\Web\Exception\ClientException;
-use Vanilla\Forum\Models\PostMetaModel;
+use DiscussionStatusModel;
 
 /**
  * Class DiscussionTypeHandler
@@ -20,80 +17,28 @@ class DiscussionTypeHandler extends AbstractTypeHandler
 {
     const HANDLER_TYPE = "Discussion";
 
-    /** @var DiscussionModel */
-    private $discussionModel;
-
-    /** @var \Gdn_Session */
-    private $session;
-
-    /** @var CategoryModel */
-    private $categoryModel;
-
     /**
-     * IdeaAbstractType constructor.
-     *
-     * @param DiscussionModel $discussionModel
-     * @param \Gdn_Session $session
-     * @param CategoryModel $categoryModel
+     * DI.
      */
-    public function __construct(
-        DiscussionModel $discussionModel,
-        \Gdn_Session $session,
-        CategoryModel $categoryModel,
-        private PostMetaModel $postMetaModel
-    ) {
-        $this->discussionModel = $discussionModel;
-        $this->session = $session;
+    public function __construct(private DiscussionStatusModel $discussionStatusModel)
+    {
         $this->setTypeHandlerName(self::HANDLER_TYPE);
-        $this->categoryModel = $categoryModel;
     }
 
     /**
-     * Handle conversion of record.
-     *
-     * @param array $from
-     * @param string $to
-     * @param array|null $postMeta
-     * @throws ClientException|\Throwable If category doesn't allow record type.
+     * @inheritdoc
      */
-    public function handleTypeConversion(array $from, $to, ?array $postMeta)
+    public function convertTo(PostTypeConversionPayload $payload): void
     {
-        $categoryID = $from["CategoryID"] ?? null;
-        $category = $this->categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
-
-        if ($this->categoryModel->isPostTypeAllowed($category, $to)) {
-            $permissionCategoryID = $from["PermissionCategoryID"] ?? null;
-            $this->session->checkPermission("Vanilla.Discussions.Edit", true, "Category", $permissionCategoryID);
-            $this->convertTo($from, $to, $postMeta);
-        } else {
-            throw new ClientException("Category #{$categoryID} doesn't allow for $to type records");
-        }
-    }
-
-    /**
-     * Convert the handlers type.
-     *
-     * @param array $record
-     * @param string $to
-     * @param array|null $postMeta
-     */
-    public function convertTo(array $record, $to, ?array $postMeta)
-    {
-        $id = $record["DiscussionID"] ?? null;
-        $this->discussionModel->setType($id, $to, true, postMeta: $postMeta);
         $discussionStatusModel = \Gdn::getContainer()->get(\DiscussionStatusModel::class);
-        $discussionStatusModel->determineAndUpdateDiscussionStatus($id);
+        $discussionStatusModel->determineAndUpdateDiscussionStatus($payload->discussionRow["DiscussionID"]);
     }
 
     /**
-     * Convert any related records|data (ie. comments)
-     *
-     * @param array $record
-     * @param string $to
-     * @return bool
+     * @inheritdoc
      */
-    public function cleanUpRelatedData(array $record, string $to)
+    public function cleanUpRelatedData(PostTypeConversionPayload $payload): void
     {
-        return true;
+        // Nothing to do.
     }
 }

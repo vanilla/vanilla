@@ -13,6 +13,7 @@ use Garden\Container\NotFoundException;
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\StaticCacheConfigTrait;
 use Garden\Utils\ContextException;
 use Garden\Web\Exception\ForbiddenException;
@@ -36,6 +37,7 @@ use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Dashboard\Models\UserFragment;
 use Vanilla\Dashboard\Models\UserVisitUpdater;
 use Vanilla\Dashboard\UserPointsModel;
+use Vanilla\Database\Select;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\FeatureFlagHelper;
@@ -337,7 +339,7 @@ class UserModel extends Gdn_Model implements
         $formatter = Gdn::getContainer()->get(DateTimeFormatter::class);
         $waitTime = $formatter->formatSeconds($lockoutTime);
 
-        return sprintf(t("You’ve reached the maximum login attempts. Please wait %s and try again."), $waitTime);
+        return sprintf(t("You've reached the maximum login attempts. Please wait %s and try again."), $waitTime);
     }
 
     /**
@@ -1564,7 +1566,7 @@ class UserModel extends Gdn_Model implements
      * @return int|false Returns the new ID of the user or **false** if there was an error.
      * @throws Gdn_UserException
      */
-    private function insertInternal($fields, $options = [])
+    private function insertInternal($fields, $options = []): int|false
     {
         $this->EventArguments["InsertFields"] = &$fields;
         $this->fireEvent("BeforeInsertUser");
@@ -1724,7 +1726,7 @@ class UserModel extends Gdn_Model implements
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function fetchFragments(array $ids, array $options = []): array
     {
@@ -2505,17 +2507,19 @@ class UserModel extends Gdn_Model implements
         $sql = $this->createSql();
 
         // Get all users that matches the IP address.
-        $query = $sql->select("UserID")->from("User");
+        $query = $sql->select("UserID")->from("UserIP");
 
         foreach ($ipAddresses as $ipAddress) {
             $query->orOp();
-            $query->whereIpAddress("LastIPAddress", $ipAddress);
+            $query->whereIpAddress("IPAddress", $ipAddress);
         }
 
         $result = $query
             // For sanity.
             ->limit(10000)
+            ->groupBy("UserID")
             ->get()
+
             ->column("UserID");
         return $result;
     }
@@ -3255,7 +3259,6 @@ class UserModel extends Gdn_Model implements
                 );
             }
         }
-
         if ($this->validate($formPostValues, $insert) && $uniqueValid) {
             // All fields on the form that need to be validated (including non-schema field rules defined above)
             $fields = $this->Validation->validationFields();
@@ -3644,6 +3647,17 @@ class UserModel extends Gdn_Model implements
             $roles = $this->getRoles($userID, false)->resultArray();
             $row["roles"] = $roles;
         }
+        $roles = $row["roles"] ?? ($row["Roles"] ?? []);
+        $roles = array_map(
+            fn(array $role) => [
+                "roleID" => $role["RoleID"] ?? $role["roleID"],
+                "name" => $role["Name"] ?? $role["name"],
+            ],
+            $roles
+        );
+        $row["roles"] = $roles;
+        unset($row["Roles"]);
+        $row["roleIDs"] = array_column($row["roles"], "roleID");
         $row["email"] = !empty($row["Email"]) ? $row["Email"] : null;
         if (array_key_exists("Photo", $row)) {
             // It might be tempting to call out to `static::getUserPhotoUrl()` here, but there is a legacy behavior where
@@ -3693,7 +3707,7 @@ class UserModel extends Gdn_Model implements
         }
 
         $name = $row["Name"] ?? "";
-        $row["Name"] = $name ? $row["Name"] : t("(Unspecified Name)");
+        $row["Name"] = $name ? $row["Name"] ?? $row["name"] : t("(Unspecified Name)");
 
         if (!array_key_exists("CountPosts", $row)) {
             $row["CountPosts"] = $row["CountComments"] + $row["CountDiscussions"];
@@ -3728,6 +3742,15 @@ class UserModel extends Gdn_Model implements
                 $result["suggestAnswers"] = $aiSuggestion->checkIfUserHasEnabledAiSuggestions($userID);
             }
         }
+
+        $label = $result["label"] ?? null;
+        $labelHtml = $label;
+        if (isset($label)) {
+            $label = strip_tags($label);
+            $result["labelHtml"] = $labelHtml;
+            $result["label"] = $label;
+        }
+
         return $result;
     }
 
@@ -3777,6 +3800,7 @@ class UserModel extends Gdn_Model implements
             "dateInserted:dt" => "When the user was created.",
             "dateLastActive:dt|n" => "Time the user was last active.",
             "dateUpdated:dt|n" => "When the user was last updated.",
+            "dateFirstVisit:dt|n?" => "When the user was last visit.",
             "roles:a?" => SchemaFactory::parse(
                 [
                     "roleID:i" => "ID of the role.",
@@ -3821,6 +3845,7 @@ class UserModel extends Gdn_Model implements
             "countComments?",
             "countPosts?",
             "label?",
+            "labelHtml:s?",
             "hashMethod?",
             "private?" => ["default" => false],
             "countVisits:i?" => [
@@ -3829,6 +3854,7 @@ class UserModel extends Gdn_Model implements
             "inviteUserID:i?",
             "punished:i?",
             "reactionsReceived?" => $this->reactionModel->compoundTypeFragmentSchema(),
+            "dateFirstVisit:dt|n?",
         ]);
         $result->add($this->schema());
 
@@ -4212,7 +4238,8 @@ class UserModel extends Gdn_Model implements
         // Check for an IPV4/IPV6 address.
         if ($isIPAddress !== false) {
             $ipAddress = $keywords;
-            $this->addIpFilters($ipAddress, ["LastIPAddress"]);
+            $ipWhere = ["ipAddresses" => [$ipAddress]];
+            $this->applyIpAddressesFilter($this->SQL, $ipWhere);
         } elseif (strtolower($keywords) == "banned") {
             $this->SQL->where("u.Banned >", 0);
             $keywords = "";
@@ -4269,7 +4296,7 @@ class UserModel extends Gdn_Model implements
                         $keywords
                     );
                 }
-            } else {
+            } elseif (!$isIPAddress) {
                 // Search on the user table.
                 $whereCriteria = [
                     "where" => [],
@@ -4350,11 +4377,9 @@ class UserModel extends Gdn_Model implements
             return;
         }
 
-        $sql->beginWhereGroup();
-        foreach ($ipAddresses as $ipAddress) {
-            $sql->orOp()->whereIpAddress("LastIPAddress", $ipAddress);
-        }
-        $sql->endWhereGroup();
+        $userIDs = $this->getUserIDsForIPAddresses($ipAddresses);
+
+        $sql->where("UserID", $userIDs);
     }
 
     /**
@@ -4420,40 +4445,6 @@ class UserModel extends Gdn_Model implements
     }
 
     /**
-     * Appends filters to the current SQL object. Filters users with a given IP Address in the UserIP table. Extends
-     * filtering to IPs in the GDN_User table for any fields passed in the $fields param.
-     *
-     * @param string $ip The IP Address to search for.
-     * @param array $fields The additional fields to check in the UserTable
-     */
-    private function addIpFilters($ip, $fields = [])
-    {
-        // Get a clean SQL object.
-        $sql = clone $this->SQL;
-        $sql->reset();
-
-        // Get all users that matches the IP address.
-        $sql->select("UserID")
-            ->from("UserIP")
-            ->where("IPAddress", inet_pton($ip));
-
-        $matchingUserIDs = $sql->get()->resultArray();
-        $userIDs = array_column($matchingUserIDs, "UserID");
-
-        // Add these users to search query.
-        $this->SQL->orWhereIn("u.UserID", $userIDs);
-
-        // Check the user table ip fields.
-        $allowedFields = ["LastIPAddress", "InsertIPAddress", "UpdateIPAddress"];
-
-        foreach ($fields as $field) {
-            if (in_array($field, $allowedFields)) {
-                $this->SQL->orWhereIn("u." . $field, [$ip, inet_pton($ip)]);
-            }
-        }
-    }
-
-    /**
      * Count search results. Upper limit of 10000 or the value of Vanilla.APIv2.MaxCount.
      *
      * @param array|string $filter
@@ -4503,8 +4494,8 @@ class UserModel extends Gdn_Model implements
 
         // Check for an IPV4/IPV6 address.
         if (filter_var($keywords, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6) !== false) {
-            $fields = ["LastIPAddress"];
-            $this->addIpFilters($keywords, $fields);
+            $ipWhere = ["ipAddresses" => [$keywords]];
+            $this->applyIpAddressesFilter($this->SQL, $ipWhere);
         } elseif (!empty($roleIDs)) {
             $this->applyRoleIDsFilter($this->SQL, $roleIDs);
         } else {
@@ -4527,6 +4518,60 @@ class UserModel extends Gdn_Model implements
         $countQuery = "SELECT COUNT(u1.UserID) as UserCount FROM ({$this->SQL->getSelect()}) u1";
         $result = $this->SQL->query($countQuery);
         return $result->value("UserCount", 0);
+    }
+
+    /**
+     * Search user that follow this discussion by username.
+     *
+     * @param string $name The username to search. Supports wildcards (e.g. user*).
+     * @param int $discussionID Discussion ID to search for.
+     * @param array $roleIDs list role IDs to filter users to.
+     * @param string $sortField Column to sort results by.
+     * @param string $sortDirection Direction used for column sort.
+     * @param int|bool $limit Maximum results to return.
+     * @param int|bool $offset Offset for result rows.
+     * @return Gdn_DataSet
+     */
+    public function searchByNameWithDocument(
+        string $name,
+        int $discussionID = 0,
+        array $roleIDs = [],
+        int|bool $limit = false,
+        int|bool $offset = false
+    ): Gdn_DataSet {
+        $query = $this->queryByName(
+            $name,
+            [],
+            options: [
+                Model::OPT_LIMIT => $limit,
+                Model::OPT_OFFSET => $offset,
+            ]
+        );
+        $select = ["u.*"];
+        $oneMonthBack = new DateTimeImmutable();
+        $oneMonthBack = $oneMonthBack->sub(new DateInterval("P1M"));
+        $orderBy = [];
+        if ($discussionID > 0) {
+            $query->join("UserDiscussion ud", "ud.UserID = u.UserID and ud.DiscussionID = $discussionID", "left");
+            $select[] = new Select("IF(ud.DateLastViewed IS NOT NULL, 1, 0)", "sortInThread");
+            $orderBy["sortInThread"] = "desc";
+        }
+        $select[] = new Select(
+            "IF(u.DateLastActive > '{$oneMonthBack->format("Y-m-d H:i:s")}', 1, 0)",
+            "sortMonthActive"
+        );
+        if (!empty($roleIDs)) {
+            $this->applyRoleIDsFilter($query, $roleIDs);
+        }
+
+        $orderBy["sortMonthActive"] = "desc";
+        $orderBy["u.CountPosts"] = "desc";
+        $orderBy["u.Name"] = "desc";
+
+        $query->select($select)->orderBy($orderBy);
+
+        $results = $query->get();
+        return $results;
     }
 
     /**
@@ -4877,7 +4922,7 @@ class UserModel extends Gdn_Model implements
      * @param string $username
      * @throws Exception
      */
-    public function triggerApplicantNotification($userID = 0, $username = ""): void
+    public function triggerApplicantNotification(int $userID = 0, string $username = ""): void
     {
         if ($userID <= 0 || empty($username)) {
             return;
@@ -5030,7 +5075,7 @@ class UserModel extends Gdn_Model implements
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function addInsertFields(&$fields)
     {
@@ -5045,9 +5090,9 @@ class UserModel extends Gdn_Model implements
 
         // Set some required dates.
         $now = DateTimeFormatter::getCurrentDateTime();
-        $fields[$this->DateInserted] = $now;
+        $fields[$this->DateInserted] = $fields[$this->DateInserted] ?? $now;
         touchValue("DateFirstVisit", $fields, $now);
-        $fields["DateLastActive"] = $now;
+        $fields["DateLastActive"] = $fields["DateLastActive"] ?? $now;
         $fields["InsertIPAddress"] = ipEncode(Gdn::request()->ipAddress());
         $fields["LastIPAddress"] = ipEncode(Gdn::request()->ipAddress());
     }
@@ -6643,26 +6688,32 @@ SQL;
     /**
      * Check and apply login rate limiting
      *
-     * @param array $user
+     * @param array|object|bool $user
      * @return bool
      */
-    public static function rateLimit($user)
+    public static function rateLimit($user = false): bool
     {
         // Garden.User.RateLimit = 0 disables rate limit.
         $loginRate = (int) Gdn::config("Garden.User.RateLimit", self::LOGIN_RATE);
         if ($loginRate === 0) {
             return true;
         }
-        // Make sure $user is an object
-        $user = (object) $user;
+        // Make sure $user is an object if it exists
+        $user = $user ? (object) $user : false;
+
+        $userRate = 0;
+        $sourceRate = 0;
+
         if (Gdn::cache()->activeEnabled()) {
             // Rate limit using Gdn_Cache.
-            $userRateKey = formatString(self::LOGIN_RATE_KEY, ["Source" => $user->UserID]);
-            $userRate = (int) Gdn::cache()->get($userRateKey);
-            $userRate += 1;
-            Gdn::cache()->store($userRateKey, 1, [
-                Gdn_Cache::FEATURE_EXPIRY => $loginRate,
-            ]);
+            if ($user) {
+                $userRateKey = formatString(self::LOGIN_RATE_KEY, ["Source" => $user->UserID]);
+                $userRate = (int) Gdn::cache()->get($userRateKey);
+                $userRate += 1;
+                Gdn::cache()->store($userRateKey, 1, [
+                    Gdn_Cache::FEATURE_EXPIRY => $loginRate,
+                ]);
+            }
 
             $sourceRateKey = formatString(self::LOGIN_RATE_KEY, ["Source" => Gdn::request()->ipAddress()]);
             $sourceRate = (int) Gdn::cache()->get($sourceRateKey);
@@ -6672,16 +6723,18 @@ SQL;
             ]);
         } elseif (c("Garden.Apc", false) && function_exists("apc_store")) {
             // Rate limit using the APC data store.
-            $userRateKey = formatString(self::LOGIN_RATE_KEY, ["Source" => $user->UserID]);
-            $userRate = (int) apc_fetch($userRateKey);
-            $userRate += 1;
-            apc_store($userRateKey, 1, $loginRate);
+            if ($user) {
+                $userRateKey = formatString(self::LOGIN_RATE_KEY, ["Source" => $user->UserID]);
+                $userRate = (int) apc_fetch($userRateKey);
+                $userRate += 1;
+                apc_store($userRateKey, 1, $loginRate);
+            }
 
             $sourceRateKey = formatString(self::LOGIN_RATE_KEY, ["Source" => Gdn::request()->ipAddress()]);
             $sourceRate = (int) apc_fetch($sourceRateKey);
             $sourceRate += 1;
             apc_store($sourceRateKey, 1, $loginRate);
-        } else {
+        } elseif (isset($user->UserID)) {
             // Rate limit using user attributes.
             $now = time();
             $userModel = Gdn::userModel();
@@ -7290,7 +7343,7 @@ SQL;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCrawlInfo(): array
     {
@@ -7299,6 +7352,8 @@ SQL;
             "/api/v2/users?sort=-userID&expand=crawl,profileFields",
             "userID"
         );
+        // A higher limit is allowed for users.
+        $r["maxLimit"] = 1000;
         return $r;
     }
 

@@ -16,6 +16,7 @@ use MachineTranslation\Services\GptTranslationService;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Logger;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Scheduler\LongRunnerFailedID;
@@ -35,7 +36,7 @@ class CommunityMachineTranslationModel implements LoggerAwareInterface, SystemCa
     const TRANSLATION_RESOURCE = "machineTranslated";
     const FEATURE_FLAG = "Feature.machineTranslation.enabled";
 
-    const TEXT_CHUNK_SIZE = 3000;
+    const TEXT_FRAGMENT_SIZE = 3000;
     /**
      * @var array of TranslatableModelInterface instances
      */
@@ -69,7 +70,7 @@ class CommunityMachineTranslationModel implements LoggerAwareInterface, SystemCa
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {
@@ -145,7 +146,7 @@ class CommunityMachineTranslationModel implements LoggerAwareInterface, SystemCa
                     $temp = "";
                     foreach ($batch as $word) {
                         $temp .= (empty($temp) ? "" : " ") . $word;
-                        if (strlen($temp) > self::TEXT_CHUNK_SIZE) {
+                        if (strlen($temp) > self::TEXT_FRAGMENT_SIZE) {
                             $textParts[] = $temp;
                             $temp = "";
                         }
@@ -190,12 +191,16 @@ class CommunityMachineTranslationModel implements LoggerAwareInterface, SystemCa
         } catch (LongRunnerTimeoutException $e) {
             return new LongRunnerNextArgs([$recordType, $remainingRecordIDs]);
         } catch (Exception $e) {
+            ErrorLogger::error(
+                $e,
+                ["MachineTranslation"],
+                [
+                    "exception" => $e->getMessage(),
+                    "recordType" => $recordType,
+                    "recordID" => $recordID,
+                ]
+            );
             yield new LongRunnerFailedID($recordID);
-            $this->logger->warning("Error Throws saving translations", [
-                "exception" => $e,
-                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
-                Logger::FIELD_TAGS => ["MachineTranslation"],
-            ]);
         }
 
         return LongRunner::FINISHED;

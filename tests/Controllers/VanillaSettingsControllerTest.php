@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -24,17 +24,17 @@ class VanillaSettingsControllerTest extends SiteTestCase
 {
     use CommunityApiTestTrait;
 
-    /** @inheritDoc */
+    /** @inheritdoc */
     protected static $addons = ["vanilla"];
 
     /** @var CategoryModel */
-    private $categoryModel;
+    protected $categoryModel;
 
     /** @var PermissionModel */
-    private $permissionModel;
+    protected $permissionModel;
 
     /** TagModel */
-    private $tagModel;
+    protected $tagModel;
 
     /**
      * Grab an array of category permissions, indexed by role ID.
@@ -43,7 +43,7 @@ class VanillaSettingsControllerTest extends SiteTestCase
      * @param bool $addDefaults
      * @return array
      */
-    private function getCategoryPermissions(int $categoryID, bool $addDefaults): array
+    protected function getCategoryPermissions(int $categoryID, bool $addDefaults): array
     {
         $permissions = $this->permissionModel->getJunctionPermissions(["JunctionID" => $categoryID], "Category", "", [
             "AddDefaults" => $addDefaults,
@@ -53,7 +53,7 @@ class VanillaSettingsControllerTest extends SiteTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -234,6 +234,7 @@ class VanillaSettingsControllerTest extends SiteTestCase
                 "Garden.MobileInputFormatter" => "rich",
                 "Vanilla.Discussions.PerPage" => 10,
                 "Vanilla.Comments.PerPage" => 10,
+                "Vanilla.Discussion.Title.MaxLength" => 100,
                 \VanillaSettingsController::CONFIG_KALTURA_DOMAINS => implode("\n", $newCustomDomains),
             ];
 
@@ -377,5 +378,39 @@ class VanillaSettingsControllerTest extends SiteTestCase
                 );
             }
         );
+    }
+
+    /**
+     * Test that invalid discussion types are filtered out when editing a category.
+     *
+     * This test verifies that when a category has invalid discussion types stored in the database,
+     * they are automatically filtered out when the category data is retrieved for the edit form.
+     * Only valid discussion types should be returned.
+     *
+     * @return void
+     */
+    public function testEditCategoryNonExistentDiscussionType()
+    {
+        // Create a category with 2 post types, one of which does not exist.
+        $newCategory = $this->createCategory(["Name" => "Test Category"]);
+        // Force in 2 post types, one of which does not exist.
+        $this->categoryModel->save([
+            "CategoryID" => $newCategory["categoryID"],
+            "AllowedDiscussionTypes" => ["Discussion", "Poll"],
+        ]);
+
+        // Grab the data for the edit category page using bessy.
+        $jsonEncodedData = $this->bessy()
+            ->getHtml(
+                "vanilla/settings/editcategory/{$newCategory["categoryID"]}",
+                [],
+                ["deliveryType" => DELIVERY_TYPE_DATA]
+            )
+            ->getRawHtml();
+        $jsonDecodedData = json_decode($jsonEncodedData, true);
+
+        $this->assertCount(1, $jsonDecodedData["AllowedDiscussionTypes"]);
+        $this->assertArrayHasKey("Discussion", $jsonDecodedData["AllowedDiscussionTypes"]);
+        $this->assertArrayNotHasKey("Poll", $jsonDecodedData["AllowedDiscussionTypes"]);
     }
 }

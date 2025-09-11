@@ -1,11 +1,11 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { suggestedContentClasses } from "@library/suggestedContent/SuggestedContent.classes";
-import { ICategoryItem } from "@library/categoriesWidget/CategoryItem";
+import type CategoriesWidgetItem from "@library/widgets/CategoriesWidget.Item";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { PageBox } from "@library/layout/PageBox";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
@@ -15,7 +15,7 @@ import CategoryFollowDropdownWithNotificationPreferencesContext from "@vanilla/a
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 
 export interface ISuggestedFollowsProps {
-    categories?: ICategoryItem[];
+    categories?: CategoriesWidgetItem.Item[];
     suggestedFollows: {
         enabled?: boolean;
         title?: string;
@@ -61,12 +61,12 @@ export function SuggestedFollows(props: ISuggestedFollowsProps) {
                             <CategoryFollowDropdownWithNotificationPreferencesContext
                                 key={category.categoryID}
                                 userID={user?.userID}
-                                categoryID={category.categoryID}
-                                categoryName={category.name}
+                                recordID={category.categoryID}
+                                name={category.name}
                                 emailDigestEnabled={emailEnabled}
                                 size={"compact"}
-                                categoryAsLabel
-                                categoryUrl={category.url}
+                                nameAsLabel
+                                viewRecordUrl={category.url}
                             />
                         ))}
                 </div>

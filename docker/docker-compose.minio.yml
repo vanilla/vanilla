@@ -1,0 +1,39 @@
+name: "vanilla"
+services:
+    # MinIO Service
+    files:
+        image: minio/minio:latest
+        container_name: "minio"
+        networks:
+            - "vanilla-network"
+        volumes:
+            - minio-data:/usr/share/minio/data
+        environment:
+            - "MINIO_ROOT_USER=minio"
+            - "MINIO_ROOT_PASSWORD=password"
+        entrypoint: ["minio", "server", "/usr/share/minio/data", "--console-address", ":9001"]
+
+    # Bucket & User Initialization Service
+    minio-init:
+        image: minio/mc
+        depends_on:
+            - files # Ensure MinIO is running first
+        networks:
+            - "vanilla-network"
+        entrypoint: >
+            /bin/sh -c "
+            sleep 5;
+            mc alias set myminio http://minio:9000 minio password;
+            mc mb myminio/default-bucket;
+            mc anonymous set download myminio/default-bucket;
+            exit 0;
+            "
+
+networks:
+    vanilla-network:
+        external: true
+        driver: "bridge"
+        name: "vanilla-network"
+
+volumes:
+    minio-data:

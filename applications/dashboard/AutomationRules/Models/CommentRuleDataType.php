@@ -20,7 +20,7 @@ use Vanilla\Salesforce\Action\EscalateSalesforceLeadAction;
 class CommentRuleDataType extends RuleDataType
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      * @psalm-suppress UndefinedClass
      */
     protected function getAllTriggerClasses(): array
@@ -29,7 +29,7 @@ class CommentRuleDataType extends RuleDataType
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      * @psalm-suppress UndefinedClass
      */
     protected function getAllActionsClasses(): array

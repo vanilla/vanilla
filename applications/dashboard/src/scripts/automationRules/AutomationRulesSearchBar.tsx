@@ -25,11 +25,6 @@ export function AutomationRulesSearchbar(props: { onSearch: (query: string) => v
                 }}
                 triggerSearchOnClear={true}
                 titleAsComponent={t("Search")}
-                handleOnKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                        props.onSearch(searchValue);
-                    }
-                }}
                 disableAutocomplete={true}
                 overwriteSearchBar={{
                     preset: SearchBarPresets.BORDER,

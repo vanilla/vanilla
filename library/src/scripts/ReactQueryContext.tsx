@@ -22,6 +22,12 @@ const queryClient = new QueryClient({
     },
 });
 
+declare global {
+    interface Window {
+        __REACT_QUERY_PRELOAD__: Array<[string[], unknown]>;
+    }
+}
+
 const preloadedValues = window.__REACT_QUERY_PRELOAD__ ?? [];
 if (Array.isArray(preloadedValues)) {
     preloadedValues.forEach(([key, value]) => {

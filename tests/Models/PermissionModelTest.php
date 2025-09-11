@@ -224,6 +224,9 @@ class PermissionModelTest extends SiteTestCase
             "Vanilla.Discussions.Sink",
             "Vanilla.Discussions.View",
             "Vanilla.Posts.Moderate",
+            "Vanilla.Tagging.Add",
+            "Garden.Tokens.Add",
+            "Garden.Staff.Allow",
         ];
 
         $this->assertEqualsCanonicalizing($expected, $permissions);

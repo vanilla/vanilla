@@ -1,15 +1,16 @@
 <?php
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\RequestInterface;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Logging\LogDecorator;
 use Vanilla\Web\SmartIDMiddleware;
+use Vanilla\Exception\PermissionException;
 
 /**
  * Allow spoofing a request as a user by sending an X-Vanilla-Spoof header.
@@ -19,7 +20,7 @@ class SpoofMiddleware
     // Permission required to use the spoof header.
     public const PERMISSION = "Garden.Settings.Manage";
 
-    // Full ame of the spoof request header.
+    // Full name of the spoof request header.
     public const SPOOF_HEADER = "X-Vanilla-Spoof";
 
     // Response header where the original user's name will be returned.
@@ -34,18 +35,27 @@ class SpoofMiddleware
     /** @var SmartIDMiddleware */
     private $smartIDMiddleware;
 
+    /** @var UserModel */
+    private $userModel;
+
     /**
      * Middleware setup routine.
      *
      * @param Gdn_Session $session
      * @param SmartIDMiddleware $smartIDMiddleware
      * @param LogDecorator $logger
+     * @param UserModel $userModel
      */
-    public function __construct(Gdn_Session $session, SmartIDMiddleware $smartIDMiddleware, LogDecorator $logger)
-    {
+    public function __construct(
+        Gdn_Session $session,
+        SmartIDMiddleware $smartIDMiddleware,
+        LogDecorator $logger,
+        UserModel $userModel
+    ) {
         $this->logger = $logger;
         $this->session = $session;
         $this->smartIDMiddleware = $smartIDMiddleware;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -54,7 +64,7 @@ class SpoofMiddleware
      * @param RequestInterface $request
      * @param callable $next
      * @return mixed
-     * @throws PermissionException If current user has invalid permissions to spoof.
+     * @throws ForbiddenException If current user has invalid permissions to spoof.
      * @throws ClientException If an issue is encountered resolving the user reference.
      */
     public function __invoke(RequestInterface $request, callable $next)
@@ -63,10 +73,43 @@ class SpoofMiddleware
 
         if ($value !== null) {
             if ($this->session->checkPermission(self::PERMISSION) !== true) {
-                throw new PermissionException(self::PERMISSION);
+                throw new PermissionException("You do not have permission to spoof a user account.");
             }
+
             $originalUser = $this->session->User;
             $userID = $this->resolveUserID(trim($value));
+
+            $targetUser = $this->getUserModel()->getID($userID, DATASET_TYPE_ARRAY);
+            $currentUser = $this->getUserModel()->getID($originalUser->UserID, DATASET_TYPE_ARRAY);
+            if ($targetUser && $currentUser) {
+                $targetAdminLevel = $targetUser["Admin"] ?? 0;
+                $currentAdminLevel = $currentUser["Admin"] ?? 0;
+
+                // Prevent self-spoofing
+                if ($userID == $originalUser->UserID) {
+                    $this->logger->info(
+                        "SpoofMiddleware: Self-spoofing blocked (targetAdminLevel = {$targetAdminLevel}, currentAdminLevel = {$currentAdminLevel})"
+                    );
+                    throw new ForbiddenException("You cannot spoof your own account.");
+                }
+
+                // Prevent non-system users from spoofing system users
+                if ($targetAdminLevel >= 2 && $currentAdminLevel < 2) {
+                    $this->logger->info(
+                        "SpoofMiddleware: Non-system user spoofing system user blocked (targetAdminLevel = {$targetAdminLevel}, currentAdminLevel = {$currentAdminLevel})"
+                    );
+                    throw new ForbiddenException("You do not have permission to spoof a system user account.");
+                }
+
+                // Prevent privilege escalation (spoofing into a user with higher admin level)
+                if ($targetAdminLevel > $currentAdminLevel) {
+                    $this->logger->info(
+                        "SpoofMiddleware: Privilege escalation spoofing blocked (targetAdminLevel = {$targetAdminLevel}, currentAdminLevel = {$currentAdminLevel})"
+                    );
+                    throw new ForbiddenException("You cannot spoof a user with higher privileges than your own.");
+                }
+            }
+
             $this->session->start($userID, false, false);
             $this->logger->addStaticContextDefaults([
                 "spoofBy" => [
@@ -112,5 +155,15 @@ class SpoofMiddleware
         }
 
         return $this->smartIDMiddleware->replaceSmartID("UserID", $ref);
+    }
+
+    /**
+     * Get the UserModel instance.
+     *
+     * @return UserModel
+     */
+    protected function getUserModel(): UserModel
+    {
+        return $this->userModel;
     }
 }

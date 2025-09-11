@@ -17,7 +17,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { SiteNavNodeTypes } from "./SiteNavNodeTypes";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 
 export const siteNavVariables = useThemeCache(() => {
     const globalVars = globalVariables();

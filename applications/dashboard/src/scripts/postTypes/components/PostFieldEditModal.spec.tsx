@@ -69,13 +69,11 @@ function WrappedModal(props?: WrappedProps) {
 
 describe("PostFieldEditModal", () => {
     beforeEach(() => {
+        const mockPostType = PostTypeFixture.getMockPostType();
         const mockAdapter = mockAPI();
         mockAdapter
             .onGet("/post-types")
-            .reply(200, [
-                PostTypeFixture.mockPostType,
-                { ...PostTypeFixture.mockPostType, postTypeID: "another-mock-post-type-id" },
-            ]);
+            .reply(200, [mockPostType, { ...mockPostType, postTypeID: "another-mock-post-type-id" }]);
     });
     it("Displays banner for one post type", async () => {
         render(<WrappedModal />);

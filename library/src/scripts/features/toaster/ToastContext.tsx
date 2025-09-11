@@ -6,12 +6,15 @@
 
 import { Toast } from "@library/features/toaster/Toast";
 import { toastManagerClasses } from "@library/features/toaster/ToastContext.styles";
+import { useStackingContext } from "@vanilla/react-utils";
 import { uuidv4 } from "@vanilla/utils";
 import React, { ReactNode, useContext, useState } from "react";
 
 export interface IToast {
     /** If the toast should dismiss itself */
     autoDismiss?: boolean;
+    /** Autodismiss duration */
+    autoDismissDuration?: number;
     /** If the toast should persist at the bottom of the stack */
     persistent?: boolean;
     /** If a toast should be dismissible by the user*/
@@ -34,6 +37,8 @@ interface IToasterContext {
     updateToast(toastID: string, toast: IToast, visibility?: boolean): void;
     /** Remove a specific toast */
     removeToast(toastID: string): void;
+    /** Let's apply extra zIndex when in modal */
+    setIsInModal: (isInModal: boolean) => void;
 }
 
 interface IToastState extends IToast {
@@ -51,6 +56,7 @@ export const ToastContext = React.createContext<IToasterContext>({
     addToast: () => "",
     updateToast: () => {},
     removeToast: () => {},
+    setIsInModal: () => {},
 });
 
 /**
@@ -79,6 +85,7 @@ export function useToastErrorHandler() {
 export function ToastProvider(props: { children: ReactNode }) {
     const { children } = props;
     const [toasts, setToast] = useState<IToastState[] | null>(null);
+    const [isInModal, setToastIsInModal] = useState<boolean>();
 
     const addToast = (toast: IToastState) => {
         const toastID = toast.toastID ?? uuidv4();
@@ -140,6 +147,10 @@ export function ToastProvider(props: { children: ReactNode }) {
         }, 2000);
     };
 
+    const setIsInModal = (isInModal: boolean) => {
+        setToastIsInModal(isInModal);
+    };
+
     return (
         <ToastContext.Provider
             value={{
@@ -147,62 +158,74 @@ export function ToastProvider(props: { children: ReactNode }) {
                 addToast,
                 updateToast,
                 removeToast,
+                setIsInModal,
             }}
         >
-            <ToastManager />
+            <ToastManager isInModal={isInModal} />
             {children}
         </ToastContext.Provider>
     );
 }
 
+declare global {
+    interface Window {
+        __LEGACY_ADD_TOAST__: (toast: IToast) => string;
+    }
+}
+
 /**
  * Renders all notifications
  */
-function ToastManager() {
+function ToastManager(props: { isInModal?: boolean }) {
     const classes = toastManagerClasses();
     const { toasts } = useContext(ToastContext);
 
+    const { zIndex } = useStackingContext();
+
     return (
-        <>
+        <section className={classes.area} style={{ zIndex: props.isInModal ? zIndex + 1 : undefined }}>
             {toasts && toasts.length > 0 && (
-                <section className={classes.area}>
-                    <>
-                        {/* Render persistent toasts first */}
-                        {toasts
-                            .filter((toast) => toast.persistent)
-                            .map((toast: IToastState) => {
-                                return (
-                                    <Toast
-                                        wide={toast.wide}
-                                        key={toast.toastID}
-                                        visibility={toast.visibility ?? true}
-                                        autoCloseDuration={toast.autoDismiss ? 3000 : undefined}
-                                        dismissible={toast.dismissible}
-                                        className={toast.className}
-                                    >
-                                        {toast.body}
-                                    </Toast>
-                                );
-                            })}
-                        {/* Render non-persistent toasts */}
-                        {toasts
-                            .filter((toast) => !toast.persistent)
-                            .map((toast: IToastState) => {
-                                return (
-                                    <Toast
-                                        key={toast.toastID}
-                                        visibility={toast.visibility ?? true}
-                                        autoCloseDuration={toast.autoDismiss ? 3000 : undefined}
-                                        dismissible={toast.dismissible}
-                                        className={toast.className}
-                                    >
-                                        {toast.body}
-                                    </Toast>
-                                );
-                            })}
-                    </>
-                </section>
+                <>
+                    {/* Render persistent toasts first */}
+                    {toasts
+                        .filter((toast) => toast.persistent)
+                        .map((toast: IToastState) => {
+                            return (
+                                <Toast
+                                    wide={toast.wide}
+                                    key={toast.toastID}
+                                    visibility={toast.visibility ?? true}
+                                    autoCloseDuration={
+                                        toast.autoDismiss ? toast.autoDismissDuration ?? 3000 : undefined
+                                    }
+                                    dismissible={toast.dismissible}
+                                    className={toast.className}
+                                >
+                                    {toast.body}
+                                </Toast>
+                            );
+                        })}
+                    {/* Render non-persistent toasts */}
+                    {toasts
+                        .filter((toast) => !toast.persistent)
+                        .map((toast: IToastState) => {
+                            return (
+                                <Toast
+                                    key={toast.toastID}
+                                    visibility={toast.visibility ?? true}
+                                    autoCloseDuration={
+                                        toast.autoDismiss ? toast.autoDismissDuration ?? 3000 : undefined
+                                    }
+                                    dismissible={toast.dismissible}
+                                    className={toast.className}
+                                >
+                                    {toast.body}
+                                </Toast>
+                            );
+                        })}
+                </>
             )}
-        </>
+            <div id="portaled-toasts"></div>
+        </section>
     );
 }

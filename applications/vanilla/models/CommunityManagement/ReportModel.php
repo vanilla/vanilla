@@ -10,6 +10,8 @@ namespace Vanilla\Forum\Models\CommunityManagement;
 use Garden\Container\ContainerException;
 use Garden\EventManager;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn;
@@ -26,8 +28,10 @@ use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
 use Vanilla\Database\Operation\ResourceEventProcessor;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Formatting\Formats\WysiwygFormat;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Forum\Addon\ReportPostTriggerHandler;
 use Vanilla\Forum\Models\SpamReport;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Models\UserFragmentSchema;
@@ -169,6 +173,11 @@ class ReportModel extends PipelineModel
             $where["rrj.reportReasonID"] = $where["reportReasonID"];
             unset($where["reportReasonID"]);
         }
+
+        if (isset($where["categoryID"])) {
+            $where["placeRecordID"] = $where["categoryID"];
+            unset($where["categoryID"]);
+        }
         $wherePrefixes = [];
         foreach ($where as $key => $value) {
             $wherePrefixes[] = explode(".", $key)[0] ?? null;
@@ -208,6 +217,7 @@ class ReportModel extends PipelineModel
 
     /**
      * @param array $where
+     * @param bool $automationRules
      *
      * @return Gdn_SQLDriver
      */
@@ -315,7 +325,12 @@ class ReportModel extends PipelineModel
             $reportID = $report["reportID"];
             $report["reasons"] = $reasonFragmentsByReportID[$reportID] ?? [];
 
-            $report["noteHtml"] = trim($this->formatService->renderHTML($report["noteBody"], $report["noteFormat"]));
+            if (isset($report["noteBody"])) {
+                $report["noteHtml"] = trim(
+                    $this->formatService->renderHTML($report["noteBody"], $report["noteFormat"])
+                );
+            }
+
             $report["recordHtml"] = trim(
                 $this->formatService->renderHTML($report["recordBody"], $report["recordFormat"])
             );
@@ -458,67 +473,91 @@ class ReportModel extends PipelineModel
      * Then mark the report as done.
      *
      * @param int $reportID
+     * @param array|null $recordOverrides Optional updates to be applied to the restored record.
      * @return void
      */
-    public function saveRecordFromPremoderation(int $reportID): void
+    public function saveRecordFromPremoderation(int $reportID, ?array $recordOverrides = null): void
     {
-        $report = $this->selectSingle(["reportID" => $reportID]);
-        $premoderatedRecord = $report["premoderatedRecord"];
-        if (empty($premoderatedRecord)) {
-            throw new ServerException("No premoderated record found.");
-        }
+        $this->database->runWithTransaction(function () use ($reportID, $recordOverrides) {
+            $report = $this->selectSingle(["reportID" => $reportID]);
+            $premoderatedRecord = $report["premoderatedRecord"];
+            if (empty($premoderatedRecord)) {
+                throw new ServerException("No premoderated record found.");
+            }
 
-        $premoderatedRecord["InsertUserID"] = $report["recordUserID"]; // Preserve the original user.
-        if (!$report["isPendingUpdate"]) {
-            $premoderatedRecord["DateInserted"] = CurrentTimeStamp::getMySQL(); // Forward date the post in case it took a while to moderate.
-        }
+            $premoderatedRecord["InsertUserID"] = $report["recordUserID"]; // Preserve the original user.
+            if (!$report["isPendingUpdate"]) {
+                $premoderatedRecord["DateInserted"] = CurrentTimeStamp::getMySQL(); // Forward date the post in case it took a while to moderate.
+            }
 
-        switch ($report["recordType"]) {
-            case "discussion":
-                if (isset($report["recordID"])) {
-                    $premoderatedRecord["DiscussionID"] = $report["recordID"];
-                    $premoderatedRecord["DateUpdated"] = CurrentTimeStamp::getMySQL();
-                }
-                $discussionModel = \Gdn::getContainer()->get(\DiscussionModel::class);
-                $discussionID = $discussionModel->save($premoderatedRecord, [
-                    "CheckPermission" => false,
-                    "SpamCheck" => false,
-                    "skipSpamCheck" => true,
-                ]);
-                $recordID = $discussionID;
-                ModelUtils::validationResultToValidationException($discussionModel);
-                ModelUtils::validateSaveResultPremoderation($discussionModel, "discussion");
+            switch ($report["recordType"]) {
+                case "discussion":
+                    if (isset($report["recordID"])) {
+                        $premoderatedRecord["DiscussionID"] = $report["recordID"];
+                        $premoderatedRecord["DateUpdated"] = CurrentTimeStamp::getMySQL();
+                    }
+                    $discussionModel = \Gdn::getContainer()->get(\DiscussionModel::class);
+                    $options = [
+                        "CheckPermission" => false,
+                        "SpamCheck" => false,
+                        "skipSpamCheck" => true,
+                    ];
+                    $discussionID = $discussionModel->save($premoderatedRecord, $options);
+                    $recordID = $discussionID;
+                    ModelUtils::validationResultToValidationException($discussionModel);
+                    ModelUtils::validateSaveResultPremoderation($discussionModel, "discussion");
 
-                break;
-            case "comment":
-                if (isset($report["recordID"])) {
-                    $premoderatedRecord["CommentID"] = $report["recordID"];
-                    $premoderatedRecord["DateUpdated"] = CurrentTimeStamp::getMySQL();
-                }
-                $commentModel = \Gdn::getContainer()->get(\CommentModel::class);
-                $commentID = $commentModel->save($premoderatedRecord, [
-                    "CheckPermission" => false,
-                    "SpamCheck" => false,
-                    "skipSpamCheck" => true,
-                ]);
-                $recordID = $commentID;
-                ModelUtils::validationResultToValidationException($commentModel);
-                ModelUtils::validateSaveResultPremoderation($commentModel, "comment");
-                break;
-            default:
-                throw new ServerException("Invalid record type.");
-        }
+                    if (isset($recordOverrides)) {
+                        // Save mod-edits as a separate operation to dispatch update event for logging/analytics.
+                        $discussionModel->save(
+                            $recordOverrides + ["DiscussionID" => $discussionID, "Format" => Rich2Format::FORMAT_KEY],
+                            $options
+                        );
+                        ModelUtils::validationResultToValidationException($discussionModel);
+                    }
 
-        // Persist this recordID into the escalation record
-        $this->update(
-            set: [
-                "recordID" => $recordID,
-                "premoderatedRecord" => null,
-                "isPending" => false,
-                "isPendingUpdate" => false,
-            ],
-            where: ["reportID" => $reportID]
-        );
+                    break;
+                case "comment":
+                    if (isset($report["recordID"])) {
+                        $premoderatedRecord["CommentID"] = $report["recordID"];
+                        $premoderatedRecord["DateUpdated"] = CurrentTimeStamp::getMySQL();
+                    }
+                    $commentModel = \Gdn::getContainer()->get(\CommentModel::class);
+                    $options = [
+                        "CheckPermission" => false,
+                        "SpamCheck" => false,
+                        "skipSpamCheck" => true,
+                    ];
+                    $commentID = $commentModel->save($premoderatedRecord, $options);
+                    $recordID = $commentID;
+                    ModelUtils::validationResultToValidationException($commentModel);
+                    ModelUtils::validateSaveResultPremoderation($commentModel, "comment");
+
+                    if (isset($recordOverrides)) {
+                        // Save mod-edits as a separate operation to dispatch update event for logging/analytics.
+                        $commentModel->save(
+                            $recordOverrides + ["CommentID" => $commentID, "Format" => Rich2Format::FORMAT_KEY],
+                            $options
+                        );
+                        ModelUtils::validationResultToValidationException($commentModel);
+                    }
+
+                    break;
+                default:
+                    throw new ServerException("Invalid record type.");
+            }
+
+            // Persist this recordID into the escalation record
+            $this->update(
+                set: [
+                    "recordID" => $recordID,
+                    "premoderatedRecord" => null,
+                    "isPending" => false,
+                    "isPendingUpdate" => false,
+                ],
+                where: ["reportID" => $reportID]
+            );
+        });
     }
 
     /**
@@ -555,7 +594,10 @@ class ReportModel extends PipelineModel
         if (!empty($set["reportReasonIDs"])) {
             $this->putReasonsForReport($reportID, $set["reportReasonIDs"]);
         }
-
+        if (Gdn::config("Feature.AutomationRules.Enabled")) {
+            $reportPostTriggerHandler = \Gdn::getContainer()->get(ReportPostTriggerHandler::class);
+            $reportPostTriggerHandler->handleUserEvent($reportID);
+        }
         $report = $this->getReport($reportID);
         $this->notifyNewReport($report);
 
@@ -581,7 +623,7 @@ class ReportModel extends PipelineModel
             "PluralHeadlineFormat" => sprintf(ReportActivity::getPluralHeadline(), $report["recordName"]),
             "RecordType" => $report["recordType"],
             "RecordID" => $report["recordID"],
-            "Route" => $report["recordUrl"],
+            "Route" => $report["recordUrl"] ?? url("/dashboard/content/reports", true),
             "Data" => [
                 "escalationID" => $report["reportID"],
                 "name" => $report["recordName"],

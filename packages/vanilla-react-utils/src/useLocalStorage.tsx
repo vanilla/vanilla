@@ -4,15 +4,13 @@
  */
 
 import { useEffect, useState } from "react";
-import { getMeta } from "@library/utility/appUtils";
-
-const host = getMeta("context.host", "");
-const PREFIX = `vanilla/${host}`;
 
 /**
  * Get saved data from localStorage or DefaultValue
  */
 export function getLocalStorageOrDefault<T>(key: string, defaultValue: T, includePrefix = false): T {
+    const host = (window as any).gdn?.meta?.context?.host ?? "";
+    const PREFIX = `vanilla/${host}`;
     const stored = localStorage.getItem(includePrefix ? `${PREFIX}/${key}` : key);
 
     if (!stored) {
@@ -25,6 +23,8 @@ export function getLocalStorageOrDefault<T>(key: string, defaultValue: T, includ
  * Allow fetching and setting of a value in the user's local storage.
  */
 export function useLocalStorage<T>(key: string, defaultValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+    const host = (window as any).gdn?.meta?.context?.host ?? "";
+    const PREFIX = `vanilla/${host}`;
     key = `${PREFIX}/${key}`;
     const [value, setValue] = useState(getLocalStorageOrDefault(key, defaultValue));
 

@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { ensureHtmlElement } from "@vanilla/dom-utils";
+import { LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import React from "react";
+import { ensureHtmlElement } from "@vanilla/dom-utils";
 import { mountReact } from "@vanilla/react-utils";
-import { LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
 
 /**
  * Mount the editor into a DOM Node.
@@ -17,6 +17,12 @@ import { LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor.l
 export default function mountEditor(containerSelector: string | Element, descriptionID?: string) {
     const container = ensureHtmlElement(containerSelector);
     const bodybox = container.closest("form")!.querySelector(".BodyBox");
+
+    // Used to provide context to mentions in legacy post and create post pages
+    // DiscussionID always exists when posting a comment
+    const discussionID = container.closest("form")?.querySelector("#Form_DiscussionID");
+    const recordType = discussionID ? "discussion" : "category";
+    const recordID = discussionID?.getAttribute("value") ?? undefined;
 
     const uploadEnabled = !!container.dataset.uploadenabled;
     const needsHtmlConversion = !!container.dataset.needshtmlconversion;
@@ -37,6 +43,8 @@ export default function mountEditor(containerSelector: string | Element, descrip
                 legacyTextArea={bodybox as HTMLInputElement}
                 uploadEnabled={uploadEnabled}
                 showConversionNotice={showConversionNotice}
+                recordType={recordType}
+                recordID={recordID}
             />,
 
             container,
@@ -136,7 +144,7 @@ export function handleLegacyAttachments(container: HTMLElement, documentFromCall
                                 }
                                 previewInput.setAttribute("name", "MediaIDs[]");
                                 previewInput.removeAttribute("id");
-                                previewInput.setAttribute("disabled", true);
+                                previewInput.setAttribute("disabled", "true");
                                 clonedNode.classList.remove("editor-file-removed");
                             });
                     }

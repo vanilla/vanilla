@@ -33,6 +33,8 @@ class OwnSite extends VanillaSite
 
     protected ConfigurationInterface $config;
 
+    protected string $applicationVersion;
+
     /**
      * DI.
      *
@@ -66,6 +68,7 @@ class OwnSite extends VanillaSite
         $internalClient->setThrowExceptions(true);
 
         $this->setHttpClient($internalClient);
+        $this->applicationVersion = APPLICATION_VERSION;
     }
 
     /**
@@ -96,10 +99,33 @@ class OwnSite extends VanillaSite
 
     /**
      * Overridden to provide local site config.
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function loadSiteConfig(): array
     {
         return $this->config->getAll();
+    }
+
+    /**
+     * Get the release version of the application.
+     *
+     * Defaults to the APPLICATION_VERSION constant, which comes from the version.json file.
+     *
+     * @return string
+     */
+    public function getApplicationVersion(): string
+    {
+        return $this->applicationVersion;
+    }
+
+    /**
+     * Primarily for use in tests.
+     *
+     * @param string $applicationVersion
+     * @return void
+     */
+    public function setApplicationVersion(string $applicationVersion): void
+    {
+        $this->applicationVersion = $applicationVersion;
     }
 }

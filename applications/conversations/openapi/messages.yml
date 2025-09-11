@@ -131,6 +131,15 @@ components:
                     type: integer
                 format:
                     $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/Format"
+                insertUserID:
+                    description: The user that created the message.
+                    type: integer
+                    x-hidden: true
+                dateInserted:
+                    description: When the message was created.
+                    format: date-time
+                    type: string
+                    x-hidden: true
             required:
                 - conversationID
                 - body

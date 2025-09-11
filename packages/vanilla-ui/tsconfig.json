@@ -1,5 +1,5 @@
 {
-    "extends": "@vanilla/tsconfig/base",
+    "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "stripInternal": true
     }

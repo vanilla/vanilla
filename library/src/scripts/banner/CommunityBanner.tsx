@@ -9,9 +9,7 @@ import Banner from "@library/banner/Banner";
 import { MemoryRouter } from "react-router";
 import { bannerVariables } from "@library/banner/Banner.variables";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";
-import { NoDescription } from "@library/banner/banner.story";
 
 interface IProps {
     title?: string; // Often the message to display isn't the real H1

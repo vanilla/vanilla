@@ -24,7 +24,7 @@ class ModelTest extends BootstrapTestCase
     protected $model;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

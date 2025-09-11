@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -9,17 +9,13 @@ import { IUser } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { IFollowedCategoryNotificationPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
 import { t } from "@vanilla/i18n";
-import {
-    CategoryNotificationPreferencesContext,
-    ICategoryPreferences,
-} from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
-import React, { Dispatch, useState } from "react";
-import Message from "@library/messages/Message";
-import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
+import { RecordID } from "@vanilla/utils";
+import { Dispatch } from "react";
 
-function usePatchCategoryNotificationPreferences(args: {
-    categoryID: number;
+export function usePatchCategoryNotificationPreferences(args: {
+    categoryID: RecordID;
     userID: IUser["userID"];
     setServerError: Dispatch<IServerError | null>;
 }) {
@@ -29,9 +25,9 @@ function usePatchCategoryNotificationPreferences(args: {
     const toast = useToast();
 
     return useMutation({
-        mutationFn: async (newPreferences: ICategoryPreferences) => {
+        mutationFn: async (newPreferences: IFollowedCategoryNotificationPreferences) => {
             setServerError(null);
-            const { data } = await apiv2.patch<ICategoryPreferences>(
+            const { data } = await apiv2.patch<IFollowedCategoryNotificationPreferences>(
                 `/categories/${categoryID}/preferences/${userID}`,
                 newPreferences,
             );
@@ -41,11 +37,11 @@ function usePatchCategoryNotificationPreferences(args: {
 
         onMutate: async function (newData) {
             setServerError(null);
-            const previousPreferences = queryClient.getQueryData<ICategoryPreferences>([
+            const previousPreferences = queryClient.getQueryData<IFollowedCategoryNotificationPreferences>([
                 "categoryNotificationPreferences",
                 { categoryID, userID },
             ]);
-            queryClient.setQueryData<ICategoryPreferences>(
+            queryClient.setQueryData<IFollowedCategoryNotificationPreferences>(
                 ["categoryNotificationPreferences", { categoryID, userID }],
                 newData,
             );
@@ -55,7 +51,7 @@ function usePatchCategoryNotificationPreferences(args: {
 
         onError: (_err: IServerError, _variables, context) => {
             if (context?.previousPreferences) {
-                queryClient.setQueryData<ICategoryPreferences>(
+                queryClient.setQueryData<IFollowedCategoryNotificationPreferences>(
                     ["categoryNotificationPreferences", { categoryID, userID }],
                     context.previousPreferences,
                 );
@@ -64,7 +60,7 @@ function usePatchCategoryNotificationPreferences(args: {
         },
 
         onSuccess: async (newData) => {
-            queryClient.setQueryData<ICategoryPreferences>(
+            queryClient.setQueryData<IFollowedCategoryNotificationPreferences>(
                 ["categoryNotificationPreferences", { categoryID, userID }],
                 newData,
             );
@@ -79,51 +75,20 @@ function usePatchCategoryNotificationPreferences(args: {
     });
 }
 
-function useGetCategoryNotificationPreferences(args: {
-    categoryID: number;
+export function useGetCategoryNotificationPreferences(args: {
+    categoryID: RecordID;
     userID: IUser["userID"];
-    initialData?: ICategoryPreferences;
+    initialData?: IFollowedCategoryNotificationPreferences;
 }) {
     const { categoryID, userID, initialData } = args;
 
-    return useQuery<unknown, IApiError, ICategoryPreferences>({
-        queryFn: async () => await apiv2.get<ICategoryPreferences>(`/categories/${categoryID}/preferences/${userID}`),
+    return useQuery<unknown, IApiError, IFollowedCategoryNotificationPreferences>({
+        queryFn: async () =>
+            await apiv2.get<IFollowedCategoryNotificationPreferences>(
+                `/categories/${categoryID}/preferences/${userID}`,
+            ),
         queryKey: ["categoryNotificationPreferences", { categoryID, userID }],
         initialData,
         refetchOnWindowFocus: false,
     });
-}
-
-export function CategoryNotificationPreferencesContextProvider(
-    props: React.PropsWithChildren<{
-        userID: IUser["userID"];
-        categoryID: number;
-        initialPreferences: ICategoryPreferences;
-    }>,
-) {
-    const { userID, categoryID, initialPreferences } = props;
-    const [serverError, setServerError] = useState<IServerError | null>(null);
-    const classesFrameBody = frameBodyClasses();
-    const preferencesQuery = useGetCategoryNotificationPreferences({
-        categoryID,
-        userID,
-        initialData: initialPreferences,
-    });
-
-    const { mutateAsync } = usePatchCategoryNotificationPreferences({
-        categoryID,
-        userID,
-        setServerError,
-    });
-
-    return (
-        <CategoryNotificationPreferencesContext.Provider
-            value={{ preferences: preferencesQuery.data, setPreferences: mutateAsync }}
-        >
-            {serverError && (
-                <Message error={serverError} stringContents={serverError.message} className={classesFrameBody.error} />
-            )}
-            {props.children}
-        </CategoryNotificationPreferencesContext.Provider>
-    );
 }

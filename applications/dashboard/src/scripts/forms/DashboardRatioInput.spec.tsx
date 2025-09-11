@@ -2,7 +2,7 @@ import { useState } from "react";
 import { RenderResult, fireEvent, render } from "@testing-library/react";
 import DashboardRatioInput from "@dashboard/forms/DashboardRatioInput";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "./DashboardLabelType";
 
 function MockForm() {
     const [value, setValue] = useState(35);

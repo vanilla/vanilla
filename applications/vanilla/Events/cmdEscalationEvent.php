@@ -35,7 +35,7 @@ class cmdEscalationEvent extends ResourceEvent implements LoggableEventInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {
@@ -61,7 +61,7 @@ class cmdEscalationEvent extends ResourceEvent implements LoggableEventInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -69,7 +69,7 @@ class cmdEscalationEvent extends ResourceEvent implements LoggableEventInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getTrackablePayload(
         TrackableCommunityModel $trackableCommunity,

@@ -15,6 +15,7 @@ use Vanilla\Forms\FormPickerOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Http\InternalClient;
+use Vanilla\InjectableInterface;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
@@ -22,9 +23,11 @@ use Vanilla\Permissions;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\TwigRenderTrait;
+use Vanilla\Widgets\Fragments\CommentItemFragmentMeta;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
+use Vanilla\Widgets\React\ReactWidget;
 
-class PostCommentThreadAsset extends AbstractLayoutAsset implements HydrateAwareInterface
+class PostCommentThreadAsset extends ReactWidget
 {
     use HydrateAwareTrait;
     use TwigRenderTrait;
@@ -34,8 +37,17 @@ class PostCommentThreadAsset extends AbstractLayoutAsset implements HydrateAware
     public function __construct(
         protected InternalClient $internalClient,
         protected ConfigurationInterface $configuration,
-        protected \Gdn_Session $session
+        protected \Gdn_Session $session,
+        protected \CommentModel $commentModel
     ) {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
     }
 
     /**
@@ -60,7 +72,7 @@ class PostCommentThreadAsset extends AbstractLayoutAsset implements HydrateAware
 
         $parentRecordParams = $this->getParentRecordParams();
         $apiParams = $parentRecordParams + [
-            "page" => $page,
+            "page" => is_numeric($page) ? (int) $page : $page,
             "limit" => $limit,
             "expand" => ["insertUser", "updateUser", "reactions", "attachments", "reportMeta"],
             "sort" => $this->getHydrateParam("sort") ?: $this->props["apiParams"]["sort"] ?? "dateInserted",
@@ -84,6 +96,25 @@ class PostCommentThreadAsset extends AbstractLayoutAsset implements HydrateAware
         $props = [];
         $maxDepth = (int) $this->props["apiParams"]["maxDepth"];
         $threadStyle = $maxDepth == 1 ? "flat" : "nested";
+        if ($page === "lookupSort") {
+            switch ($apiParams["sort"]) {
+                case "-dateInserted":
+                    $orderBy = [["c.DateInserted", "desc"]];
+                    break;
+                case "-score":
+                    $orderBy = [["c.Score", "desc"]];
+                    break;
+                // It's too expensive to calculate the offset for other sorts
+                // for comment permalinks, so we will default to the dateInserted sort.
+                default:
+                    $orderBy = [["c.DateInserted", "asc"]];
+                    $apiParams["sort"] = "dateInserted";
+            }
+            $apiParams["page"] = $this->commentModel->getCommentThreadPage(
+                commentRowOrCommentID: $commentID,
+                orderBy: $orderBy
+            );
+        }
         $props["threadStyle"] = $threadStyle;
         // maybe we should always get comments and commentsThread ?
         if ($threadStyle === "nested") {
@@ -181,7 +212,7 @@ TWIG
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): ?string
     {
@@ -313,5 +344,13 @@ TWIG
             self::widgetSubtitleSchema(),
             self::widgetDescriptionSchema(allowDynamic: false)
         );
+    }
+
+    /**
+     * @inheridoc
+     */
+    static function getFragmentClasses(): array
+    {
+        return [CommentItemFragmentMeta::class];
     }
 }

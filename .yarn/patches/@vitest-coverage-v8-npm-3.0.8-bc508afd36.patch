@@ -1,0 +1,54 @@
+diff --git a/dist/provider.js b/dist/provider.js
+index 0fe52f5689bff31baf0d557c2376b7234e0eee5d..5b8e2938b004bcee2da11473b869bfe8f8e6a698 100644
+--- a/dist/provider.js
++++ b/dist/provider.js
+@@ -391,7 +391,7 @@ function requireConvertSourceMap () {
+ 		exports.generateMapFileComment = function (file, options) {
+ 		  var data = 'sourceMappingURL=' + file;
+ 		  return options && options.multiline ? '/*# ' + data + ' */' : '//# ' + data;
+-		}; 
++		};
+ 	} (convertSourceMap));
+ 	return convertSourceMap;
+ }
+@@ -1007,7 +1007,7 @@ function requireSourcemapCodec_umd () {
+ 		    Object.defineProperty(exports, '__esModule', { value: true });
+ 
+ 		}));
+-		
++
+ 	} (sourcemapCodec_umd$1, sourcemapCodec_umd$1.exports));
+ 	return sourcemapCodec_umd$1.exports;
+ }
+@@ -1268,7 +1268,7 @@ function requireResolveUri_umd () {
+ 		    return resolve;
+ 
+ 		}));
+-		
++
+ 	} (resolveUri_umd$1));
+ 	return resolveUri_umd$1.exports;
+ }
+@@ -1877,7 +1877,7 @@ function requireTraceMapping_umd () {
+ 		    exports.traceSegment = traceSegment;
+ 
+ 		}));
+-		
++
+ 	} (traceMapping_umd$1, traceMapping_umd$1.exports));
+ 	return traceMapping_umd$1.exports;
+ }
+@@ -2216,7 +2216,12 @@ function requireV8ToIstanbul$1 () {
+ 	  }
+ 
+ 	  async load () {
+-	    const rawSource = this.sources.source || await readFile(this.path, 'utf8');
++		try {
++	    var rawSource = this.sources.source || await readFile(this.path, 'utf8');
++		} catch (err) {
++			console.error("Failed to read file: " + this.path);
++			throw err;
++		}
+ 	    this.rawSourceMap = this.sources.sourceMap ||
+ 	      // if we find a source-map (either inline, or a .map file) we load
+ 	      // both the transpiled and original source, both of which are used during

@@ -14,6 +14,7 @@ use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Widgets\Fragments\PostItemFragmentMeta;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\WidgetSchemaTrait;
 use Vanilla\Forms\FormOptions;
@@ -47,6 +48,14 @@ class DiscussionListAsset extends AbstractLayoutAsset implements HydrateAwareInt
     {
         $this->baseDiscussionWidget = $baseDiscussionWidget;
         $this->categoryModel = $categoryModel;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [PostItemFragmentMeta::class];
     }
 
     /**
@@ -124,7 +133,12 @@ class DiscussionListAsset extends AbstractLayoutAsset implements HydrateAwareInt
         $props["apiParams"] = $apiParams;
         $props["isAsset"] = true;
 
-        $props = $this->baseDiscussionWidget->getProps($props);
+        $assetProps = $this->baseDiscussionWidget->getProps($props);
+        // If the user doesn't have permissions
+        if ($assetProps === null) {
+            return null;
+        }
+        $props = array_replace($props, $assetProps);
 
         //at this point we should have some defaults
         if (!$props) {
@@ -186,7 +200,7 @@ class DiscussionListAsset extends AbstractLayoutAsset implements HydrateAwareInt
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

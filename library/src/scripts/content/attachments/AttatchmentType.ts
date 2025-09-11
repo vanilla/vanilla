@@ -3,12 +3,13 @@
  * @license GPL-2.0-only
  */
 
-export enum AttachmentType {
-    FILE = "A file",
-    PDF = "Adobe Portable Document Format (PDF)",
-    EXCEL = "Microsoft Excel Spreadsheet",
-    WORD = "Microsoft Word Document",
-    PPT = "Microsoft PowerPoint Presentation",
-    ARCHIVE = "An archived file or files",
-    IMAGE = "An image file",
-}
+export const AttachmentType = {
+    FILE: "A file",
+    PDF: "Adobe Portable Document Format (PDF)",
+    EXCEL: "Microsoft Excel Spreadsheet",
+    WORD: "Microsoft Word Document",
+    PPT: "Microsoft PowerPoint Presentation",
+    ARCHIVE: "An archived file or files",
+    IMAGE: "An image file",
+} as const;
+export type AttachmentType = (typeof AttachmentType)[keyof typeof AttachmentType];

@@ -19,4 +19,9 @@ interface FormChoicesInterface
      * @return array
      */
     public function getChoices(): array;
+
+    /**
+     * @return array{options?: array, optionsLookup?: array}
+     */
+    public function getOptionsData(): array;
 }

@@ -9,10 +9,12 @@ namespace Vanilla\Controllers\Api;
 use AbstractApiController;
 use Garden\Schema\ValidationException;
 use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ServerException;
 use UserModel;
 use Vanilla\ApiUtils;
-use Vanilla\Dashboard\Models\RagSummaryService;
+use Vanilla\Dashboard\Models\OpenAiSummaryService;
+use Vanilla\Search\AiConversationFilterService;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchResultItem;
@@ -38,7 +40,8 @@ class SearchApiController extends AbstractApiController
     public function __construct(
         private UserModel $userModel,
         private SearchService $searchService,
-        private RagSummaryService $ragSummaryService
+        private OpenAiSummaryService $ragSummaryService,
+        private AiConversationFilterService $ragFilterService
     ) {
     }
 
@@ -102,7 +105,11 @@ class SearchApiController extends AbstractApiController
     }
 
     /**
-     * Uses the search service to get rag of search results.
+     * Uses the search service to get ai-conversation of search results.
+     *
+     * Note: The term `rag` was initially used during developpement to refer to what is now AI conversation.
+     *
+     * Do NOT rename this endpoint since it is used by Nexus.
      *
      * @param array $query
      *
@@ -111,6 +118,71 @@ class SearchApiController extends AbstractApiController
      * @throws ServerException
      */
     public function get_rag(array $query): Data
+    {
+        // Set default parameters
+        $query["matchMode"] = $query["matchMode"] ?? "vectorized";
+        $query["expand"] = "vectors";
+
+        // Apply AI conversation filters
+        $this->ragFilterService->applyFilters($query);
+
+        $in = $this->searchService->buildQuerySchema();
+        $query = $in->validate($query);
+        $driver = $this->searchService->getActiveDriver($query["driver"] ?? null);
+
+        // Paging
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
+
+        $searchResults = $driver->search(
+            $query,
+            new SearchOptions(
+                $offset,
+                $limit,
+                includeTypeaheads: $query["includeTypeaheads"] ?? false,
+                includeResults: $query["includeResults"] ?? true
+            )
+        );
+        $result = $this->normalizeRagResult($searchResults);
+        return new Data($result);
+    }
+
+    /**
+     * Normalize the result for Rag.
+     *
+     * @param SearchResults $searchResults
+     * @return array
+     */
+    private function normalizeRagResult(SearchResults $searchResults): array
+    {
+        $rows = $searchResults->getResultItems();
+        $result = [];
+
+        foreach ($rows as $row) {
+            if ($row instanceof SearchResultItem) {
+                $result[] = [
+                    "excerpt" => $row->getTextFragments(),
+                    "title" => $row->getName(),
+                    "id" => $row->getRecordID(),
+                    "type" => $row->getType(),
+                    "url" => $row->getUrl(),
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Uses the search service to get ai-conversation search results using OpenAI.
+     *
+     * @param array $query
+     *
+     * @return Data
+     * @throws ServerException
+     * @throws ValidationException
+     * @throws ClientException
+     */
+    public function get_summary(array $query): Data
     {
         $in = $this->searchService->buildQuerySchema();
         $query = $in->validate($query);
@@ -128,15 +200,9 @@ class SearchApiController extends AbstractApiController
             )
         );
 
-        $expands = $query["expand"] ?? [];
-
-        $ragResult = $this->ragSummaryService->ragSummary(
-            $searchResults->getResultItems(),
-            $query["query"],
-            in_array("summary", $expands)
-        );
-
-        return new Data($ragResult);
+        $textFragments = $this->combineTextFragments($searchResults->getResultItems());
+        $result = $this->ragSummaryService->getSummary($textFragments, $query["query"]);
+        return new Data($result);
     }
 
     /**
@@ -156,5 +222,25 @@ class SearchApiController extends AbstractApiController
         foreach ($rows as &$row) {
             $populate($row);
         }
+    }
+
+    /**
+     * Merge multiple text fragments into a single text field.
+     *
+     * @param array $searchResults
+     * @return array
+     */
+    private function combineTextFragments(array $searchResults): array
+    {
+        $texts = [];
+        foreach ($searchResults as $searchResult) {
+            if ($searchResult instanceof SearchResultItem) {
+                $texts["summary"][] = $searchResult->getTextFragments();
+            } else {
+                $texts["summary"][] = $searchResult["textFragments"];
+            }
+        }
+
+        return $texts;
     }
 }

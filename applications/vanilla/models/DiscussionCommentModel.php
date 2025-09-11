@@ -42,7 +42,7 @@ class DiscussionCommentModel extends AbstractCommentParentHandler
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordType(): string
     {
@@ -107,7 +107,7 @@ class DiscussionCommentModel extends AbstractCommentParentHandler
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function hasCommentParentEditPermissionBypass(array $commentRow): bool
     {
@@ -116,7 +116,7 @@ class DiscussionCommentModel extends AbstractCommentParentHandler
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function hasCommentParentDeletePermissionBypass(array $commentRow): bool
     {
@@ -237,11 +237,11 @@ class DiscussionCommentModel extends AbstractCommentParentHandler
     public function getCategoryID(int $parentID): ?int
     {
         $discussion = $this->discussionModel->getID($parentID, DATASET_TYPE_ARRAY);
-        return $discussion["CategoryID"];
+        return $discussion["CategoryID"] ?? 0;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function applyCommentQueryFiltering(Gdn_SQLDriver &$subQuery, array &$permissionWheres, array $where): void
     {
@@ -368,7 +368,7 @@ class DiscussionCommentModel extends AbstractCommentParentHandler
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function isSearchable(): bool
     {

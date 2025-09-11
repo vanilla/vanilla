@@ -1,28 +1,30 @@
-import type { IComment } from "@dashboard/@types/api/comment";
-import type { IDiscussion } from "@dashboard/@types/api/discussion";
-import { roleLookUp, userLookup } from "@dashboard/moderation/communityManagmentUtils";
-import { FilterBlock } from "@dashboard/moderation/components/FilterBlock";
-import { ReasonFilter } from "@dashboard/moderation/components/ReasonFilter";
 import { ReportStatus, reportStatusLabel } from "@dashboard/moderation/components/ReportFilters.constants";
-import { Icon } from "@vanilla/icons";
-import apiv2 from "@library/apiv2";
+import { roleLookUp, userLookup } from "@dashboard/moderation/communityManagmentUtils";
+
+import { BorderType } from "@library/styles/styleHelpersBorders";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import { FilterBlock } from "@dashboard/moderation/components/FilterBlock";
+import type { IComment } from "@dashboard/@types/api/comment";
+import type { IDiscussion } from "@dashboard/@types/api/discussion";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { PageBox } from "@library/layout/PageBox";
-import { ListItem } from "@library/lists/ListItem";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { BorderType } from "@library/styles/styleHelpersBorders";
-import { useQuery } from "@tanstack/react-query";
-import { t } from "@vanilla/i18n";
-import Translate from "@library/content/Translate";
-import { MetaItem } from "@library/metas/Metas";
-import { metasClasses } from "@library/metas/Metas.styles";
-import ProfileLink from "@library/navigation/ProfileLink";
-import SmartLink from "@library/routing/links/SmartLink";
-import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
+import { Icon } from "@vanilla/icons";
 import InputBlock from "@library/forms/InputBlock";
+import { ListItem } from "@library/lists/ListItem";
+import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
+import { MetaItem } from "@library/metas/Metas";
+import { PageBox } from "@library/layout/PageBox";
+import ProfileLink from "@library/navigation/ProfileLink";
+import { ReasonFilter } from "@dashboard/moderation/components/ReasonFilter";
+import SmartLink from "@library/routing/links/SmartLink";
+import Translate from "@library/content/Translate";
+import apiv2 from "@library/apiv2";
 import { css } from "@emotion/css";
+import { getMeta } from "@library/utility/appUtils";
+import { metasClasses } from "@library/metas/Metas.styles";
+import { t } from "@vanilla/i18n";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { useQuery } from "@tanstack/react-query";
 
 export type IReportFilters = {
     /** Status of the report */
@@ -46,6 +48,15 @@ interface IProps {
 
 export function ReportFilters(props: IProps) {
     const { value, onFilter } = props;
+
+    const permissions = usePermissionsContext();
+    const hasMemberRestrictions = getMeta("moderation.restrictMemberFilterUI", false);
+    const communityModerate = permissions.hasPermission("community.moderate");
+    const siteManage = permissions.hasPermission("site.manage");
+
+    // AIDEV-NOTE: Show member filters unless restricted by config AND user lacks required permissions
+    const shouldShowMemberFilters = !hasMemberRestrictions || communityModerate || siteManage;
+
     const reportFilterOptions: ISelectBoxItem[] = [
         {
             name: reportStatusLabel(ReportStatus.NEW),
@@ -110,7 +121,7 @@ export function ReportFilters(props: IProps) {
                                             c0={
                                                 reportRecordQuery.data?.insertUser ? (
                                                     <ProfileLink
-                                                        className={metasClasses().metaLink}
+                                                        asMeta
                                                         userFragment={reportRecordQuery.data?.insertUser}
                                                     />
                                                 ) : (
@@ -119,10 +130,7 @@ export function ReportFilters(props: IProps) {
                                             }
                                             c1={
                                                 reportRecordQuery.data?.category ? (
-                                                    <SmartLink
-                                                        to={reportRecordQuery.data.category.url}
-                                                        className={metasClasses().metaLink}
-                                                    >
+                                                    <SmartLink to={reportRecordQuery.data.category.url} asMeta>
                                                         {reportRecordQuery.data.category.name}
                                                     </SmartLink>
                                                 ) : (
@@ -164,27 +172,31 @@ export function ReportFilters(props: IProps) {
                 initialFilters={props.value.reportReasonID}
                 onFilterChange={props.onFilter}
             />
-            <FilterBlock
-                apiName={"insertUserID"}
-                label={"Reporter"}
-                initialFilters={props.value.insertUserID}
-                dynamicOptionApi={userLookup}
-                onFilterChange={props.onFilter}
-            />
-            <FilterBlock
-                apiName={"insertUserRoleID"}
-                label={"Reporter Role"}
-                initialFilters={props.value.insertUserRoleID}
-                dynamicOptionApi={roleLookUp}
-                onFilterChange={props.onFilter}
-            />
-            <FilterBlock
-                apiName={"recordUserID"}
-                label={"Post Author"}
-                initialFilters={props.value.recordUserID}
-                dynamicOptionApi={userLookup}
-                onFilterChange={props.onFilter}
-            />
+            {shouldShowMemberFilters && (
+                <>
+                    <FilterBlock
+                        apiName={"insertUserID"}
+                        label={"Reporter"}
+                        initialFilters={props.value.insertUserID}
+                        dynamicOptionApi={userLookup}
+                        onFilterChange={props.onFilter}
+                    />
+                    <FilterBlock
+                        apiName={"insertUserRoleID"}
+                        label={"Reporter Role"}
+                        initialFilters={props.value.insertUserRoleID}
+                        dynamicOptionApi={roleLookUp}
+                        onFilterChange={props.onFilter}
+                    />
+                    <FilterBlock
+                        apiName={"recordUserID"}
+                        label={"Post Author"}
+                        initialFilters={props.value.recordUserID}
+                        dynamicOptionApi={userLookup}
+                        onFilterChange={props.onFilter}
+                    />
+                </>
+            )}
         </>
     );
 }

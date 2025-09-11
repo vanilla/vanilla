@@ -8,34 +8,45 @@
 namespace Vanilla\Models;
 
 use Garden\Web\Data;
+use Gdn_Session;
+use Vanilla\APIv2\ProductMessagesApiController;
 use Vanilla\Dashboard\Api\DashboardApiController;
+use Vanilla\Web\JsInterpop\PreloadedQuery;
+use Vanilla\Web\JsInterpop\ReactQueryPreloadProvider;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
 
 /**
  * Page preloader for dashboard menus data.
  */
-class DashboardPreloadProvider implements ReduxActionProviderInterface
+class DashboardPreloadProvider implements ReactQueryPreloadProvider
 {
-    /** @var DashboardApiController */
-    private $dashboardApi;
-
     /**
      * DI.
-     *
-     * @param DashboardApiController $dashboardApi
      */
-    public function __construct(DashboardApiController $dashboardApi)
-    {
-        $this->dashboardApi = $dashboardApi;
+    public function __construct(
+        private DashboardApiController $dashboardApi,
+        private ProductMessagesApiController $productMessagesApiController,
+        private Gdn_Session $session
+    ) {
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
-    public function createActions(): array
+    public function createQueries(): array
     {
-        $menus = $this->dashboardApi->index_menus();
-        return [new ReduxAction("@@dashboardsections/fetchDashboardSections/fulfilled", Data::box($menus), [])];
+        $result = [];
+
+        $result[] = new PreloadedQuery(["dashboardMenus"], Data::box($this->dashboardApi->index_menus()));
+
+        if ($this->session->checkPermission("site.manage")) {
+            $result[] = new PreloadedQuery(
+                ["productMessages"],
+                Data::box($this->productMessagesApiController->index())
+            );
+        }
+
+        return $result;
     }
 }

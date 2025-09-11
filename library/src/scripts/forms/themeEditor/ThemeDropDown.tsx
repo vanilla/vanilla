@@ -11,6 +11,7 @@ import { t } from "@vanilla/i18n";
 import React, { useEffect } from "react";
 import { themeDropDownClasses } from "@library/forms/themeEditor/ThemeDropDown.styles";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
+import { NestedSelect } from "@library/forms/nestedSelect";
 
 interface IProps extends IMenuPlacement {
     variableKey: string; // If it exists, it will behave like a regular input. If not, the value(s) need to be handled manually with hidden input type.
@@ -59,19 +60,20 @@ export function ThemeDropDown(_props: IProps) {
     return (
         <>
             <div className={themeDropDownClasses().root}>
-                <SelectOne
-                    key={rawValue ?? undefined}
-                    label={null}
+                <NestedSelect
+                    compact={true}
+                    options={options}
+                    value={rawValue ?? defaultOption.value}
+                    classes={{
+                        input: themeDropDownClasses().select,
+                    }}
+                    onChange={(newOption) => {
+                        setValue(newOption as string);
+                    }}
+                    disabled={disabled}
+                    isClearable={false}
                     labelID={labelID}
                     inputID={inputID}
-                    options={options}
-                    value={selectedOption}
-                    placeholder={defaultOption.label}
-                    defaultValue={defaultOption}
-                    disabled={disabled ?? options.length === 1}
-                    menuPlacement={MenuPlacement.AUTO}
-                    isClearable={false}
-                    onChange={onChange}
                 />
             </div>
             <ThemeBuilderRevert

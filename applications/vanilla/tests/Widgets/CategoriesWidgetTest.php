@@ -92,7 +92,7 @@ class CategoriesWidgetTest extends SiteTestCase
         if ($childCategory) {
             $categoryItem["children"][] = $this->makeCategoryItem($childCategory, $depth + 1);
         }
-        return $categoryItem;
+        return $this->markForSparseComparision($categoryItem);
     }
 
     /**

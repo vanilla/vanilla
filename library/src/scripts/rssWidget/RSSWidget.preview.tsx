@@ -5,7 +5,7 @@
 
 import React from "react";
 
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { RSSWidget } from "@library/rssWidget/RSSWidget";
 import RSS_PLACEHOLDER_IMAGE from "@library/rssWidget/rssFeedPlaceholder.png";
 
@@ -23,8 +23,8 @@ export function RSSWidgetPreview(props: IProps) {
         to: "#",
     };
     return (
-        <Widget>
+        <LayoutWidget>
             <RSSWidget {...props} itemData={[placeholderRSSFeedItem, placeholderRSSFeedItem, placeholderRSSFeedItem]} />
-        </Widget>
+        </LayoutWidget>
     );
 }

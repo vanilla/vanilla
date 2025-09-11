@@ -21,7 +21,7 @@ class SuggestedContentMeta extends SiteMetaExtra
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getValue(): array
     {

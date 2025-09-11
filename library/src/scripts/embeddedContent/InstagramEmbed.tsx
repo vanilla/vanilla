@@ -19,6 +19,16 @@ interface IProps extends IBaseEmbedProps {
     name?: string;
 }
 
+declare global {
+    interface Window {
+        instgrm: {
+            Embeds: {
+                process(): Promise<void>;
+            };
+        };
+    }
+}
+
 /**
  * A class for rendering Instagram embeds.
  */

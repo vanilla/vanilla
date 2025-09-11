@@ -56,6 +56,15 @@ export class TabHandler {
                 return false;
             }
 
+            if (element.hasAttribute("inert")) {
+                return false;
+            }
+
+            const closestInert = element.closest("[inert]");
+            if (closestInert instanceof HTMLElement && closestInert.hasAttribute("inert")) {
+                return false;
+            }
+
             if (element.classList.contains(TabHandler.NO_TABBING) || element.closest(`.${TabHandler.NO_TABBING}`)) {
                 return false;
             }

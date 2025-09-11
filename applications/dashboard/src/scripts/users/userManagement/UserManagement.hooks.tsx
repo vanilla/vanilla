@@ -11,9 +11,10 @@ import { IPatchUserParams, IPostUserParams } from "@library/features/users/UserA
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserSortParams, USERS_LIMIT_PER_PAGE } from "@dashboard/users/userManagement/UserManagementUtils";
 import { IApiError, IFieldError } from "@library/@types/api/core";
+import { getMeta } from "@library/utility/appUtils";
 export interface IGetUsersQueryParams {
     userID?: Array<IUser["userID"]>;
-    // When fetching a user it returns a numeric `banned` field that should be interpretted as more of a `banType` field. When filtering we can only filter by banned or not banned.
+    // When fetching a user it returns a numeric `banned` field that should be interpreted as more of a `banType` field. When filtering we can only filter by banned or not banned.
     isBanned?: boolean;
     query?: string;
     name?: string;
@@ -27,7 +28,7 @@ export interface IGetUsersQueryParams {
     rankIDs?: number[];
     dateInserted?: string;
     dateLastActive?: string;
-    ipAddresses?: string[];
+    ipAddresses?: string;
     profileFields?: {
         [key: string]: any;
     };
@@ -40,12 +41,17 @@ export interface IGetUsersResponse {
 }
 
 export async function getUsers(params: IGetUsersQueryParams = {}) {
-    const { data, headers } = await apiv2.get<IUser[]>("/users?expand=profileFields", {
-        params: {
-            limit: USERS_LIMIT_PER_PAGE,
-            ...params,
+    const customProfileFieldsEnabled = getMeta("featureFlags.CustomProfileFields.Enabled");
+
+    const { data, headers } = await apiv2.get<IUser[]>(
+        customProfileFieldsEnabled ? "/users?expand=profileFields" : "/users",
+        {
+            params: {
+                limit: USERS_LIMIT_PER_PAGE,
+                ...params,
+            },
         },
-    });
+    );
 
     return {
         users: data,

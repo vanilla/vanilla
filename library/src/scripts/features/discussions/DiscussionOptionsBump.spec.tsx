@@ -1,66 +1,67 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionOptionsBump from "@library/features/discussions/DiscussionOptionsBump";
-import { mockAPI } from "@library/__tests__/utility";
 import { ToastProvider } from "@library/features/toaster/ToastContext";
 import { vitest } from "vitest";
-import MockAdapter from "axios-mock-adapter/types";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
+import { makeMockDiscussionsApi } from "@vanilla/addon-vanilla/posts/__fixtures__/DiscussionsApi.fixture";
+import { DiscussionsApiContext } from "@vanilla/addon-vanilla/posts/DiscussionsApi";
 
-const discussion = DiscussionFixture.mockDiscussion;
-let mockApi: MockAdapter;
+const mockDiscussion = DiscussionFixture.mockDiscussion;
+
+const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, enabled: true } },
+});
+
 const onMutateSuccess = vitest.fn(async function () {});
 
-async function renderInProvider() {
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: {
-                enabled: true,
-                retry: false,
-            },
-        },
-    });
+const mockDiscussionsApi = makeMockDiscussionsApi();
 
+async function renderInProvider() {
     return render(
         <ToastProvider>
             <QueryClientProvider client={queryClient}>
-                <DiscussionOptionsBump discussion={discussion} onSuccess={onMutateSuccess} />
+                <DiscussionsApiContext.Provider value={{ api: mockDiscussionsApi }}>
+                    <DiscussionOptionsBump discussion={mockDiscussion} onSuccess={onMutateSuccess} />
+                </DiscussionsApiContext.Provider>
             </QueryClientProvider>
         </ToastProvider>,
     );
 }
 
-beforeEach(() => {
-    mockApi = mockAPI();
-    onMutateSuccess.mockReset();
+afterEach(() => {
+    queryClient.clear();
+    vitest.resetAllMocks();
 });
 
 describe("DiscussionOptionsBump", () => {
     describe("Success", () => {
         beforeEach(async () => {
-            mockApi.onPatch(`/discussions/${discussion.discussionID}/bump`).replyOnce(200, discussion);
-
+            mockDiscussionsApi.bump = vitest.fn(async (_discussionID) => {
+                return mockDiscussion;
+            });
             await renderInProvider();
-
             const button = await screen.findByText("Bump");
-
             await userEvent.click(button);
         });
 
         it("makes an API call to the bump endpoint", async () => {
-            expect(mockApi.history.patch.length).toBe(1);
+            expect(mockDiscussionsApi.bump).toHaveBeenCalledWith(mockDiscussion.discussionID);
         });
 
         it("calls the onMutateSuccess callback", async () => {
-            expect(onMutateSuccess).toHaveBeenCalledTimes(1);
+            await vitest.waitFor(() => {
+                expect(mockDiscussionsApi.bump).toHaveReturned();
+            });
+            expect(onMutateSuccess).toHaveBeenCalled();
         });
 
         it("displays a success message", async () => {
@@ -73,12 +74,10 @@ describe("DiscussionOptionsBump", () => {
         const fakeErrorMessage = "Fake Error";
 
         beforeEach(async () => {
-            mockApi
-                .onPatch(`/discussions/${discussion.discussionID}/bump`)
-                .replyOnce(500, { message: fakeErrorMessage });
-
+            mockDiscussionsApi.bump = vitest.fn(async (_discussionID) => {
+                throw new Error(fakeErrorMessage);
+            });
             await renderInProvider();
-
             const button = await screen.findByText("Bump");
             await userEvent.click(button);
         });

@@ -34,7 +34,9 @@ export const createPostFormAssetClasses = useThemeCache(() => {
         gap: 16,
     });
     const postFieldsContainer = css({});
-    const postBodyContainer = css({});
+    const postBodyContainer = css({
+        width: "100%",
+    });
     const tagsContainer = css({
         "& li": {
             padding: 0,
@@ -52,19 +54,6 @@ export const createPostFormAssetClasses = useThemeCache(() => {
     });
     const popularTagsLayout = css({});
     const announcementContainer = css({});
-    const footer = css({
-        display: "flex",
-        justifyContent: "flex-end",
-        gap: 16,
-    });
-
-    const draftLastSaved = css({
-        display: "flex",
-        justifyContent: "end",
-        "& time": {
-            marginInlineStart: ".5ch",
-        },
-    });
 
     return {
         formContainer,
@@ -76,7 +65,5 @@ export const createPostFormAssetClasses = useThemeCache(() => {
         labelStyle,
         popularTagsLayout,
         announcementContainer,
-        footer,
-        draftLastSaved,
     };
 });

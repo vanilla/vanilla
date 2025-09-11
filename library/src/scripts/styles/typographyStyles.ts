@@ -12,7 +12,7 @@ import { oneColumnVariables } from "@library/layout/Section.variables";
 import { lineHeightAdjustment } from "@library/styles/textUtils";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { Mixins } from "@library/styles/Mixins";
 
 export const typographyClasses = useThemeCache(() => {

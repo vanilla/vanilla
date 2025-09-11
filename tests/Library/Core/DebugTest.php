@@ -20,7 +20,7 @@ class DebugTest extends TestCase
     private $debug;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {
@@ -29,7 +29,7 @@ class DebugTest extends TestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {

@@ -12,12 +12,12 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 
 /**
  * Abstraction layer for the module displaying Categories.
  */
-abstract class AbstractHomeWidgetModule extends AbstractReactModule
+abstract class AbstractHomeWidgetModule extends LegacyReactModule
 {
     use HomeWidgetContainerSchemaTrait;
 
@@ -202,7 +202,7 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

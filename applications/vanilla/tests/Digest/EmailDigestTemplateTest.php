@@ -133,6 +133,7 @@ HTML
                         ],
                     ],
                 ],
+                "digestSubscribeReason" => "Digest Subscribe Reason",
                 "digestUnsubscribeLink" => "https://demo.vanillawip.com/unsubscribe/token",
                 "footer" => $rich2Formatter->renderPlainText($rich2Footer),
             ],

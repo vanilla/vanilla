@@ -249,7 +249,7 @@ export const themeBuilderClasses = useThemeCache(() => {
 
     const section = style("section", {
         borderTop: `solid #c1cbd7 1px`,
-        marginTop: styleUnit(32),
+        marginTop: "18px",
     });
 
     const sectionTitle = style("sectionTitle", {

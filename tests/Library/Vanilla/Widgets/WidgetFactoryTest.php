@@ -7,7 +7,7 @@
 
 namespace VanillaTests\Library\Widgets;
 
-use Vanilla\Widgets\WidgetFactory;
+use Vanilla\Widgets\LegacyWidgetFactory;
 use VanillaTests\BootstrapTestCase;
 use VanillaTests\Fixtures\MockWidgets\MockWidget1;
 
@@ -21,7 +21,7 @@ class WidgetFactoryTest extends BootstrapTestCase
      */
     public function testWidgetParams()
     {
-        $factory = new WidgetFactory(MockWidget1::class);
+        $factory = new LegacyWidgetFactory(MockWidget1::class);
         $expected = [
             [
                 "name" => "Title",

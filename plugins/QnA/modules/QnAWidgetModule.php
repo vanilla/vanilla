@@ -26,7 +26,7 @@ class QnAWidgetModule extends BaseDiscussionWidgetModule
     const ALL_QUESTIONS = "all";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -34,7 +34,7 @@ class QnAWidgetModule extends BaseDiscussionWidgetModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getApiSchema(): Schema
     {

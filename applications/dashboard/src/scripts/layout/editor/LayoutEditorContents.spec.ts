@@ -9,15 +9,30 @@ import { LayoutEditorFixture } from "@dashboard/layout/editor/__fixtures__/Layou
 import { IEditableLayoutSpec } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 
 describe("LayoutEditorContents", () => {
+    const titleBar: IEditableLayoutSpec["titleBar"] = {
+        $hydrate: "react.titleBar",
+        testID: "titleBar",
+        $fragmentImpls: {
+            TitleBar: {
+                fragmentUUID: "styleguide",
+            },
+        },
+    } as any;
     describe("catalog hydration", () => {
         const editSpec: IEditableLayoutSpec = {
             layoutViewType: "home",
+            titleBar,
             layout: [
                 {
                     $hydrate: "react.section.2-columns",
                     mainBottom: [
                         {
                             $hydrate: "react.my-widget",
+                            $middleware: {
+                                "role-filter": {
+                                    roleIDs: [1, 2],
+                                },
+                            },
                             myWidgetProp: {
                                 foo: "bar",
                             },
@@ -38,11 +53,18 @@ describe("LayoutEditorContents", () => {
             expect(contents.getLayout()).toBe(editSpec.layout);
         });
 
-        it("hydrates from the catalog", () => {
-            expect(contents.hydrate()).toStrictEqual({
+        it("Filters roles when hydrating", () => {
+            expect(
+                contents.hydrate({
+                    roleIDs: [3, 4],
+                }),
+            ).toStrictEqual({
                 layoutViewType: "home",
+                titleBar,
                 layout: [
                     {
+                        $fragmentImpls: {},
+                        $middleware: undefined,
                         $reactComponent: "SectionTwoColumns",
                         $reactProps: {
                             $hydrate: "react.section.2-columns",
@@ -52,6 +74,52 @@ describe("LayoutEditorContents", () => {
                             },
                             mainBottom: [
                                 {
+                                    $fragmentImpls: {},
+                                    $middleware: undefined,
+                                    $reactComponent: "react.not-a-widget",
+                                    $reactProps: {
+                                        $hydrate: "react.not-a-widget",
+                                        $componentName: "react.not-a-widget",
+                                        $editorPath: {
+                                            sectionIndex: 0,
+                                            sectionRegion: "mainBottom",
+                                            sectionRegionIndex: 1,
+                                        },
+                                        myProp: {
+                                            $hydrate: "some-hydrate",
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+            });
+        });
+
+        it("hydrates from the catalog", () => {
+            expect(contents.hydrate()).toStrictEqual({
+                layoutViewType: "home",
+                titleBar,
+                layout: [
+                    {
+                        $fragmentImpls: {},
+                        $middleware: undefined,
+                        $reactComponent: "SectionTwoColumns",
+                        $reactProps: {
+                            $hydrate: "react.section.2-columns",
+                            $componentName: "SectionTwoColumns",
+                            $editorPath: {
+                                sectionIndex: 0,
+                            },
+                            mainBottom: [
+                                {
+                                    $fragmentImpls: {},
+                                    $middleware: {
+                                        "role-filter": {
+                                            roleIDs: [1, 2],
+                                        },
+                                    },
                                     $reactComponent: "MyWidget",
                                     $reactProps: {
                                         $hydrate: "react.my-widget",
@@ -67,6 +135,8 @@ describe("LayoutEditorContents", () => {
                                     },
                                 },
                                 {
+                                    $fragmentImpls: {},
+                                    $middleware: undefined,
                                     $reactComponent: "react.not-a-widget",
                                     $reactProps: {
                                         $hydrate: "react.not-a-widget",
@@ -90,6 +160,7 @@ describe("LayoutEditorContents", () => {
         it("resolves specific field params to mapped strings", () => {
             const spec: IEditableLayoutSpec = {
                 layoutViewType: "home",
+                titleBar,
                 layout: [
                     {
                         $hydrate: "react.section.2-columns",

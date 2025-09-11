@@ -77,7 +77,11 @@ class StopForumSpamPremoderator implements PremoderationHandlerInterface
             $ipFrequency >= $this->config->get("Plugins.StopForumSpam.IPThreshold2", 20) ||
             $emailFrequency >= $this->config->get("Plugins.StopForumSpam.EmailThreshold2", 50)
         ) {
-            return new PremoderationResponse(PremoderationResponse::SUPER_SPAM, $modUserID);
+            return new PremoderationResponse(
+                PremoderationResponse::SUPER_SPAM,
+                $modUserID,
+                PremoderationResponse::PREMODERATION_SPAM_STOP_FORUM_SPAM
+            );
         }
 
         // Flag registrations as spam above a certain threshold.
@@ -86,7 +90,11 @@ class StopForumSpamPremoderator implements PremoderationHandlerInterface
             $emailFrequency >= $this->config->get("Plugins.StopForumSpam.EmailThreshold1", 20)
         ) {
             // We are spam.
-            return new PremoderationResponse(PremoderationResponse::SPAM, $modUserID);
+            return new PremoderationResponse(
+                PremoderationResponse::SPAM,
+                $modUserID,
+                PremoderationResponse::PREMODERATION_SPAM_STOP_FORUM_SPAM
+            );
         }
 
         return PremoderationResponse::valid();

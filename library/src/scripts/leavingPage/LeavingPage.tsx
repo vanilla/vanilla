@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { CallToAction } from "@library/callToAction/CallToAction";
+import { CallToAction } from "@library/widgets/CallToAction";
 import Translate from "@library/content/Translate";
 import TitleBar from "@library/headers/TitleBar";
 import { Backgrounds } from "@library/layout/Backgrounds";
@@ -14,7 +14,7 @@ import SectionOneColumn from "@library/layout/SectionOneColumn";
 import { leavingPageClasses } from "@library/leavingPage/LeavingPage.classes";
 import SmartLink from "@library/routing/links/SmartLink";
 import { getMeta, t } from "@library/utility/appUtils";
-import qs from "qs";
+import * as qs from "qs-esm";
 import React from "react";
 import "@library/theming/reset";
 import { ButtonTypes } from "@library/forms/buttonTypes";

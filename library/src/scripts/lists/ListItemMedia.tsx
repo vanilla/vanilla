@@ -29,7 +29,7 @@ export function ListItemMedia(props: IProps) {
     const urlSrcSet = useMemo<string | undefined>(() => {
         if (typeof props.srcSet === "object") return createSourceSetValue(props.srcSet);
 
-        return props.srcSet ?? "";
+        return props.srcSet;
     }, [props.srcSet]);
 
     if (!props.src)
@@ -37,5 +37,5 @@ export function ListItemMedia(props: IProps) {
             <div className={cx(mediaClass, classes.ratioContainer(props.ratio ?? { vertical: 9, horizontal: 16 }))} />
         );
 
-    return <ResponsiveImage {...rest} className={mediaClass} srcSet={urlSrcSet} />;
+    return <ResponsiveImage {...rest} className={mediaClass} {...(!!urlSrcSet && { srcSet: urlSrcSet })} />;
 }

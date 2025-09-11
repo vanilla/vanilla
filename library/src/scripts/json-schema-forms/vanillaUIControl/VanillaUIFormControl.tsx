@@ -6,7 +6,7 @@
 
 import React, { useContext } from "react";
 import { IControlProps } from "../types";
-import { TextBox, AutoComplete, AutoCompleteLookupOptions, FormGroupContext } from "@vanilla/ui";
+import { TextBox, AutoComplete, AutoCompleteLookupOptions, FormGroupContext, type ILookupApi } from "@vanilla/ui";
 import { useVanillaUIFormControlContext } from "./VanillaUIFormControlContext";
 
 interface IProps extends IControlProps {}
@@ -21,7 +21,8 @@ export function VanillaUIFormControl(props: IProps) {
         "aria-labelledby": labelID,
     };
     const commonContextProps = vanillaUIContext.commonInputProps;
-    const contextProps = vanillaUIContext.inputTypeProps[control.inputType] ?? {};
+    const contextInputType = control.inputType === "select" ? "dropDown" : control.inputType;
+    const contextProps = vanillaUIContext.inputTypeProps[contextInputType] ?? {};
     switch (control.inputType) {
         case "textBox":
             content = (
@@ -35,6 +36,35 @@ export function VanillaUIFormControl(props: IProps) {
                     onChange={(e) => {
                         props.onChange(e.target.value);
                     }}
+                />
+            );
+            break;
+        case "select":
+            content = (
+                <AutoComplete
+                    {...commonProps}
+                    {...commonContextProps}
+                    {...contextProps}
+                    value={props.instance}
+                    placeholder={control.placeholder}
+                    onChange={(newValue) => {
+                        props.onChange(newValue);
+                    }}
+                    disabled={props.disabled}
+                    optionProvider={
+                        control.optionsLookup ? (
+                            <AutoCompleteLookupOptions lookup={control.optionsLookup as ILookupApi} />
+                        ) : undefined
+                    }
+                    options={
+                        control.options
+                            ? control.options.map((option) => ({
+                                  key: option.value ?? option.label,
+                                  value: option.value ?? option.label,
+                                  label: option.label,
+                              }))
+                            : undefined
+                    }
                 />
             );
             break;

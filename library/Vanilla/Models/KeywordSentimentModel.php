@@ -11,6 +11,7 @@ use Gdn_Database;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\PruneProcessor;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\KeywordsModel;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Schema\RangeExpression;
@@ -49,7 +50,7 @@ class KeywordSentimentModel extends PipelineModel
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function insert(array $set, $options = []): int
     {
@@ -66,6 +67,14 @@ class KeywordSentimentModel extends PipelineModel
 
         $set["keywordID"] = $keywordID;
         unset($set["keyword"]);
+        if (!is_numeric($set["sentimentScore"]) && !is_int($set["sentimentScore"])) {
+            ErrorLogger::error(
+                "Invalid Sentiment Score {$set["sentimentScore"]}",
+                ["openAI", "sentimentAnalysis"],
+                ["data" => $set]
+            );
+            $set["sentimentScore"] = 0;
+        }
         parent::insert($set);
 
         return $keywordID;

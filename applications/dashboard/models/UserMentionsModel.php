@@ -14,6 +14,7 @@ use Exception;
 use Garden\EventManager;
 use Gdn;
 use Generator;
+use phpDocumentor\Reflection\Types\Boolean;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use UserModel;
@@ -46,6 +47,8 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
         "discussion" => ["name" => \DiscussionModel::class],
         "comment" => ["name" => \CommentModel::class],
     ];
+
+    const MENTION_KEY = "Garden.Format.Mentions";
 
     /** @var EventManager */
     private $eventManager;
@@ -84,11 +87,22 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function getSystemCallableMethods(): array
     {
         return ["indexUserMentions", "anonymizeUserMentions", "getTotalCount"];
+    }
+
+    /**
+     * Check the site allows to parse mentions.
+     *
+     * @return bool
+     */
+    public static function canParseMentions(): bool
+    {
+        return Gdn::config()->get(self::MENTION_KEY, \UsersApiController::AT_MENTION_FILTER_LOOSE) !==
+            \UsersApiController::AT_MENTION_DISABLED;
     }
 
     /**
@@ -100,6 +114,9 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
      */
     public function parseMentions(string $body, string $format): array
     {
+        if (!self::canParseMentions()) {
+            return [];
+        }
         $mentions = $this->formatService->parseAllMentions($body, $format);
         $mentions = array_unique($mentions);
 

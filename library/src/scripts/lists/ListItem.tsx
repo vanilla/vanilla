@@ -26,8 +26,9 @@ import { IFeaturedImage, IImage } from "@library/@types/api/core";
 import { ListItemMedia } from "@library/lists/ListItemMedia";
 import { listItemMediaClasses } from "@library/lists/ListItemMedia.styles";
 import { createSourceSetValue, t } from "@library/utility/appUtils";
-import { HomeWidgetItemDefaultImage } from "@library/homeWidget/HomeWidgetItemDefaultImage";
+import { WidgetDefaultImage } from "@library/homeWidget/WidgetDefaultImage";
 import type { IBoxOptions } from "@library/styles/cssUtilsTypes";
+import { useWithThemeContext } from "@library/theming/ThemeOverrideContext";
 
 export interface IListItemProps {
     className?: string;
@@ -42,6 +43,7 @@ export interface IListItemProps {
     iconWrapperClass?: string;
     secondIcon?: React.ReactNode;
     metas?: React.ReactNode;
+    metasContainerClass?: string;
     metasWrapperClass?: string;
     mediaItem?: React.ReactNode;
     image?: IImage;
@@ -55,14 +57,23 @@ export interface IListItemProps {
     asTile?: boolean;
     disableButtonsInItems?: boolean;
     boxOptions?: Partial<IBoxOptions>;
+    primaryActions?: React.ReactNode;
 }
 
 export function ListItem(props: IListItemProps) {
-    const { headingDepth = 3, descriptionClassName, truncateDescription = true, descriptionMaxCharCount = 200 } = props;
+    const {
+        headingDepth = 3,
+        descriptionClassName,
+        truncateDescription = true,
+        descriptionMaxCharCount = 200,
+        primaryActions,
+    } = props;
     const selfRef = useRef<HTMLDivElement>(null);
     const { layout } = useContext(ListItemContext);
-    const listItemVars = listItemVariables(props.options);
-    const mediaClasses = listItemMediaClasses();
+
+    const listItemVars = listItemVariables.useAsHook(props.options);
+
+    const mediaClasses = listItemMediaClasses.useAsHook();
     const {
         options: { iconPosition },
     } = listItemVars;
@@ -73,7 +84,7 @@ export function ListItem(props: IListItemProps) {
     const asTile = props.asTile == null ? props.asTile || isMobileMedia : props.asTile;
     const iconInMeta = iconPosition === ListItemIconPosition.META && !hasImage;
     const hasCheckbox = Boolean(props.checkbox);
-    const classes = listItemClasses(asTile, hasImage, hasCheckbox, isMobileMedia && !props.asTile);
+    const classes = listItemClasses.useAsHook(asTile, hasImage, hasCheckbox, isMobileMedia && !props.asTile);
 
     const checkboxWrapped = props.checkbox && <div className={cx(classes.checkboxContainer)}>{props.checkbox}</div>;
 
@@ -128,7 +139,7 @@ export function ListItem(props: IListItemProps) {
                             mediaClasses.ratioContainer({ vertical: 9, horizontal: 16 }),
                         )}
                     >
-                        <HomeWidgetItemDefaultImage />
+                        <WidgetDefaultImage />
                     </div>
                 )}
                 {!asTile && icon}
@@ -170,7 +181,7 @@ export function ListItem(props: IListItemProps) {
         </div>
     ) : null;
 
-    let metas = <Metas className={classes.metasContainer}>{props.metas}</Metas>;
+    let metas = <Metas className={cx(classes.metasContainer, props.metasContainerClass)}>{props.metas}</Metas>;
 
     if (iconInMeta) {
         metas = (
@@ -226,6 +237,7 @@ export function ListItem(props: IListItemProps) {
                         </div>
                     </div>
                 </div>
+                {primaryActions && <div className={classes.primaryActionsContainer}>{primaryActions}</div>}
                 {!asTile && actionsContent}
             </div>
         </PageBox>

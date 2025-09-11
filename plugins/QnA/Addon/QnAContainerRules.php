@@ -15,6 +15,8 @@ use Vanilla\Dashboard\AutomationRules\EscalationRuleService;
 use Vanilla\Dashboard\Models\ActivityService;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\QnA\Activity\AnswerAcceptedActivity;
+use Vanilla\QnA\Activity\BookmarkedAnswerAcceptedActivity;
+use Vanilla\QnA\Activity\MyQuestionAnswerAcceptedActivity;
 use Vanilla\QnA\Activity\QuestionAnswerActivity;
 use Vanilla\QnA\Activity\QuestionFollowUpActivity;
 use Vanilla\QnA\AutomationRules\Triggers\UnAnsweredQuestionTrigger;
@@ -56,7 +58,9 @@ class QnAContainerRules extends AddonContainerRules
             ->rule(ActivityService::class)
             ->addCall("registerActivity", [AnswerAcceptedActivity::class])
             ->addCall("registerActivity", [QuestionAnswerActivity::class])
-            ->addCall("registerActivity", [QuestionFollowUpActivity::class]);
+            ->addCall("registerActivity", [QuestionFollowUpActivity::class])
+            ->addCall("registerActivity", [BookmarkedAnswerAcceptedActivity::class])
+            ->addCall("registerActivity", [MyQuestionAnswerAcceptedActivity::class]);
 
         $container
             ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)

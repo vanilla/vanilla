@@ -13,6 +13,7 @@ use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Database\SetLiterals\MinMax;
+use Vanilla\Models\Model;
 use Vanilla\Schema\RangeExpression;
 use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
@@ -32,6 +33,9 @@ class MySQLDriverTest extends SiteTestCase
      */
     protected $dump;
 
+    /** @var Gdn_Database */
+    protected $db;
+
     /**
      * Rest the SQL driver before every test.
      */
@@ -39,6 +43,7 @@ class MySQLDriverTest extends SiteTestCase
     {
         parent::setUp();
         $db = static::container()->get(Gdn_Database::class);
+        $this->db = $db;
         $this->sql = $db->createSql();
         static::container()->setInstance(\Gdn_MySQLDriver::class, $this->sql);
         static::container()->setInstance(\Gdn_DatabaseStructure::class, null);
@@ -140,6 +145,81 @@ where `bar` in ('a')
 EOT;
 
         $this->assertEquals($expected, $sql);
+    }
+
+    /**
+     * Test the iterable from {@link \Gdn_SQLDriver::chunkByID()}
+     *
+     * @return void
+     */
+    public function testChunkByID(): void
+    {
+        \Gdn::structure()
+            ->table("testChunkByID")
+            ->primaryKey("id")
+            ->column("colA", "text")
+            ->column("colB", "text")
+            ->set(drop: true);
+
+        $initialRows = [
+            [
+                "id" => 1,
+                "colA" => "a1",
+                "colB" => "a1",
+            ],
+            [
+                "id" => 2,
+                "colA" => "a2",
+                "colB" => "a2",
+            ],
+            [
+                "id" => 3,
+                "colA" => "a3",
+                "colB" => "a3",
+            ],
+        ];
+        foreach ($initialRows as $row) {
+            $this->sql->insert("testChunkByID", $row);
+        }
+
+        $actual = [];
+        $iterator = $this->db
+            ->createSql()
+            ->select(["id", "colB"])
+            ->from("testChunkByID")
+            ->chunkByID(
+                idField: "id",
+                options: [
+                    Model::OPT_LIMIT => 2,
+                ]
+            );
+        foreach ($iterator as $actualRow) {
+            $actual[] = $actualRow;
+        }
+
+        $expected = array_map(fn($row) => ["id" => $row["id"], "colB" => $row["colB"]], $initialRows);
+        $this->assertEquals($expected, $actual);
+
+        // Also check with a where condition and DESC order.
+        $actual = [];
+        $iterator = $this->db
+            ->createSql()
+            ->select(["id", "colB"])
+            ->from("testChunkByID")
+            ->where("id", [1, 3])
+            ->chunkByID(
+                idField: "id",
+                options: [
+                    Model::OPT_LIMIT => 1,
+                    // Descending order as well.
+                    Model::OPT_DIRECTION => "DESC",
+                ]
+            );
+        foreach ($iterator as $actualRow) {
+            $actual[] = $actualRow;
+        }
+        $expected = [$expected[2], $expected[0]];
+        $this->assertEquals($expected, $actual);
     }
 
     /**

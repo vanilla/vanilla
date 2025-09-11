@@ -7,9 +7,10 @@
 
 namespace VanillaTests\APIv2;
 
+use Gdn;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\CurrentTimeStamp;
-use VanillaTests\Analytics\SpyingAnalyticsTestTrait;
+use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -30,6 +31,16 @@ class DiscussionsMergeTest extends SiteTestCase
     use UsersAndRolesApiTestTrait;
 
     /**
+     * Get a new model for each test.
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->userPreferenceModel = Gdn::getContainer()->get(UserNotificationPreferencesModel::class);
+    }
+
+    /**
      * Test success PATCH /discussions/merge
      */
     public function testSuccessMergeDiscussions(): void
@@ -41,8 +52,19 @@ class DiscussionsMergeTest extends SiteTestCase
         $this->enableCaching();
         $rootCategory = $this->createCategory();
         CurrentTimeStamp::mockTime("2022-01-01");
-        $category1 = $this->createCategory(["parentCategoryID" => $rootCategory["categoryID"]]);
+        $roles = $this->getRoles();
+        $category1 = $this->createPermissionedCategory(
+            ["parentCategoryID" => $rootCategory["categoryID"]],
+            [$roles["Member"]]
+        );
         $discussion1 = $this->createDiscussion();
+        $memberUser = $this->createUser([
+            "name" => "testNotications2",
+        ]);
+
+        $this->userPreferenceModel->save($memberUser["userID"], [
+            "Popup.NewComment.{$category1["categoryID"]}" => 1,
+        ]);
         $comment1_1 = $this->createComment(["body" => "comment1"]);
         $comment1_2 = $this->createComment(["body" => "comment2"]);
         $category2 = $this->createCategory(["parentCategoryID" => $rootCategory["categoryID"]]);
@@ -58,8 +80,12 @@ class DiscussionsMergeTest extends SiteTestCase
         $comment2_2 = $this->createComment(["body" => "comment4", "discussionID" => $discussion2["discussionID"]]);
 
         $mergedDiscussionIDs = [$discussion2["discussionID"], $discussion3["discussionID"]];
-
+        $this->api()->setUserID($memberUser["userID"]);
+        $oldNotifications = $this->api()
+            ->get("/notifications")
+            ->getBody();
         // Merge the records.
+        $this->api()->setUserID($discussion1["insertUserID"]);
         $response = $this->api()->patch("/discussions/merge", [
             "discussionIDs" => $mergedDiscussionIDs,
             "destinationDiscussionID" => $discussion1["discussionID"],
@@ -69,7 +95,13 @@ class DiscussionsMergeTest extends SiteTestCase
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
         $this->assertEqualsCanonicalizing($mergedDiscussionIDs, $body["progress"]["successIDs"]);
+        $this->api()->setUserID($memberUser["userID"]);
 
+        // No new Notifications should have been created.
+        $notifications = $this->api()
+            ->get("/notifications")
+            ->getBody();
+        $this->assertCount(count($oldNotifications), $notifications);
         // Redirects should have been created.
         $sourceDiscussions = $this->api()->get("/discussions", ["discussionID" => $mergedDiscussionIDs]);
         $this->assertRowsLike(

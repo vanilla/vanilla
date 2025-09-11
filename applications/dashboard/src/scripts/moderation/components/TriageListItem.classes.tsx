@@ -70,6 +70,11 @@ export const triageListItemClasses = () => {
         marginTop: 4,
     });
 
+    const triageItem = css({
+        minWidth: 0,
+        overflow: "auto",
+    });
+
     return {
         container,
         main,
@@ -80,5 +85,6 @@ export const triageListItemClasses = () => {
         footer,
         actions,
         attachments,
+        triageItem,
     };
 };

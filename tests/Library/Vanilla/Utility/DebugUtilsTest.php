@@ -16,7 +16,7 @@ use VanillaTests\VanillaTestCase;
 class DebugUtilsTest extends VanillaTestCase
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {

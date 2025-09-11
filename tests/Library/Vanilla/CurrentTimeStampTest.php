@@ -22,7 +22,7 @@ class CurrentTimeStampTest extends TestCase
     private $mockTime;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -30,7 +30,7 @@ class CurrentTimeStampTest extends TestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {

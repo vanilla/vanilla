@@ -13,7 +13,7 @@ use Vanilla\Formatting\Rich2\NodeList;
 class RootNode extends AbstractNode
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -21,7 +21,7 @@ class RootNode extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -29,7 +29,7 @@ class RootNode extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $node): bool
     {
@@ -37,7 +37,7 @@ class RootNode extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

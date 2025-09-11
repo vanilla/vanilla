@@ -1,6 +1,6 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -24,10 +24,15 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { useUniqueID } from "@library/utility/idUtils";
 import { Popover, positionMatchWidth } from "@reach/popover";
 import { t } from "@vanilla/i18n";
-import { RecordID, stableObjectHash } from "@vanilla/utils";
-import { ChangeEventHandler, KeyboardEventHandler, RefObject, useEffect, useMemo, useRef, useState } from "react";
+import { RecordID } from "@vanilla/utils";
+import { ChangeEventHandler, KeyboardEventHandler, RefObject, useEffect, useRef, useState } from "react";
 import type { Select } from "@vanilla/json-schema-forms";
-import classNames from "classnames";
+import { useIsMounted } from "@vanilla/react-utils";
+export namespace NestedSelect {
+    export type Option = Select.Option;
+    export type Config = Select.SelectConfig;
+    export type OptionLookup = Select.LookupApi;
+}
 
 export function NestedSelect(props: INestedSelectProps) {
     const {
@@ -45,6 +50,8 @@ export function NestedSelect(props: INestedSelectProps) {
         createableLabel,
         onInputValueChange,
         withOptionCache,
+        checkIsOptionUserCreated,
+        inline,
         initialValues,
     } = props;
     const [isFocused, setIsFocused] = useState<boolean>(props.autoFocus ?? false);
@@ -53,12 +60,13 @@ export function NestedSelect(props: INestedSelectProps) {
     const [isClearable, setIsClearable] = useState<boolean>(false);
     const [highlightedValue, setHighlightedValue] = useState<RecordID>();
 
-    const classes = nestedSelectClasses({
+    const classes = nestedSelectClasses.useAsHook({
         compact: props.compact,
+        inline: props.inline,
         maxHeight: props.maxHeight,
     });
-    const classesInputBlock = inputBlockClasses();
-    const classesInput = inputClasses();
+    const classesInputBlock = inputBlockClasses.useAsHook();
+    const classesInput = inputClasses.useAsHook();
 
     const inputRef = useRef() as RefObject<HTMLInputElement>;
     const selectRef = useRef() as RefObject<HTMLDivElement>;
@@ -71,19 +79,34 @@ export function NestedSelect(props: INestedSelectProps) {
     const inputID = props.inputID ?? `${id}-input`;
     const errorID = `${id}-errors`;
     const optionID = `${id}-option`;
-    const [createdOptions, setCreatedOptions] = useState<Select.Option[]>([]);
+
+    let initialVals = initialValues ?? props.value;
 
     // Keep initial values stable between state update and renders here
-    const _initialValues = useRef(props.initialValues ?? props.value);
+    const _initialExistingValues = useRef(
+        initialVals
+            ? [...[initialVals]]
+                  .flat()
+                  .filter((val) => (checkIsOptionUserCreated ? !checkIsOptionUserCreated(val) : true))
+            : [],
+    );
 
-    let { options, optionsByValue, optionsByGroup } = useNestedOptions({
+    const [createdValues, setCreatedValues] = useState<RecordID[]>(
+        initialVals
+            ? [...[initialVals]]
+                  .flat()
+                  .filter((val) => (checkIsOptionUserCreated ? checkIsOptionUserCreated(val) : false))
+            : [],
+    );
+
+    let { options, selectedOptions, optionsByValue, optionsByGroup } = useNestedOptions({
+        value,
         searchQuery: inputValue,
         options: props.options,
         optionsLookup: props.optionsLookup,
-        initialValues: _initialValues.current,
-        createable,
-        createdOptions,
+        initialValues: _initialExistingValues.current,
         withOptionCache,
+        ...(!!createable && { createable, createdValues }),
     });
 
     useEffect(() => {
@@ -122,25 +145,18 @@ export function NestedSelect(props: INestedSelectProps) {
         inputRef.current?.blur();
     };
 
+    const selectedOption = optionsByValue[value as RecordID];
+
     // Update selected value or list of tokens if the value is changed externally
     useEffect(() => {
         let hasValue = false;
         if (Array.isArray(value)) {
-            hasValue = value.length > 0;
+            hasValue = value.length > 0 && selectedOptions.length > 0;
         } else {
-            hasValue = value !== undefined;
+            hasValue = value !== undefined && !!selectedOption;
         }
         setIsClearable(Boolean(props.isClearable) && hasValue);
     }, [value]);
-
-    const selectedOption = optionsByValue[value as RecordID];
-
-    const selectedTokens = useMemo<INestedSelectOptionProps[]>(() => {
-        if (multiple && Array.isArray(value)) {
-            return value.map((val) => optionsByValue[val]);
-        }
-        return [];
-    }, [value, optionsByValue]);
 
     // When changing the input value, filter the options by the input value
     const handleOnInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -172,8 +188,8 @@ export function NestedSelect(props: INestedSelectProps) {
         }
 
         // Pressing the backspace key should remove the last token if the input is empty
-        if (event.key === "Backspace" && multiple && selectedTokens.length && !inputValue.length) {
-            const lastToken = selectedTokens.pop();
+        if (event.key === "Backspace" && multiple && selectedOptions.length && !inputValue.length) {
+            const lastToken = selectedOptions.pop();
             if (lastToken?.value) {
                 void handleOnSelect(lastToken.value);
             }
@@ -271,25 +287,26 @@ export function NestedSelect(props: INestedSelectProps) {
         return currentOption;
     };
 
+    const isMounted = useIsMounted();
+
     // Select or deselect an option and update the appropriate props
     const handleOnSelect = async (option: RecordID) => {
-        setCreatedOptions((opts) => {
-            if (!createable) {
-                return opts;
-            }
-            if (createdOptions.find((opt) => opt.value === option)) {
-                // We already have it.
-                return opts;
-            }
+        if (createable) {
+            setCreatedValues((prevValues) => {
+                if (createdValues.find((opt) => opt === option)) {
+                    // We already have it.
+                    return prevValues;
+                }
 
-            // If the option is not creatable don't add it.
-            if (!optionsByValue[option]?.data?.createable) {
-                return opts;
-            }
+                // If the option is not creatable don't add it.
+                if (!optionsByValue[option]?.data?.createable) {
+                    return prevValues;
+                }
 
-            // Otherwise add it.
-            return [...opts, { value: option, label: option } as Select.Option];
-        });
+                // Otherwise add it.
+                return [...prevValues, option];
+            });
+        }
 
         let data: any;
         let tmpValue: INestedSelectProps["value"] = multiple
@@ -309,10 +326,15 @@ export function NestedSelect(props: INestedSelectProps) {
         }
 
         // send the new value to the parent component and clear the input and close the menu
-        await onChange(tmpValue, data);
+        await onChange(tmpValue as any, data);
+
+        if (!isMounted()) {
+            return;
+        }
         setInputValue("");
         setIsOpen(false);
         setHighlightedValue(undefined);
+        inputRef.current?.focus();
     };
 
     // Clear the selected options and replace with either the default values or an empty value
@@ -325,18 +347,18 @@ export function NestedSelect(props: INestedSelectProps) {
             : optionsByValue[tmpValue as RecordID];
 
         // send the new value back to the parent component and remove the Clear button
-        onChange(tmpValue, data);
+        onChange(tmpValue as any, data);
         setIsClearable(false);
     };
 
     const checkRequirement = {
         ...(!multiple && { required: props.required }),
-        ...(multiple && selectedTokens.length === 0 && { required: props.required }),
+        ...(multiple && selectedOptions.length === 0 && { required: props.required }),
     };
 
     return (
         <>
-            <div id={id} className={classNames(classesInputBlock.root, cx(classes.root, classOverrides?.root))}>
+            <div id={id} className={cx(classesInputBlock.root, classes.root, classOverrides?.root)}>
                 {label && (
                     <label
                         id={labelID}
@@ -368,18 +390,17 @@ export function NestedSelect(props: INestedSelectProps) {
                         ref={selectRef}
                         data-testid="inputContainer"
                     >
-                        <div className={classes.input}>
+                        <div className={cx(classes.input, multiple && selectedOptions.length > 0 && "tokens")}>
                             {multiple && (
                                 <>
-                                    {selectedTokens.map((token, idx) => {
+                                    {selectedOptions.map((token, idx) => {
                                         if (!token) {
                                             return null;
                                         }
                                         const { label, value } = token;
                                         return (
                                             <TokenItem
-                                                key={stableObjectHash(token)}
-                                                className={classes.token}
+                                                key={idx}
                                                 compact={props.compact}
                                                 onRemove={() => handleOnSelect(value as RecordID)}
                                             >
@@ -390,6 +411,9 @@ export function NestedSelect(props: INestedSelectProps) {
                                 </>
                             )}
                             <input
+                                size={
+                                    inline ? Math.max(4, selectedOption?.label?.length ?? inputValue.length) : undefined
+                                }
                                 type="text"
                                 id={inputID}
                                 aria-label={props.ariaLabel ?? label}
@@ -409,7 +433,7 @@ export function NestedSelect(props: INestedSelectProps) {
                                 placeholder={
                                     multiple
                                         ? // Token is selected
-                                          selectedTokens.length > 0
+                                          selectedOptions.length > 0
                                             ? undefined
                                             : props.placeholder
                                         : // Single value is selected
@@ -431,6 +455,10 @@ export function NestedSelect(props: INestedSelectProps) {
                             targetRef={selectRef}
                             hidden={!isOpen}
                             position={positionMatchWidth}
+                            onTouchMove={(e) => {
+                                // somehow Popover blocks this event so we need to stop it so the mobile scrolling works
+                                e.stopPropagation();
+                            }}
                         >
                             {options.length ? (
                                 options.map((option, idx) => {

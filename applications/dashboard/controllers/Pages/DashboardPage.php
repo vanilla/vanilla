@@ -8,6 +8,7 @@
 use Garden\Web\Data;
 use Vanilla\Dashboard\Events\DashboardAccessEvent;
 use Vanilla\Logging\AuditLogger;
+use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\DashboardPreloadProvider;
 use Vanilla\Utility\Timers;
 use Vanilla\Web\ThemedPage;
@@ -46,7 +47,9 @@ class DashboardPage extends ThemedPage
         // Preload for frontend
         /** @var DashboardPreloadProvider $dashboardProvider */
         $dashboardProvider = \Gdn::getContainer()->get(DashboardPreloadProvider::class);
-        $this->registerReduxActionProvider($dashboardProvider);
+        $this->registerPreloader($dashboardProvider);
+        $userPreloadProvider = \Gdn::getContainer()->get(CurrentUserPreloadProvider::class);
+        $this->registerPreloader($userPreloadProvider);
         parent::initAssets();
     }
 

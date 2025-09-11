@@ -6,8 +6,9 @@
 
 import { queryRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/queries/queryRichLink";
 import { MyEditor } from "@library/vanilla-editor/typescript";
-import { getEditorString } from "@udecode/plate-common";
+import { getEditorString, getNodeString } from "@udecode/plate-common";
 import { floatingLinkActions } from "@udecode/plate-link";
+import { ELEMENT_LINK_AS_BUTTON } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 
 /**
  * We're using this instead of the one in @udecode/plate because we want it to work with our embeds, rather than just
@@ -28,6 +29,11 @@ export function triggerFloatingLinkEdit(editor: MyEditor) {
     }
 
     let text = getEditorString(editor, path);
+
+    // for button type links, getEditorString() won't return the text content so we need to get it from the element
+    if (element.type === ELEMENT_LINK_AS_BUTTON) {
+        text = getNodeString(element);
+    }
 
     floatingLinkActions.url(element.url);
 

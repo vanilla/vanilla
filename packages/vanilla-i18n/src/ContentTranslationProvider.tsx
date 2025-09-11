@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -23,12 +23,12 @@ let _TranslationComponent: React.ComponentType<IContentTranslatorProps> | null =
  * Provider of the translation component.
  */
 export const ContentTranslationProvider = (props: { children: React.ReactNode }) => {
-    const { locales } = useLocaleInfo();
+    const { currentLocale, locales } = useLocaleInfo();
 
     return (
         <context.Provider
             value={{
-                shouldDisplay: _TranslationComponent !== null && locales.length > 1,
+                shouldDisplay: !!_TranslationComponent && locales.some((locale) => locale.localeKey !== currentLocale),
                 Translator: _TranslationComponent !== null ? _TranslationComponent : NullContentTranslator,
             }}
         >

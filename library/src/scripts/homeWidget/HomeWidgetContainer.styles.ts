@@ -4,9 +4,10 @@
  */
 
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { HomeWidgetItemContentType, homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
+import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
+import { WidgetItemContentType } from "./WidgetItemOptions";
 import { pageHeadingBoxVariables, SubtitleType } from "@library/layout/PageHeadingBox.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { navLinksVariables } from "@library/navigation/navLinksStyles";
@@ -94,11 +95,13 @@ export const homeWidgetContainerVariables = useThemeCache(
                     name: "View All",
                 },
                 visualBackgroundType: "inner",
-                maxColumnCount: [
-                    HomeWidgetItemContentType.TITLE_BACKGROUND,
-                    HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
-                    HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
-                ].includes(itemVars.options.contentType)
+                maxColumnCount: (
+                    [
+                        WidgetItemContentType.TitleBackground,
+                        WidgetItemContentType.TitleDescriptionImage,
+                        WidgetItemContentType.TitleBackgroundDescription,
+                    ] as WidgetItemContentType[]
+                ).includes(itemVars.options.contentType)
                     ? 4
                     : 3,
                 subtitle: {
@@ -146,9 +149,9 @@ export const homeWidgetContainerVariables = useThemeCache(
                     ...options.innerBackground,
                     color:
                         options.visualBackgroundType === "inner" &&
-                        ![BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN, BorderType.NONE].includes(
-                            options.borderType!,
-                        )
+                        !(
+                            [BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN, BorderType.NONE] as BorderType[]
+                        ).includes(options.borderType!)
                             ? globalVars.body.backgroundImage.color
                             : undefined,
                 },

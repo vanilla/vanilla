@@ -16,6 +16,7 @@ helpAsset(
 $form = $this->Form;
 /** @var \Garden\EventManager $eventManager */
 $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+$featureFlagHelper = Gdn::getContainer()->get(\Vanilla\FeatureFlagHelper::class);
 $formats = $this->data("formats");
 $formatOptions = [];
 foreach ($formats as $altFormatKey => $formatName) {
@@ -34,12 +35,7 @@ echo $form->errors();
     <?php
     $checkboxDesc =
         "Checkboxes allow admins to perform batch actions on a number of posts or comments at the same time.";
-    echo $form->toggle(
-        "Vanilla.AdminCheckboxes.Use",
-        "Enable checkboxes on posts and comments",
-        [],
-        $checkboxDesc
-    );
+    echo $form->toggle("Vanilla.AdminCheckboxes.Use", "Enable checkboxes on posts and comments", [], $checkboxDesc);
     ?>
 </div>
 
@@ -102,6 +98,40 @@ echo $form->errors();
     </div>
 </div>
 
+<h2 class="subheading"><?php echo t("Mentions"); ?></h2>
+    <div class="form-group">
+        <div class="label-wrap-wide">
+            <?php
+                echo $form->label('Everyone can global mention.', 'Garden.Format.Mentions');
+                echo '<p class="info">Any user can mention any other user, even if they do not have access to the current category or group.</p>';
+                ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $form->radio("Garden.Format.Mentions", "", ["value" => UsersApiController::AT_MENTION_GLOBAL, "default" => UsersApiController::AT_MENTION_FILTER_LOOSE]); ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="label-wrap-wide">
+            <?php
+                echo $form->label("Strictly Filter @ mentions by Groups and Categories and do not show users who aren't part of the category or group.", "Garden.Format.Mentions");
+                echo "<p class=\"info\">Enable this option to show only users who belong to the selected category or group when posting. If someone tries to mention a user who isn't part of the group or category, those users simply won't appear in the mention list except to users with the moderation.manage permission. This feature only works with the Rich Editor.</p>";
+            ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $form->radio("Garden.Format.Mentions", "", ['value' => UsersApiController::AT_MENTION_FILTER_STRICT, "default" => UsersApiController::AT_MENTION_FILTER_LOOSE]); ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="label-wrap-wide">
+            <?php
+                echo $form->label("Disable @ mentions", "Garden.Format.Mentions");
+                echo "<p class=\"info\">Disable @ mentions for the entire community.</p>";
+            ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $form->radio("Garden.Format.Mentions", "", ["value" =>UsersApiController::AT_MENTION_DISABLED, "default" => UsersApiController::AT_MENTION_FILTER_LOOSE]); ?>
+        </div>
+    </div>
 <h2 class="subheading"><?php echo t("Embeds"); ?></h2>
 
 <div class="form-group">
@@ -267,6 +297,7 @@ echo $form->errors();
         <?php echo $form->dropDown("Garden.EditContentTimeout", $Options, $Fields); ?>
     </div>
 </div>
+<?php if (!$featureFlagHelper::featureEnabled("customLayout.createPost")): ?>
 <div class="form-group">
     <?php
     $autosaveDescription =
@@ -277,6 +308,7 @@ echo $form->errors();
     echo $form->toggle("Vanilla.Drafts.Autosave", "Automatically Save Drafts", [], $autosaveDescription);
     ?>
 </div>
+<?php endif; ?>
 <div class="form-group">
     <div class="label-wrap">
         <?php echo $form->label("Max Post Length", "Vanilla.Comment.MaxLength"); ?>
@@ -295,6 +327,17 @@ echo $form->errors();
     </div>
     <div class="input-wrap">
         <?php echo $form->textBox("Vanilla.Comment.MinLength", ["class" => "InputBox SmallInput"]); ?>
+    </div>
+</div>
+<div class="form-group">
+    <div class="label-wrap">
+        <?php echo $form->label("Max Post Title Length", "Vanilla.Discussion.Title.MaxLength"); ?>
+        <div class="info"><?php echo t(
+            "You can specify a maximum post title length. Minimum is 50 and Maximum is 250."
+        ); ?></div>
+    </div>
+    <div class="input-wrap">
+        <?php echo $form->textBox("Vanilla.Discussion.Title.MaxLength", ["class" => "InputBox SmallInput"]); ?>
     </div>
 </div>
 <?php echo $form->close("Save"); ?>

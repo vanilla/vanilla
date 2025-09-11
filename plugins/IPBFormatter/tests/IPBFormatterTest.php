@@ -21,7 +21,7 @@ class IPBFormatterTest extends AbstractFormatTestCase
     use UserMentionTestTraits;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -38,7 +38,7 @@ class IPBFormatterTest extends AbstractFormatTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function prepareFormatter(): FormatInterface
     {
@@ -46,7 +46,7 @@ class IPBFormatterTest extends AbstractFormatTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function prepareFixtures(): array
     {

@@ -5,14 +5,14 @@
  */
 
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/themeCache";
 import voteCounterVariables from "@library/voteCounter/VoteCounter.variables";
 import { percent } from "csx";
 
-export const voteCounterClasses = useThemeCache(() => {
+export const voteCounterClasses = useThemeCache((direction: "horizontal" | "vertical") => {
     const globalVars = globalVariables();
     const vars = voteCounterVariables();
 
@@ -21,29 +21,46 @@ export const voteCounterClasses = useThemeCache(() => {
         color: ColorsUtils.colorOut(vars.colors.fg),
         fontSize: vars.sizing.height,
         lineHeight: 1,
-        width: "1em",
+        width: direction === "horizontal" ? "auto" : "1em",
         borderRadius: "1em",
         minHeight: "1em",
-        display: "flex",
-        flexDirection: "column",
+        display: "inline-flex",
+        flexDirection: direction === "horizontal" ? "row" : "column",
         alignItems: "center",
         justifyContent: "flex-end",
         boxShadow: `0px 0px 0px 2px ${ColorsUtils.colorOut(globalVars.mainColors.bg)}`,
+
+        ...(direction === "horizontal" && {
+            padding: "0 4px",
+            minHeight: "initial",
+        }),
     });
 
     const count = css({
         fontSize: "0.35em",
         fontWeight: globalVars.fonts.weights.semiBold,
+        whiteSpace: "nowrap",
 
-        [`&:first-child`]: {
-            // the count is first child when there is only an 'up' vote arrow.
-            lineHeight: 1.43,
-            marginBottom: percent(-20),
-        },
-        [`&:nth-child(2)`]: {
-            // the count is second child when there there are 'up' and 'down' vote arrows.
-            lineHeight: 0.72,
-        },
+        ...(direction === "vertical" && {
+            [`&:first-child`]: {
+                // the count is first child when there is only an 'up' vote arrow.
+                lineHeight: 1.43,
+                marginBottom: percent(-20),
+            },
+            [`&:nth-child(2)`]: {
+                // the count is second child when there there are 'up' and 'down' vote arrows.
+                lineHeight: 0.72,
+            },
+        }),
+
+        ...(direction === "horizontal" && {
+            "&:first-child": {
+                paddingLeft: "4px",
+            },
+            "&:last-child": {
+                paddingRight: "4px",
+            },
+        }),
     });
 
     const iconCheckedStyle: CSSObject = {

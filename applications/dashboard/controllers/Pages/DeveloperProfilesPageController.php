@@ -13,7 +13,7 @@ use Vanilla\Utility\Timers;
 use Vanilla\Web\PageDispatchController;
 
 /**
- * GET /settings/developer/profiles
+ * GET /settings/vanilla-staff/profiles
  */
 class DeveloperProfilesPageController extends PageDispatchController
 {
@@ -30,7 +30,7 @@ class DeveloperProfilesPageController extends PageDispatchController
     }
 
     /**
-     * GET /settings/developer/profiles
+     * GET /settings/vanilla-staff/profiles
      *
      * @return Data
      */
@@ -46,7 +46,7 @@ class DeveloperProfilesPageController extends PageDispatchController
     }
 
     /**
-     * GET /settings/developer/profiles/:developerProfileID
+     * GET /settings/vanilla-staff/profiles/:developerProfileID
      *
      * @param int $id
      *
@@ -64,7 +64,7 @@ class DeveloperProfilesPageController extends PageDispatchController
     }
 
     /**
-     * GET /settings/developer/profiles/by-request-id/:cloudflareRayID
+     * GET /settings/vanilla-staff/profiles/by-request-id/:cloudflareRayID
      *
      * @param string $path
      */

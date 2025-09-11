@@ -7,7 +7,9 @@
 
 namespace Vanilla\Forum\Models;
 
+use UsersApiController;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
+use TagModel;
 
 /**
  * Class for adding extra site meta related to posting settings.
@@ -19,12 +21,13 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
      */
     public function __construct(
         private \Vanilla\Contracts\ConfigurationInterface $config,
-        private EscalationModel $escalationModel
+        private EscalationModel $escalationModel,
+        private TagModel $tagModel
     ) {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getValue(): array
     {
@@ -46,14 +49,10 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
         $postTypes = array_values(array_filter(array_column(\DiscussionModel::discussionTypes(), "apiType")));
         $postTypeModel = \Gdn::getContainer()->get(PostTypeModel::class);
         $availablePostTypes = $postTypeModel->getAvailablePostTypes();
-        $postTypesMap = [];
-        foreach ($availablePostTypes as $postType) {
-            if (isset($postType["parentPostTypeID"])) {
-                $postTypesMap[$postType["postTypeID"]] = $postType["parentPostTypeID"];
-            } else {
-                $postTypesMap[$postType["postTypeID"]] = $postType["postTypeID"];
-            }
-        }
+        $postTypesMap = array_column($availablePostTypes, null, index_key: "postTypeID");
+
+        $mentionsConfig = $this->config->get("Garden.Format.Mentions", UsersApiController::AT_MENTION_GLOBAL);
+        $mentionsEnabled = $mentionsConfig !== UsersApiController::AT_MENTION_DISABLED;
 
         return [
             "community" => [
@@ -73,6 +72,14 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
             ],
             "posting" => [
                 "minLength" => $minLength,
+                "titleMaxLength" => \DiscussionModel::getPostTitleMaxLength(),
+            ],
+            "tagging" => [
+                "enabled" => $this->tagModel->discussionTaggingEnabled(),
+                "scopedTaggingEnabled" => $this->tagModel->scopedTaggingEnabled(),
+            ],
+            "mentions" => [
+                "enabled" => $mentionsEnabled,
             ],
         ];
     }

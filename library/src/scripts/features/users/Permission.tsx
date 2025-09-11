@@ -9,6 +9,7 @@ import getStore from "@library/redux/getStore";
 import React from "react";
 import { IPermissions } from "@library/features/users/userTypes";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { RecordID } from "@vanilla/utils";
 
 export enum PermissionMode {
     /**
@@ -81,7 +82,7 @@ export interface IPermission {
 export interface IPermissionOptions {
     mode: PermissionMode;
     resourceType?: string;
-    resourceID?: number | null;
+    resourceID?: RecordID | null;
 }
 
 /**
@@ -103,10 +104,6 @@ export function checkPermission(
 
     if (!permissions.data || permissions.status !== LoadStatus.SUCCESS) {
         return false;
-    }
-
-    if (permissions.data.isAdmin) {
-        return true;
     }
 
     if (!options) {
@@ -132,7 +129,7 @@ export function checkPermission(
 
         const junctions = permissions.data.junctions?.[resourceType] ?? null;
         if (junctions) {
-            resourceHasJunction = junctions.includes(resourceID);
+            resourceHasJunction = junctions.includes(parseInt(`${resourceID}`));
         }
     }
 
@@ -159,6 +156,11 @@ export function checkPermission(
             }
         }
     });
+
+    if (permissions.data.isAdmin) {
+        return true;
+    }
+
     return hasMatch;
 }
 

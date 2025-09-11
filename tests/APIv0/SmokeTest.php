@@ -33,7 +33,7 @@ class SmokeTest extends SiteTestCase
     private $config;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

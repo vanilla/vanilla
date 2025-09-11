@@ -28,7 +28,7 @@ use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Logging\AuditLogger;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Web\SystemTokenUtils;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetService;
 
 /**
  * Event handlers for the Dashboard application.
@@ -98,7 +98,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             ->rule(\Vanilla\Menu\CounterModel::class)
             ->addCall("addProvider", [new Reference(ActivityCounterProvider::class)])
             ->addCall("addProvider", [new Reference(RoleCounterProvider::class)])
-            ->rule(WidgetService::class)
+            ->rule(LegacyWidgetService::class)
             ->addCall("registerWidget", [CommunityLeadersModule::class]);
 
         $mf = \Vanilla\Models\ModelFactory::fromContainer($dic);
@@ -384,6 +384,23 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         }
 
         $escalationsEnabled = FeatureFlagHelper::featureEnabled("escalations");
+
+        $nav->addGroupToSection("VanillaStaff", "Product", "product")
+            ->addLinkToSection(
+                "VanillaStaff",
+                "Manage Messages",
+                "/settings/vanilla-staff/product-messages",
+                "product.messages"
+            )
+            ->addGroupToSection("VanillaStaff", "Developer", "developer")
+            ->addLinkToSection("VanillaStaff", "Database Migrations", "/utility/structure", "developer.dbaStructure")
+            ->addLinkToSection("VanillaStaff", "Aggregate Counts", "/dba/counts", "developer.dbaCounts")
+            ->addLinkToSection(
+                "VanillaStaff",
+                "Performance Profiles",
+                "/settings/vanilla-staff/profiles",
+                "developer.profiles"
+            );
 
         $nav->addGroupToSection("Moderation", t("Posts"), "content")
             ->addLinkToSectionIf(
@@ -768,87 +785,9 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
     public function settingsController_tagging_create($sender, $search = null, $type = null, $page = null)
     {
         $sender->permission("Garden.Settings.Manage");
-
         $sender->title("Tagging");
         $sender->setHighlightRoute("settings/tagging");
-        $sQL = Gdn::sql();
-
-        /** @var Gdn_Form $form */
-        $form = $sender->Form;
-
-        if ($form->authenticatedPostBack()) {
-            $formValue = (bool) $form->getFormValue("Tagging.Discussions.Enabled");
-            saveToConfig("Tagging.Discussions.Enabled", $formValue);
-        }
-
-        [$offset, $limit] = offsetLimit($page, 100);
-        $sender->setData("_Limit", $limit);
-
-        if ($search) {
-            $sQL->like("FullName", $search, "right");
-        }
-
-        $queryType = $type;
-
-        if (($type && strtolower($type) == "all") || $search || $type === null) {
-            $queryType = false;
-            $type = "";
-        }
-
-        // This type doesn't actually exist, but it will represent the blank types in the column.
-        if (strtolower($type) == "tags") {
-            $queryType = "";
-        }
-
-        if (!$search && $queryType !== false) {
-            $sQL->where("Type", $queryType);
-        }
-
-        // Get all tag types
-        $tagModel = TagModel::instance();
-        $tagTypes = $tagModel->getTagTypes();
-        $tagTypes = array_change_key_case($tagTypes, CASE_LOWER);
-
-        // Store type for view
-        $tagType = !empty($type) ? $type : "All";
-        $sender->setData("_TagType", $tagType);
-
-        // Store tag types
-        $sender->setData("_TagTypes", $tagTypes);
-
-        // Determine if new tags can be added for the current type.
-        $canAddTags = !empty($tagTypes[$type]["addtag"]) && $tagTypes[$type]["addtag"] ? 1 : 0;
-        $canAddTags &= checkPermission("Vanilla.Tagging.Add");
-        $sender->setData("_CanAddTags", $canAddTags);
-
-        $data = $sQL
-            ->select("t.*")
-            ->from("Tag t")
-            ->orderBy("t.CountDiscussions", "desc")
-            ->limit($limit, $offset)
-            ->get()
-            ->resultArray();
-
-        $sender->setData("Tags", $data);
-
-        if ($search) {
-            $sQL->like("FullName", $search, "right");
-        }
-
-        // Make sure search uses its own search type, so results appear in their own tab.
-        $sender->Form->Action = url("/settings/tagging/?type=" . $tagType);
-
-        // Search results pagination will mess up a bit, so don't provide a type in the count.
-        $recordCountWhere = ["Type" => $queryType];
-        if ($queryType === false) {
-            $recordCountWhere = [];
-        }
-        if ($search) {
-            $recordCountWhere = [];
-        }
-
-        $sender->setData("RecordCount", $sQL->getCount("Tag", $recordCountWhere));
-        $sender->render("tagging");
+        $sender->render("tagging-settings");
     }
 
     /**
@@ -1011,7 +950,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         if (!$hasPermission && $discussion["InsertUserID"] !== GDN::session()->UserID) {
             throw permissionException("Vanilla.Tagging.Add");
         }
-        $sender->title("Add Tags");
+        $sender->title(t("Add Tags"));
 
         if ($sender->Form->authenticatedPostBack()) {
             $rawFormTags = $sender->Form->getFormValue("Tags");

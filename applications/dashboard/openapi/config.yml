@@ -913,3 +913,17 @@ components:
                     x-key: "premoderation.challengeAgeCutoffInDays"
                     x-read: community.moderate
                     x-write: community.moderate
+                "tagging.enabled":
+                    description: Enable or disable tagging
+                    type: boolean
+                    default: false
+                    x-key: "Tagging.Discussions.Enabled"
+                    x-read: site.manage
+                    x-write: site.manage
+                "tagging.scopedTagging.enabled":
+                    description: Enable or disable scoped tagging
+                    type: boolean
+                    default: false
+                    x-key: "Tagging.ScopedTagging.Enabled"
+                    x-read: site.manage
+                    x-write: site.manage

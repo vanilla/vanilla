@@ -1,0 +1,28 @@
+name: "vanilla"
+services:
+    database:
+        build:
+            context: "./images/mysql"
+        container_name: "database"
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_DATABASE: vanilla_dev
+        networks:
+            vanilla-network:
+                aliases:
+                    - mysql.vanilla.local
+        volumes:
+            - "mysql8:/var/lib/mysql"
+            - "logs-mysql8:/var/log/mysql"
+
+volumes:
+    mysql8:
+    logs-mysql8:
+
+networks:
+    vanilla-network:
+        external: true
+        driver: "bridge"
+        name: "vanilla-network"

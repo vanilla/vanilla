@@ -260,4 +260,23 @@ describe("AccountSettings", () => {
         expect(suggestionCheckbox).toBeInTheDocument();
         expect(suggestionCheckbox).toBeChecked();
     });
+
+    it("Update analytics anonymization when checkbox is clicked", async () => {
+        const mockAdapter = mockAPI();
+        mockAdapter.onPatch("/analytics/privacy").replyOnce(200, {});
+
+        render(
+            <AccountSettingsFixtures.UserEditingSelf>
+                <AccountSettingsImpl />
+            </AccountSettingsFixtures.UserEditingSelf>,
+        );
+
+        const analyticsAnonymizationCheckbox = screen.getByRole("checkbox", { name: "Anonymize my analytics data" });
+        expect(analyticsAnonymizationCheckbox).toBeInTheDocument();
+        expect(analyticsAnonymizationCheckbox).not.toBeChecked();
+
+        fireEvent.click(analyticsAnonymizationCheckbox);
+
+        expect(analyticsAnonymizationCheckbox).toBeChecked();
+    });
 });

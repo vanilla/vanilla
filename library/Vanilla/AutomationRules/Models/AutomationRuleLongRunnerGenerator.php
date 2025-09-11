@@ -54,7 +54,7 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getSystemCallableMethods(): array
     {
@@ -155,7 +155,8 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
                         }
                         yield new LongRunnerSuccessID($primaryKey);
                     } catch (LongRunnerTimeoutException $e) {
-                        throw $e;
+                        $params["currentCount"] = $count;
+                        return new LongRunnerNextArgs([$lastRecordID, $cacheLockCombo, $params]);
                     } catch (\Exception $exception) {
                         $this->automationRuleDispatchesModel->updateDispatchStatus(
                             $dispatchUUID,
@@ -165,6 +166,14 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
                             ],
                             $exception->getMessage()
                         );
+                        $this->logger->error("Automation rule long runner execution failed", [
+                            Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                            Logger::FIELD_TAGS => ["automationRules", "long-runner"],
+                            "automationRuleID" => $automationRule["automationRuleID"],
+                            "automationRuleRevisionID" => $automationRule["automationRuleRevisionID"],
+                            "dispatchUUID" => $dispatchUUID,
+                            "exception" => $exception,
+                        ]);
                         yield new LongRunnerFailedID($primaryKey);
                     } catch (\Throwable $exception) {
                         // Execution has failed
@@ -188,6 +197,7 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
             );
             throw $lockE;
         } catch (\InvalidArgumentException $e) {
+            $this->markDispatchAsFailed($dispatchUUID, $automationRule, $e);
             throw $e;
         } catch (\Throwable $exception) {
             $this->markDispatchAsFailed($dispatchUUID, $automationRule, $exception);
@@ -209,7 +219,7 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
         );
         $this->logger->info("Finished processing automation rule", [
             Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
-            Logger::FIELD_TAGS => ["automation-rule", "long-runner"],
+            Logger::FIELD_TAGS => ["automationRules", "long-runner"],
             "automationRuleID" => $automationRule["automationRuleID"],
             "automationRuleRevisionID" => $automationRule["automationRuleRevisionID"],
             "dispatchUUID" => $dispatchUUID,
@@ -239,7 +249,7 @@ class AutomationRuleLongRunnerGenerator implements SystemCallableInterface
         );
         $this->logger->error("Automation rule long runner execution failed", [
             Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
-            Logger::FIELD_TAGS => ["automation-rule", "long-runner"],
+            Logger::FIELD_TAGS => ["automationRules", "long-runner"],
             "automationRuleID" => $automationRule["automationRuleID"],
             "automationRuleRevisionID" => $automationRule["automationRuleRevisionID"],
             "dispatchUUID" => $dispatchUUID,

@@ -19,13 +19,12 @@ use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\Forum\Controllers\Api\EscalationsApiController;
-use Vanilla\Forum\Controllers\Api\ReportsApiController;
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportModel;
 use Vanilla\Forum\Models\CommunityManagement\ReportReasonModel;
 use Vanilla\Logger;
 use Vanilla\Models\Model;
+use Vanilla\Forum\Models\CommunityManagement\CommunityManagementRecordModel;
 
 class CreateEscalationAction extends ExternalAction implements PostInterface
 {
@@ -33,7 +32,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
 
     private const AUTOMATION_REPORT_BODY = '[{"children":[{"text":"Automation generated report"}],"type":"p"}]';
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -41,7 +40,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -49,7 +48,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -57,7 +56,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function canAddAction(): bool
     {
@@ -66,7 +65,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setPostRecord(array $postRecord): void
     {
@@ -74,7 +73,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getPostRecord(): array
     {
@@ -82,7 +81,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -111,7 +110,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -128,6 +127,11 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     public function executeLongRunner(array $actionValue, array $object): bool
     {
         //check the type of object
+        if (!isset($object["recordID"]) && isset($object["CommentID"])) {
+            $object["recordID"] = $object["CommentID"];
+            $object["recordType"] = "comment";
+            $object["recordName"] = "Comment: " . substr($object["Body"] ?? "", 0, 100);
+        }
         if (!isset($object["recordID"]) && isset($object["DiscussionID"])) {
             $object["recordID"] = $object["DiscussionID"];
             $object["recordType"] = "discussion";
@@ -138,7 +142,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function execute(): bool
     {
@@ -148,6 +152,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
         if (!$this->dispatched) {
             $attributes = [
                 "affectedRecordType" => $object["recordType"],
+                "recordID" => $object["recordID"],
                 "estimatedRecordCount" => 1,
                 "affectedRecordCount" => 0,
             ];
@@ -288,33 +293,60 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
      */
     private function escalate(array $record, bool $longRunningJob = false): int
     {
-        $escalationsApiController = Gdn::getContainer()->get(EscalationsApiController::class);
+        $escalationModel = Gdn::getContainer()->get(EscalationModel::class);
+        $communityManagementRecordModel = Gdn::getContainer()->get(CommunityManagementRecordModel::class);
         $automationRule = $this->getAutomationRule();
         $actionValue = $automationRule["action"]["actionValue"];
+
+        // Get the full record details from the community management record model
+        $fullRecord = $communityManagementRecordModel->getRecord($record["recordType"], $record["recordID"]);
+        if (!$fullRecord) {
+            throw new \Garden\Web\Exception\NotFoundException($record["recordType"], [
+                "recordType" => $record["recordType"],
+                "recordID" => $record["recordID"],
+            ]);
+        }
+
         $escalationRecord = [
             "recordIsLive" => $actionValue["recordIsLive"] ?? false,
             "recordID" => $record["recordID"],
             "recordType" => $record["recordType"],
             "name" => $record["recordName"] ?? ($record["Name"] ?? ""),
-            "automation" => true,
+            "placeRecordType" => "category",
+            "placeRecordID" => $fullRecord["CategoryID"],
+            "status" => EscalationModel::STATUS_OPEN,
+            "recordUserID" => $fullRecord["InsertUserID"],
+            "recordDateInserted" => $fullRecord["DateInserted"],
+            "countComments" => 0,
         ];
+
         if (isset($actionValue["assignedModeratorID"])) {
             $escalationRecord["assignedUserID"] = $actionValue["assignedModeratorID"];
-        }
-        if (isset($record["reportID"])) {
-            $escalationRecord["reportID"] = $record["reportID"];
-        } else {
-            $escalationRecord["noteBody"] = self::AUTOMATION_REPORT_BODY;
-            $escalationRecord["noteFormat"] = Rich2Format::FORMAT_KEY;
-            $escalationRecord["reportReasonIDs"] = [ReportReasonModel::INITIAL_REASON_AUTOMATION_RULE];
         }
 
         $exceptionData = [
             "recordID" => $record["recordID"],
             "recordType" => $record["recordType"],
         ];
+
         try {
-            $result = $escalationsApiController->post($escalationRecord);
+            $escalationID = $escalationModel->insert($escalationRecord);
+
+            // AIDEV-NOTE: Link the report to the escalation if we have a reportID
+            if (isset($record["reportID"])) {
+                $escalationModel->linkReportsToEscalation($escalationID, [$record["reportID"]]);
+            }
+
+            // AIDEV-NOTE: Create attachment for the escalation (same as API controller)
+            // Use queryEscalations to get the escalation with all computed fields
+            $escalations = $escalationModel->queryEscalations(["escalationID" => $escalationID]);
+            $escalation = $escalations[0] ?? null;
+            if ($escalation) {
+                $attachmentProvider = Gdn::getContainer()->get(
+                    \Vanilla\Forum\Models\VanillaEscalationAttachmentProvider::class
+                );
+                $attachmentProvider->createAttachmentFromEscalation($escalation);
+            }
         } catch (\Throwable $e) {
             $exceptionData["error"] = $e->getMessage();
             $this->addLog("error", "Error occurred while escalating record", $exceptionData);
@@ -340,12 +372,14 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
             }
             throw $e;
         }
+
         $this->addLog("info", "Post escalated.", [
             "recordID" => $record["recordID"],
             "recordType" => $record["recordType"],
             "automationRuleID" => $this->getAutomationRuleID(),
         ]);
-        return $result["escalationID"];
+
+        return $escalationID;
     }
 
     /**
@@ -364,17 +398,38 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
         if (!in_array($recordType, ["discussion", "comment"])) {
             throw new \InvalidArgumentException("Invalid record type");
         }
-        $reportApiController = Gdn::getContainer()->get(ReportsApiController::class);
+
+        $reportModel = Gdn::getContainer()->get(ReportModel::class);
+        $communityManagementRecordModel = Gdn::getContainer()->get(CommunityManagementRecordModel::class);
+
+        // Get the full record details from the community management record model
+        $fullRecord = $communityManagementRecordModel->getRecord($recordType, $recordID);
+        if (!$fullRecord) {
+            throw new \Garden\Web\Exception\NotFoundException($recordType, [
+                "recordType" => $recordType,
+                "recordID" => $recordID,
+            ]);
+        }
+
         $report = [
             "recordID" => $recordID,
             "recordType" => $recordType,
             "reportReasonIDs" => [ReportReasonModel::INITIAL_REASON_AUTOMATION_RULE],
             "noteBody" => self::AUTOMATION_REPORT_BODY,
             "noteFormat" => Rich2Format::FORMAT_KEY,
-            "automation" => true,
+            "placeRecordType" => "category",
+            "placeRecordID" => $fullRecord["CategoryID"],
+            "status" => ReportModel::STATUS_NEW,
+            "recordUserID" => $fullRecord["InsertUserID"],
+            "recordName" => $fullRecord["Name"],
+            "recordBody" => $fullRecord["Body"],
+            "recordFormat" => $fullRecord["Format"],
+            "recordDateInserted" => $fullRecord["DateInserted"],
+            "recordInsertIPAddress" => $fullRecord["InsertIPAddress"],
         ];
-        $result = $reportApiController->post($report);
-        return $result["reportID"];
+
+        $reportID = $reportModel->insert($report);
+        return $reportID;
     }
 
     /**
@@ -401,7 +456,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -427,7 +482,7 @@ class CreateEscalationAction extends ExternalAction implements PostInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {

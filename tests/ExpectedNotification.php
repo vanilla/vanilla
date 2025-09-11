@@ -7,12 +7,13 @@
 
 namespace VanillaTests;
 
+use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class to represent an expected notification in a test.
  */
-class ExpectedNotification
+class ExpectedNotification implements JsonSerializable
 {
     /** @var string */
     private $expectedType;
@@ -62,5 +63,17 @@ class ExpectedNotification
         if ($this->reason !== null) {
             TestCase::assertEquals($this->reason, $actualNotification["reason"]);
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            "expectedType" => $this->expectedType,
+            "expectedFragments" => $this->expectedFragments,
+            "expectedReason" => $this->reason,
+        ];
     }
 }

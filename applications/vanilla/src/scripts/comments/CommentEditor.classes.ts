@@ -43,6 +43,12 @@ export const commentEditorClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "baseline",
         justifyContent: "space-between",
+        flexDirection: "column",
+    });
+
+    const errorMessages = css({
+        marginBlockStart: 0,
+        marginBlockEnd: 16,
     });
 
     const title = css({
@@ -67,5 +73,6 @@ export const commentEditorClasses = useThemeCache(() => {
         title,
         formatNoticeLayout,
         editorSpacing,
+        errorMessages,
     };
 });

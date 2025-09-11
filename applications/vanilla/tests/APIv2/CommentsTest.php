@@ -9,14 +9,13 @@ namespace VanillaTests\APIv2;
 
 use CommentModel;
 use DiscussionModel;
-use Exception;
 use Garden\Container\ContainerException;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ForbiddenException;
-use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Gdn;
+use MediaModel;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Utility\ModelUtils;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -25,7 +24,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class CommentsTest extends AbstractResourceTest
 {
-    public static $addons = ["stubcontent", "test-mock-issue"];
+    public static $addons = ["stubcontent", "test-mock-issue", "editor"];
 
     use TestExpandTrait;
     use AssertLoggingTrait;
@@ -762,6 +761,60 @@ class CommentsTest extends AbstractResourceTest
     }
 
     /**
+     * Test that you can still post a comment when including a non-existent draftID.
+     *
+     * @return void
+     */
+    public function testPostingCommentFromDeletedDraft(): void
+    {
+        $discussion = $this->createDiscussion();
+        $commentBody = "This is a comment";
+
+        // Post the comment
+        $this->api()
+            ->post("/comments", [
+                "body" => $commentBody,
+                "discussionID" => $discussion["discussionID"],
+                "format" => "markdown",
+                "draftID" => 9999,
+            ])
+            ->assertSuccess();
+    }
+
+    /**
+     * Test that you cannot delete a draft that belongs to another user if you don't have the correct permission.
+     *
+     * @return void
+     */
+    public function testPostingWithAnotherUsersDraft(): void
+    {
+        $discussion = $this->createDiscussion();
+        $commentDraftData = [
+            "recordType" => "comment",
+            "parentRecordID" => $discussion["discussionID"],
+            "attributes" => [
+                "body" => "Hello world. I am a comment.",
+                "format" => "Markdown",
+            ],
+        ];
+        $draft = $this->api()
+            ->post("/drafts", $commentDraftData)
+            ->assertSuccess()
+            ->getBody();
+
+        $user = $this->createUser();
+        $this->runWithUser(function () use ($draft, $discussion) {
+            $this->expectExceptionCode(403);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->createComment([
+                "body" => "Should not post",
+                "discussionID" => $discussion["discussionID"],
+                "draftID" => $draft["draftID"],
+            ]);
+        }, $user);
+    }
+
+    /**
      * Provide reaction data to test permissions.
      *
      * @return array[]
@@ -781,5 +834,190 @@ class CommentsTest extends AbstractResourceTest
             ],
             "flags" => ["spam", "flag.add", "You need the Reactions.Flag.Add permission to do that"],
         ];
+    }
+
+    /**
+     * Test joining of media onto comments.
+     *
+     * @return void
+     */
+    public function testJoiningOfMedia(): void
+    {
+        $discussion = $this->createDiscussion();
+        $comment = $this->createComment();
+        // Create some media rows for the comments.
+        $this->createMedia("Comment", $comment["commentID"], "/test1");
+        $this->createMedia("Comment", $comment["commentID"], "/test2");
+
+        // Fetching the comment list will join the media to the post.
+        $comment = $this->api()
+            ->get("/comments?commentID={$comment["commentID"]}")
+            ->getBody()[0];
+
+        $this->assertStringContainsString("/test1", $comment["body"]);
+        $this->assertStringContainsString("/test2", $comment["body"]);
+
+        // Joining the table will result in
+
+        // Now let's add a malformed attachment.
+        $this->createMedia(
+            "Comment",
+            $comment["commentID"],
+            "/test3",
+            overrides: [
+                // The bad type should be normalized.
+                "Type" => "",
+            ]
+        );
+
+        $comment = $this->api()
+            ->get("/comments", [
+                "commentID" => $comment["commentID"],
+            ])
+            ->getBody()[0];
+
+        $this->assertStringContainsString("/test1", $comment["body"]);
+        $this->assertStringContainsString("/test2", $comment["body"]);
+        $this->assertStringContainsString("/test3", $comment["body"]);
+
+        // We do not join these when crawling (performance issues).
+        $comment = $this->api()
+            ->get("/comments", [
+                "commentID" => $comment["commentID"],
+                "expand" => "crawl",
+            ])
+            ->getBody()[0];
+
+        $this->assertStringNotContainsString("/test1", $comment["body"]);
+        $this->assertStringNotContainsString("/test2", $comment["body"]);
+        $this->assertStringNotContainsString("/test3", $comment["body"]);
+    }
+
+    /**
+     * Create a media record.
+     *
+     * @param string $foreignTable
+     * @param int $foreignID
+     * @param string $url
+     * @param array $overrides
+     * @return void
+     */
+    private function createMedia(string $foreignTable, int $foreignID, string $url, array $overrides = []): void
+    {
+        $mediaModel = \Gdn::getContainer()->get(MediaModel::class);
+        $mediaID = $mediaModel->save([
+            "Name" => $url,
+            "Path" => $url,
+            "Type" => "test",
+            "Size" => 500,
+            "Active" => 1,
+            "ForeignTable" => $foreignTable,
+            "ForeignID" => $foreignID,
+        ]);
+        ModelUtils::validationResultToValidationException($mediaModel);
+        $mediaModel->setField($mediaID, $overrides);
+    }
+
+    /**
+     * Test that the insertUserID, updateUserID, dateInserted, and dateUpdated can be overwritten.
+     *
+     * @return void
+     */
+    public function testMigratableFields(): void
+    {
+        $this->createDiscussion();
+        $this->createUser();
+
+        $this->createComment([
+            "dateInserted" => "2012-12-21",
+            "dateUpdated" => "2012-12-22",
+            "insertUserID" => $this->lastUserID,
+            "updateUserID" => $this->lastUserID,
+        ]);
+        $this->api->get($this->baseUrl . "/" . $this->lastInsertCommentID)->assertJsonObjectLike([
+            "dateInserted" => "2012-12-21T00:00:00+00:00",
+            "dateUpdated" => "2012-12-22T00:00:00+00:00",
+            "insertUserID" => $this->lastUserID,
+            "updateUserID" => $this->lastUserID,
+        ]);
+
+        $this->createUser();
+        $this->api
+            ->patch($this->baseUrl . "/" . $this->lastInsertCommentID, [
+                "dateInserted" => "2013-12-21",
+                "dateUpdated" => "2013-12-22",
+                "insertUserID" => $this->lastUserID,
+                "updateUserID" => $this->lastUserID,
+            ])
+            ->assertJsonObjectLike([
+                "dateInserted" => "2013-12-21T00:00:00+00:00",
+                "dateUpdated" => "2013-12-22T00:00:00+00:00",
+                "insertUserID" => $this->lastUserID,
+                "updateUserID" => $this->lastUserID,
+            ]);
+    }
+
+    /**
+     * Make sure that users without the `site.manage` permission are not able to set or edit migratable fields.
+     *
+     * @param string $method
+     * @param array $body
+     * @return void
+     * @dataProvider provideMigratablePayload
+     */
+    public function testMigratableFieldsPermissions(string $method, array $body, bool $expectError = false): void
+    {
+        $this->createCategory();
+        $this->createDiscussion();
+
+        if ($expectError) {
+            $this->expectException(ForbiddenException::class);
+            $this->expectExceptionMessage("Permission Problem");
+        }
+
+        $this->runWithPermissions(
+            function () use ($method, $body) {
+                if ($method === "POST") {
+                    $this->createComment($body);
+                } elseif ($method === "PATCH") {
+                    $this->createComment();
+                    $this->api->patch($this->baseUrl . "/" . $this->lastInsertCommentID, $body);
+                } else {
+                    throw new \Exception("Invalid HTTP request method.");
+                }
+
+                $comment = $this->api->get($this->baseUrl . "/" . $this->lastInsertCommentID)->getBody();
+                $this->assertNotEquals("2012-12-21T00:00:00+00:00", $comment["dateInserted"]);
+                $this->assertNotEquals("2012-12-21T00:00:00+00:00", $comment["dateUpdated"]);
+                $this->assertNotEquals(1, $comment["insertUserID"]);
+                $this->assertNotEquals(1, $comment["updateUserID"]);
+            },
+            [],
+            [
+                "type" => "category",
+                "id" => $this->lastInsertedCategoryID,
+                "permissions" => ["discussions.view" => true, "comments.add" => true, "comments.edit" => true],
+            ]
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function provideMigratablePayload(): array
+    {
+        $r = [
+            ["POST", []],
+            ["POST", ["dateInserted" => "2012-12-21"]],
+            ["POST", ["dateUpdated" => "2012-12-21"]],
+            ["POST", ["insertUserID" => 1], true],
+            ["POST", ["updateUserID" => 1]],
+            ["PATCH", []],
+            ["PATCH", ["dateInserted" => "2012-12-21"]],
+            ["PATCH", ["dateUpdated" => "2012-12-21"]],
+            ["PATCH", ["updateUserID" => 1]],
+        ];
+
+        return $r;
     }
 }

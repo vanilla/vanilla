@@ -29,6 +29,11 @@ export interface IUnsubscribeContent extends IUnsubscribePreference {
     contentUrl?: string;
 }
 
+export interface IMutedContent {
+    discussionID: number;
+    label: string;
+}
+
 export interface IDecodedToken {
     activityID: number;
     activityTypes: string[];
@@ -44,10 +49,11 @@ export interface IDecodedToken {
 export interface IUnsubscribeData extends IDecodedToken {
     preferences: IUnsubscribePreference[];
     hasMultiple?: boolean;
-    isAllProcessed?: boolean;
+    isAlreadyProcessed?: boolean;
     isEmailDigest?: boolean;
     isUnfollowContent?: boolean;
     followedContent?: IUnsubscribeContent;
+    mutedContent?: IMutedContent;
 }
 
 // The data type structure of the data returned from each API call
@@ -68,8 +74,16 @@ interface IFollowContentResult extends IPreferenceResult {
     userID?: number;
 }
 
+interface IMuteResult {
+    discussionID: number;
+    discussionName: string;
+    mute: boolean;
+    userID: number;
+}
+
 export interface IUnsubscribeResult {
     preferences: IPreferenceResult[];
-    followCategory?: IFollowCategoryResult;
-    followContent?: IFollowContentResult;
+    mute?: IMuteResult;
+    followCategory?: IFollowCategoryResult | never[];
+    followContent?: IFollowContentResult | never[];
 }

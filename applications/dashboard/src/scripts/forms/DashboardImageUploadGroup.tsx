@@ -26,7 +26,7 @@ interface IProps {
 
     // Common props.
     label: React.ReactNode;
-    tooltip?: string;
+    tooltip?: string | React.ReactNode;
     description?: React.ReactNode;
     imageUploader?: typeof uploadFile;
     disabled?: boolean;

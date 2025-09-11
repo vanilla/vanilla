@@ -6,8 +6,9 @@
 
 import { Schema, ValidationResult, InstanceType } from "@cfworker/json-schema";
 import React from "react";
-import { IconType } from "@icons/IconType";
+import { type IconType } from "@vanilla/icons";
 import { Select } from ".";
+import { INestedSelectProps } from "@library/forms/nestedSelect";
 
 export type Path = Array<string | number>;
 
@@ -17,7 +18,7 @@ export interface ICommonControl {
     legend?: string;
     default?: string;
     disabled?: boolean;
-    tooltip?: string;
+    tooltip?: string | React.ReactNode;
     tooltipIcon?: IconType;
     description?: string | null | React.ReactNode;
     placeholder?: string;
@@ -71,6 +72,7 @@ export interface ISelectControl extends Select.SelectConfig, ICommonControl {
     inputType: "select";
     createableLabel?: string;
     choices?: Select.SelectConfig["options"];
+    checkIsOptionUserCreated?: INestedSelectProps["checkIsOptionUserCreated"];
 }
 
 export interface IRadioControl extends ICommonControl {
@@ -172,9 +174,20 @@ export interface IDateRangeControl extends ICommonControl {
     dateRangeDirection?: "above" | "below";
 }
 
-export interface IDragAndDropControl extends ICommonControl {
+export type IDragAndDropControl = ICommonControl & {
     inputType: "dragAndDrop";
-}
+    itemSchema: JsonSchema;
+    allowAdd?: boolean; // Allow adding new items
+} & (
+        | {
+              asModal: true;
+              modalTitle: string;
+              modalSubmitLabel: string;
+          }
+        | {
+              asModal?: false;
+          }
+    );
 
 export interface IEmptyControl extends ICommonControl {
     inputType: "empty";
@@ -203,7 +216,7 @@ export interface ICustomControl<
     >,
 > extends ICommonControl {
     inputType: "custom";
-    component: P;
+    component: P | string;
     componentProps?: React.ComponentProps<P>;
 }
 
@@ -245,7 +258,11 @@ export interface Condition extends Partial<JsonSchema> {
     type?: string;
     const?: any;
     enum?: any[];
+    invert?: boolean;
+    [key: string]: any;
 }
+
+export type CustomConditionEvaluator = (condition: Condition, rootInstance: any) => boolean | null;
 
 export interface ISchemaTab {
     id: string;
@@ -294,6 +311,12 @@ export interface ISectionProps extends IBaseSchemaFormProps {
 export interface IControlGroupProps extends IBaseSchemaFormProps {
     controls: IFormControl[];
     required?: boolean;
+}
+
+export interface ICustomControlProps extends IControlProps<ICustomControl> {
+    value: any;
+    onChange(instance: any): void;
+    errors: IFieldError[];
 }
 
 export interface IControlProps<T = IFormControl> extends IBaseSchemaFormProps {

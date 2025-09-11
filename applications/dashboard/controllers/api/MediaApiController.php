@@ -15,6 +15,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\ImageResizer;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
@@ -379,15 +380,21 @@ class MediaApiController extends AbstractApiController
         $in = $this->schema(
             [
                 "file" => $uploadSchema,
+                "foreignType:s?",
+                "foreignID:i?",
             ],
             "in"
-        )->setDescription("Add a media item.");
+        )
+            ->merge(new MigratableSchema(["insertUserID:i?"]))
+            ->setDescription("Add a media item.");
 
         $body = $in->validate($body);
 
         $fileData = [
-            "foreignType" => "embed",
-            "foreignID" => $this->getSession()->UserID,
+            "foreignType" => $body["foreignType"] ?? "embed",
+            "foreignID" => $body["foreignID"] ?? $this->getSession()->UserID,
+            "InsertUserID" => $body["insertUserID"] ?? $this->getSession()->UserID,
+            "DateInserted" => $body["dateInserted"] ?? DateTimeFormatter::getCurrentDateTime(),
         ];
 
         if ($this->resizeImages) {

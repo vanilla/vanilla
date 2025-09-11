@@ -8,6 +8,12 @@
  * @package editor
  */
 
+use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
+use Vanilla\EmbeddedContent\Embeds\FileEmbed;
+use Vanilla\Models\VanillaMediaSchema;
+use Vanilla\Utility\ModelUtils;
+
 /**
  * Class EditorPlugin
  */
@@ -1918,5 +1924,106 @@ class EditorPlugin extends Gdn_Plugin
             }
         }
         return $this->canUpload;
+    }
+
+    /**
+     * Add the file to a non-rich discussion. This should only affect migrated content.
+     *
+     * @param array $results
+     * @return array
+     * @throws ValidationException
+     */
+    public function discussionsApiController_getSingleOutput_handler(array $results): array
+    {
+        // Check whether attachments should be rendered (for example, private discussions).
+        $shouldAttach = Gdn::eventManager()->fireFilter("shouldAttachUploads", true);
+        if (!$shouldAttach) {
+            return $results;
+        }
+
+        $mediaModel = new MediaModel();
+        $attachments = $mediaModel
+            ->getWhere(["ForeignID" => $results["discussionID"], "ForeignTable" => "discussion"])
+            ->resultArray();
+
+        $results["body"] = $mediaModel->appendMediaToPost($results["body"], $attachments);
+        return $results;
+    }
+
+    /**
+     * Add the file to a non-rich comment. This should only affect migrated content.
+     *
+     * @param array $results
+     * @return array
+     * @throws ValidationException
+     */
+    public function commentsApiController_getOutput_handler(array $results): array
+    {
+        // Check whether attachments should be rendered (for example, private discussions).
+        $shouldAttach = Gdn::eventManager()->fireFilter("shouldAttachUploads", true);
+        if (!$shouldAttach) {
+            return $results;
+        }
+
+        $mediaModel = new MediaModel();
+        $attachments = $mediaModel
+            ->getWhere(["ForeignID" => $results["commentID"], "ForeignTable" => "comment"])
+            ->resultArray();
+
+        $results["body"] = $mediaModel->appendMediaToPost($results["body"], $attachments);
+        return $results;
+    }
+
+    /**
+     * Add the file to a rich comment. This should only affect migrated content.
+     *
+     * @param array $results
+     * @return array
+     * @throws ValidationException
+     */
+    public function commentsApiController_indexOutput(
+        array $results,
+        CommentsApiController $commentsApiController,
+        Schema $inputSchema,
+        array $query
+    ): array {
+        if (ModelUtils::isExpandOption("crawl", $query["expand"] ?? [])) {
+            // No expansion of these when crawling for search.
+            return $results;
+        }
+
+        // Check whether attachments should be rendered (for example, private discussions).
+        $shouldAttach = Gdn::eventManager()->fireFilter("shouldAttachUploads", true);
+        if (!$shouldAttach) {
+            return $results;
+        }
+
+        $commentIDs = array_column($results, "commentID");
+
+        // Bail early if there are no valid comments.
+        if (empty($commentIDs)) {
+            return $results;
+        }
+
+        $mediaModel = new MediaModel();
+        $attachments = $mediaModel->getWhere(["ForeignID" => $commentIDs, "ForeignTable" => "comment"])->resultArray();
+
+        if (empty($attachments)) {
+            return $results;
+        }
+
+        foreach ($results as $key => $comment) {
+            // Only get attachments for this comment.
+            $commentAttachments = [];
+            foreach ($attachments as $attachment) {
+                if ($attachment["ForeignID"] == $comment["commentID"]) {
+                    $commentAttachments[] = $attachment;
+                }
+            }
+
+            $results[$key]["body"] = $mediaModel->appendMediaToPost($comment["body"], $commentAttachments);
+        }
+
+        return $results;
     }
 }

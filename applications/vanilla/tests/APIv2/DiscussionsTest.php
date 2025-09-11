@@ -9,8 +9,6 @@ namespace VanillaTests\APIv2;
 
 use CategoryModel;
 use DiscussionModel;
-use Garden\Container\ContainerException;
-use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
@@ -22,13 +20,13 @@ use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\DiscussionTypeConverter;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\Formats\WysiwygFormat;
+use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Web\AbstractJsonLDItem;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
 use VanillaTests\SchedulerTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
-use function Symfony\Component\String\u;
 
 /**
  * Test the /api/v2/discussions endpoints.
@@ -75,7 +73,9 @@ class DiscussionsTest extends AbstractResourceTest
             "pinned",
             "sink",
             "postMeta",
+            "type",
             "postTypeID",
+            "tagIDs",
         ];
         $this->sortFields = ["dateLastComment", "dateInserted", "discussionID"];
 
@@ -138,6 +138,7 @@ class DiscussionsTest extends AbstractResourceTest
     {
         $fields = [
             "bookmark" => ["bookmark", true, "bookmarked"],
+            "mute" => ["mute", true, "muted"],
         ];
         return $fields;
     }
@@ -163,7 +164,7 @@ class DiscussionsTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -171,6 +172,8 @@ class DiscussionsTest extends AbstractResourceTest
         DiscussionModel::categoryPermissions(false, true);
         $this->setupTestDiscussionModel();
         $this->createUserFixtures();
+
+        self::setConfig("Tagging.Discussions.Enabled", true);
     }
 
     /**
@@ -2518,5 +2521,591 @@ facilisis luctus, metus</p>";
         $this->assertEquals("unknown", $authorItem["name"]);
         $this->assertEquals("https://example.com/unknown", $authorItem["url"]);
         $this->assertEquals(UserModel::getDefaultAvatarUrl(), $authorItem["image"]);
+    }
+
+    /**
+     * Generate Test Data for Post Type Filtering
+     *
+     * @return array
+     * @throws \Exception
+     */
+    private function generateTestDataForPostTypeFiltering(): array
+    {
+        $postTypeModel = $this->container()->get(PostTypeModel::class);
+        try {
+            $postTypeModel->delete(["postTypeID" => "test-meta-discussion"]);
+            $this->resetTable("postField");
+            $this->resetTable("postMeta");
+            $this->resetTable("GDN_postTypePostFieldJunction");
+        } catch (\Exception $e) {
+            //Ignore if the tables are not present
+        }
+
+        $postFields = [];
+        $postType = $this->createPostType([
+            "postTypeID" => "test-meta-discussion",
+            "name" => "Test Meta Discussion",
+        ]);
+        $postTypeID = $postType["postTypeID"];
+
+        // Create some PostFields for the PostType
+
+        $postFields["textPostField"] = $this->createPostField([
+            "postTypeID" => $postTypeID,
+            "postFieldID" => "text-meta-field",
+            "label" => "Discussion Meta Name",
+            "description" => "test txt field",
+            "visibility" => "private",
+        ]);
+        $postFields["multilineTextField"] = $this->createPostField([
+            "postTypeID" => $postTypeID,
+            "postFieldID" => "multi-text-meta-field",
+            "label" => "Discussion Meta Description",
+            "description" => "test multiline field",
+            "dataType" => "text",
+            "formType" => "text-multiline",
+        ]);
+        $postFields["numericField"] = $this->createPostField([
+            "postTypeID" => $postTypeID,
+            "postFieldID" => "numeric-meta-field",
+            "label" => "Discussion Meta Number",
+            "description" => "test number field",
+            "dataType" => "number",
+            "formType" => "number",
+            "visibility" => "internal",
+        ]);
+        $postFields["dropdownField"] = $this->createPostField([
+            "postTypeID" => $postTypeID,
+            "postFieldID" => "dropdown-meta-field",
+            "label" => "Discussion Meta Dropdown",
+            "description" => "test dropdown field",
+            "dataType" => "text",
+            "formType" => "dropdown",
+            "dropdownOptions" => ["option1", "option2", "option3"],
+            "Visibility" => "internal",
+        ]);
+        $postFields["tokenField"] = $this->createPostField([
+            "postTypeID" => $postTypeID,
+            "postFieldID" => "token-meta-field",
+            "label" => "Discussion Meta Token",
+            "description" => "test token field",
+            "dataType" => "string[]",
+            "formType" => "tokens",
+            "dropdownOptions" => ["token1", "token2", "token3"],
+        ]);
+        $postFields["DateFields"] = $this->createPostField([
+            "postTypeID" => $postTypeID,
+            "postFieldID" => "date-meta-field",
+            "label" => "Discussion Meta Date",
+            "description" => "test date field",
+            "dataType" => "date",
+            "formType" => "date",
+        ]);
+
+        $postFields["CheckBox"] = $this->createPostField([
+            "postTypeID" => $postTypeID,
+            "postFieldID" => "checkbox-meta-field",
+            "label" => "Discussion Meta Checkbox",
+            "description" => "test checkbox field",
+            "dataType" => "boolean",
+            "formType" => "checkbox",
+        ]);
+
+        // create few discussions with the post types
+
+        $discussion = $this->createDiscussion([
+            "postTypeID" => $postTypeID,
+            "postMeta" => [
+                $postFields["textPostField"]["postFieldID"] => "Hello world!!",
+                $postFields["multilineTextField"]["postFieldID"] => "This World is a beautiful place",
+                $postFields["numericField"]["postFieldID"] => 101,
+                $postFields["dropdownField"]["postFieldID"] => "option1",
+                $postFields["tokenField"]["postFieldID"] => ["token1", "token2"],
+                $postFields["DateFields"]["postFieldID"] => "2025-01-01",
+            ],
+        ]);
+        $discussions[$this->lastInsertedDiscussionID] = $discussion;
+
+        $discussion = $this->createDiscussion([
+            "postTypeID" => $postTypeID,
+            "postMeta" => [
+                $postFields["textPostField"]["postFieldID"] => "World is amazing",
+                $postFields["multilineTextField"]["postFieldID"] =>
+                    "This world is an amazing place with amazing people",
+                $postFields["numericField"]["postFieldID"] => 101,
+                $postFields["dropdownField"]["postFieldID"] => "option2",
+                $postFields["tokenField"]["postFieldID"] => ["token2", "token3"],
+                $postFields["DateFields"]["postFieldID"] => "2025-02-02",
+                $postFields["CheckBox"]["postFieldID"] => 1,
+            ],
+        ]);
+        $discussions[$this->lastInsertedDiscussionID] = $discussion;
+
+        $discussion = $this->createDiscussion([
+            "postTypeID" => $postTypeID,
+            "postMeta" => [
+                $postFields["textPostField"]["postFieldID"] => "What a wonderful world",
+                $postFields["multilineTextField"]["postFieldID"] => "Can't believe how wonderful this world is",
+                $postFields["numericField"]["postFieldID"] => 105,
+                $postFields["dropdownField"]["postFieldID"] => "option2",
+                $postFields["tokenField"]["postFieldID"] => ["token1", "token3"],
+                $postFields["DateFields"]["postFieldID"] => "2025-03-03",
+            ],
+        ]);
+        $discussions[$this->lastInsertedDiscussionID] = $discussion;
+
+        return [$postType, $postFields, $discussions];
+    }
+
+    /**
+     * Discussion end-point post type filtering validations
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testPostFieldValidationOnIndexFiltering()
+    {
+        $this->generateTestDataForPostTypeFiltering();
+        $this->createUserFixtures();
+
+        // Trying to search with fields to which a user does not have access should throw exception
+        $this->runWithExpectedExceptionMessage(
+            "You don't have permission to access the following fields: text-meta-field, numeric-meta-field",
+            function () {
+                $this->runWithUser(function () {
+                    $this->api()->get($this->baseUrl, [
+                        "postMeta" => [
+                            "text-meta-field" => "world",
+                            "numeric-meta-field" => 101,
+                        ],
+                    ]);
+                }, $this->memberID);
+            }
+        );
+
+        // Trying to search with invalid data types should throw validation exception
+
+        $this->runWithExpectedExceptionMessage("postMeta.checkbox-meta-field is not a valid boolean.", function () {
+            $this->api()->get($this->baseUrl, [
+                "postMeta" => [
+                    "checkbox-meta-field" => "hello",
+                ],
+            ]);
+        });
+
+        $this->runWithExpectedExceptionMessage("postMeta.date-meta-field is not a valid datetime.", function () {
+            $this->api()->get($this->baseUrl, [
+                "postMeta" => [
+                    "date-meta-field" => "hello",
+                ],
+            ]);
+        });
+
+        // Trying to search with invalid options should throw validation exception
+
+        $this->runWithExpectedExceptionMessage(
+            "postMeta.dropdown-meta-field[0] must be one of: option1, option2, option3.",
+            function () {
+                $this->api()->get($this->baseUrl, [
+                    "postMeta" => [
+                        "dropdown-meta-field" => ["option4", "option2"],
+                    ],
+                ]);
+            }
+        );
+        $this->runWithExpectedExceptionMessage(
+            "postMeta.token-meta-field[0] must be one of: token1, token2, token3.",
+            function () {
+                $this->api()->get($this->baseUrl, [
+                    "postMeta" => [
+                        "token-meta-field" => ["tokenX", "token1"],
+                    ],
+                ]);
+            }
+        );
+    }
+
+    /**
+     * Test filtering discussions by post types
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testDiscussionFilteringByPostTypes()
+    {
+        [$postType, $postFields, $discussions] = $this->generateTestDataForPostTypeFiltering();
+        $discussionIDs = array_keys($discussions);
+
+        // Test filtering by text field
+        $result = $this->api()
+            ->get($this->baseUrl, [
+                "postMeta" => [
+                    "text-meta-field" => "world",
+                ],
+            ])
+            ->getBody();
+
+        $this->assertCount(3, $result);
+
+        $this->assertEqualsCanonicalizing($discussionIDs, array_column($result, "discussionID"));
+
+        $result = $this->api()
+            ->get($this->baseUrl, [
+                "postMeta" => [
+                    "text-meta-field" => "Hello",
+                ],
+            ])
+            ->getBody();
+
+        $this->assertCount(1, $result);
+        $this->assertEquals($discussionIDs[0], $result[0]["discussionID"]);
+
+        // Test filtering by numeric field
+        $result = $this->api()
+            ->get($this->baseUrl, [
+                "postMeta" => [
+                    "numeric-meta-field" => 101,
+                ],
+            ])
+            ->getBody();
+        $this->assertCount(2, $result);
+        $this->assertEqualsCanonicalizing(array_slice($discussionIDs, 0, 2), array_column($result, "discussionID"));
+
+        // Test filtering by dropdown field
+        $result = $this->api()
+            ->get($this->baseUrl, [
+                "postMeta" => [
+                    "dropdown-meta-field" => "option2",
+                ],
+            ])
+            ->getBody();
+        $this->assertCount(2, $result);
+        $this->assertEqualsCanonicalizing(array_slice($discussionIDs, 1, 2), array_column($result, "discussionID"));
+
+        $result = $this->api()
+            ->get($this->baseUrl, [
+                "postMeta" => [
+                    "dropdown-meta-field" => "option1",
+                ],
+            ])
+            ->getBody();
+
+        $this->assertCount(1, $result);
+        $this->assertEquals($discussionIDs[0], $result[0]["discussionID"]);
+
+        // Test filtering by token field
+        $result = $this->api()
+            ->get($this->baseUrl, [
+                "postMeta" => [
+                    "token-meta-field" => ["token1", "token2"],
+                ],
+            ])
+            ->getBody();
+        $this->assertCount(3, $result);
+        $this->assertEqualsCanonicalizing($discussionIDs, array_column($result, "discussionID"));
+
+        // Test filtering by date field
+        $result = $this->api()
+            ->get($this->baseUrl, [
+                "postMeta" => [
+                    "date-meta-field" => "2025-01-01",
+                ],
+            ])
+            ->getBody();
+        $this->assertCount(1, $result);
+        $this->assertEquals($discussionIDs[0], $result[0]["discussionID"]);
+
+        $result = $this->api()
+            ->get($this->baseUrl, [
+                "postMeta" => [
+                    "date-meta-field" => "[2025-01-01,2025-02-03]",
+                ],
+            ])
+            ->getBody();
+        $this->assertCount(2, $result);
+        $this->assertEqualsCanonicalizing(array_slice($discussionIDs, 0, 2), array_column($result, "discussionID"));
+    }
+
+    /**
+     * Test post discussion with dropdown and token post field validates for dropdown options
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testPostValidationWithDropdownAndTokenField()
+    {
+        $postType = $this->createPostType([
+            "postTypeID" => "test-meta-discussion-post",
+            "name" => "Test Post Meta Discussion",
+        ]);
+        $postTypeID = $postType["postTypeID"];
+
+        $postFields["dropdownField"] = $this->createPostField([
+            "postTypeID" => $postTypeID,
+            "postFieldID" => "dropdown-post-field",
+            "label" => "Discussion Dropdown PostType",
+            "description" => "test dropdown field",
+            "dataType" => "text",
+            "formType" => "dropdown",
+            "dropdownOptions" => ["A", "B", "C"],
+            "Visibility" => "internal",
+        ]);
+        $postFields["tokenField"] = $this->createPostField([
+            "postTypeID" => $postTypeID,
+            "postFieldID" => "token-post-field",
+            "label" => "Discussion Token PostType",
+            "description" => "test token field",
+            "dataType" => "string[]",
+            "formType" => "tokens",
+            "dropdownOptions" => ["1", "2", "3"],
+        ]);
+
+        $this->runWithExpectedExceptionMessage(
+            "postMeta.dropdown-post-field must be one of: A, B, C.",
+            function () use ($postTypeID, $postFields) {
+                $this->createDiscussion([
+                    "postTypeID" => $postTypeID,
+                    "postMeta" => [
+                        $postFields["dropdownField"]["postFieldID"] => "Z",
+                    ],
+                ]);
+            }
+        );
+
+        $this->runWithExpectedExceptionMessage("postMeta.token-post-field must be one of: 1, 2, 3", function () use (
+            $postTypeID,
+            $postFields
+        ) {
+            $this->createDiscussion([
+                "postTypeID" => $postTypeID,
+                "postMeta" => [
+                    $postFields["dropdownField"]["postFieldID"] => "A",
+                    $postFields["tokenField"]["postFieldID"] => ["4", "5"],
+                ],
+            ]);
+        });
+    }
+
+    /**
+     * Test that you can still post a discussion when including a non-existent draftID.
+     *
+     * @return void
+     */
+    public function testPostingDiscussionFromDeletedDraft(): void
+    {
+        self::disableFeature("DraftScheduling");
+        $body = "Should still post";
+        $discussion = $this->createDiscussion(["body" => $body, "draftID" => 9999]);
+        $this->assertSame($body, $discussion["body"]);
+    }
+
+    /**
+     * Test that you cannot delete a draft that belongs to another user if you don't have the correct permission.
+     *
+     * @return void
+     */
+    public function testPostingWithAnotherUsersDraft(): void
+    {
+        $draftData = [
+            "recordType" => "discussion",
+            "parentRecordID" => 1,
+            "attributes" => [
+                "announce" => 1,
+                "body" => "Hello world.",
+                "closed" => 1,
+                "format" => "Markdown",
+                "name" => "Discussion Draft",
+                "sink" => 0,
+                "tags" => "interesting,helpful",
+                "type" => "discussion",
+                "groupID" => null,
+            ],
+        ];
+
+        $draft = $this->api()
+            ->post("/drafts", $draftData)
+            ->assertSuccess()
+            ->getBody();
+
+        $user = $this->createUser();
+        $this->runWithUser(function () use ($draft) {
+            $this->expectExceptionCode(403);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->createDiscussion(["body" => "Should not post", "draftID" => $draft["draftID"]]);
+        }, $user);
+    }
+
+    /**
+     * Test muting and unmuting a discussion.
+     *
+     * @return void
+     */
+    public function testMuting(): void
+    {
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+
+        $this->api()->put("discussions/{$discussion["discussionID"]}/mute", [
+            "muted" => true,
+        ]);
+
+        $this->api()
+            ->get("discussions/muted")
+            ->assertSuccess()
+            ->assertCount(1)
+            ->assertJsonArrayContains([
+                "discussionID" => $discussion["discussionID"],
+            ]);
+
+        $this->api()->put("discussions/{$discussion["discussionID"]}/mute", [
+            "muted" => false,
+        ]);
+
+        $this->api()
+            ->get("discussions/muted")
+            ->assertSuccess()
+            ->assertCount(0);
+    }
+
+    /**
+     * Test that the muted parameter is returned in the payload of the GET /discussions/{id} and GET /discussions endpoints.
+     *
+     * @return void
+     */
+    public function testMutedPartOfPayload(): void
+    {
+        $this->createCategory();
+        $discussion = $this->createDiscussion();
+
+        $this->api()
+            ->get("discussions/{$discussion["discussionID"]}")
+            ->assertSuccess()
+            ->assertJsonObjectLike([
+                "discussionID" => $discussion["discussionID"],
+                "muted" => false,
+            ]);
+
+        $this->api()
+            ->get("discussions")
+            ->assertSuccess()
+            ->assertJsonArrayContains([
+                "discussionID" => $discussion["discussionID"],
+                "muted" => false,
+            ]);
+    }
+
+    /**
+     * Test that we receive the proper error when muting a non-existent discussion.
+     *
+     * @return void
+     */
+    public function testMutingNonExistentDiscussion(): void
+    {
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage("Discussion not found");
+        $this->api()->put("discussions/99999/mute", [
+            "muted" => true,
+        ]);
+    }
+
+    /**
+     * Test that the insertUserID, updateUserID, dateInserted, and dateUpdated can be overwritten.
+     *
+     * @return void
+     */
+    public function testMigratableFields(): void
+    {
+        $this->createUser();
+
+        $this->createDiscussion([
+            "dateInserted" => "2012-12-21",
+            "dateUpdated" => "2012-12-22",
+            "insertUserID" => $this->lastUserID,
+            "updateUserID" => $this->lastUserID,
+        ]);
+        $this->api->get($this->baseUrl . "/" . $this->lastInsertedDiscussionID)->assertJsonObjectLike([
+            "dateInserted" => "2012-12-21T00:00:00+00:00",
+            "dateUpdated" => "2012-12-22T00:00:00+00:00",
+            "insertUserID" => $this->lastUserID,
+            "updateUserID" => $this->lastUserID,
+        ]);
+
+        $this->createUser();
+        $this->api
+            ->patch($this->baseUrl . "/" . $this->lastInsertedDiscussionID, [
+                "dateInserted" => "2013-12-21",
+                "dateUpdated" => "2013-12-22",
+                "insertUserID" => $this->lastUserID,
+                "updateUserID" => $this->lastUserID,
+            ])
+            ->assertJsonObjectLike([
+                "dateInserted" => "2013-12-21T00:00:00+00:00",
+                "dateUpdated" => "2013-12-22T00:00:00+00:00",
+                "insertUserID" => $this->lastUserID,
+                "updateUserID" => $this->lastUserID,
+            ]);
+    }
+
+    /**
+     * Make sure that users without the `site.manage` permission are not able to set or edit migratable fields.
+     *
+     * @param string $method
+     * @param array $body
+     * @return void
+     * @dataProvider provideMigratablePayload
+     */
+    public function testMigratableFieldsPermissions(string $method, array $body, bool $expectError = false): void
+    {
+        if ($expectError) {
+            $this->expectException(ForbiddenException::class);
+            $this->expectExceptionMessage("Permission Problem");
+        }
+
+        $this->createCategory();
+        $this->runWithPermissions(
+            function () use ($method, $body) {
+                if ($method === "POST") {
+                    $this->createDiscussion($body);
+                } elseif ($method === "PATCH") {
+                    $this->createDiscussion();
+                    $this->api->patch($this->baseUrl . "/" . $this->lastInsertedDiscussionID, $body);
+                } else {
+                    throw new \Exception("Invalid HTTP request method.");
+                }
+
+                $discussion = $this->api->get($this->baseUrl . "/" . $this->lastInsertedDiscussionID)->getBody();
+                $this->assertNotEquals("2012-12-21T00:00:00+00:00", $discussion["dateInserted"]);
+                $this->assertNotEquals("2012-12-21T00:00:00+00:00", $discussion["dateUpdated"]);
+                $this->assertNotEquals(1, $discussion["insertUserID"]);
+                $this->assertNotEquals(1, $discussion["updateUserID"]);
+            },
+            [],
+            [
+                "type" => "category",
+                "id" => $this->lastInsertedCategoryID,
+                "permissions" => ["discussions.view" => true, "discussions.add" => true, "discussions.edit" => true],
+            ]
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function provideMigratablePayload(): array
+    {
+        $r = [
+            ["POST", []],
+            ["POST", ["dateInserted" => "2012-12-21"]],
+            ["POST", ["dateUpdated" => "2012-12-21"]],
+            ["POST", ["insertUserID" => 1]],
+            ["POST", ["updateUserID" => 1]],
+            ["PATCH", []],
+            ["PATCH", ["dateInserted" => "2012-12-21"]],
+            ["PATCH", ["dateUpdated" => "2012-12-21"]],
+            ["PATCH", ["insertUserID" => 1], true],
+            ["PATCH", ["updateUserID" => 1]],
+        ];
+
+        return $r;
     }
 }

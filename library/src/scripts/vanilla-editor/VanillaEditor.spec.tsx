@@ -4,13 +4,12 @@
  * @license Proprietary
  */
 
-import { mockAPI } from "@library/__tests__/utility";
-import {
-    LegacyFormVanillaEditor,
-    deserializeHtml,
-    emailLinkCheck,
-} from "@library/vanilla-editor/VanillaEditor.loadable";
+import { LegacyFormVanillaEditorLoadable, emailLinkCheck } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, fireEvent, render } from "@testing-library/react";
+
+import { deserializeHtml } from "@library/vanilla-editor/deserializeHtml";
+import { mockAPI } from "@library/__tests__/utility";
 
 describe("deserializeHtml", () => {
     const MOCK_HTML = `<p>This is a <strong>test</strong> html <span class="some-class-name">fragment</span></p>`;
@@ -166,6 +165,15 @@ describe("VanillaEditor", () => {
     const mockAdapter = mockAPI();
     mockAdapter.onGet("/users/by-names").reply(200, []);
 
+    // Create a QueryClient for the test
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                retry: false,
+            },
+        },
+    });
+
     beforeAll(() => {
         const textarea = document.createElement("textarea");
         textarea.value = `[{"type":"p","children":[{"text":"${mockText}"}]}]`;
@@ -179,7 +187,12 @@ describe("VanillaEditor", () => {
 
     it("Editor content should be empty when comment is posted/event is fired", async () => {
         const { queryByText } = render(
-            <LegacyFormVanillaEditor legacyTextArea={form?.firstChild as HTMLInputElement} initialFormat={"rich2"} />,
+            <QueryClientProvider client={queryClient}>
+                <LegacyFormVanillaEditorLoadable
+                    legacyTextArea={form?.firstChild as HTMLInputElement}
+                    initialFormat={"rich2"}
+                />
+            </QueryClientProvider>,
         );
 
         // Assert that it exists

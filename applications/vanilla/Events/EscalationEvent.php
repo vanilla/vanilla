@@ -99,7 +99,7 @@ class EscalationEvent extends ResourceEvent implements LoggableEventInterface, T
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -107,7 +107,7 @@ class EscalationEvent extends ResourceEvent implements LoggableEventInterface, T
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAction(): string
     {
@@ -115,7 +115,7 @@ class EscalationEvent extends ResourceEvent implements LoggableEventInterface, T
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getPayload(): ?array
     {
@@ -173,7 +173,7 @@ class EscalationEvent extends ResourceEvent implements LoggableEventInterface, T
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {

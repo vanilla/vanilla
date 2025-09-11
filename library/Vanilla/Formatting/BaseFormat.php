@@ -181,12 +181,12 @@ abstract class BaseFormat implements FormatInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     abstract public function removeUserPII(string $username, string $body): string;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     abstract public function parseAllMentions($body): array;
 

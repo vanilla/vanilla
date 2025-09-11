@@ -7,7 +7,7 @@
 import MockAdapter from "axios-mock-adapter";
 import apiv2 from "@library/apiv2";
 import { useLayoutEffect } from "react";
-import qs from "qs";
+import * as qs from "qs-esm";
 
 /**
  * Utility for importing everything from a wepback require.context

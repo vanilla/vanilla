@@ -6,13 +6,13 @@
 
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import apiv2 from "@library/apiv2";
-import { ICategoryItem } from "@library/categoriesWidget/CategoryItem";
+import type CategoriesWidgetItem from "@library/widgets/CategoriesWidget.Item";
 import { useQuery } from "@tanstack/react-query";
 import { RecordID } from "@vanilla/utils";
 
 interface SuggestedContent {
     discussions?: IDiscussion[];
-    categories?: ICategoryItem[];
+    categories?: CategoriesWidgetItem.Item[];
 }
 export interface SuggestedContentQueryParams {
     suggestedFollowsLimit?: number;

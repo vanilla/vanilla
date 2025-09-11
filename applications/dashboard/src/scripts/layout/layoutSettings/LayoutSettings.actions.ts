@@ -52,7 +52,7 @@ export const persistLayoutDraft = createAsyncThunk<
 
 export const fetchLayoutCatalogByViewType = createAsyncThunk(
     "@@appearance/fetchLayoutCatalogByViewType",
-    async (layoutViewType: ILayoutCatalog["layoutViewType"]) => {
+    async (layoutViewType: ILayoutCatalog["layoutViewType"] | "all") => {
         const response = await apiv2.get<ILayoutCatalog>(`/layouts/catalog`, {
             params: { layoutViewType },
         });

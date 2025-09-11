@@ -11,8 +11,11 @@
 use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Dashboard\Models\AiConversationModel;
 use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Logger;
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Models\ModelCache;
 use Vanilla\Permissions;
 use Vanilla\Utility\DebugUtils;
@@ -41,6 +44,11 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
 
     /** @var ModelCache */
     private $modelCache;
+
+    public const FEATURE_FLAGGED_PERMISSIONS = [
+        "Garden.Schedule.Allow" => ContentDraftModel::FEATURE_SCHEDULE,
+        AiConversationModel::PERMISSION_KEY => AiConversationModel::AI_CONVERSATION_FEATURE_FLAG,
+    ];
 
     /**
      * Class constructor. Defines the related database table name.
@@ -278,6 +286,7 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Reactions.Flag.Add" => 1,
             "Reactions.Positive.Add" => 1,
             "Reactions.Negative.Add" => 1,
+            "Garden.Staff.Allow" => 1,
         ]);
         $this->addDefault(RoleModel::TYPE_ADMINISTRATOR, [
             "Garden.SignIn.Allow" => 1,
@@ -305,6 +314,9 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Reactions.Flag.Add" => 1,
             "Reactions.Positive.Add" => 1,
             "Reactions.Negative.Add" => 1,
+            "Vanilla.Tagging.Add" => 1,
+            "Garden.Tokens.Add" => 1,
+            "Garden.Staff.Allow" => 1,
         ]);
         $this->addDefault(RoleModel::TYPE_MEMBER, [
             "Garden.SignIn.Allow" => 1,
@@ -1008,6 +1020,14 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
     public function getPermissionsEdit($roleID, $limitToSuffix = "", $includeJunction = true, $overrides = false)
     {
         $permissions = $this->getPermissions($roleID, $limitToSuffix, $includeJunction);
+        foreach (self::FEATURE_FLAGGED_PERMISSIONS as $featurePermission => $featureFlag) {
+            foreach ($permissions as &$permissionSet) {
+                if (!FeatureFlagHelper::featureEnabled($featureFlag)) {
+                    unset($permissionSet[$featurePermission]);
+                }
+            }
+        }
+
         $permissions = $this->unpivotPermissions($permissions);
 
         if (is_array($overrides)) {

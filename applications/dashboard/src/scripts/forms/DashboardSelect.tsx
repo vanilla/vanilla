@@ -4,7 +4,7 @@
  */
 
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import SelectOne, { ISelectOneProps } from "@library/forms/select/SelectOne";

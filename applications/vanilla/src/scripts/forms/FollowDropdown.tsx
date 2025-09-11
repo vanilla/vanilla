@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -16,50 +16,49 @@ import { Icon } from "@vanilla/icons";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { css, cx } from "@emotion/css";
-import React, { useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import { INotificationPreferences, NotificationType } from "@library/notificationPreferences";
-import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/CategoryNotificationPreferences.hooks";
 import { followDropdownClasses } from "@vanilla/addon-vanilla/forms/FollowDropdown.classes";
 import { RecordID } from "@vanilla/utils";
+import { FollowedContentNotificationPreferences } from "@library/followedContent/FollowedContent.types";
 
-export interface IFollowDropdownProps {
-    emailDigestEnabled: boolean;
-    className?: string;
-    onPreferencesChange?: (categoryWithNewPreferences) => void;
-    /** Used for testing to override open state */
-    isOpen?: boolean;
-    /** Disable network calls for widget preview */
-    preview?: boolean;
-    /** Widget style overrides */
-    borderRadius?: number;
-    buttonColor?: string;
-    textColor?: string;
-    alignment?: "start" | "center" | "end";
-    /** Only the bell icon instead of the button with text */
-    iconOnly?: boolean;
-    size?: "compact" | "default";
-    categoryAsLabel?: boolean;
-}
-interface IProps extends IFollowDropdownProps {
-    recordID: RecordID;
-    name: string;
-    preferencesTable: React.ReactNode;
-    updatePreferences: (preferences: ICategoryPreferences) => Promise<ICategoryPreferences>;
-    submitForm: () => Promise<any>;
-    unfollowAndResetPreferences: () => Promise<void>;
-    isFollowed: boolean;
-    defaultUserPreferences?: INotificationPreferences;
-    notificationTypes: Record<string, NotificationType>;
-    recordDetails?: {
-        recordKey: string;
-        recordUnfollowText: string;
-        recordFollowedContentText: string;
-    };
-    viewRecordUrl?: string;
-    viewRecordText?: string;
-}
+export function FollowDropdown<T extends Record<string, NotificationType>>(
+    props: PropsWithChildren<{
+        notificationTypes: T;
+        updatePreferences: (preferences: FollowedContentNotificationPreferences<T>) => Promise<void>;
+        unfollowAndResetPreferences: () => Promise<void>;
+        isFollowed: boolean;
+        name: string;
+        recordID: RecordID;
+        emailDigestEnabled: boolean;
 
-export function FollowDropdown(props: IProps) {
+        className?: string;
+        defaultUserPreferences?: INotificationPreferences;
+        onPreferencesChange?: (categoryWithNewPreferences) => void;
+        /** Used for testing to override open state */
+        isOpen?: boolean;
+        /** Disable network calls for widget preview */
+        preview?: boolean;
+        /** Widget style overrides */
+        borderRadius?: number;
+        buttonColor?: string;
+        textColor?: string;
+        alignment?: "start" | "center" | "end";
+        /** Only the bell icon instead of the button with text */
+        iconOnly?: boolean;
+        size?: "compact" | "default";
+        nameAsLabel?: boolean;
+
+        viewRecordUrl?: string;
+        viewRecordText?: string;
+
+        recordDetails?: {
+            recordKey: string;
+            recordUnfollowText: string;
+            recordFollowedContentText: string;
+        };
+    }>,
+) {
     const [isOpen, setIsOpen] = useState<boolean>(!!props.isOpen);
 
     const {
@@ -72,20 +71,21 @@ export function FollowDropdown(props: IProps) {
         textColor,
         alignment,
         iconOnly,
-        preferencesTable,
+        children,
         isFollowed,
         defaultUserPreferences,
         notificationTypes,
         updatePreferences,
-        submitForm,
         unfollowAndResetPreferences,
         size = "default",
-        categoryAsLabel,
+        nameAsLabel,
         viewRecordUrl,
         viewRecordText,
     } = props;
 
-    const classes = followDropdownClasses({
+    type PreferencesType = Parameters<typeof updatePreferences>[0];
+
+    const classes = followDropdownClasses.useAsHook({
         isOpen,
         isFollowed,
         borderRadius,
@@ -98,7 +98,7 @@ export function FollowDropdown(props: IProps) {
     const buttonContents = () => {
         const icon = isFollowed ? <Icon size={size} icon="follow-filled" /> : <Icon size={size} icon="follow-empty" />;
         let followedText = isFollowed ? t("Following") : t("Follow");
-        if (categoryAsLabel) {
+        if (nameAsLabel) {
             followedText = props.name;
         }
 
@@ -124,12 +124,12 @@ export function FollowDropdown(props: IProps) {
                 })}
                 onVisibilityChange={async (b) => {
                     if (!preview && !isFollowed && b) {
-                        let newPreferences: Partial<ICategoryPreferences> = {};
+                        let newPreferences = {};
                         // apply the default user notification preferences
                         Object.entries(notificationTypes).forEach(([_key, type]) => {
                             newPreferences = {
                                 ...newPreferences,
-                                ...type.getDefaultPreferences?.(defaultUserPreferences ?? {}),
+                                ...type.getDefaultPreferences(defaultUserPreferences ?? {}),
                             };
                         });
 
@@ -137,13 +137,13 @@ export function FollowDropdown(props: IProps) {
                             "preferences.followed": true,
                             ...newPreferences,
                             ...(emailDigestEnabled && { "preferences.email.digest": true }),
-                        });
+                        } as PreferencesType);
 
                         props.onPreferencesChange?.({
                             preferences: {
                                 "preferences.followed": true,
                             },
-                            ...(recordDetails ? { [recordDetails.recordKey]: recordID } : { categoryID: recordID }),
+                            ...(recordDetails && { [recordDetails.recordKey]: recordID }),
                         });
                     }
                     setIsOpen(b);
@@ -157,19 +157,17 @@ export function FollowDropdown(props: IProps) {
                             {/* If we're on the followed content preference page, this button should be hidden */}
                             {!window.location.pathname.includes("/followed-content") && (
                                 <ToolTip
-                                    label={t(
-                                        recordDetails?.recordFollowedContentText ?? "View all followed categories",
-                                    )}
+                                    label={recordDetails?.recordFollowedContentText ?? t("View all followed content")}
                                 >
                                     <span>
                                         <LinkAsButton
                                             to="/profile/followed-content"
                                             buttonType={ButtonTypes.ICON}
                                             className={classes.preferencesButton}
-                                            ariaLabel={t(
+                                            ariaLabel={
                                                 recordDetails?.recordFollowedContentText ??
-                                                    "View all followed categories",
-                                            )}
+                                                t("View all followed content")
+                                            }
                                         >
                                             <SettingsIcon />
                                         </LinkAsButton>
@@ -182,15 +180,7 @@ export function FollowDropdown(props: IProps) {
                         <FrameBody hasVerticalPadding={true}>
                             <>
                                 <p className={classes.heading}>{props.name}</p>
-                                <form
-                                    role="form"
-                                    onSubmit={async (e) => {
-                                        e.preventDefault();
-                                        await submitForm();
-                                    }}
-                                >
-                                    {preferencesTable}
-                                </form>
+                                {children}
                             </>
                         </FrameBody>
                     }
@@ -202,7 +192,7 @@ export function FollowDropdown(props: IProps) {
                                     target="_blank"
                                     className={cx(classes.fullWidth, classes.viewRecordButton)}
                                 >
-                                    {t(viewRecordText ?? "View Category")}
+                                    {viewRecordText ?? t("View Record")}
                                 </LinkAsButton>
                             )}
 
@@ -215,14 +205,12 @@ export function FollowDropdown(props: IProps) {
                                         await unfollowAndResetPreferences();
                                         props.onPreferencesChange?.({
                                             preferences: {},
-                                            ...(recordDetails
-                                                ? { [recordDetails.recordKey]: recordID }
-                                                : { categoryID: recordID }),
+                                            ...(recordDetails && { [recordDetails.recordKey]: recordID }),
                                         });
                                         setIsOpen(false);
                                     }}
                                 >
-                                    {t(recordDetails?.recordUnfollowText ?? "Unfollow Category")}
+                                    {recordDetails?.recordUnfollowText ?? t("Unfollow")}
                                 </Button>
                             )}
                         </FrameFooter>

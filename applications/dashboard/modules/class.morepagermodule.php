@@ -75,7 +75,7 @@ class MorePagerModule extends PagerModule
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function assetTarget()
     {
@@ -83,7 +83,7 @@ class MorePagerModule extends PagerModule
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function configure($offset, $limit, $totalRecords, $url, $forceConfigure = false)
     {

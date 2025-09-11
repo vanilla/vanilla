@@ -24,6 +24,14 @@ class PostCreateCommentAsset extends AbstractCreateCommentAsset
         return "discussion";
     }
 
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
+    }
+
     protected function getParentRecordID(): string
     {
         return $this->getHydrateParam("discussionID");

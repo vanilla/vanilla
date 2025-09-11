@@ -6,12 +6,13 @@
 
 import { IBaseEmbedData } from "@library/embeddedContent/embedService.register";
 import {
+    ELEMENT_LINK_AS_BUTTON,
     ELEMENT_RICH_EMBED_CARD,
     ELEMENT_RICH_EMBED_INLINE,
     IRichEmbedElement,
     RichLinkAppearance,
 } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
-import { IVanillaLinkElement, MyEditor } from "@library/vanilla-editor/typescript";
+import { IVanillaLinkAsButtonElement, IVanillaLinkElement, MyEditor } from "@library/vanilla-editor/typescript";
 import { findNode, getNodeString } from "@udecode/plate-common";
 import { ELEMENT_LINK } from "@udecode/plate-link";
 import isEmpty from "lodash-es/isEmpty";
@@ -25,7 +26,7 @@ export function queryRichLink(
     embedData?: IBaseEmbedData;
     url: string;
     path: Path;
-    element: IVanillaLinkElement | IRichEmbedElement;
+    element: IVanillaLinkElement | IVanillaLinkAsButtonElement | IRichEmbedElement;
     text: string;
 } | null {
     at = at ?? editor.selection!;
@@ -33,18 +34,19 @@ export function queryRichLink(
         return null;
     }
 
-    const simpleLink = findNode<IVanillaLinkElement>(editor, {
+    const simpleLink = findNode<IVanillaLinkElement | IVanillaLinkAsButtonElement>(editor, {
         at: at,
         match: {
-            type: ELEMENT_LINK,
+            type: [ELEMENT_LINK, ELEMENT_LINK_AS_BUTTON],
         },
     });
 
     if (simpleLink) {
+        const isLinkAsButton = simpleLink[0].type === ELEMENT_LINK_AS_BUTTON;
         const text = !isEmpty(getNodeString(simpleLink[0])) ? getNodeString(simpleLink[0]) : simpleLink[0].url;
 
         return {
-            appearance: RichLinkAppearance.LINK,
+            appearance: isLinkAsButton ? RichLinkAppearance.BUTTON : RichLinkAppearance.LINK,
             url: simpleLink[0].url,
             embedData: simpleLink[0].embedData,
             path: simpleLink[1],

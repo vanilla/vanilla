@@ -66,8 +66,9 @@ class ApiFilterMiddleware
      * Modify the blacklist.
      *
      * @param string $field The field to add to the blacklist.
+     * @internal Exposed for usage in tests
      */
-    protected function addBlacklistField(string $field)
+    public function addBlacklistField(string $field)
     {
         $field = strtolower($field);
         if (!in_array($field, $this->blacklist)) {
@@ -79,8 +80,9 @@ class ApiFilterMiddleware
      * Remove a blacklisted field.
      *
      * @param string $field The field to remove from the blacklist.
+     * @internal Exposed for usage in tests
      */
-    protected function removeBlacklistField(string $field)
+    public function removeBlacklistField(string $field)
     {
         if (($key = array_search(strtolower($field), $this->blacklist)) !== false) {
             unset($this->blacklist[$key]);

@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -23,13 +23,12 @@ import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 import { RoleRequestReducer } from "@dashboard/roleRequests/state/roleRequestReducer";
 import { mountDashboardTabs } from "@dashboard/forms/mountDashboardTabs";
 import { mountDashboardCodeEditors } from "@dashboard/forms/DashboardCodeEditor";
-import { TextEditorContextProvider } from "@library/textEditor/TextEditor";
+import { TextEditorContextProvider } from "@library/textEditor/MonacoEditor";
 import { VanillaLabsPage } from "@dashboard/pages/VanillaLabsPage";
 import { bindToggleChildrenEventListeners } from "@dashboard/settings";
 import { LanguageSettingsPage } from "@dashboard/pages/LanguageSettingsPage";
 import { escapeHTML } from "@vanilla/dom-utils";
 import { getDashboardRoutes } from "@dashboard/dashboardRoutes";
-import { dashboardSectionSlice } from "@dashboard/DashboardSectionSlice";
 import AdminHeader from "@dashboard/components/AdminHeader";
 import ModernEmbedSettings from "@library/embed/ModernEmbedSettings";
 import { userProfilesSlice } from "@dashboard/userProfiles/state/UserProfiles.slice";
@@ -46,8 +45,15 @@ import { RouterRegistry } from "@library/Router.registry";
 import { AISuggestions } from "@dashboard/aiSuggestions/AISuggestions";
 import { InterestsSettings } from "@dashboard/interestsSettings/InterestsSettings";
 import GenerateDataExportURL from "@dashboard/components/GenerateDataExportURL";
+import Permission from "@library/features/users/Permission";
+import { AdminAssistant } from "@library/features/adminAssistant/AdminAssistant";
 
 // Expose some new module functions to our old javascript system.
+declare global {
+    interface Window {
+        escapeHTML: (html: string) => string;
+    }
+}
 window.escapeHTML = escapeHTML;
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
@@ -87,11 +93,12 @@ applySharedPortalContext((props) => {
             <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, scrollOffset: navHeight }}>
                 <TextEditorContextProvider>{props.children}</TextEditorContextProvider>
             </ScrollOffsetContext.Provider>
+            <Permission permission={"site.manage"}>
+                <AdminAssistant />
+            </Permission>
         </AppContext>
     );
 });
-
-registerReducer(dashboardSectionSlice.name, dashboardSectionSlice.reducer);
 
 RouterRegistry.addRoutes(getDashboardRoutes());
 
@@ -140,6 +147,10 @@ addComponent("automationRules", () => {
 
 addComponent("postTypes", () => {
     return <Router sectionRoots={["/settings/post-types"]} />;
+});
+
+addComponent("taggingSettings", () => {
+    return <Router sectionRoots={["/settings/tagging"]} />;
 });
 
 addComponent("aiSuggestions", AISuggestions);

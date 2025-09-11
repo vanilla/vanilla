@@ -43,7 +43,7 @@ class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupOpeningTag(): string
     {
@@ -51,7 +51,7 @@ class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupClosingTag(): string
     {

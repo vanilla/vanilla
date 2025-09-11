@@ -934,9 +934,10 @@ export function _BookmarkIcon(props: { className?: string; "aria-hidden"?: areaH
     );
 }
 export function NewPostMenuIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
+    const classes = iconClasses.useAsHook();
     return (
         <svg
-            className={classNames(iconClasses().newPostMenuIcon, props.className)}
+            className={classNames(classes.newPostMenuIcon, props.className)}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 16 16"
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
@@ -1083,7 +1084,7 @@ export function ArrowIcon(props: { className?: string; "aria-hidden"?: areaHidde
 }
 
 export function DownvoteIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const classes = iconClasses();
+    const classes = iconClasses.useAsHook();
 
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={cx(classes.downvote, props.className)}>
@@ -1095,7 +1096,7 @@ export function DownvoteIcon(props: { className?: string; "aria-hidden"?: areaHi
 }
 
 export function UpvoteIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const classes = iconClasses();
+    const classes = iconClasses.useAsHook();
 
     return <DownvoteIcon aria-hidden={props["aria-hidden"]} className={cx(classes.upvote, props.className)} />;
 }

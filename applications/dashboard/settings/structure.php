@@ -1338,7 +1338,7 @@ $Construct
     ->column("Attributes", "text", true)
     ->column("DateInserted", "datetime")
     ->column("InsertUserID", "int", false, "key")
-    ->column("InsertIPAddress", "ipaddress")
+    ->column("InsertIPAddress", "ipaddress", true)
     ->column("DateUpdated", "datetime", true)
     ->column("UpdateUserID", "int", true)
     ->column("UpdateIPAddress", "ipaddress", true)

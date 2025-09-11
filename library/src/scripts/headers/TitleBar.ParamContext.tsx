@@ -5,19 +5,19 @@
  */
 
 import { createContext, useContext, useMemo } from "react";
-
 import type { BorderType } from "@library/styles/styleHelpersBorders";
 import type { ColorHelper } from "csx";
 import type { DeepPartial } from "redux";
-import type { IThemeVariables } from "@library/theming/themeReducer";
-import type { LogoAlignment } from "@library/headers/LogoAlignment";
-import type TitleBarFragmentInjectable from "@vanilla/injectables/TitleBarFragment";
-import { TitleBarTransparentContext } from "@library/headers/TitleBar.TransparentContext";
-import { getPixelNumber } from "@library/styles/styleUtils";
-import { navigationVariables } from "@library/headers/navigationVariables";
-import { stableObjectHash } from "@vanilla/utils";
-import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { IMe } from "@library/@types/api/users";
 import { useCurrentUser } from "@library/features/users/userHooks";
+import type { LogoAlignment } from "@library/headers/LogoAlignment";
+import { INavigationVariableItem, navigationVariables } from "@library/headers/navigationVariables";
+import { TitleBarTransparentContext } from "@library/headers/TitleBar.TransparentContext";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import type { IThemeVariables } from "@library/theming/themeReducer";
+import type TitleBarFragmentInjectable from "@vanilla/injectables/TitleBarFragment";
+import { getPixelNumber } from "@library/styles/styleUtils";
+import { stableObjectHash } from "@vanilla/utils";
 
 export const TitleBarPositioning = {
     StickySolid: "StickySolid",
@@ -159,10 +159,7 @@ export function TitleBarParamContextProvider(
     const navigation = useMemo(() => {
         const items = props.navigationType === "custom" ? props.navigation?.items ?? [] : navVars.navigationItems;
 
-        const filteredItems = items.filter((item) => {
-            const roleIDs = item.roleIDs ?? [];
-            return roleIDs.length === 0 || roleIDs.some((roleID) => currentUser?.roleIDs.includes(roleID));
-        });
+        const filteredItems = filterNavItemsByRole(items, currentUser);
 
         const navigation: ITitleBarParams["navigation"] = {
             items: filteredItems,
@@ -208,4 +205,22 @@ export function TitleBarParamContextProvider(
             {children}
         </TitleBarParamContext.Provider>
     );
+}
+
+export function filterNavItemsByRole(items: INavigationVariableItem[], currentUser: IMe) {
+    return items.filter((item) => {
+        const roleIDs = item.roleIDs ?? [];
+        const hasRoleAccess = roleIDs.length === 0 || roleIDs.some((roleID) => currentUser?.roleIDs.includes(roleID));
+
+        if (!hasRoleAccess) {
+            return false;
+        }
+
+        // If item has children, filter them recursively
+        if (Array.isArray(item.children) && item.children.length > 0) {
+            item.children = filterNavItemsByRole(item.children, currentUser);
+        }
+
+        return true;
+    });
 }

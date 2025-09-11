@@ -950,7 +950,7 @@ class DiscussionModel extends Gdn_Model implements
         $this->EventArguments["sql"] = &$this->SQL;
         $this->fireEvent("BeforeGet"); // @see 'BeforeGetCount' for consistency in results vs. counts
         $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL));
+        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL, $this->SQL));
 
         $removeAnnouncements = true;
         if (strtolower(val("Announce", $wheres)) == "all") {
@@ -1137,6 +1137,8 @@ class DiscussionModel extends Gdn_Model implements
      * @param bool|string $filterType Query Filter.
      * @param bool|int $userID potential User ID.
      * @param array $selects Extra fields to select.
+     * @param array $extraInnerSelects Extra fields to select on the inner query.
+     *
      * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
      * @throws Exception
      */
@@ -1149,7 +1151,8 @@ class DiscussionModel extends Gdn_Model implements
         bool $expand = true,
         $filterType = false,
         $userID = false,
-        array $selects = []
+        array $selects = [],
+        array $extraInnerSelects = []
     ) {
         $limit = $limit ?? $this->getDefaultLimit();
 
@@ -1165,10 +1168,18 @@ class DiscussionModel extends Gdn_Model implements
         $this->EventArguments["Wheres"] = &$where;
         $this->EventArguments["Selects"] = &$selects;
         $this->getEventManager()->fire("discussionModel_beforeGet", $this, $this->EventArguments);
-        $finalQuery = $this->getWhereQuery($where, $orderBy, $selects, $limit, $offset, $filterType, $userID);
-        $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new DiscussionQueryEvent($finalQuery));
+        $finalQuery = $this->getWhereQuery(
+            $where,
+            $orderBy,
+            $selects,
+            $limit,
+            $offset,
+            $filterType,
+            $userID,
+            $extraInnerSelects
+        );
         $data = $finalQuery->get();
+        $this->SQL->reset();
 
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
@@ -1201,6 +1212,8 @@ class DiscussionModel extends Gdn_Model implements
      * @param int|false $offset The offset within the total set.
      * @param bool|string $filterType Query Filter.
      * @param bool|int $userID potential User ID.
+     * @param array $extraInnerSelects
+     *
      * @return Gdn_MySQLDriver Returns query of discussions.
      * @throws Exception
      */
@@ -1211,7 +1224,9 @@ class DiscussionModel extends Gdn_Model implements
         $limit = false,
         $offset = false,
         $filterType = false,
-        $userID = false
+        $userID = false,
+        array $extraInnerSelects = [],
+        bool $innerOnly = false
     ): Gdn_MySQLDriver {
         $limit = $limit ?: $this->getDefaultLimit();
         $offset = $offset ?: 0;
@@ -1234,13 +1249,26 @@ class DiscussionModel extends Gdn_Model implements
             }
         }
 
-        $sql = $this->SQL;
+        // We're doing an inner/outer query pattern here for performance reasons.
+        // The inner query MUST only select the primary key.
+        // This optimizes deep offset selects, by avoiding the need to scan the entire table content.
+        // Instead MySQL can do index scans.
+        // Still needs to be the GLOBAL SQL object because of plugins reading it.
+        $innerQuery = $this->SQL->select("d.DiscussionID")->from("Discussion d");
+        if (!empty($extraInnerSelects)) {
+            $innerQuery->select($extraInnerSelects);
+        }
 
-        $sql->select("d.*")->from("Discussion d");
+        $outerQuery = $this->createSql()
+            ->with("DiscussionBase", $innerQuery)
+            ->select("d.*")
+            ->select($selects)
+            ->from("@DiscussionBase db")
+            ->join("Discussion d", "d.DiscussionID = db.DiscussionID");
 
         // Set Dirty records
         if ($joinDirtyRecords) {
-            $this->applyDirtyWheres("d");
+            $this->applyDirtyWheres("d", $innerQuery);
         }
 
         if (isset($where["d.Followed"])) {
@@ -1257,12 +1285,13 @@ class DiscussionModel extends Gdn_Model implements
         }
 
         if (isset($where["d.Type"])) {
-            PostTypeModel::whereParentPostType($sql, $where["d.Type"], "d.");
+            PostTypeModel::whereParentPostType($innerQuery, $where["d.Type"], "d.");
             unset($where["d.Type"]);
         }
 
         if (isset($where["d.DiscussionID"]) && isset($where["d.InterestCategoryID"])) {
-            $sql->beginWhereGroup()
+            $innerQuery
+                ->beginWhereGroup()
                 ->where("d.DiscussionID", $where["d.DiscussionID"])
                 ->orWhere(
                     "d.CategoryID",
@@ -1282,11 +1311,15 @@ class DiscussionModel extends Gdn_Model implements
 
         // Add the UserDiscussion query.
         if ($userID > 0) {
-            $sql->join("UserDiscussion ud", "ud.DiscussionID = d.DiscussionID and ud.UserID = $userID", "left")
+            $outerQuery
+                ->leftJoin("UserDiscussion ud", "ud.DiscussionID = d.DiscussionID and ud.UserID = $userID")
                 ->select("ud.UserID", "", "WatchUserID")
                 ->select("ud.DateLastViewed, ud.Dismissed, ud.Bookmarked")
                 ->select("ud.CountComments", "", "CountCommentWatch")
                 ->select("ud.Participated");
+
+            // Keeping as left join to mitgate performance impact if we don't actually have a where with `ud.*`
+            $innerQuery->leftJoin("UserDiscussion ud", "ud.DiscussionID = d.DiscussionID and ud.UserID = $userID");
 
             if ($filterType) {
                 $where["ud." . ucfirst($filterType)] = 1;
@@ -1304,12 +1337,14 @@ class DiscussionModel extends Gdn_Model implements
 
             $announceValue = (array) $where["d.Announce"];
             if (in_array(0, $announceValue)) {
-                $sql->beginWhereGroup()
+                $innerQuery
+                    ->beginWhereGroup()
                     ->where(["d.Announce" => $announceValue])
                     ->orWhere(["ud.Dismissed <>" => 0])
                     ->endWhereGroup();
             } else {
-                $sql->where(["d.Announce" => $where["d.Announce"]])
+                $innerQuery
+                    ->where(["d.Announce" => $where["d.Announce"]])
                     ->beginWhereGroup()
                     ->where(["ud.Dismissed <>" => 1])
                     ->orWhere("ud.Dismissed is null")
@@ -1320,27 +1355,36 @@ class DiscussionModel extends Gdn_Model implements
 
         $insertUserRoleIDs = $where["uri.RoleID"] ?? null;
         if (!empty($insertUserRoleIDs)) {
-            $sql->join("UserRole uri", "d.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
+            $innerQuery->join("UserRole uri", "d.InsertUserID = uri.UserID")->where("uri.RoleID", $insertUserRoleIDs);
 
             // Ensure rows aren't duplicated
-            $sql->distinct();
+            $innerQuery->groupBy("d.DiscussionID");
         }
         unset($where["uri.RoleID"]);
 
-        $this->EventArguments["SQL"] = $sql;
+        // Used for customer plugins.
+        $this->EventArguments["SQL"] = $innerQuery;
         $this->fireEvent("BeforeGetSubQuery");
 
-        $sql->select($selects);
-        $sql->where($where);
+        $innerQuery->where($where);
+        $innerQuery->limit($limit);
+        $innerQuery->offset($offset);
 
         if (!empty($orderBy)) {
-            $sql->orderBy($orderBy);
+            $orderBy = $this->normalizeQuery($orderBy, "d");
+            $innerQuery->orderBy($orderBy);
+            $outerQuery->orderBy($orderBy);
         }
 
-        $sql->limit($limit);
-        $sql->offset($offset);
+        $eventManager = $this->getEventManager();
 
-        return $sql;
+        if ($innerOnly) {
+            $eventManager->dispatch(new DiscussionQueryEvent(innerQuery: $innerQuery, outerQuery: $innerQuery));
+            return $innerQuery;
+        } else {
+            $eventManager->dispatch(new DiscussionQueryEvent(innerQuery: $innerQuery, outerQuery: $outerQuery));
+            return $outerQuery;
+        }
     }
 
     /**
@@ -1354,6 +1398,10 @@ class DiscussionModel extends Gdn_Model implements
     {
         $safeWheres = [];
         foreach ($where as $key => $value) {
+            if ($key === ModelUtils::SORT_TRENDING) {
+                $safeWheres[$key] = $value;
+                continue;
+            }
             if ($value instanceof \Vanilla\Database\CallbackWhereExpression) {
                 $safeWheres[$key] = $value;
                 continue;
@@ -1385,13 +1433,14 @@ class DiscussionModel extends Gdn_Model implements
     public function getPagingCount(array $where = [], $filterType = false, $userID = false): int
     {
         $count = $this->getWhereQuery(
-            $where,
-            [],
-            ["d.DiscussionID"],
-            false,
-            false,
-            $filterType,
-            $userID
+            where: $where,
+            orderBy: [],
+            selects: ["d.DiscussionID"],
+            limit: false,
+            offset: false,
+            filterType: $filterType,
+            userID: $userID,
+            innerOnly: true
         )->getPagingCount("d.DiscussionID");
         return $count;
     }
@@ -1886,7 +1935,7 @@ class DiscussionModel extends Gdn_Model implements
             $this->SQL->limit($limit, $offset);
         }
         $eventManager = $this->getEventManager();
-        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL));
+        $eventManager->dispatch(new DiscussionQueryEvent($this->SQL, $this->SQL));
         $this->fireEvent("BeforeGetByUser");
 
         $data = $this->SQL->get();
@@ -2637,13 +2686,16 @@ class DiscussionModel extends Gdn_Model implements
      * @param array|false $settings
      * - CheckPermission - Check permissions during insert. Default true.
      *
-     * @return int $discussionID Unique ID of the discussion.
+     * @return int|string|bool Result of the save operation.
+     * * - int: DiscussionID on successful insert/update.
+     * * - string: "SPAM" or "UNAPPROVED" when content requires moderation.
+     * * - bool: false when validation fails and no custom value is supplied by event listeners.
      * @throws ContainerException
      * @throws NotFoundException
      * @throws NotFoundException
      * @throws PremoderationException
      */
-    public function save($formPostValues, $settings = false)
+    public function save($formPostValues, $settings = false): int|string|bool
     {
         $isSchedule = $settings["scheduled"] ?? false;
 
@@ -2815,7 +2867,7 @@ class DiscussionModel extends Gdn_Model implements
                     $fields = $validation->schemaValidationFields();
                     return $this->saveScheduledPost($fields);
                 } else {
-                    return $discussionID;
+                    return intval($discussionID);
                 }
             }
             // Backward compatible check for flood control
@@ -3072,7 +3124,7 @@ class DiscussionModel extends Gdn_Model implements
             }
         }
 
-        return $discussionID;
+        return intval($discussionID);
     }
 
     /**
@@ -4278,9 +4330,8 @@ SQL;
     {
         $name = $discussion["Name"] ?? "";
         $dateInserted = $discussion["DateInserted"] ?? "";
-        $body = Gdn_Format::reduceWhiteSpaces(
-            Gdn_Format::excerpt($discussion["Body"] ?? "", $discussion["Format"] ?? "Html")
-        );
+        // The body is always rendered in HTML at this point
+        $body = Gdn::formatService()->renderExcerpt($discussion["Body"] ?? "", $discussion["Format"] ?? "Html");
 
         $result = [
             "headline" => $name,

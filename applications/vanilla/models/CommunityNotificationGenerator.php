@@ -115,7 +115,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
             ),
             "RecordType" => "Discussion",
             "RecordID" => $discussionID,
-            "Route" => discussionUrl($discussion, "", "/"),
+            "Route" => \DiscussionModel::discussionUrl($discussion, "", "/"),
             "Data" => [
                 "Name" => $name,
                 "Category" => $categoryName,

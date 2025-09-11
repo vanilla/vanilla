@@ -1974,20 +1974,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     }
 
     /**
-     * Apply expand query params for api queries.
-     * @param string $recordType
-     * @return array
-     */
-    public function discussionArticleModel_applyExpand(string $recordType = ""): array
-    {
-        $expand = [];
-        if ($recordType === "question") {
-            $expand["expand"] = "acceptedAnswers";
-        }
-        return $expand;
-    }
-
-    /**
      * Add answer meta data to comment record.
      *
      * @param array $comment
@@ -2059,17 +2045,13 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             throw new ClientException("The comment is not an answer.");
         }
 
-        if ($discussion["InsertUserID"] !== $sender->getSession()->UserID) {
+        $isPostAuthor = $discussion["InsertUserID"] === $sender->getSession()->UserID;
+        if (!$isPostAuthor && !$this->session->getPermissions()->has("curation.manage")) {
             $this->discussionModel->categoryPermission("Vanilla.Discussions.Edit", $discussion["CategoryID"]);
         }
 
         if ($discussion["Closed"]) {
             $sender->permission("Garden.Moderation.Manage");
-        }
-
-        // Body is a required field in CommentModel::save.
-        if (!array_key_exists("Body", $data)) {
-            $data["Body"] = $comment["Body"];
         }
 
         $status = ucFirst($body["status"]);

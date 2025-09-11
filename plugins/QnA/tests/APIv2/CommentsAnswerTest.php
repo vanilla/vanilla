@@ -10,6 +10,7 @@ namespace VanillaTests\APIv2;
 use CategoriesApiController;
 use Garden\Web\Exception\ForbiddenException;
 use Gdn_Session;
+use QnAPlugin;
 use UserModel;
 use Vanilla\CurrentTimeStamp;
 use VanillaTests\ExpectedNotification;
@@ -208,6 +209,73 @@ class CommentsAnswerTest extends AbstractAPIv2Test
 
         $answeredQuestion = $this->getQuestion($question["discussionID"]);
         $this->assertIsQuestion($answeredQuestion, ["status" => "answered"]);
+    }
+
+    /**
+     * Test that post authors can accept answers on their own questions.
+     */
+    public function testAcceptAnswerByAuthor(): void
+    {
+        $memberUser = $this->createUser();
+        $this->createCategory();
+
+        $question = $this->runWithUser(function () {
+            return $this->createQuestion();
+        }, $memberUser);
+        $answer = $this->createAnswer();
+
+        $this->acceptAnswerAsUser($answer, $memberUser);
+
+        // Discussion should now be accepted.
+        $this->api()
+            ->get("/discussions/{$question["discussionID"]}")
+            ->assertJsonObjectLike([
+                "statusID" => QnAPlugin::DISCUSSION_STATUS_ACCEPTED,
+            ]);
+    }
+
+    /**
+     * Test that users with discussions.edit permission can accept answers.
+     */
+    public function testAcceptAnswerByCategoryEditPermission(): void
+    {
+        $category = $this->createCategory();
+        $user = $this->createUserWithCategoryPermissions($category, [
+            "discussions.edit" => true,
+        ]);
+
+        $question = $this->createQuestion();
+        $answer = $this->createAnswer();
+
+        $this->acceptAnswerAsUser($answer, $user);
+
+        // Discussion should now be accepted.
+        $this->api()
+            ->get("/discussions/{$question["discussionID"]}")
+            ->assertJsonObjectLike([
+                "statusID" => QnAPlugin::DISCUSSION_STATUS_ACCEPTED,
+            ]);
+    }
+
+    /**
+     * Test that users with curation.manage permission can accept answers.
+     */
+    public function testAcceptAnswerByCurationPermission(): void
+    {
+        $this->createCategory();
+        $user = $this->createCurator();
+
+        $question = $this->createQuestion();
+        $answer = $this->createAnswer();
+
+        $this->acceptAnswerAsUser($answer, $user);
+
+        // Discussion should now be accepted.
+        $this->api()
+            ->get("/discussions/{$question["discussionID"]}")
+            ->assertJsonObjectLike([
+                "statusID" => QnAPlugin::DISCUSSION_STATUS_ACCEPTED,
+            ]);
     }
 
     /**

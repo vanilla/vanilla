@@ -2288,16 +2288,24 @@ SQL;
                 $sql2 = $this->applyParameters($sql, $parameters);
 
                 $this->Database->CapturedSql[] = $sql2;
-                $this->reset();
                 return true;
             }
 
             $result = $this->Database->query($sql, $parameters, $queryOptions);
         } catch (Exception $ex) {
-            $this->reset();
             throw $ex;
+        } finally {
+            $this->reset();
+            foreach ($this->withs as $with) {
+                [$name, $subquery1, $subquery2] = $with;
+                if ($subquery1) {
+                    $subquery1->reset();
+                }
+                if ($subquery2) {
+                    $subquery2->reset();
+                }
+            }
         }
-        $this->reset();
 
         return $result;
     }

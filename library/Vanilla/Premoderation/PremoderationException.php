@@ -16,7 +16,8 @@ class PremoderationException extends ClientException
 {
     public function __construct(public PremoderationItem $item, public PremoderationResult $result, array $context = [])
     {
-        $message = sprintf("Your %s will appear after it is approved.", strtolower($item->recordType));
+        $recordType = $item->recordType === "discussion" ? "post" : $item->recordType;
+        $message = sprintf("Your %s will appear after it is approved.", strtolower($recordType));
 
         parent::__construct($message, 202, $context);
     }

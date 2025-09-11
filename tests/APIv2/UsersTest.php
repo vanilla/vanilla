@@ -1235,7 +1235,7 @@ class UsersTest extends AbstractResourceTest
     protected function triggerDirtyRecords()
     {
         $this->resetTable("dirtyRecord");
-        $user = $this->createUser();
+        $user = $this->createUser(["name" => "triggerDirtyRecords"]);
         $this->givePoints($user["userID"], 10);
     }
 
@@ -2547,6 +2547,20 @@ class UsersTest extends AbstractResourceTest
     }
 
     /**
+     * Provider for testNameValidation
+     *
+     * @return void
+     */
+    public static function providerInvalidUsernames(): array
+    {
+        return [
+            "short name" => ["on"],
+            "long name" => ["veryLong_Validname123456789"],
+            "name with spaced" => ["some name"],
+        ];
+    }
+
+    /**
      *  Test to make sure we show discovery text on the user endpoint.
      */
 
@@ -2716,5 +2730,20 @@ class UsersTest extends AbstractResourceTest
             $actual = $response->getBody();
             $this->assertArraySubsetRecursive($expected, $actual);
         });
+    }
+
+    /**
+     * Test user name validation.
+     * @dataProvider providerInvalidUsernames
+     */
+    public function testNameValidation(string $name): void
+    {
+        $this->configuration->removeFromConfig("Garden.User.ValidationRegexPattern");
+        $this->configuration->removeFromConfig("Garden.User.ValidationRegex");
+        $this->configuration->removeFromConfig("Garden.User.ValidationLength");
+        $this->expectExceptionMessage(
+            "Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long."
+        );
+        $this->createUser(["name" => $name]);
     }
 }

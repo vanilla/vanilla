@@ -15,7 +15,6 @@ import { useEmailConfirmationToast } from "@library/features/Layout/EmailConfirm
 import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { getSiteSection } from "@library/utility/appUtils";
 import { LayoutQueryContextProvider } from "@library/features/Layout/LayoutQueryProvider";
-import TitleBar from "@library/headers/TitleBar";
 import { useEffect, useState } from "react";
 
 interface IProps {
@@ -72,7 +71,11 @@ export function LayoutPage(props: IProps) {
             <PageBoxDepthContextProvider depth={0}>
                 <LayoutQueryContextProvider layoutQuery={layoutQuery}>
                     <LayoutRenderer noSuspense={true} allowInternalProps layout={[layout.data.titleBar]} />
-                    <LayoutRenderer layout={layout.data.layout} contexts={layout.data.contexts} />
+                    <LayoutRenderer
+                        key={layout?.data?.layoutID}
+                        layout={layout.data.layout}
+                        contexts={layout.data.contexts}
+                    />
                 </LayoutQueryContextProvider>
             </PageBoxDepthContextProvider>
         </WidgetLayout>

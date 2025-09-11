@@ -499,11 +499,13 @@ class CommentModel extends Gdn_Model implements
             }
         }
 
-        if (isset($where["c.DiscussionID"]) && !isset($where["c.parentRecordID"])) {
+        if (isset($where["c.DiscussionID"])) {
             $where["c.parentRecordType"] = "discussion";
             $where["c.parentRecordID"] = $where["c.DiscussionID"];
             unset($where["c.DiscussionID"]);
         }
+
+        unset($where["d.DiscussionID"]);
 
         $subQuery->where($where);
 
@@ -578,7 +580,8 @@ class CommentModel extends Gdn_Model implements
     public function getByDiscussion(int $discussionID, $limit, $offset = 0, array $where = []): Gdn_DataSet
     {
         $where = array_merge($where, [
-            "d.DiscussionID" => $discussionID,
+            "c.parentRecordID" => $discussionID,
+            "c.parentRecordType" => "discussion",
         ]);
 
         $options = [
@@ -1031,11 +1034,12 @@ class CommentModel extends Gdn_Model implements
      *
      * @param array|int $commentRowOrCommentID
      * @param string $layoutID
-     *
+     * @param array|null $orderBy An array indicating how to order the results. Take the form of:
+     *  [["sort", "direction"], ["sort", "direction"], ...]. If null, the model's set _OrderBy will be used.
      * @return int
      * @throws NotFoundException
      */
-    public function getCommentThreadPage(array|int $commentRowOrCommentID): int
+    public function getCommentThreadPage(array|int $commentRowOrCommentID, ?array $orderBy = null): int
     {
         $commentID = is_array($commentRowOrCommentID)
             ? $commentRowOrCommentID["commentID"] ?? $commentRowOrCommentID["CommentID"]
@@ -1043,7 +1047,7 @@ class CommentModel extends Gdn_Model implements
         $perPage = Gdn::config("Vanilla.Comments.PerPage", 30);
         $maxDepth = $this->resolveCommentMaxDepth($commentID);
         $topLevelComment = $maxDepth > 1 ? $this->threadModel->resolveTopLevelParentComment($commentID) : $commentID;
-        $threadOffset = $this->getCommentThreadOffset($topLevelComment, $maxDepth);
+        $threadOffset = $this->getCommentThreadOffset($topLevelComment, $maxDepth, $orderBy);
         return floor($threadOffset / $perPage) + 1;
     }
 
@@ -1052,11 +1056,16 @@ class CommentModel extends Gdn_Model implements
      *
      * @param int|array|object $commentRowOrCommentID Unique ID or a comment object for which the offset is being defined.
      * @param int $maxDepth
+     * @param array|null $orderBy An array indicating how to order the results. Take the form of:
+     * [["sort", "direction"], ["sort", "direction"], ...]. If null, the model's set _OrderBy will be used.
      * @return int The offset of the comment within the discussion thread.
      * @throws NotFoundException
      */
-    public function getCommentThreadOffset(array|object|int $commentRowOrCommentID, int $maxDepth = 1): int
-    {
+    public function getCommentThreadOffset(
+        array|object|int $commentRowOrCommentID,
+        int $maxDepth = 1,
+        ?array $orderBy = null
+    ): int {
         if (is_numeric($commentRowOrCommentID)) {
             $comment = $this->getID($commentRowOrCommentID, DATASET_TYPE_ARRAY);
             $commentID = $commentRowOrCommentID;
@@ -1086,8 +1095,10 @@ class CommentModel extends Gdn_Model implements
 
         $this->SQL->beginWhereGroup();
 
+        $orderBy = $orderBy ?? $this->_OrderBy;
+
         // Figure out the where clause based on the sort.
-        foreach ($this->_OrderBy as $part) {
+        foreach ($orderBy as $part) {
             [$expr, $value] = $this->_WhereFromOrderBy($part, $comment, "");
 
             if (!isset($prevWhere)) {

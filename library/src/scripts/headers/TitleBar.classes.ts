@@ -544,6 +544,7 @@ export const titleBarClasses = useThemeCache((overrides?: IThemeVariables) => {
             "&&&": {
                 minWidth: styleUnit(vars.dropDownContents.minWidth),
                 maxHeight: styleUnit(vars.dropDownContents.maxHeight),
+                zIndex: 1061,
             },
             "& .frame": {
                 maxHeight: "80vh",

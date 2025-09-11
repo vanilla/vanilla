@@ -4,13 +4,14 @@
  * @license Proprietary
  */
 
-import { DashboardMenusApi } from "@dashboard/DashboardMenusApi";
-import { INavigationTreeItem } from "@library/@types/api/core";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import { DashboardMenusApi, hasGroupLinkChildren } from "@dashboard/DashboardMenusApi";
+
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 import Heading from "@library/layout/Heading";
+import { INavigationTreeItem } from "@library/@types/api/core";
 import SiteNav from "@library/navigation/SiteNav";
 import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { useUniqueID } from "@library/utility/idUtils";
 
 interface IProps {
@@ -37,18 +38,36 @@ function useDashboardNav(sectionID: string): INavigationTreeItem[] | null {
             parentID: "root",
             recordType: "panelMenu",
             recordID: item.id,
-            children: item.children.map((child) => {
-                return {
-                    name: child.name,
-                    parentID: item.id,
-                    recordType: "link",
-                    recordID: child.id,
-                    url: child.url,
-                    ...(child.badge && { badge: child.badge }),
-                };
-            }),
+            children: convertGroupChildrenToNavItems(item),
         };
     });
+}
+
+function convertGroupChildrenToNavItems(group: DashboardMenusApi.Group): INavigationTreeItem[] {
+    if (hasGroupLinkChildren(group)) {
+        // Convert GroupLinks to INavigationTreeItem[]
+        return group.children.map((child) => {
+            return {
+                name: child.name,
+                parentID: group.id,
+                recordType: "link",
+                recordID: child.id,
+                url: child.url,
+                ...(child.badge && { badge: child.badge }),
+            };
+        });
+    } else {
+        // Recursively convert nested Groups
+        return group.children.map((child) => {
+            return {
+                name: child.name,
+                parentID: group.id,
+                recordType: "panelMenu",
+                recordID: child.id,
+                children: convertGroupChildrenToNavItems(child),
+            };
+        });
+    }
 }
 
 export function AdminNav(props: IProps) {

@@ -37,7 +37,8 @@ class PostCommentThreadAsset extends ReactWidget
     public function __construct(
         protected InternalClient $internalClient,
         protected ConfigurationInterface $configuration,
-        protected \Gdn_Session $session
+        protected \Gdn_Session $session,
+        protected \CommentModel $commentModel
     ) {
     }
 
@@ -71,7 +72,7 @@ class PostCommentThreadAsset extends ReactWidget
 
         $parentRecordParams = $this->getParentRecordParams();
         $apiParams = $parentRecordParams + [
-            "page" => $page,
+            "page" => is_numeric($page) ? (int) $page : $page,
             "limit" => $limit,
             "expand" => ["insertUser", "updateUser", "reactions", "attachments", "reportMeta"],
             "sort" => $this->getHydrateParam("sort") ?: $this->props["apiParams"]["sort"] ?? "dateInserted",
@@ -95,6 +96,25 @@ class PostCommentThreadAsset extends ReactWidget
         $props = [];
         $maxDepth = (int) $this->props["apiParams"]["maxDepth"];
         $threadStyle = $maxDepth == 1 ? "flat" : "nested";
+        if ($page === "lookupSort") {
+            switch ($apiParams["sort"]) {
+                case "-dateInserted":
+                    $orderBy = [["c.DateInserted", "desc"]];
+                    break;
+                case "-score":
+                    $orderBy = [["c.Score", "desc"]];
+                    break;
+                // It's too expensive to calculate the offset for other sorts
+                // for comment permalinks, so we will default to the dateInserted sort.
+                default:
+                    $orderBy = [["c.DateInserted", "asc"]];
+                    $apiParams["sort"] = "dateInserted";
+            }
+            $apiParams["page"] = $this->commentModel->getCommentThreadPage(
+                commentRowOrCommentID: $commentID,
+                orderBy: $orderBy
+            );
+        }
         $props["threadStyle"] = $threadStyle;
         // maybe we should always get comments and commentsThread ?
         if ($threadStyle === "nested") {

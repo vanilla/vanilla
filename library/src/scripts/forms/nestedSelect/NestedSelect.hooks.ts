@@ -76,7 +76,7 @@ export function useNestedOptions(params: {
 
     function findOptionRecursively(options: Select.Option[], value: RecordID) {
         for (const option of options) {
-            if (option.value === value) {
+            if (`${option.value}` === `${value}`) {
                 return option;
             }
             if (option.children) {

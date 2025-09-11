@@ -47,6 +47,7 @@ import { getSiteSection } from "@library/utility/appUtils";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import { useToast } from "@library/features/toaster/ToastContext";
 
 interface IProps {
     category: ICategory | null;
@@ -90,6 +91,7 @@ const INITIAL_EMPTY_FORM_BODY: Partial<ICreatePostForm> = {
  * A form for creating a new post
  */
 export function CreatePostFormAsset(props: IProps) {
+    const { addToast } = useToast();
     const { pushSmartLocation } = useLinkContext();
     const { hasPermission } = usePermissionsContext();
     // remove feature flag dependency when this feature is fully released
@@ -176,6 +178,7 @@ export function CreatePostFormAsset(props: IProps) {
 
     const postMutation = usePostMutation();
 
+    const moderationMessage = postMutation.data?.status === 202 ? postMutation.data?.message : undefined;
     const [error, setError] = useState<string>();
     const [fieldErrors, setFieldErrors] = useState<IFieldError[] | null>(null);
 
@@ -354,15 +357,33 @@ export function CreatePostFormAsset(props: IProps) {
         } as ICreatePostForm;
 
         if (endpoint) {
-            const response = await postMutation.mutateAsync({
-                endpoint,
-                body,
-            });
-            removeDraft(true);
-            pushSmartLocation(response.canonicalUrl);
+            try {
+                const response = await postMutation.mutateAsync({
+                    endpoint,
+                    body,
+                });
+
+                removeDraft(true);
+
+                const responseHasMessage = "status" in response && "message" in response;
+                if (!responseHasMessage) {
+                    addToast({
+                        autoDismiss: true,
+                        body: body.discussionID ? t("Success! Post updated") : t("Success! Post created"),
+                    });
+
+                    pushSmartLocation(response.canonicalUrl);
+                }
+            } catch (error) {
+                addToast({
+                    autoDismiss: false,
+                    dismissible: true,
+                    body: t("Error. Post could not be created."),
+                });
+                // Re-enable autosave
+                enableAutosave();
+            }
         }
-        // Re-enable autosave
-        enableAutosave();
     };
 
     // We want to wait for the draft to populate the form
@@ -459,6 +480,10 @@ export function CreatePostFormAsset(props: IProps) {
     }, [postMutation.error?.errors]);
 
     const isSubmitting = postMutation.isLoading;
+
+    if (moderationMessage) {
+        return <Message type="neutral" stringContents={moderationMessage} contents={moderationMessage} />;
+    }
 
     return (
         <>

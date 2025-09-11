@@ -107,6 +107,25 @@ export function AdminPageStory(props: { children: React.ReactNode; apiMock?: (mo
         props.apiMock?.(mock);
     });
 
+    setMeta("siteSection", {
+        basePath: "",
+        contentLocale: "en",
+        sectionGroup: "vanilla",
+        sectionID: "0",
+        name: "Test Site",
+        apps: { forum: true },
+        attributes: {},
+    });
+    setMeta("defaultSiteSection", {
+        basePath: "",
+        contentLocale: "en",
+        sectionGroup: "vanilla",
+        sectionID: "0",
+        name: "Test Site",
+        apps: { forum: true },
+        attributes: {},
+    });
+
     return (
         <SiteNavProvider categoryRecordType="panelMenu">
             <CurrentUserContextProvider

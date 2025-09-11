@@ -521,12 +521,14 @@ class EscalationModel extends PipelineModel
     public function insert(array $set, array $options = [])
     {
         $escalationID = parent::insert($set, $options);
+
         $escalation = $this->getEscalation($escalationID);
+        if ($escalation) {
+            $this->notifyNewEscalation($escalation);
 
-        $this->notifyNewEscalation($escalation);
-
-        if (isset($set["assignedUserID"]) && $set["assignedUserID"] > 0) {
-            $this->notifyAssignedUser($escalation, $set["assignedUserID"]);
+            if (isset($set["assignedUserID"]) && $set["assignedUserID"] > 0) {
+                $this->notifyAssignedUser($escalation, $set["assignedUserID"]);
+            }
         }
 
         return $escalationID;

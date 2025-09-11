@@ -18,6 +18,7 @@ import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarCont
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
+import { StackingContextProvider } from "@vanilla/react-utils";
 import classNames from "classnames";
 import * as React from "react";
 
@@ -115,7 +116,9 @@ export default function DashboardTitleBar(props: IProps) {
                         </>
                     )}
 
-                    {isCompact ? <MeBoxMobile /> : <MeBox currentUser={currentUser} />}
+                    <StackingContextProvider>
+                        {isCompact ? <MeBoxMobile /> : <MeBox currentUser={currentUser} />}
+                    </StackingContextProvider>
                 </TitleBarParamContextProvider>
             </Container>
         </header>

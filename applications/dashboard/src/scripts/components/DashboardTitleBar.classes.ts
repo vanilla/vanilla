@@ -17,7 +17,7 @@ export const DashboardTitleBarClasses = useThemeCache(() => {
         height: 48,
         position: "sticky",
         top: 0,
-        zIndex: 1053,
+        zIndex: 1061,
     });
 
     const flexContainer = css({

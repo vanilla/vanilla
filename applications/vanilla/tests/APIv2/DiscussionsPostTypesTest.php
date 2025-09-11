@@ -484,4 +484,36 @@ class DiscussionsPostTypesTest extends AbstractAPIv2Test
         $this->assertEquals($discussion["discussionID"], $context["discussionID"]);
         $this->setConfig("auditLog.enabled", false);
     }
+
+    /**
+     * Test moving a legacy post to a category with type conversion.
+     *
+     * @return void
+     */
+    public function testMoveFromLegacyPost()
+    {
+        // Simulate a legacy discussion that only has `Type` column.
+        $category = $this->createCategory();
+        $discussionID = $this->discussionModel->save([
+            "Name" => "Test Post",
+            "CategoryID" => $category["categoryID"],
+            "Type" => "Idea",
+            "Body" => "Test post",
+            "Format" => "Html",
+        ]);
+
+        $targetCategory = $this->createCategory();
+        $this->api()
+            ->patch("/discussions/move", [
+                "discussionIDs" => [$discussionID],
+                "categoryID" => $targetCategory["categoryID"],
+                "postTypeID" => "question",
+            ])
+            ->assertSuccess()
+            ->assertJsonObjectLike(["status" => "success"]);
+
+        $this->api()
+            ->get("/discussions/{$discussionID}")
+            ->assertJsonObjectLike(["postTypeID" => "question", "categoryID" => $targetCategory["categoryID"]]);
+    }
 }

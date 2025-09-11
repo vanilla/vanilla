@@ -55,8 +55,25 @@ class CivilTongueTests extends SiteTestCase
         $this->resetTable("Discussion");
         $this->createDiscussion(["body" => "Scope Creep is a bad thing"]);
         $result = $this->api()
-            ->get("discussions", ["expand" => "crawl,tagIDs"])
+            ->get("discussions", ["expand" => ["crawl", "tagIDs"]])
             ->getBody();
         $this->assertEquals("Scope Creep is a bad thing", $result[0]["body"]);
+    }
+
+    /**
+     * Test that the filtering works with the API with special HTML characters &.
+     *
+     * @return void
+     */
+    public function testDiscussionApiFilteringHtmlCharacters(): void
+    {
+        $config = $this->container()->get(ConfigurationInterface::class);
+        $config->saveToConfig("Plugins.CivilTongue", ["Replacement" => "*$%&", "Words" => self::BAD_WORD]);
+
+        $discussion = $this->createDiscussion(["body" => "Scope Creep is a bad thing"]);
+        $result = $this->api()
+            ->get("discussions/{$discussion["discussionID"]}")
+            ->getBody();
+        $this->assertEquals("*$%&amp; is a bad thing", $result["body"]);
     }
 }

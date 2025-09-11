@@ -94,8 +94,8 @@ class DiscussionTypeConverter
         $postTypeChangedEvent = new DiscussionPostTypeChangeEvent(
             postTypeID: $payload->toPostTypeID,
             previousPostTypeID: $payload->fromPostTypeID ??
-                ($payload["discussionRow"]["postTypeID"] ??
-                    ($payload["discussionRow"]["Type"] ?? DiscussionModel::DISCUSSION_TYPE)),
+                ($payload->discussionRow["postTypeID"] ??
+                    ($payload->discussionRow["Type"] ?? DiscussionModel::DISCUSSION_TYPE)),
             context: [
                 "discussionID" => $payload->discussionRow["DiscussionID"],
             ]

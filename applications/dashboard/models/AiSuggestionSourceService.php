@@ -28,6 +28,7 @@ use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
+use Vanilla\Logger;
 use Vanilla\OpenAI\OpenAIClient;
 use Vanilla\OpenAI\OpenAIPrompt;
 use Vanilla\Scheduler\LongRunner;
@@ -211,7 +212,12 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
                 yield new LongRunnerSuccessID($source->getName());
             } catch (Exception $e) {
                 $this->logger->warning(
-                    "Error generating suggestions for discussion {$discussion["DiscussionID"]}: {$e->getMessage()}"
+                    "Error generating suggestions for discussion {$discussion["DiscussionID"]}: {$e->getMessage()}",
+                    [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                        Logger::FIELD_TAGS => ["aiSuggestions"],
+                        "exception" => $e,
+                    ]
                 );
             }
         }
@@ -221,19 +227,30 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
             $suggestionsMerged = $this->calculateTopSuggestions($suggestions, $discussion);
         } catch (Exception $e) {
             $suggestionsMerged = $suggestions;
-            $this->logger->warning("Error Throws calculateTopSuggestions", ["exception" => $e]);
+            $this->logger->warning("Error Throws calculateTopSuggestions", [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                Logger::FIELD_TAGS => ["aiSuggestions"],
+                "exception" => $e,
+            ]);
         }
 
         if (count($suggestionsMerged) === 0) {
-            $this->logger->info("No found suggestion results.");
+            $this->logger->info("No found suggestion results.", [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                Logger::FIELD_TAGS => ["aiSuggestions"],
+            ]);
         }
         try {
             $this->aiSuggestionModel->saveSuggestions($recordID, $suggestionsMerged);
+            if (!empty($suggestionsMerged)) {
+                $this->notifyAiSuggestions($discussion);
+            }
         } catch (Exception $e) {
-            $this->logger->warning("Error Throws saving suggestions", ["exception" => $e]);
-        }
-        if (!empty($suggestionsMerged)) {
-            $this->notifyAiSuggestions($discussion);
+            $this->logger->warning("Error Throws saving suggestions", [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                Logger::FIELD_TAGS => ["aiSuggestions"],
+                "exception" => $e,
+            ]);
         }
         return LongRunner::FINISHED;
     }
@@ -259,6 +276,8 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
             $keywords = implode(",", $keywords);
         } catch (\Exception $e) {
             $this->logger->warning("Error generating Vanilla category suggestions for discussion", [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                Logger::FIELD_TAGS => ["aiSuggestions"],
                 "exception" => $e->getMessage(),
             ]);
             $keywords = $discussion["Name"];
@@ -289,7 +308,11 @@ class AiSuggestionSourceService implements LoggerAwareInterface, SystemCallableI
                     $result[] = ["summary" => $answer["answerSource"]] + $item;
                 }
             } catch (Exception $e) {
-                $this->logger->warning("Error processing response", ["exception" => $e]);
+                $this->logger->warning("Error processing response", [
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
+                    Logger::FIELD_TAGS => ["aiSuggestions"],
+                    "exception" => $e,
+                ]);
                 // If the body of the article is too long, abridge it to the provided limit, and try one more time to summarize.
                 if (
                     str_contains($e->getMessage(), "maximum context length is") &&

@@ -12,6 +12,7 @@ use Gdn;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Web\AbstractJsonLDItem;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -233,5 +234,29 @@ class DiscussionThreadPageControllerTest extends SiteTestCase
                 ->assertJsonObject()
                 ->assertSuccess();
         }, \UserModel::GUEST_USER_ID);
+    }
+
+    /**
+     * Test that the headline and description are properly set.
+     *
+     * @return void
+     */
+    public function testRichJsonLdDescription(): void
+    {
+        $this->createDiscussion([
+            "name" => __FUNCTION__,
+            "body" => "[{\"type\":\"p\",\"children\":[{\"text\":\"This is SUPER important for SEO!\"}]}]",
+            "format" => "rich2",
+        ]);
+        $dispatcher = Gdn::getContainer()->get(\Garden\Web\Dispatcher::class);
+        $response = $dispatcher->dispatch(new Request("/discussion/$this->lastInsertedDiscussionID"))->getData();
+
+        // Extract and process the JsonLdDescription
+        preg_match('~<script type="application/ld\+json">(.*?)</script>~s', $response, $rawJson);
+        $this->assertNotEmpty($rawJson[1], "Failed to extract the jsonLDBody");
+        $jsonLDItems = json_decode($rawJson[1], true);
+
+        $this->assertEquals($jsonLDItems["@graph"][1]["headline"], __FUNCTION__);
+        $this->assertEquals($jsonLDItems["@graph"][1]["description"], "This is SUPER important for SEO!");
     }
 }

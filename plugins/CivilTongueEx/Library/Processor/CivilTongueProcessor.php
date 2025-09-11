@@ -39,7 +39,7 @@ class CivilTongueProcessor implements SanitizeInterface
 
         $rootElement = $document->getRoot();
         $content = $document->getInnerHtml();
-        $content = $this->contentFilter->replace($content);
+        $content = $this->contentFilter->replace($content, true);
         // We need proper HTML, to be passed along here
         DomUtils::setInnerHTML($rootElement, $content);
         return $document;

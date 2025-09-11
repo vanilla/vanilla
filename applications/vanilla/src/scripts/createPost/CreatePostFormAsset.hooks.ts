@@ -10,11 +10,9 @@ import { IGroup } from "@groups/groups/Group.types";
 import { IApiError } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
 import { ITag } from "@library/features/tags/TagsReducer";
-import { useToast } from "@library/features/toaster/ToastContext";
 import { MyValue } from "@library/vanilla-editor/typescript";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import { t } from "@vanilla/i18n";
 import { logError, RecordID } from "@vanilla/utils";
 
 interface MutationArgs {
@@ -39,30 +37,29 @@ export interface ICreatePostForm {
 
 export interface IGetEditPostResponse extends ICreatePostForm {}
 
+type PostMutationResponse =
+    | IDiscussion
+    | {
+          status: 202;
+          message: string;
+      };
+
 export const usePostMutation = () => {
-    const { addToast } = useToast();
     const queryClient = useQueryClient();
 
-    return useMutation<IDiscussion, IApiError, MutationArgs>({
+    return useMutation<PostMutationResponse, IApiError, MutationArgs>({
         mutationKey: ["newPost"],
         mutationFn: async (mutationArgs: MutationArgs) => {
             const { endpoint, body } = mutationArgs;
             const { discussionID, ...bodyNoID } = body || {};
 
             const response = await (discussionID
-                ? apiv2.patch(`/discussions/${discussionID}`, bodyNoID)
-                : apiv2.post(endpoint, body));
+                ? apiv2.patch<PostMutationResponse>(`/discussions/${discussionID}`, bodyNoID)
+                : apiv2.post<PostMutationResponse>(endpoint, body));
 
             return response.data;
         },
         onSuccess: (data: IDiscussion, variables: MutationArgs) => {
-            const { body } = variables;
-            const { discussionID } = body || {};
-
-            addToast({
-                autoDismiss: true,
-                body: discussionID ? t("Success! Post updated") : t("Success! Post created"),
-            });
             if (variables.body.discussionID) {
                 void queryClient.invalidateQueries({
                     queryKey: ["discussion", { discussionID: parseInt(`${variables.body.discussionID}`) }],
@@ -72,11 +69,6 @@ export const usePostMutation = () => {
         },
         onError: (error) => {
             logError(error);
-            addToast({
-                autoDismiss: false,
-                dismissible: true,
-                body: t("Error. Post could not be created."),
-            });
             return error.response.data;
         },
     });

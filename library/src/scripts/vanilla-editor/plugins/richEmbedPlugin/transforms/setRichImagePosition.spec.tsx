@@ -27,6 +27,11 @@ const spaceTextNodeParagraph = {
     children: [spaceTextNode],
 };
 
+const emptyTextNodeParagraph = {
+    type: "p",
+    children: [emptyTextNode],
+};
+
 function imageNode(type = ELEMENT_RICH_EMBED_CARD) {
     return {
         type: type,
@@ -57,6 +62,33 @@ const paragraphWithInlineImage = {
     children: [emptyTextNode, imageNode(ELEMENT_RICH_EMBED_INLINE), spaceTextNode],
 };
 
+const fileEmbedNode = {
+    type: "rich_embed_card",
+    children: [
+        {
+            text: "",
+        },
+    ],
+    dataSourceType: "file",
+    url: "http://files-api.vanilla.local/default-bucket/6G08JYNJBEO8/sundae-with-cherry.jpg",
+    embedData: {
+        url: "http://files-api.vanilla.local/default-bucket/6G08JYNJBEO8/sundae-with-cherry.jpg",
+        name: "sundae with cherry.jpg",
+        type: "image/jpeg",
+        size: 299161,
+        width: 1900,
+        height: 1267,
+        displaySize: "large",
+        float: "none",
+        mediaID: 891,
+        dateInserted: "2025-08-07T13:39:15+00:00",
+        insertUserID: 9,
+        foreignType: "embed",
+        foreignID: "9",
+        embedType: "file",
+    },
+};
+
 describe("setRichImagePosition", () => {
     it("can convert a standard image to inline", () => {
         const editor = createVanillaEditor();
@@ -65,7 +97,7 @@ describe("setRichImagePosition", () => {
 
         setRichImagePosition(editor, "inline");
 
-        expect(editor.children).toStrictEqual([paragraphWithInlineImage]);
+        expect(editor.children).toStrictEqual([paragraphWithInlineImage, emptyTextNodeParagraph]);
     });
 
     it("can convert an inline image back to a standard card", () => {
@@ -77,5 +109,48 @@ describe("setRichImagePosition", () => {
 
         setRichImagePosition(editor, "small");
         expect(editor.children).toStrictEqual([imageNode(ELEMENT_RICH_EMBED_CARD), spaceTextNodeParagraph]);
+    });
+
+    it("when the the previous element in the editor is an embed, converting an image to inline should cause a new paragraph element to be created with the inline image as its child", () => {
+        const editor = createVanillaEditor();
+
+        editor.insertNode(fileEmbedNode);
+
+        editor.insertNode(imageNode(ELEMENT_RICH_EMBED_CARD));
+
+        setRichImagePosition(editor, "inline");
+
+        expect(editor.children).toStrictEqual([fileEmbedNode, paragraphWithInlineImage, emptyTextNodeParagraph]);
+    });
+
+    it("does not delete the first paragraph element when converting an image to inline at the start of the editor", () => {
+        const editor = createVanillaEditor();
+
+        editor.insertNode({
+            type: "p",
+            children: [
+                {
+                    text: "hello",
+                },
+            ],
+        });
+
+        editor.insertNodes([imageNode(ELEMENT_RICH_EMBED_CARD)], { at: [0] });
+
+        editor.select([0]);
+
+        setRichImagePosition(editor, "inline");
+
+        expect(editor.children).toStrictEqual([
+            paragraphWithInlineImage,
+            {
+                type: "p",
+                children: [
+                    {
+                        text: "hello",
+                    },
+                ],
+            },
+        ]);
     });
 });

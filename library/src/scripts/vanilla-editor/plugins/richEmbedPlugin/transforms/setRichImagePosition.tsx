@@ -46,13 +46,19 @@ export function setRichImagePosition(editor: MyEditor, displaySize?: string, at?
 
     // An image has been added as a top-level node, and the display size changed to inline
     // We need to move it so it's nested inside of the previous node, and change the type
+    // If there is no previous node, or the previous node is another embed, we insert an empty paragraph
+    // and insert the inline image there
     if (isTopLevelNode && displaySize === "inline") {
         const previousSiblingArray = getPreviousSiblingNode(editor, currentEmbedPath);
 
         const previousSibling = previousSiblingArray && previousSiblingArray[0];
-        // Our target path for moving the image, fall back to the start of the editor if not found
-        // (that covers the case of inserting an image as the first thing in an empty editor)
-        const previousSiblingPath = (previousSiblingArray && previousSiblingArray[1]) ?? [0];
+        const previousSiblingPath = previousSiblingArray && previousSiblingArray[1];
+
+        const allowedParents = ["p", "h1", "h2", "h3", "h4", "h5", "h6"];
+        const shouldInsertAsChild =
+            previousSibling &&
+            Element.isElement(previousSibling) &&
+            allowedParents.includes(previousSibling.type as string);
 
         editor.withoutNormalizing(() => {
             // Remove the current embed, so we can nest it inline with other content
@@ -61,36 +67,58 @@ export function setRichImagePosition(editor: MyEditor, displaySize?: string, at?
             });
 
             // Also remove the previous node, so we can replace it with the updated version
-            removeNodes(editor, {
-                at: previousSiblingPath as number[],
-            });
+            // If there is no previous node, we're at the start of the editor, so no need to remove anything
+            if (previousSiblingPath) {
+                removeNodes(editor, {
+                    at: previousSiblingPath as number[],
+                });
+            }
 
             const type = Element.isElement(previousSibling) ? previousSibling.type : "p";
             const children = Element.isElement(previousSibling) ? previousSibling.children : [];
 
-            insertNodes(
-                editor,
-                [
-                    {
-                        type: type as string,
-                        children: [
-                            ...children,
-                            {
-                                ...currentEmbed[0],
-                                // Change the type to allow nesting inline with other content
-                                type: ELEMENT_RICH_EMBED_INLINE,
-                            },
-                            // Add a space, otherwise it's hard to add text after the inline image
-                            {
-                                text: " ",
-                            },
-                        ],
-                    },
-                ],
+            const embedContents = [
                 {
-                    at: previousSiblingPath as number[],
+                    ...currentEmbed[0],
+                    // Change the type to allow nesting inline with other content
+                    type: ELEMENT_RICH_EMBED_INLINE,
                 },
-            );
+                // Add a space, otherwise it's hard to add text after the inline image
+                {
+                    text: " ",
+                },
+            ];
+
+            const nodesToInsert = shouldInsertAsChild
+                ? [
+                      {
+                          ...previousSibling,
+                          type: type as string,
+                          children: [...children, ...embedContents],
+                      },
+                  ]
+                : previousSibling
+                ? [
+                      {
+                          ...previousSibling,
+                          type: type as string,
+                          children: [...children],
+                      },
+                      {
+                          type: "p",
+                          children: embedContents,
+                      },
+                  ]
+                : [
+                      {
+                          type: "p",
+                          children: embedContents,
+                      },
+                  ];
+
+            insertNodes(editor, nodesToInsert, {
+                at: previousSiblingPath ? (previousSiblingPath as number[]) : [0],
+            });
         });
     }
 

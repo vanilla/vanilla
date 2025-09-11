@@ -162,6 +162,8 @@ class ValidateUsernameTest extends SharedBootstrapTestCase
      */
     public function testDefaultPasswordValidation($value, $expected): void
     {
+        $this->config->removeFromConfig("Garden.User.ValidationRegexPattern");
+        $this->config->removeFromConfig("Garden.User.ValidationRegex");
         $this->assertSame($expected, validateUsername($value));
     }
 

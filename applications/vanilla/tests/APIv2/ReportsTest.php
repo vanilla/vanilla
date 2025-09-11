@@ -331,4 +331,24 @@ class ReportsTest extends SiteTestCase
             ->assertFailure()
             ->assertResponseCode(404);
     }
+
+    /**
+     * Make sure that NULL noteBody are not returned.
+     *
+     * @return void
+     */
+    public function testNoNoteBody(): void
+    {
+        $discussion = $this->createDiscussion();
+        $report = $this->createReport($discussion, [
+            "reportReasonIDs" => ["spam"],
+            "noteBody" => null,
+        ]);
+
+        $report = $this->api()
+            ->get("reports/$report[reportID]")
+            ->assertSuccess()
+            ->getBody();
+        $this->assertTrue(!isset($report["noteBody"]));
+    }
 }

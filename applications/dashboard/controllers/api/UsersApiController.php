@@ -21,7 +21,6 @@ use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\DateFilterSchema;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Search\UserSearchType;
 use Vanilla\ImageResizer;
 use Vanilla\Models\CrawlableRecordSchema;
@@ -1044,6 +1043,7 @@ class UsersApiController extends AbstractApiController
         if ($id == $this->getSession()->UserID) {
             $in->merge(Schema::parse(["passwordConfirmation:s?"]));
         }
+        $in->addValidator("name", $this->createUserNameValidator());
         $in->addValidator("roleID", $this->createRoleIDValidator($id));
         $in->addValidator("profileFields", $this->profileFieldModel->validateEditable($id));
 
@@ -1106,6 +1106,7 @@ class UsersApiController extends AbstractApiController
         $this->permission("Garden.Users.Add");
 
         $in = $this->schema($this->userPostSchema(), "in")->setDescription("Add a user.");
+        $in->addValidator("name", $this->createUserNameValidator());
         $in->addValidator("roleID", $this->createRoleIDValidator());
         $in->addValidator("profileFields", $this->profileFieldModel->validateEditable());
         $out = $this->schema($this->userSchema(), "out");
@@ -1552,6 +1553,25 @@ class UsersApiController extends AbstractApiController
             $field->addError("You don't have permission to assign these roles: " . implode(", ", $roleNames), [
                 "status" => 403,
             ]);
+        };
+    }
+
+    /**
+     * Returns a validator that checks if the current user name is valid
+     *
+     * @return Closure
+     */
+    private function createUserNameValidator(): Closure
+    {
+        return function (string $userName, ValidationField $field) {
+            if (!empty($userName) && !validateUsername($userName)) {
+                $field->addError(
+                    t(
+                        "UsernameError",
+                        "Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long."
+                    )
+                );
+            }
         };
     }
 

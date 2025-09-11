@@ -190,6 +190,19 @@ trait QnaApiTestTrait
     }
 
     /**
+     * Accept an answer as a specific user.
+     *
+     * @param array $answer The answer to accept
+     * @param array|int $userOrUserID The user accepting the answer
+     */
+    public function acceptAnswerAsUser(array $answer, $userOrUserID): void
+    {
+        $this->runWithUser(function () use ($answer) {
+            $this->api()->patch("comments/answer/" . $answer["commentID"], ["status" => "accepted"]);
+        }, $userOrUserID);
+    }
+
+    /**
      * @return \QnaModel
      */
     private function getQnaModel(): \QnaModel

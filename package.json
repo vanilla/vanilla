@@ -108,7 +108,7 @@
     "@vanilla/react-utils": "workspace:^",
     "@vanilla/ui": "workspace:^",
     "@vanilla/utils": "workspace:^",
-    "axios": "^1.7.9",
+    "axios": "^1.12.0",
     "classnames": "2.2.6",
     "css-box-model": "^1.2.1",
     "csx": "9.0.0",

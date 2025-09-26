@@ -16,6 +16,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ServerException;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\CallbackWhereExpression;
 use Vanilla\Database\Select;
@@ -80,6 +81,9 @@ abstract class Gdn_SQLDriver
 
     /** @var int The number of records to limit the query to. FALSE by default. */
     protected $_Limit;
+
+    /** @var string */
+    protected $_Order;
 
     /**
      * @var array An associative array of parameter_name => parameter_value pairs to be
@@ -154,6 +158,10 @@ abstract class Gdn_SQLDriver
         $joins = $options[Model::OPT_JOINS] ?? false;
         if ($joins) {
             $this->applyJoins($joins);
+        }
+
+        if ($selects instanceof Schema) {
+            $selects = array_keys($selects->getField("properties"));
         }
 
         if (!empty($selects)) {
@@ -882,6 +890,49 @@ abstract class Gdn_SQLDriver
         $sql = $this->getSelect();
         $result = $this->query($sql);
         return $result;
+    }
+
+    /**
+     * Iterate through a query in chunks by a primary key.
+     *
+     * @param string $idField The primary key to iterate by.
+     * @param array $options Standard model options. use LIMIT to set the chunk size.
+     *
+     * @return iterable<array>
+     */
+    public function chunkByID(string $idField, array $options = []): iterable
+    {
+        $options[Model::OPT_LIMIT] = $options[Model::OPT_LIMIT] ?? 100; // Make a chunk size if none was provided.
+        $options[Model::OPT_ORDER] = $options[Model::OPT_ORDER] ?? $idField;
+        $options[Model::OPT_DIRECTION] = $options[Model::OPT_DIRECTION] ?? "ASC";
+
+        $this->applyModelOptions($options);
+
+        $lastID = null;
+        while (true) {
+            $newQuery = clone $this;
+            $operator = strtoupper($options[Model::OPT_DIRECTION]) === "ASC" ? ">" : "<";
+
+            if ($lastID !== null) {
+                $newQuery->where("$idField $operator", $lastID);
+            }
+            $results = $newQuery->query($newQuery->getSelect())->resultArray();
+
+            if (empty($results)) {
+                break;
+            }
+
+            foreach ($results as $result) {
+                yield $result;
+
+                $lastID = $result[$idField] ?? null;
+                if ($lastID === null) {
+                    throw new ServerException(
+                        "The field '$idField' was not found in the result set and is required for Gdn_SqlDriver::chunkByID()."
+                    );
+                }
+            }
+        }
     }
 
     /**
@@ -2237,16 +2288,24 @@ SQL;
                 $sql2 = $this->applyParameters($sql, $parameters);
 
                 $this->Database->CapturedSql[] = $sql2;
-                $this->reset();
                 return true;
             }
 
             $result = $this->Database->query($sql, $parameters, $queryOptions);
         } catch (Exception $ex) {
-            $this->reset();
             throw $ex;
+        } finally {
+            $this->reset();
+            foreach ($this->withs as $with) {
+                [$name, $subquery1, $subquery2] = $with;
+                if ($subquery1) {
+                    $subquery1->reset();
+                }
+                if ($subquery2) {
+                    $subquery2->reset();
+                }
+            }
         }
-        $this->reset();
 
         return $result;
     }

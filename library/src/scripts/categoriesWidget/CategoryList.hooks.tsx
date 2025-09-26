@@ -19,6 +19,7 @@ export interface IGetCategoryListParams {
     categoryID?: RecordID | RecordID[];
     parentCategoryID?: number;
     siteSectionID?: number | string;
+    includeParentCategory?: 0 | 1 | undefined;
     page?: number;
     sort?: "categoryID" | "name" | "dateFollowed" | "-dateFollowed";
 }
@@ -54,4 +55,23 @@ export function useCategoryList(
     });
 
     return { refetch, error, isLoading, isSuccess, isFetching, data, status };
+}
+
+export function useCategory(
+    categoryID?: ICategory["categoryID"],
+    shouldFetch: boolean = true,
+    initialData?: ICategory,
+) {
+    const categoryQuery = useQuery<any, IApiError, ICategory>({
+        queryFn: async () => {
+            const response = await apiv2.get(`/categories/${categoryID}`);
+            return response.data;
+        },
+        keepPreviousData: true,
+        queryKey: ["category", categoryID],
+        enabled: shouldFetch,
+        initialData,
+    });
+
+    return categoryQuery;
 }

@@ -8,7 +8,7 @@ import { ColorHelper, deg, percent, quote } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { defaultTransition } from "@library/styles/styleHelpersAnimation";
 import { styleUnit } from "@library/styles/styleUnit";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { keyframes } from "@emotion/css";
 
 const spinnerOffset = 73;

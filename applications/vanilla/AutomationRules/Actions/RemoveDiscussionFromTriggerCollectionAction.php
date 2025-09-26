@@ -15,7 +15,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -23,7 +23,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -31,7 +31,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -39,7 +39,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -47,7 +47,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -60,7 +60,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -68,7 +68,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
@@ -90,7 +90,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function addWhereArray(array $where, array $actionValue): array
     {
@@ -117,7 +117,7 @@ class RemoveDiscussionFromTriggerCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {

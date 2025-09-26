@@ -15,8 +15,8 @@ import classNames from "classnames";
  */
 export function MeBoxIcon(props: IProps) {
     const { count, countLabel, compact, children } = props;
-    const compactClasses = compactMeBoxClasses();
-    const classes = meBoxClasses();
+    const compactClasses = compactMeBoxClasses.useAsHook();
+    const classes = meBoxClasses.useAsHook();
     return (
         <div
             className={classNames(

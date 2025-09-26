@@ -1,14 +1,16 @@
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
+import { getMeta } from "@library/utility/appUtils";
 import { useSection } from "@library/layout/LayoutContext";
-import { Widget } from "@library/layout/Widget";
-import NewPostMenuFAB from "@library/newPostMenu/NewPostMenuFAB";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import NewPostMenuDropDown from "@library/newPostMenu/NewPostMenuDropdown";
 import { DeepPartial } from "redux";
-import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import type { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { createLoadableComponent } from "@vanilla/react-utils";
+import AiFAB from "@library/aiConversations/AiFAB";
 
 export enum PostTypes {
     LINK = "link",
@@ -37,6 +39,11 @@ export interface INewPostMenuProps {
     postableDiscussionTypes?: string[];
 }
 
+const NewPostMenuFAB = createLoadableComponent({
+    loadFunction: () => import("./NewPostMenuFAB.loadable"),
+    fallback: () => null, // No fallback, just don't show the fab until it's loaded.
+});
+
 export default function NewPostMenu(props: INewPostMenuProps) {
     const { postableDiscussionTypes, items, ...rest } = props;
     const isCompact = !useSection().isFullWidth && !props.forceDesktopOnly;
@@ -52,11 +59,16 @@ export default function NewPostMenu(props: INewPostMenuProps) {
         return <></>;
     }
 
+    const aiConversationsEnabled = getMeta("featureFlags.ragSearch.Enabled", false);
+
     const content = isCompact ? (
         <NewPostMenuFAB items={filteredItems} />
     ) : (
-        <NewPostMenuDropDown items={filteredItems} {...rest} />
+        <>
+            <NewPostMenuDropDown items={filteredItems} {...rest} />
+            {aiConversationsEnabled && <AiFAB />}
+        </>
     );
 
-    return <Widget>{content}</Widget>;
+    return <LayoutWidget>{content}</LayoutWidget>;
 }

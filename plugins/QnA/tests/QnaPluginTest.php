@@ -106,7 +106,11 @@ class QnaPluginTest extends SiteTestCase
     {
         $discussionID = $this->createQuestion()["discussionID"];
         $answer = $this->createAnswer();
-        $this->bessy()->post("/discussion/qnaoptions?discussionid={$discussionID}", ["Type" => "Discussion"]);
+        $this->api()
+            ->put("/discussions/{$discussionID}/type", [
+                "type" => "Discussion",
+            ])
+            ->assertSuccess();
         $expectedStatusID = 0;
         $discussionModel = $this->container()->get(\DiscussionModel::class);
         $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
@@ -123,7 +127,11 @@ class QnaPluginTest extends SiteTestCase
         $answer = $this->createAnswer();
         $this->acceptAnswer($question, $answer);
         $discussionID = $question["discussionID"];
-        $this->bessy()->post("/discussion/qnaoptions?discussionid={$discussionID}", ["Type" => "Discussion"]);
+        $this->api()
+            ->put("/discussions/{$discussionID}/type", [
+                "type" => "Discussion",
+            ])
+            ->assertSuccess();
         $expectedStatusID = 0;
         $discussionModel = $this->container()->get(\DiscussionModel::class);
         $discussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
@@ -139,7 +147,11 @@ class QnaPluginTest extends SiteTestCase
     public function testDiscussionBackToQna(array $discussion)
     {
         $discussionID = $discussion["DiscussionID"];
-        $this->bessy()->post("/discussion/qnaoptions?discussionid={$discussionID}", ["Type" => "Question"]);
+        $this->api()
+            ->put("/discussions/{$discussionID}/type", [
+                "type" => "Question",
+            ])
+            ->assertSuccess();
         $discussionModel = $this->container()->get(\DiscussionModel::class);
         $question = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
         $this->assertEquals(QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $question["statusID"]);

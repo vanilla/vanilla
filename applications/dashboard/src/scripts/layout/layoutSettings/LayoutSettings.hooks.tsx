@@ -13,6 +13,7 @@ import {
     LayoutViewFragment,
     LayoutViewType,
     LAYOUT_VIEW_TYPES,
+    type ILayoutCatalog,
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { Loadable, LoadStatus } from "@library/@types/api/core";
 import apiv2 from "@library/apiv2";
@@ -149,7 +150,7 @@ export function useCatalogForLayout(layoutID: RecordID) {
  *
  * @param layoutViewType The type of layout to use.
  */
-export function useLayoutCatalog(layoutViewType: LayoutViewType | null) {
+export function useLayoutCatalog(layoutViewType: LayoutViewType | "all" | null): ILayoutCatalog | null {
     const { fetchLayoutCatalogByViewType } = useLayoutsActions();
 
     const catalogs = useLayoutSelector(({ layoutSettings }) => layoutSettings.catalogByViewType);

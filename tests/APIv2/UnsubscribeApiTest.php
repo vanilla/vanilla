@@ -38,7 +38,7 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
     private $config;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -70,7 +70,7 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
         ]);
 
         $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
-        $this->userModel->savePreference($notifyUser["UserID"], [
+        $this->userNotificationPreferencesModel->save($notifyUser["UserID"], [
             "Email.DiscussionComment" => "1",
         ]);
 
@@ -113,7 +113,7 @@ class UnsubscribeApiTest extends AbstractAPIv2Test
         $notifyUserID = 2;
 
         $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
-        $this->userModel->savePreference($notifyUser["UserID"], [
+        $this->userNotificationPreferencesModel->save($notifyUser["UserID"], [
             "Email.DigestEnabled" => "1",
         ]);
 

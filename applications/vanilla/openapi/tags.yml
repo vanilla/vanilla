@@ -67,7 +67,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Tag"
+                            $ref: "#/components/schemas/TagPost"
             responses:
                 "200":
                     description: Success.
@@ -110,7 +110,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Tag"
+                            $ref: "#/components/schemas/TagPatch"
             responses:
                 "200":
                     description: Success.
@@ -176,6 +176,44 @@ components:
                           default: null
                           description: The tag type.
                 - $ref: "../../dashboard/openapi/columns.yaml#/components/schemas/InsertInfo"
+        TagPost:
+            properties:
+                name:
+                    type: string
+                    description: The full name of the tag.
+                urlcode:
+                    type: string
+                    description: The URL slug of the tag.
+                parentTagID:
+                    type: integer
+                    description: The parent ID of the tag.
+                    nullable: true
+                type:
+                    type: string
+                    nullable: true
+                    default: null
+                    description: The tag type.
+            required:
+                - name
+            type: object
+        TagPatch:
+            properties:
+                name:
+                    type: string
+                    description: The full name of the tag.
+                urlcode:
+                    type: string
+                    description: The URL slug of the tag.
+                parentTagID:
+                    type: integer
+                    description: The parent ID of the tag.
+                    nullable: true
+                type:
+                    type: string
+                    nullable: true
+                    default: null
+                    description: The tag type.
+            type: object
 
         LegacyTag:
             description: A backwards compatible tag.

@@ -6,8 +6,10 @@
 
 namespace Vanilla;
 
+use DiscussionModel;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Forum\Models\PostTypeModel;
+use Vanilla\Dashboard\Events\DiscussionPostTypeChangeEvent;
+use Vanilla\Logging\AuditLogger;
 
 /**
  * Class RecordTypeConverter
@@ -23,18 +25,18 @@ class DiscussionTypeConverter
     const RESTRICTED_TYPES = ["Report", "Redirect"];
 
     /** @var AbstractTypeHandler[] */
-    private $typeHandlers = [];
+    private array $typeHandlers = [];
 
-    public function __construct(private PostTypeModel $postTypeModel)
+    public function __construct(private DiscussionModel $discussionModel)
     {
     }
 
     /**
      * Add type handlers.
      *
-     * @param string $type
+     * @param AbstractTypeHandler $type
      */
-    public function addTypeHandler($type = "")
+    public function addTypeHandler(AbstractTypeHandler $type)
     {
         $this->typeHandlers[] = $type;
     }
@@ -46,10 +48,10 @@ class DiscussionTypeConverter
      *
      * @return AbstractTypeHandler|null
      */
-    public function getTypeHandlers(string $type): ?AbstractTypeHandler
+    private function getTypeHandler(string $type): ?AbstractTypeHandler
     {
         foreach ($this->typeHandlers as $typeHandler) {
-            if ($typeHandler->getTypeHandlerName() === $type) {
+            if (strtolower($typeHandler->getTypeHandlerName()) === strtolower($type)) {
                 return $typeHandler;
             }
         }
@@ -58,46 +60,46 @@ class DiscussionTypeConverter
 
     /**
      * Convert a record.
-     *
-     * @param array $from The record we are converting.
-     * @param string $to The identifier of the type we are converting this record to.
-     * @param array|null $postMeta Optional array of post field data (used for custom post types).
-     * @param bool $isCustomPostType Whether this is a custom post type.
-     * @throws ClientException If record type is restricted or unavailable.
      */
-    public function convert(array $from, string $to, ?array $postMeta = null, bool $isCustomPostType = false)
+    public function convert(PostTypeConversionPayload $payload)
     {
-        if (in_array($to, self::RESTRICTED_TYPES)) {
-            throw new ClientException("{$to} record type conversion are restricted.");
+        if (in_array($payload->toBaseType, self::RESTRICTED_TYPES)) {
+            throw new ClientException("{$payload->toBaseType} record type conversion are restricted.");
         }
 
-        if ($isCustomPostType) {
-            // Look up the base type of this custom post type.
-            $toPostType = $this->postTypeModel->getByID($to);
-            $toBaseType = ucfirst($toPostType["baseType"]);
-        } else {
-            // for DB compatibility
-            $toBaseType = $to = ucfirst($to);
-        }
-
-        $toHandler = $this->getTypeHandlers($toBaseType);
+        $toHandler = $this->getTypeHandler($payload->toBaseType);
         if (!$toHandler) {
             throw new ClientException("record type unavailable");
         }
 
-        $toHandler->handleTypeConversion($from, $to, $postMeta);
-
-        if (isset($from["postTypeID"])) {
-            // We are converting from a record with a custom post type.
-            $fromPostType = $this->postTypeModel->getByID($to);
-            $fromBaseType = $fromPostType["baseType"];
-        } else {
-            $fromBaseType = $from["Type"] ?? "Discussion";
+        if (!$toHandler->canConvert($payload)) {
+            throw new ClientException(
+                "Category '{$payload->targetCategoryRow["Name"]}' does not allow for '{$payload->toPostTypeID}' type records."
+            );
         }
 
-        $fromHandler = $this->getTypeHandlers($fromBaseType);
-        if ($fromHandler) {
-            $fromHandler->cleanUpRelatedData($from, $to);
+        // First set the main type.
+        $this->discussionModel->setType(
+            $payload->discussionRow["DiscussionID"],
+            $payload->toPostTypeID,
+            postMeta: $payload->postMeta
+        );
+        $toHandler->convertTo($payload);
+
+        if ($payload->fromBaseType !== null) {
+            $this->getTypeHandler($payload->fromBaseType)?->cleanUpRelatedData($payload);
         }
+
+        // Add it to the Audit log
+        $postTypeChangedEvent = new DiscussionPostTypeChangeEvent(
+            postTypeID: $payload->toPostTypeID,
+            previousPostTypeID: $payload->fromPostTypeID ??
+                ($payload->discussionRow["postTypeID"] ??
+                    ($payload->discussionRow["Type"] ?? DiscussionModel::DISCUSSION_TYPE)),
+            context: [
+                "discussionID" => $payload->discussionRow["DiscussionID"],
+            ]
+        );
+        AuditLogger::log($postTypeChangedEvent);
     }
 }

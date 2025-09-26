@@ -9,6 +9,7 @@
  */
 
 use Vanilla\FeatureFlagHelper;
+use Vanilla\Permissions;
 
 /**
  * Renders the dashboard nav.
@@ -90,6 +91,13 @@ class DashboardNavModule extends SiteNavModule
             "description" => "Configuration & Addons",
             "url" => "/dashboard/role",
         ],
+        "VanillaStaff" => [
+            "permission" => "vanillaStaffOnly",
+            "section" => "VanillaStaff",
+            "title" => "Vanilla Staff",
+            "description" => "Vanilla Staff",
+            "url" => "/settings/vanilla-staff/product-messages",
+        ],
     ];
 
     /**
@@ -134,11 +142,17 @@ class DashboardNavModule extends SiteNavModule
             $this->handleUserPreferencesSectionLandingPage();
         }
         $session = Gdn::session();
+        $permissions = $session->getPermissions();
 
         $sections = self::$sectionsInfo;
 
         foreach ($sections as $key => &$section) {
-            if (val("permission", $section) && !$session->checkPermission(val("permission", $section), false)) {
+            $permission = $section["permission"] ?? null;
+            $isLocalhost = str_contains(\Gdn::request()->getHost(), "vanilla.local");
+            $isUserVanillaStaff = $permissions->isSysAdmin() || ($permissions->isAdmin() && $isLocalhost);
+            $hasPermission =
+                $permission === "vanillaStaffOnly" ? $isUserVanillaStaff : $permissions->hasAny((array) $permission);
+            if ($permission && !$hasPermission) {
                 unset($sections[$key]);
             } else {
                 $section["title"] = t($section["title"]);

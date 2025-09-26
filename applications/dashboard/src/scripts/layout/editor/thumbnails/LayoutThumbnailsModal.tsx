@@ -20,6 +20,8 @@ import { useUniqueID } from "@library/utility/idUtils";
 import LayoutSectionsThumbnails from "@dashboard/layout/editor/thumbnails/LayoutSectionsThumbnails";
 import LayoutWidgetsThumbnails from "@dashboard/layout/editor/thumbnails/LayoutWidgetsThumbnails";
 import { layoutThumbnailsClasses } from "@dashboard/layout/editor/thumbnails/LayoutThumbnails.classes";
+import Translate from "@library/content/Translate";
+import SmartLink from "@library/routing/links/SmartLink";
 
 interface ILayoutThumbnailsModalProps<T extends "sections" | "widgets"> {
     title?: string;
@@ -29,6 +31,8 @@ interface ILayoutThumbnailsModalProps<T extends "sections" | "widgets"> {
     onAddSection: (sectionID: string) => void;
     itemType: "sections" | "widgets";
     selectedSection?: string;
+    descriptionOverride?: React.ReactNode;
+    disableGrouping?: boolean; // Optional prop to disable grouping for widgets
 }
 
 export function LayoutThumbnailsModal<T extends "sections" | "widgets">(props: ILayoutThumbnailsModalProps<T>) {
@@ -41,7 +45,7 @@ export function LayoutThumbnailsModal<T extends "sections" | "widgets">(props: I
     return (
         <Modal noFocusOnExit isVisible={isVisible} size={ModalSizes.LARGE} exitHandler={exitHandler}>
             <form
-                data-layout-editor-modal
+                data-layout-editor-focus-container
                 className={layoutThumbnailsClasses().form}
                 onSubmit={(e) => {
                     e.preventDefault();
@@ -62,6 +66,19 @@ export function LayoutThumbnailsModal<T extends "sections" | "widgets">(props: I
                                     />
                                 ) : (
                                     <LayoutWidgetsThumbnails
+                                        disableGrouping={props.disableGrouping}
+                                        description={
+                                            props.descriptionOverride ?? (
+                                                <Translate
+                                                    source="Get started selecting the best widget for your Homepage. Find out more in the <1>documentation.</1>"
+                                                    c1={(text) => (
+                                                        <SmartLink to="https://success.vanillaforums.com/kb/articles/548">
+                                                            {text}
+                                                        </SmartLink>
+                                                    )}
+                                                />
+                                            )
+                                        }
                                         labelID={titleID}
                                         widgets={sections}
                                         onChange={setSelectedSectionID}

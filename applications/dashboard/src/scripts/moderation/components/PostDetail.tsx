@@ -80,7 +80,7 @@ export function PostDetail(props: IProps) {
                         <BlurContainer>
                             <UserContent
                                 className={listClasses.description}
-                                content={activeRevisionOption.recordHtml}
+                                vanillaSanitizedHtml={activeRevisionOption.recordHtml}
                                 moderateEmbeds
                             />
                         </BlurContainer>
@@ -103,17 +103,9 @@ export function PostDetail(props: IProps) {
                                 <MetaItem>
                                     <Translate
                                         source="Posted by <0/> in <1/>"
-                                        c0={
-                                            <ProfileLink
-                                                className={metasClasses().metaLink}
-                                                userFragment={activeRevisionOption.recordUser}
-                                            />
-                                        }
+                                        c0={<ProfileLink asMeta userFragment={activeRevisionOption.recordUser} />}
                                         c1={
-                                            <SmartLink
-                                                to={activeRevisionOption.placeRecordUrl}
-                                                className={metasClasses().metaLink}
-                                            >
+                                            <SmartLink to={activeRevisionOption.placeRecordUrl} asMeta>
                                                 {activeRevisionOption.placeRecordName}
                                             </SmartLink>
                                         }

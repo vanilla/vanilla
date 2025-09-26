@@ -22,7 +22,7 @@ class HeadingTerminatorBlot extends AbstractLineTerminatorBlot
     const DEFAULT_LEVEL = 2;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $operation): bool
     {

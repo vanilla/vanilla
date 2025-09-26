@@ -622,7 +622,7 @@ class Gdn
      * Translates a code into the selected locale's definition.
      *
      * @param string $code The code related to the language-specific definition.
-     * @param string|false $default The default value to be displayed if the translation code is not found.
+     * @param string|false|array $default The default value to be displayed if the translation code is not found.
      * @return string The translated string or $code if there is no value in $default.
      */
     public static function translate($code, $default = false)
@@ -652,11 +652,7 @@ class Gdn
      */
     public static function userMetaModel()
     {
-        static $userMetaModel = null;
-        if (is_null($userMetaModel)) {
-            $userMetaModel = new UserMetaModel();
-        }
-        return $userMetaModel;
+        return \Gdn::getContainer()->get(UserMetaModel::class);
     }
 
     /**

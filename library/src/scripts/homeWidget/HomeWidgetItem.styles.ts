@@ -14,14 +14,13 @@ import { Mixins } from "@library/styles/Mixins";
 import { activeSelector, styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { percent, ColorHelper, calc, color, rgba } from "csx";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { LocalVariableMapping } from "@library/styles/VariableMapping";
 import { DeepPartial } from "redux";
-
 import defaultIcon from "./widgetDefaultIcon.svg";
 
 export enum HomeWidgetItemContentType {

@@ -75,3 +75,10 @@ export default HtmlWidget;
 function lookupNonce(fallback: string): string {
     return document.querySelector("script")?.nonce ?? fallback;
 }
+
+declare global {
+    interface Window {
+        __VANILLA_HTML_WIDGET_NODES__: Record<string, HTMLElement>;
+        __VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__: any;
+    }
+}

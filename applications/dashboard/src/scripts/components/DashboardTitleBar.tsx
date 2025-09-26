@@ -3,21 +3,24 @@
  * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
-import * as React from "react";
 import { DashboardTitleBarClasses } from "@dashboard/components/DashboardTitleBar.classes";
-import SmartLink from "@library/routing/links/SmartLink";
-import DashboardMeBox from "@library/headers/mebox/pieces/DashboardMeBox";
-import { Icon } from "@vanilla/icons";
-import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
-import Hamburger from "@library/flyouts/Hamburger";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { dropDownClasses } from "@library/flyouts/dropDownStyles";
-import { t } from "@vanilla/i18n";
-import Container from "@library/layout/components/Container";
-import classNames from "classnames";
-import { IDashboardSection } from "@dashboard/DashboardSectionType";
-import { INavigationVariableItem } from "@library/headers/navigationVariables";
+import type { DashboardMenusApi } from "@dashboard/DashboardMenusApi";
 import { useCurrentUser } from "@library/features/users/userHooks";
+import { dropDownClasses } from "@library/flyouts/dropDownStyles";
+import Hamburger from "@library/flyouts/Hamburger";
+import MeBox from "@library/headers/mebox/MeBox";
+import { MeBoxMobile } from "@library/headers/mebox/MeBoxMobile";
+import { INavigationVariableItem } from "@library/headers/navigationVariables";
+import { titleBarClasses } from "@library/headers/TitleBar.classes";
+import { TitleBarParamContextProvider } from "@library/headers/TitleBar.ParamContext";
+import Container from "@library/layout/components/Container";
+import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
+import SmartLink from "@library/routing/links/SmartLink";
+import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
+import { StackingContextProvider } from "@vanilla/react-utils";
+import classNames from "classnames";
+import * as React from "react";
 
 interface IExtraSectionContent {
     key: string;
@@ -33,12 +36,10 @@ DashboardTitleBar.registerContent = function (registeredContent: IExtraSectionCo
 
 //Some props are for storybook, to force opening dropdowns, sidenavs and modals
 interface IProps {
-    forceMeBoxOpen?: boolean;
-    forceMeBoxOpenAsModal?: boolean;
     isCompact?: boolean;
     forceHamburgerOpen?: boolean;
     hamburgerContent?: React.ReactNode;
-    sections: IDashboardSection[];
+    sections: DashboardMenusApi.Section[];
     extraSectionContent?: IExtraSectionContent;
     activeSectionID?: string;
 }
@@ -55,70 +56,70 @@ export default function DashboardTitleBar(props: IProps) {
     return (
         <header className={classes.container}>
             <Container fullGutter className={classes.flexContainer}>
-                {isCompact && (
-                    <>
-                        <Hamburger
-                            className={titleBarClasses().hamburger}
-                            extraNavTop={props.hamburgerContent}
-                            extraNavBottom={
-                                <>
-                                    <hr className={dropdownClasses.separator} />
-                                    <SmartLink className={dropdownClasses.action} to={"/"}>
-                                        <div className={classes.iconWrapper}>
-                                            <Icon icon="meta-external-compact" />
-                                        </div>
-                                        {t("Visit Site")}
-                                    </SmartLink>
-                                </>
-                            }
-                            showCloseIcon={false}
-                            navigationItems={sections as unknown as INavigationVariableItem[]}
-                            forceHamburgerOpen={props.forceHamburgerOpen}
-                        />
-                        <div className={classes.logoContainer}>
-                            <Icon icon={"vanilla-logo"} className={classes.logo} />
-                        </div>
-                    </>
-                )}
-                {!isCompact && (
-                    <>
-                        <div className={classes.brand}>
+                <TitleBarParamContextProvider>
+                    {isCompact && (
+                        <>
+                            <Hamburger
+                                className={titleBarClasses().hamburger}
+                                extraNavTop={props.hamburgerContent}
+                                extraNavBottom={
+                                    <>
+                                        <hr className={dropdownClasses.separator} />
+                                        <SmartLink className={dropdownClasses.action} to={"/"}>
+                                            <div className={classes.iconWrapper}>
+                                                <Icon icon="meta-external-compact" />
+                                            </div>
+                                            {t("Visit Site")}
+                                        </SmartLink>
+                                    </>
+                                }
+                                showCloseIcon={false}
+                                navigationItems={sections as unknown as INavigationVariableItem[]}
+                                forceHamburgerOpen={props.forceHamburgerOpen}
+                            />
                             <div className={classes.logoContainer}>
                                 <Icon icon={"vanilla-logo"} className={classes.logo} />
                             </div>
-                            <SmartLink to={"/"} className={classes.backBtn}>
-                                {t("Visit Site")}
-                                <Icon icon="meta-external" size="compact" />
-                            </SmartLink>
-                        </div>
-                        <nav className={classes.nav}>
-                            {sections &&
-                                sections.map((section, key) => {
-                                    return (
-                                        <SmartLink
-                                            key={key}
-                                            className={classNames(
-                                                classes.link,
-                                                section.id === activeSectionID ? "active" : "",
-                                            )}
-                                            to={section.url}
-                                        >
-                                            <div className={classes.linkLabel}>{section.name}</div>
-                                        </SmartLink>
-                                    );
-                                })}
-                            {DashboardTitleBar.extraSectionContent.map((content, key) => (
-                                <content.component key={key} />
-                            ))}
-                        </nav>
-                    </>
-                )}
-                <DashboardMeBox
-                    currentUser={currentUser}
-                    forceOpen={props.forceMeBoxOpen}
-                    forceOpenAsModal={props.forceMeBoxOpenAsModal}
-                    isCompact={isCompact}
-                />
+                        </>
+                    )}
+                    {!isCompact && (
+                        <>
+                            <div className={classes.brand}>
+                                <div className={classes.logoContainer}>
+                                    <Icon icon={"vanilla-logo"} className={classes.logo} />
+                                </div>
+                                <SmartLink to={"/"} className={classes.backBtn}>
+                                    {t("Visit Site")}
+                                    <Icon icon="meta-external" size="compact" />
+                                </SmartLink>
+                            </div>
+                            <nav className={classes.nav}>
+                                {sections &&
+                                    sections.map((section, key) => {
+                                        return (
+                                            <SmartLink
+                                                key={key}
+                                                className={classNames(
+                                                    classes.link,
+                                                    section.id === activeSectionID ? "active" : "",
+                                                )}
+                                                to={section.url}
+                                            >
+                                                <div className={classes.linkLabel}>{section.name}</div>
+                                            </SmartLink>
+                                        );
+                                    })}
+                                {DashboardTitleBar.extraSectionContent.map((content, key) => (
+                                    <content.component key={key} />
+                                ))}
+                            </nav>
+                        </>
+                    )}
+
+                    <StackingContextProvider>
+                        {isCompact ? <MeBoxMobile /> : <MeBox currentUser={currentUser} />}
+                    </StackingContextProvider>
+                </TitleBarParamContextProvider>
             </Container>
         </header>
     );

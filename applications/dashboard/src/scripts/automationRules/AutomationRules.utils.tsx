@@ -18,7 +18,7 @@ import { ProfileField } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { t } from "@vanilla/i18n";
 import { JsonSchema } from "@vanilla/json-schema-forms";
-import cloneDeep from "lodash/cloneDeep";
+import cloneDeep from "lodash-es/cloneDeep";
 import { automationRulesClasses } from "@dashboard/automationRules/AutomationRules.classes";
 import { compare } from "@vanilla/utils";
 

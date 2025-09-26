@@ -7,12 +7,12 @@
 import React from "react";
 import { dashboardFormGroupClasses } from "@dashboard/forms/DashboardFormGroup.classes";
 import { FormGroupContext } from "@dashboard/forms/DashboardFormGroupContext";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { useDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
 import { cx } from "@emotion/css";
 import { useContext } from "react";
 
-interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+interface IDashboardInputWrapProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
     isInline?: boolean;
     isGrid?: boolean;
@@ -20,7 +20,7 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const DashboardInputWrap = React.forwardRef(function DashboardInputWrap(
-    props: IProps,
+    props: IDashboardInputWrapProps,
     ref: React.Ref<HTMLDivElement>,
 ) {
     const { className, children, isGrid, isInline, isVertical, ...rest } = props;

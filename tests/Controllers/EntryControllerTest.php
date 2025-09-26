@@ -52,7 +52,7 @@ class EntryControllerTest extends SiteTestCase
     private $tokenModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -102,8 +102,8 @@ class EntryControllerTest extends SiteTestCase
                     "enabled" => true,
                 ]);
 
-                $expected = '<li class="form-group"><label for="Form_Profilefield-test-textInput">xss test: &lt;svg onXss=1 onload=alert(document.domain)&gt;</label>
-<div class="Gloss">this is a test</div><input type="text" id="Form_Profilefield-test-textInput" name="Profile[field-test-textInput]" value="" class="InputBox" /></li><li class="form-group"><label for="Form_Profilefield-test-dropdown">field test dropdown</label>
+                $expected = '<li class="form-group"><label for="Form_xsstestltsvgonXss1onloadalertdocument-dot-domaingt">xss test: &lt;svg onXss=1 onload=alert(document.domain)&gt;</label>
+<div class="Gloss">this is a test</div><input type="text" id="Form_Profilefield-test-textInput" name="Profile[field-test-textInput]" value="" class="InputBox" /></li><li class="form-group"><label for="Form_fieldtestdropdown">field test dropdown</label>
 <div class="Gloss">this is a test description for dropdown</div><select id="Form_Profilefield-test-dropdown" name="Profile[field-test-dropdown]" class="" data-value="">
 <option value=""></option>
 <option value="0">0</option>
@@ -543,6 +543,10 @@ class EntryControllerTest extends SiteTestCase
                 "TermsOfService" => "1",
             ]);
 
+            $registerPage = $this->bessy()->getHtml("/entry/register");
+            //Make sure our Terms of Use is  shown
+            $registerPage->assertContainsString("TermsOfService");
+
             $r = $this->bessy()->post("/entry/register", $user);
             $welcome = $this->assertEmailSentTo($user["Email"]);
             // Clear userID and reload froom session cookie.
@@ -571,6 +575,59 @@ class EntryControllerTest extends SiteTestCase
             $this->assertTrue($r2->data("EmailConfirmed"));
             $this->assertSame((int) $r->data("UserID"), \Gdn::session()->UserID);
         });
+    }
+
+    /**
+     * Test a basic registration flow without termsOfService.
+     */
+    public function testRegisterBasicNoTerms(): void
+    {
+        $this->runWithConfig(
+            ["Garden.Registration.Method" => "Basic", "Garden.Registration.RequireTermsOfService" => false],
+            function () {
+                $this->api()->setUserID(0);
+                $user = self::sprintfCounter([
+                    "Name" => "registerBasicUser1",
+                    "Email" => "test%s1@example.com",
+                    "Password" => __FUNCTION__,
+                    "PasswordMatch" => __FUNCTION__,
+                ]);
+
+                $registerPage = $this->bessy()->getHtml("/entry/register");
+
+                $registerPage->assertContainsString("Remember");
+                //Make sure our Terms of Use is not shown
+                $registerPage->assertNotContainsString("TermsOfService");
+
+                $r = $this->bessy()->post("/entry/register", $user);
+                $welcome = $this->assertEmailSentTo($user["Email"]);
+                // Clear userID and reload from session cookie.
+                /** @var Gdn_CookieIdentity $cookieIdentity */
+                $cookieIdentity = Gdn::factory("Identity");
+                $cookieIdentity->UserID = null;
+                // The user has registered. Let's simulate clicking on the confirmation email.
+                $emailUrl = Http::createFromString($welcome->template->getButtonUrl());
+                $this->assertStringContainsString("/entry/emailconfirm", $emailUrl->getPath());
+
+                parse_str($emailUrl->getQuery(), $query);
+                $this->assertArraySubsetRecursive(
+                    [
+                        "vn_medium" => "email",
+                        "vn_campaign" => "welcome",
+                        "vn_source" => "register",
+                    ],
+                    $query
+                );
+
+                $this->assertAuditLogged(
+                    ExpectedAuditLog::create("user_register")->withMessage("User `registerBasicUser1` registered.")
+                );
+
+                $r2 = $this->bessy()->get($welcome->template->getButtonUrl(), [], []);
+                $this->assertTrue($r2->data("EmailConfirmed"));
+                $this->assertSame((int) $r->data("UserID"), \Gdn::session()->UserID);
+            }
+        );
     }
 
     /**

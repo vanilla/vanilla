@@ -8,7 +8,7 @@ import { Property } from "csstype";
 import { important } from "csx";
 import { styleFactory } from "@library/styles/styleUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 
 export const userSelect = (value: Property.UserSelect = "none", isImportant: boolean = false): CSSObject => {
     const val = (isImportant ? important(value) : value) as any;

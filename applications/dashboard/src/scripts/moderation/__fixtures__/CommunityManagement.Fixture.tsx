@@ -11,17 +11,21 @@ import {
     IReport,
     ITriageRecord,
 } from "@dashboard/moderation/CommunityManagementTypes";
-import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import { STORY_IPSUM_LONG, STORY_IPSUM_LONG2 } from "@library/storybook/storyData";
-import { labelize, notEmpty } from "@vanilla/utils";
-import random from "lodash/random";
-import { STORY_IPSUM_SHORT } from "@library/storybook/storyData";
 import { IUser, IUserFragment } from "@library/@types/api/users";
-import { createMemoryHistory } from "history";
-import { Router } from "react-router-dom";
-import { configureStore, createReducer } from "@reduxjs/toolkit";
-import { Provider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { STORY_IPSUM_LONG, STORY_IPSUM_LONG2 } from "@library/storybook/storyData";
+import { configureStore, createReducer } from "@reduxjs/toolkit";
+import { labelize, notEmpty, stableObjectHash } from "@vanilla/utils";
+
+import { LoadStatus } from "@library/@types/api/core";
+import { Provider } from "react-redux";
+import { Router } from "react-router-dom";
+import { STORY_IPSUM_SHORT } from "@library/storybook/storyData";
+import { UserFixture } from "@library/features/__fixtures__/User.fixture";
+import { blessStringAsSanitizedHtml } from "@vanilla/dom-utils";
+import { createMemoryHistory } from "history";
+import random from "lodash-es/random";
+import { setMeta } from "@library/utility/appUtils";
 
 export class CommunityManagementFixture {
     private static getRecord(record?: Partial<ICommunityManagementRecord>): ICommunityManagementRecord {
@@ -41,7 +45,7 @@ export class CommunityManagementFixture {
             placeRecordUrl: "https://example.tld",
             placeRecordName: "Example Category Name",
             recordDateInserted: new Date(2024, 3, 5).toISOString(),
-            recordHtml: STORY_IPSUM_LONG + STORY_IPSUM_LONG2,
+            recordHtml: blessStringAsSanitizedHtml(STORY_IPSUM_LONG + STORY_IPSUM_LONG2),
             ...record,
         };
     }
@@ -97,7 +101,9 @@ export class CommunityManagementFixture {
             } as IUserFragment,
             updateUserID: 2,
             status: "Open",
-            noteHtml: "<p>This post is spam. This user is re-posting the same content everywhere on the community</p>",
+            noteHtml: blessStringAsSanitizedHtml(
+                "<p>This post is spam. This user is re-posting the same content everywhere on the community</p>",
+            ),
             reasons: reasons,
             isPending: false,
             isPendingUpdate: false,
@@ -155,6 +161,28 @@ export class CommunityManagementFixture {
 
         const history = createMemoryHistory();
 
+        // AIDEV-NOTE: Mock global meta values for site sections used by AdminHeader useAppearanceNavItems
+        setMeta("siteSection", {
+            basePath: "",
+            contentLocale: "en",
+            sectionGroup: "vanilla",
+            sectionID: "0",
+            name: "Test Site",
+            apps: { forum: true },
+            attributes: {},
+        });
+        setMeta("defaultSiteSection", {
+            basePath: "",
+            contentLocale: "en",
+            sectionGroup: "vanilla",
+            sectionID: "0",
+            name: "Test Site",
+            apps: { forum: true },
+            attributes: {},
+        });
+        setMeta("siteSectionSlugs", []);
+        setMeta("postTypes", ["discussion"]);
+
         const testReducer = createReducer(
             {
                 users: {
@@ -162,6 +190,35 @@ export class CommunityManagementFixture {
                     usersByID: {
                         2: {
                             ...UserFixture.adminAsCurrent,
+                        },
+                    },
+                },
+                // AIDEV-NOTE: Add config state to fix AdminHeader useAppearanceNavItems dependency
+                config: {
+                    configsByLookupKey: {
+                        [stableObjectHash(["customLayout.home"])]: {
+                            status: LoadStatus.SUCCESS,
+                            data: {},
+                        },
+                        [stableObjectHash(["customLayout.discussionList"])]: {
+                            status: LoadStatus.SUCCESS,
+                            data: {},
+                        },
+                        [stableObjectHash(["customLayout.categoryList"])]: {
+                            status: LoadStatus.SUCCESS,
+                            data: {},
+                        },
+                        [stableObjectHash(["layoutEditor.home"])]: {
+                            status: LoadStatus.SUCCESS,
+                            data: {},
+                        },
+                        [stableObjectHash(["layoutEditor.discussionList"])]: {
+                            status: LoadStatus.SUCCESS,
+                            data: {},
+                        },
+                        [stableObjectHash(["layoutEditor.categoryList"])]: {
+                            status: LoadStatus.SUCCESS,
+                            data: {},
                         },
                     },
                 },

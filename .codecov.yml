@@ -52,6 +52,13 @@ comment:
     behavior: default
     require_changes: true
     show_carryforward_flags: true
+    bundle_change_threshold: "1Kb"
+
+# Post informational status (never fails) with threshold of 5%
+# This is the default configuration
+bundle_analysis:
+    warning_threshold: "5%"
+    status: "informational"
 
 ignore:
     - "**/views/**/*.php"

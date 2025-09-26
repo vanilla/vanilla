@@ -6,7 +6,7 @@
 import * as React from "react";
 import Button from "@library/forms/Button";
 import { useState } from "react";
-import { LayoutSectionID } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { LayoutSectionID, type ILayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { LayoutThumbnailsModal } from "@dashboard/layout/editor/thumbnails/LayoutThumbnailsModal";
 import { EMPTY_SCHEMA } from "@vanilla/json-schema-forms";
 import OneColumnIcon from "../../../../../design/images/sectionIcons/1column.svg";
@@ -36,136 +36,157 @@ export default {
 };
 
 //real sections are fetched via useLayoutCatalog() hook, e.g. useLayoutCatalog("home").sections;
-const fauxData = {
+const fauxData: ILayoutCatalog["assets"] = {
     "react.section.1-column": {
         schema: EMPTY_SCHEMA,
         $reactComponent: "Component 1",
         iconUrl: OneColumnIcon,
         name: "1 column",
+        widgetGroup: "Sections",
     },
     "react.section.2-columns": {
         schema: EMPTY_SCHEMA,
         $reactComponent: "Component 2",
         iconUrl: TwoColumnIcon,
         name: "2 columns",
+        widgetGroup: "Sections",
     },
     "react.section.3-columns": {
         schema: EMPTY_SCHEMA,
         $reactComponent: "Component 3",
         iconUrl: ThreeColumnIcon,
         name: "3 columns",
+        widgetGroup: "Sections",
     },
     "react.section.full-width": {
         schema: EMPTY_SCHEMA,
         $reactComponent: "Component for full width",
         iconUrl: FullWidthIcon,
         name: "Full Width",
+        widgetGroup: "Sections",
     },
 };
 
 //real sections are fetched via useLayoutCatalog() hook, e.g. useLayoutCatalog("home").widgets;
-const widgetsFauxData = {
+const widgetsFauxData: ILayoutCatalog["widgets"] = {
     "react.article.articles": {
         $reactComponent: "",
         iconUrl: ArticlesIcon,
         schema: EMPTY_SCHEMA,
         name: "Articles",
+        widgetGroup: "Knowledge Base",
     },
     "react.banner.content": {
         $reactComponent: "",
         iconUrl: BannerIcon,
         schema: EMPTY_SCHEMA,
         name: "Content Banner",
+        widgetGroup: "Knowledge Base",
     },
     "react.banner.full": {
         $reactComponent: "",
         iconUrl: BannerIcon,
         schema: EMPTY_SCHEMA,
         name: "Banner",
+        widgetGroup: "Widgets",
     },
     "react.categories": {
         $reactComponent: "",
         iconUrl: CategoriesIcon,
         schema: EMPTY_SCHEMA,
         name: "Categories",
+        widgetGroup: "Community",
     },
     "react.discussion.announcements": {
         $reactComponent: "",
         iconUrl: AnnouncementsIcon,
         schema: EMPTY_SCHEMA,
         name: "Announcements",
+        widgetGroup: "Community",
     },
     "react.discussion.discussions": {
         $reactComponent: "",
         iconUrl: DiscussionsIcon,
         schema: EMPTY_SCHEMA,
         name: "Discussions",
+        widgetGroup: "Community",
     },
     "react.discussion.ideas": {
         $reactComponent: "",
         iconUrl: IdeasIcon,
         schema: EMPTY_SCHEMA,
         name: "Ideas",
+        widgetGroup: "Community",
     },
     "react.discussion.questions": {
         $reactComponent: "",
         iconUrl: QuestionsIcon,
         schema: EMPTY_SCHEMA,
         name: "Questions",
+        widgetGroup: "Community",
     },
     "react.event.events": {
         $reactComponent: "",
         iconUrl: EventsIcon,
         schema: EMPTY_SCHEMA,
         name: "Events",
+        widgetGroup: "Community",
     },
     "react.html": {
         $reactComponent: "",
         iconUrl: CustomHtmlIcon,
         schema: EMPTY_SCHEMA,
         name: "Custom HTML",
+        widgetGroup: "Custom",
     },
     "react.leaderboard": {
         $reactComponent: "",
         iconUrl: LeaderboardIcon,
         schema: EMPTY_SCHEMA,
         name: "Leaderboard",
+        widgetGroup: "Widgets",
     },
     "react.online": {
         $reactComponent: "",
         iconUrl: WhosOnlineIcon,
         schema: EMPTY_SCHEMA,
         name: "Who's Online",
+        widgetGroup: "Widgets",
     },
     "react.quick-links": {
         $reactComponent: "",
         iconUrl: QuickLinksIcon,
         schema: EMPTY_SCHEMA,
         name: "Quick Links",
+        widgetGroup: "Widgets",
     },
     "react.rss": {
         $reactComponent: "",
         iconUrl: RSSFeedIcon,
         schema: EMPTY_SCHEMA,
         name: "RSS Feed",
+        widgetGroup: "Widgets",
     },
     "react.tag": {
         $reactComponent: "",
         iconUrl: TagCloudIcon,
         schema: EMPTY_SCHEMA,
         name: "Tag Cloud",
+        widgetGroup: "Community",
     },
     "react.userspotlight": {
         $reactComponent: "",
         iconUrl: UserSpotlightIcon,
         schema: EMPTY_SCHEMA,
         name: "User Spotlight",
+        widgetGroup: "Widgets",
     },
     "react.sitetotals": {
         $reactComponent: "",
         iconUrl: SiteTotalsIcon,
         schema: EMPTY_SCHEMA,
         name: "Site Totals",
+        widgetGroup: "Widgets",
     },
 };
 

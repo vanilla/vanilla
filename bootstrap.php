@@ -37,6 +37,8 @@ use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchTypeCollectorInterface;
 use Vanilla\Site\OwnSiteProvider;
 use Vanilla\Site\SingleSiteSectionProvider;
+use Vanilla\Storage\S3\S3StorageProvider;
+use Vanilla\Storage\StorageService;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Theme\ThemeService;
@@ -52,7 +54,8 @@ use Vanilla\Web\TwigRenderer;
 use Vanilla\Web\UASniffer;
 use Vanilla\Widgets\TabWidgetModule;
 use Vanilla\Widgets\TabWidgetTabService;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Forum\Draft\ScheduledDraftService;
+use Vanilla\Widgets\LegacyWidgetService;
 
 if (!defined("APPLICATION")) {
     exit();
@@ -100,17 +103,6 @@ $dic->setInstance(Container::class, $dic)
     // Site sections
     ->rule(\Vanilla\Site\SiteSectionModel::class)
     ->addCall("addProvider", [new Reference(SingleSiteSectionProvider::class)])
-    ->setShared(true)
-
-    // Site applications
-    ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
-    ->setClass(\Vanilla\Site\ApplicationProvider::class)
-    ->addCall("add", [
-        new Reference(\Vanilla\Site\Application::class, [
-            "garden",
-            ["api", "entry", "sso", "utility", "robots.txt", "robots"],
-        ]),
-    ])
     ->setShared(true)
 
     // ApplicationManager
@@ -300,7 +292,7 @@ $dic->setInstance(Container::class, $dic)
     ->addCall("registerSearchType", [new Reference(GlobalSearchType::class)])
     ->setInherit(true)
 
-    ->rule(WidgetService::class)
+    ->rule(LegacyWidgetService::class)
     ->addCall("registerWidget", [TabWidgetModule::class])
     ->setShared(true)
 
@@ -331,6 +323,11 @@ $dic->setInstance(Container::class, $dic)
 
     ->rule("HtmlFormatter")
     ->setClass(VanillaHtmlFormatter::class)
+    ->setShared(true)
+
+    // File Storage
+    ->rule(StorageService::class)
+    ->addCall("addProvider", [new Reference(S3StorageProvider::class)])
     ->setShared(true)
 
     ->rule(\Vanilla\Formatting\Quill\Renderer::class)
@@ -426,12 +423,12 @@ $dic->setInstance(Container::class, $dic)
     // Controller data preloading
     ->rule(Page::class)
     ->setInherit(true)
-    ->addCall("registerReduxActionProvider", ["provider" => new Reference(LocalePreloadProvider::class)])
-    ->addCall("registerReduxActionProvider", ["provider" => new Reference(CurrentUserPreloadProvider::class)])
+    ->addCall("registerPreloader", ["provider" => new Reference(LocalePreloadProvider::class)])
+    ->addCall("registerPreloader", ["provider" => new Reference(CurrentUserPreloadProvider::class)])
     ->rule(Gdn_Controller::class)
     ->setInherit(true)
-    ->addCall("registerReduxActionProvider", ["provider" => new Reference(LocalePreloadProvider::class)])
-    ->addCall("registerReduxActionProvider", ["provider" => new Reference(CurrentUserPreloadProvider::class)])
+    ->addCall("registerPreloader", ["provider" => new Reference(LocalePreloadProvider::class)])
+    ->addCall("registerPreloader", ["provider" => new Reference(CurrentUserPreloadProvider::class)])
 
     // Optimizations
     ->rule(ModelFactory::class)
@@ -661,6 +658,11 @@ register_shutdown_function(function () use ($dic) {
     ) {
         // Flush our buffers and close the request.
         $scheduler->finalizeRequest();
+
+        // Invoke the Schedule Service to process any scheduled drafts
+        Gdn::getContainer()
+            ->get(ScheduledDraftService::class)
+            ->processScheduledDrafts();
 
         // Now extend our time limit a bit for the local jobs.
         set_time_limit(60);

@@ -8,6 +8,7 @@
 namespace Vanilla\Models;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Vanilla\ApiUtils;
 use Vanilla\ImageResizer;
 
@@ -33,15 +34,16 @@ class VanillaMediaSchema extends Schema
             "width:i|n?", // Image width
             "height:i|n?", // Image height
             "displaySize:s?" => [
-                // Image display size "large" | "medium" | "small"
+                // Image display size "large" | "medium" | "small" | "inline"
                 "default" => "large",
-                "enum" => ["large", "medium", "small"],
+                "enum" => ["large", "medium", "small", "inline"],
             ],
             "float:s?" => [
                 // Image float "left" | "right"
                 "default" => "none",
                 "enum" => ["none", "left", "right"],
             ],
+            "downloadUrl:s?",
         ];
 
         if ($withDbFields) {
@@ -50,7 +52,7 @@ class VanillaMediaSchema extends Schema
                 "dateInserted:dt", // When the media item was created.
                 "insertUserID:i", // The user that created the media item.
                 "foreignType:s|n", // Table the media is linked to.
-                "foreignID:i|n", // The ID of the table
+                "foreignID:s|n", // The ID of the table
                 "foreignUrl:s?",
             ];
 
@@ -89,6 +91,7 @@ class VanillaMediaSchema extends Schema
      *
      * @param array $row
      * @return array
+     * @throws ValidationException
      */
     public static function normalizeFromDbRecord(array $row): array
     {
@@ -114,6 +117,7 @@ class VanillaMediaSchema extends Schema
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($row);
+        $schemaRecord["type"] = $schemaRecord["type"] ?: "unknown";
         $schema = new VanillaMediaSchema(true);
         return $schema->validate($schemaRecord);
     }

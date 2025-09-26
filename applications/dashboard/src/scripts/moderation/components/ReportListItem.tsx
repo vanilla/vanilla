@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
+import { DashboardMenusApi } from "@dashboard/DashboardMenusApi";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
 import { IReport } from "@dashboard/moderation/CommunityManagementTypes";
 import { isHtmlEmpty } from "@dashboard/moderation/communityManagmentUtils";
@@ -24,6 +24,7 @@ import { useToast } from "@library/features/toaster/ToastContext";
 import { deletedUserFragment } from "@library/features/users/constants/userFragment";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { ListItem, ListItemContext } from "@library/lists/ListItem";
 import { ListItemLayout } from "@library/lists/ListItem.variables";
 import ButtonLoader from "@library/loaders/ButtonLoader";
@@ -47,14 +48,14 @@ export function ReportListItem(props: IProps) {
     const classes = reportListItemClasses();
     const url = "/dashboard/content/triage/" + report.reportID;
     const [showEscalate, setShowEscalate] = useState(false);
-    const { fetchDashboardSections } = useDashboardSectionActions();
+    const sectionUtils = DashboardMenusApi.useUtils();
 
     const queryClient = useQueryClient();
     const toast = useToast();
     async function invalidateCaches() {
         await queryClient.invalidateQueries(["reports"]);
         await queryClient.invalidateQueries(["post"]);
-        fetchDashboardSections();
+        await sectionUtils.invalidate();
     }
 
     const dismissMutation = useMutation({
@@ -131,7 +132,7 @@ export function ReportListItem(props: IProps) {
                     isHtmlEmpty(report.noteHtml) ? (
                         <Translate source={"No report notes were provided by <0/>"} c0={report.insertUser?.name} />
                     ) : (
-                        <UserContent content={report.noteHtml} />
+                        <UserContent vanillaSanitizedHtml={report.noteHtml} />
                     )
                 }
                 truncateDescription={false}
@@ -162,7 +163,7 @@ export function ReportListItem(props: IProps) {
                         description={
                             <CollapsableContent maxHeight={50} gradientClasses={classes.gradientOverride}>
                                 <BlurContainer>
-                                    <UserContent content={report.recordHtml} moderateEmbeds />
+                                    <UserContent vanillaSanitizedHtml={report.recordHtml} moderateEmbeds />
                                 </BlurContainer>
                             </CollapsableContent>
                         }
@@ -213,14 +214,23 @@ export function ReportListItem(props: IProps) {
                         {report.escalationUrl ? (
                             <SmartLink to={report.escalationUrl}>{t("View Escalation")}</SmartLink>
                         ) : (
-                            <Button
-                                buttonType={ButtonTypes.TEXT_PRIMARY}
-                                onClick={() => {
-                                    setShowEscalate(true);
-                                }}
+                            <ConditionalWrap
+                                condition={!report.recordID}
+                                component={ToolTip}
+                                componentProps={{ label: t("Premoderated posts cannot be escalated") }}
                             >
-                                {t("Escalate")}
-                            </Button>
+                                <span>
+                                    <Button
+                                        disabled={!report.recordID}
+                                        buttonType={ButtonTypes.TEXT_PRIMARY}
+                                        onClick={() => {
+                                            setShowEscalate(true);
+                                        }}
+                                    >
+                                        {t("Escalate")}
+                                    </Button>
+                                </span>
+                            </ConditionalWrap>
                         )}
                     </>
                 </div>

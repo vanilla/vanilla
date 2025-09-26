@@ -15,7 +15,7 @@ use Vanilla\Dashboard\Activity\MyAccountActivityGroup;
 class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityTypeID(): string
     {
@@ -23,7 +23,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreference(): string
     {
@@ -31,7 +31,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceDescription(): string
     {
@@ -39,7 +39,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getGroupClass(): string
     {
@@ -47,7 +47,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function allowsComments(): bool
     {
@@ -55,7 +55,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getProfileHeadline(): ?string
     {
@@ -66,7 +66,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getFullHeadline(): ?string
     {
@@ -77,7 +77,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPluralHeadline(): ?string
     {
@@ -85,7 +85,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isNotificationType(): bool
     {
@@ -93,7 +93,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isPublicActivity(): bool
     {
@@ -101,7 +101,7 @@ class AddedToConversationActivity extends \Vanilla\Dashboard\Activity\Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityReason(): ?string
     {

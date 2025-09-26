@@ -18,7 +18,7 @@ import {
 import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
 import { UserIconTypes } from "@library/icons/titleBar";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { leaderboardWidgetClasses } from "@library/leaderboardWidget/LeaderboardWidget.styles";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { visibility } from "@library/styles/styleHelpersVisibility";
@@ -58,7 +58,7 @@ export function LeaderboardWidget(props: IProps) {
         : true;
 
     return (
-        <Widget>
+        <LayoutWidget>
             <HomeWidgetContainer
                 {...{ title, subtitle, description }}
                 options={{
@@ -87,7 +87,7 @@ export function LeaderboardWidget(props: IProps) {
                     <LeaderboardTable countKeys={countKeys} rows={leaders} />
                 )}
             </HomeWidgetContainer>
-        </Widget>
+        </LayoutWidget>
     );
 }
 

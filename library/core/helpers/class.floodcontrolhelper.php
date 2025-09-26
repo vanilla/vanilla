@@ -22,11 +22,10 @@ class FloodControlHelper
      * @param \Vanilla\FloodControlTrait $instance
      * @param string $configScope Scope under with the configurations are sets ('Vanilla', 'Conversations').
      * @param string $type Type of record that will be used to configure to trait.
-     * @param bool $skipAdmins Whether to skip flood control for admins/moderators or not. Default is true.
      *
      * @return \Psr\SimpleCache\CacheInterface
      */
-    public static function configure($instance, $configScope, $type, $skipAdmins = true)
+    public static function configure($instance, $configScope, $type)
     {
         // The CheckSpam and SpamCheck attributes are deprecated and should be removed in 2018.
         if (property_exists($instance, "CheckSpam")) {
@@ -52,8 +51,7 @@ class FloodControlHelper
             ->setTimeSpan(c($configScope . "." . $type . ".SpamTime", 60))
             ->setLockTime(c($configScope . "." . $type . ".SpamLock", 60))
             ->setKeyCurrentPostCount($keyPostCount)
-            ->setKeyLastDateChecked($keyLastDateChecked)
-            ->setSkipAdmins($skipAdmins);
+            ->setKeyLastDateChecked($keyLastDateChecked);
 
         return $storageObject;
     }

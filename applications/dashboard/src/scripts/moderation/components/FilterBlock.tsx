@@ -179,7 +179,7 @@ export function FilterBlock(props: FilterBlockProps) {
                             <CheckBox
                                 key={`${option.name}`}
                                 className={classes.checkbox}
-                                label={t(`${option.name}`)}
+                                label={t(`${option.name}`, { optional: true })}
                                 labelBold={false}
                                 checked={filters[option.value] ?? false}
                                 onChange={(e) => setFilters((prev) => ({ ...prev, [option.value]: e.target.checked }))}

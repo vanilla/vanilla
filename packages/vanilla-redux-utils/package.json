@@ -8,9 +8,6 @@
         "lodash-es": "*",
         "redux": "^4.0.0"
     },
-    "devDependencies": {
-        "@vanilla/tsconfig": "^3.0.1"
-    },
     "publishConfig": {
         "access": "public"
     }

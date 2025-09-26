@@ -198,7 +198,7 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFragments(): array
     {
@@ -268,7 +268,7 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderHTML(): string
     {
@@ -278,7 +278,7 @@ class BlotGroupCollection implements \IteratorAggregate, TextDOMInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function stringify(): FormatText
     {

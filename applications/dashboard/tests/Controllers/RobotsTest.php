@@ -21,7 +21,7 @@ class RobotsTest extends SiteTestCase
     public static $addons = ["dashboard", "vanilla"];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

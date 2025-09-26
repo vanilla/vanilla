@@ -70,7 +70,7 @@ class ConversationModel extends ConversationsModel implements AggregateCountable
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function calculateAggregates(string $aggregateName, int $from, int $to)
     {

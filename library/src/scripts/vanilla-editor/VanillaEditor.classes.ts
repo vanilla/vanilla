@@ -5,6 +5,8 @@
  */
 
 import { css } from "@emotion/css";
+import { inputVariables } from "@library/forms/inputStyles";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { useThemeCache } from "@library/styles/themeCache";
@@ -25,6 +27,7 @@ export const vanillaEditorClasses = useThemeCache(() => {
                 outline: "none",
             },
             flex: 1,
+            marginTop: 0,
         });
 
     const elementToolbarPosition = css({
@@ -53,16 +56,20 @@ export const vanillaEditorClasses = useThemeCache(() => {
 
     const placeholder = css({
         position: "absolute",
-        top: "9px",
-        left: "15px",
+        top: "13px",
+        left: "14px",
+
         fontSize: "16px",
-        color: "rgb(85, 90, 98)",
+        color: ColorsUtils.colorOut(inputVariables().colors.placeholder),
         pointerEvents: "none",
         userSelect: "none",
-        opacity: "0.333",
 
         "&.hidden": {
             display: "none",
+        },
+
+        ".is-legacy &": {
+            top: "10px",
         },
     });
 

@@ -70,7 +70,7 @@ class DiscussionLayoutRecordProvider implements LayoutViewRecordProviderInterfac
      * Immediately resolve to the discussion's category. No need to wait until the parent query comes.
      * {@link CategoryLayoutRecordProvider} will take it from here.
      *
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveLayoutQuery(LayoutQuery $query): LayoutQuery
     {
@@ -104,7 +104,7 @@ class DiscussionLayoutRecordProvider implements LayoutViewRecordProviderInterfac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParentLayoutQuery(LayoutQuery $query): LayoutQuery
     {

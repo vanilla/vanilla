@@ -24,6 +24,7 @@ export type AutomationRuleTriggerType =
     | "staleDiscussionTrigger"
     | "staleCollectionTrigger"
     | "timeSinceUserRegistrationTrigger"
+    | "timeSinceLastActiveTrigger"
     | "unAnsweredQuestionTrigger";
 export type AutomationRuleActionType =
     | "addDiscussionToCollectionAction"

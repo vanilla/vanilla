@@ -20,8 +20,8 @@ export interface IListProps {
 }
 
 export function List(props: IListProps) {
-    const options = listVariables(props.options).options;
-    const classes = listItemClasses();
+    const options = listVariables.useAsHook(props.options).options;
+    const classes = listItemClasses.useAsHook();
     return (
         <PageBox
             as={props.as ?? "ul"}

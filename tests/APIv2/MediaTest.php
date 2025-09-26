@@ -7,7 +7,6 @@
 
 namespace VanillaTests\APIv2;
 
-use Exception;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ResponseException;
@@ -15,7 +14,6 @@ use Garden\Web\Redirect;
 use Gdn_Upload;
 use Garden\Http\HttpResponse;
 use PHPUnit\Framework\TestCase;
-use Vanilla\Exception\PermissionException;
 use Vanilla\UploadedFile;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Fixtures\TestUploader;

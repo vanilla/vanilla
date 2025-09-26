@@ -35,6 +35,7 @@ class UserFragmentSchema extends Schema
                 "punished:i?", // The jailed status of the user.
                 "private:b?", // The private profile status of the user.
                 "label:s?",
+                "labelHtml:s?",
                 "profileFields:o?",
             ])
         );
@@ -84,6 +85,7 @@ class UserFragmentSchema extends Schema
 
         // Rank label can be polluted with HTML to add some styling.
         $label = $dbRecord["Label"] ?? ($dbRecord["label"] ?? null);
+        $labelHtml = $label;
         if (isset($label)) {
             $label = strip_tags($label);
         }
@@ -99,6 +101,7 @@ class UserFragmentSchema extends Schema
             "dateLastActive" => $dbRecord["DateLastActive"] ?? ($dbRecord["dateLastActive"] ?? null),
             "title" => $dbRecord["Title"] ?? null,
             "label" => $label,
+            "labelHtml" => $labelHtml,
         ];
 
         if ($privateProfile && !$hasFullProfileViewPermission) {

@@ -33,6 +33,7 @@
         "composer.lock": true,
         "**/node_modules": true,
         "dist": true,
+        "packages/*/dist": true,
         "legacy-dist": true,
         "coverage": true,
         "cloud/applications/groups": true,
@@ -198,12 +199,24 @@
     ],
     "editor.wordWrapColumn": 120,
     "typescript.preferences.autoImportFileExcludePatterns": [
-        "jquery*",
-        "vitest/dist/*",
+        "packages/vanilla-*/dist/**",
+        "**/*.story.tsx",
+        "**/*.spec.tsx"
+    ],
+    "typescript.preferences.autoImportSpecifierExcludeRegexes": [
+        "jquery.*",
+        "vitest/dist/.*",
         "packages/vanilla-ui-library",
-        "@icons/*",
+        "@icons/.*",
         "styled-components",
-        "react-select/*"
+        "react-select/.*",
+        "^lodash$",
+        "^lodash-es$",
+        "^vm$",
+        "^node:vm$",
+        "postcss",
+        "@vanilla\/ui-library",
+        "@emotion/css/macro"
     ],
     "php.suggest.basic": false,
     "files.associations": {
@@ -212,6 +225,9 @@
     },
     "typescript.tsdk": "node_modules/typescript/lib",
     "cSpell.words": [
-        "apiv"
+        "apiv",
+        "injectables",
+        "mebox",
+        "vnla"
     ]
 }

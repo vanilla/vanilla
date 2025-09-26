@@ -32,7 +32,7 @@ interface IProps {
 export function ContentItemHeader(props: IProps) {
     const { user, excludePhoto, options, readOnly, additionalAuthorMeta } = props;
 
-    const classes = ContentItemClasses();
+    const classes = ContentItemClasses.useAsHook();
 
     const threadItemContext = useContentItemContext();
 

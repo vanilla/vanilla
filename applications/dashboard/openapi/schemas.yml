@@ -54,6 +54,15 @@ components:
                       ssoID:
                           description: The unique ID of the user from the source site, if using SSO.
                           type: string
+                      label:
+                          description: The label of the user as plaintext.
+                          type: string
+                      labelHtml:
+                          description: The label of the user in HTML format.
+                          type: string
+                      private:
+                          description: Whether the user profile is private or not.
+                          type: boolean
                   required:
                       - userID
                       - name

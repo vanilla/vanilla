@@ -103,7 +103,7 @@ export const userDropDownClasses = useThemeCache(() => {
 
     const accountLinks = css({
         fontSize: styleUnit(globalVars.fonts.size.medium),
-        color: ColorsUtils.colorOut(globalVars.elementaryColors.darkText),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         ...Mixins.linkDecoration(),
     });
 

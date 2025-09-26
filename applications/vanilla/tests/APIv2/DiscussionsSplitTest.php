@@ -7,7 +7,9 @@
 
 namespace APIv2;
 
+use Gdn;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Forum\Models\PostTypeModel;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\ExpectExceptionTrait;
@@ -31,7 +33,7 @@ class DiscussionsSplitTest extends SiteTestCase
     public static $addons = ["QnA", "ideation"];
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -39,11 +41,12 @@ class DiscussionsSplitTest extends SiteTestCase
 
         // These tests do not work with custom post types.
         $this->disableFeature(PostTypeModel::FEATURE_POST_TYPES);
+        $this->userPreferenceModel = Gdn::getContainer()->get(UserNotificationPreferencesModel::class);
         parent::setUp();
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {
@@ -72,7 +75,7 @@ class DiscussionsSplitTest extends SiteTestCase
         }
         $category2 = $this->createCategory(["parentCategoryID" => $rootCategory["categoryID"]]);
         $commentIDsToSplit = array_column(array_slice($comments, 10, 10), "commentID");
-        // Merge the records.
+        // Split the records.
         $response = $this->api()->post("/discussions/split", [
             "commentIDs" => $commentIDsToSplit,
             "newPost" => [
@@ -161,9 +164,22 @@ class DiscussionsSplitTest extends SiteTestCase
         $this->enableCaching();
         $rootCategory = $this->createCategory(["allowedDiscussionTypes" => ["Question"]]);
         CurrentTimeStamp::mockTime("2022-01-01");
-        $category1 = $this->createCategory(["parentCategoryID" => $rootCategory["categoryID"]]);
-        $discussion1 = $this->createDiscussion();
+        $roles = $this->getRoles();
+        $category1 = $this->createPermissionedCategory(
+            ["parentCategoryID" => $rootCategory["categoryID"]],
+            [$roles["Member"]]
+        );
 
+        $memberUser = $this->createUser([
+            "name" => "testNotications2",
+        ]);
+
+        $this->userPreferenceModel->save($memberUser["userID"], [
+            "Popup.NewDiscussion.{$category1["categoryID"]}" => 1,
+            "Popup.NewComment.{$category1["categoryID"]}" => 1,
+        ]);
+
+        $discussion1 = $this->createDiscussion();
         // Create some nested comments
         $comment0 = $this->createComment(["body" => "test Comment0"]);
         $comment1 = $this->createComment(["body" => "test Comment1"]);
@@ -178,13 +194,21 @@ class DiscussionsSplitTest extends SiteTestCase
         $comment2_3 = $this->createNestedComment($comment2, ["body" => "test Comment23"]);
         $comment2_3_1 = $this->createNestedComment($comment2_3, ["body" => "test Comment231"]);
 
+        $this->api()->setUserID($memberUser["userID"]);
+        $oldNotifications = $this->api()
+            ->get("/notifications")
+            ->getBody();
+        // Make sure we get some new discussion notification.
+        $this->assertNotCount(0, $oldNotifications);
+        $this->api()->setUserID($discussion1["insertUserID"]);
+
         $commentsToSplit = [$comment0, $comment1, $comment1_2_1, $comment2_1, $comment2_2];
         $commentsExpectedToSplit = [$comment0, $comment1, $comment1_1, $comment1_2, $comment1_2_1];
         //$comment2_2 comment split but moved to root of the nested comments.
         $category2 = $this->createCategory(["parentCategoryID" => $rootCategory["categoryID"]]);
 
         $commentIDsToSplit = array_column($commentsToSplit, "commentID");
-        // Merge the records.
+        // Split the records.
         $response = $this->api()->post("/discussions/split", [
             "commentIDs" => $commentIDsToSplit,
             "newPost" => [
@@ -203,6 +227,14 @@ class DiscussionsSplitTest extends SiteTestCase
             [$commentIDsToSplit[1], $commentIDsToSplit[4], 3],
             $body["progress"]["successIDs"]
         );
+
+        $this->api()->setUserID($memberUser["userID"]);
+
+        // No new Notifications should have been created.
+        $notifications = $this->api()
+            ->get("/notifications")
+            ->getBody();
+        $this->assertCount(count($oldNotifications), $notifications);
 
         // Check directly selected comment.
         foreach ($commentsExpectedToSplit as $splitComment) {
@@ -348,7 +380,7 @@ class DiscussionsSplitTest extends SiteTestCase
     }
 
     /**
-     * Check that a not found error is returned if we try to merge non-existing discussions.
+     * Check that a not found error is returned if we try to split non-existing discussions.
      */
     public function testNotFound()
     {
@@ -369,7 +401,7 @@ class DiscussionsSplitTest extends SiteTestCase
     }
 
     /**
-     * Check that a not found error is returned if we try to merge non-existing discussions.
+     * Check that a not found error is returned if we try to split non-existing discussions.
      */
     public function testInvalidPostType()
     {
@@ -505,5 +537,51 @@ class DiscussionsSplitTest extends SiteTestCase
         $this->assertCount(2, $allDiscussions);
         $this->assertEquals(8, $allDiscussions[1]["countComments"]);
         $this->assertEquals(3, $allDiscussions[0]["countComments"]);
+    }
+
+    /**
+     * Test that the split comment workflow works with the postTypes.
+     *
+     * @return void
+     */
+    public function testSplitDiscussionWithPostType(): void
+    {
+        $this->enableFeature(PostTypeModel::FEATURE_POST_TYPES);
+        $this->createCategory();
+        $this->createDiscussion();
+        $comment = $this->createComment();
+
+        $postType = $this->createPostType([
+            "name" => "Test Post Type",
+            "description" => "Test Post Type",
+            "icon" => "test",
+        ]);
+
+        $this->api()
+            ->post("/discussions/split", [
+                "commentIDs" => [$comment["commentID"]],
+                "newPost" => [
+                    "name" => "New Discussion",
+                    "body" => "Discussion",
+                    "format" => "html",
+                    "categoryID" => $this->lastInsertedCategoryID,
+                    "postType" => $postType["postTypeID"],
+                    "authorType" => "me",
+                ],
+            ])
+            ->assertSuccess();
+
+        $updatedComment = $this->api()
+            ->get("comments", ["commentID" => $comment["commentID"]])
+            ->getBody();
+        $this->assertNotSame($comment["discussionID"], $updatedComment[0]["discussionID"]);
+
+        $this->api()
+            ->get("/discussions/{$updatedComment[0]["discussionID"]}")
+            ->assertSuccess()
+            ->assertJsonObjectLike([
+                "postTypeID" => $postType["postTypeID"],
+                "type" => $postType["parentPostTypeID"],
+            ]);
     }
 }

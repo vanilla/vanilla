@@ -25,7 +25,7 @@ class LocalesTest extends AbstractAPIv2Test
     protected static $enabledLocales = ["vf_en" => "en", "vf_zh" => "zh"];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

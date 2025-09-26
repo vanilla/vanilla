@@ -97,7 +97,7 @@ class WysiwygFormat extends HtmlFormat
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseAllMentions($body): array
     {

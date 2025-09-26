@@ -19,7 +19,7 @@ use Vanilla\Utility\SchemaUtils;
 class DiscussionWidgetModule extends BaseDiscussionWidgetModule
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -27,7 +27,7 @@ class DiscussionWidgetModule extends BaseDiscussionWidgetModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getApiSchema(): Schema
     {

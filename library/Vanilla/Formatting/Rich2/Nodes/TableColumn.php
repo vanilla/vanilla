@@ -13,7 +13,7 @@ class TableColumn extends AbstractNode
     const TYPE_KEY = "td";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -23,7 +23,7 @@ class TableColumn extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -31,7 +31,7 @@ class TableColumn extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getTextEnd(): string
     {
@@ -39,7 +39,7 @@ class TableColumn extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

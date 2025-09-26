@@ -42,7 +42,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -50,7 +50,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -58,7 +58,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTemplateID(): string
     {
@@ -66,7 +66,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamInputSchema(): Schema
     {
@@ -74,7 +74,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getParamResolvedSchema(): Schema
     {
@@ -82,7 +82,7 @@ class DiscussionCategoryPageLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {

@@ -7,6 +7,7 @@
 
 namespace Vanilla\Forum\Models;
 
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Theme\VariableProviders\QuickLink;
 use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
 
@@ -15,17 +16,13 @@ use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
  */
 class ForumQuickLinksProvider implements QuickLinkProviderInterface
 {
-    /** @var \Gdn_Session */
-    private $session;
-
     /**
      * DI.
      *
      * @param \Gdn_Session $session
      */
-    public function __construct(\Gdn_Session $session)
+    public function __construct(private \Gdn_Session $session, private ContentDraftModel $contentDraftModel)
     {
-        $this->session = $session;
     }
 
     /**
@@ -55,8 +52,13 @@ class ForumQuickLinksProvider implements QuickLinkProviderInterface
             -1,
             "session.valid"
         );
-
-        $result[] = new QuickLink("My Drafts", "/drafts", $this->session->User->CountDrafts ?? 0, -1, "session.valid");
+        $result[] = new QuickLink(
+            "My Drafts",
+            "/drafts",
+            $this->contentDraftModel->draftsWhereCountByUser(),
+            -1,
+            "session.valid"
+        );
 
         return $result;
     }

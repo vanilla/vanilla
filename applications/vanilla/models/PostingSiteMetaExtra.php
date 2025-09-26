@@ -8,6 +8,7 @@
 namespace Vanilla\Forum\Models;
 
 use Vanilla\Forum\Models\CommunityManagement\EscalationModel;
+use TagModel;
 
 /**
  * Class for adding extra site meta related to posting settings.
@@ -19,12 +20,13 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
      */
     public function __construct(
         private \Vanilla\Contracts\ConfigurationInterface $config,
-        private EscalationModel $escalationModel
+        private EscalationModel $escalationModel,
+        private TagModel $tagModel
     ) {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getValue(): array
     {
@@ -73,6 +75,10 @@ class PostingSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
             ],
             "posting" => [
                 "minLength" => $minLength,
+                "titleMaxLength" => \DiscussionModel::getPostTitleMaxLength(),
+            ],
+            "tagging" => [
+                "enabled" => $this->tagModel->discussionTaggingEnabled(),
             ],
         ];
     }

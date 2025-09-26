@@ -18,7 +18,7 @@ class CloseDiscussionAction extends AutomationAction
 {
     public string $affectedRecordType = "Discussion";
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -26,7 +26,7 @@ class CloseDiscussionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -34,7 +34,7 @@ class CloseDiscussionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -42,7 +42,7 @@ class CloseDiscussionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -50,7 +50,7 @@ class CloseDiscussionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -63,7 +63,7 @@ class CloseDiscussionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -94,7 +94,7 @@ class CloseDiscussionAction extends AutomationAction
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {

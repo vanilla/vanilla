@@ -25,7 +25,7 @@ class BaseTranslatableModel implements TranslatableModelInterface
     protected array $contentToTranslate = [];
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getContentType(): string
     {
@@ -33,7 +33,7 @@ class BaseTranslatableModel implements TranslatableModelInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getPrimaryKey(): string
     {
@@ -41,7 +41,7 @@ class BaseTranslatableModel implements TranslatableModelInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getContentToTranslate(int $primaryID = null, array $data = null): array
     {
@@ -61,7 +61,7 @@ class BaseTranslatableModel implements TranslatableModelInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getContentKeysToTranslate(): array
     {
@@ -69,7 +69,7 @@ class BaseTranslatableModel implements TranslatableModelInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getContentModel(): Gdn_Model
     {
@@ -77,7 +77,7 @@ class BaseTranslatableModel implements TranslatableModelInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getObjectKey(array $data): string
     {

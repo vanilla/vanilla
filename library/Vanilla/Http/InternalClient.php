@@ -86,6 +86,7 @@ class InternalClient extends SiteHttpClient
     {
         // If we already have our own domain, strip it off.
         $uri = str_replace($this->baseUrl, "", $uri);
+        $uri = str_replace(\Gdn::request()->getSimpleUrl(), "", $uri);
 
         if (strpos($uri, "//") === false) {
             $uri = $this->baseUrl . "/" . ltrim($uri, "/");
@@ -314,7 +315,7 @@ class InternalClient extends SiteHttpClient
 
     /**
      * Wrap in {@link InternalResponse}
-     * @inheritDoc
+     * @inheritdoc
      *
      * @return T
      */
@@ -330,7 +331,7 @@ class InternalClient extends SiteHttpClient
 
     /**
      * Wrap in {@link InternalResponse}
-     * @inheritDoc
+     * @inheritdoc
      *
      * @return T
      */
@@ -341,7 +342,7 @@ class InternalClient extends SiteHttpClient
 
     /**
      * Wrap in {@link InternalResponse}
-     * @inheritDoc
+     * @inheritdoc
      *
      * @return T
      */
@@ -352,7 +353,7 @@ class InternalClient extends SiteHttpClient
 
     /**
      * Wrap in {@link InternalResponse}
-     * @inheritDoc
+     * @inheritdoc
      *
      * @return T
      */
@@ -363,7 +364,7 @@ class InternalClient extends SiteHttpClient
 
     /**
      * Wrap in {@link InternalResponse}
-     * @inheritDoc
+     * @inheritdoc
      *
      * @return T
      */
@@ -374,7 +375,7 @@ class InternalClient extends SiteHttpClient
 
     /**
      * Wrap in {@link InternalResponse}
-     * @inheritDoc
+     * @inheritdoc
      *
      * @return T
      */

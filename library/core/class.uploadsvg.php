@@ -22,7 +22,7 @@ class Gdn_UploadSvg extends Gdn_Upload
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function clear()
     {

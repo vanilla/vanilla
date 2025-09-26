@@ -71,9 +71,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /** @var array Format option overrides. */
     private $formatOptions = [];
 
-    /** @var string use for translationDebug */
-    private $fallBackDecorator = "";
-
     private array $auditConfigsOld = [];
     private array $auditConfigsNew = [];
 
@@ -417,9 +414,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             if (is_array($value) && array_key_exists($keys[$i], $value)) {
                 $value = $value[$keys[$i]];
             } else {
-                if ($this->fallBackDecorator ?? false) {
-                    $defaultValue = $this->fallBackDecorator . $defaultValue . $this->fallBackDecorator;
-                }
                 return $defaultValue;
             }
         }
@@ -831,7 +825,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAll(): array
     {
@@ -986,7 +980,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function saveWithoutAuditLog(string|array $name, mixed $value = "")
     {
@@ -1053,16 +1047,6 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
         if (!empty($save)) {
             $this->saveToConfig($save, null, $persist);
         }
-    }
-
-    /**
-     * Set a fallback decorator.
-     *
-     * @param string $decorator
-     */
-    public function setFallbackDecorator(string $decorator)
-    {
-        $this->fallBackDecorator = $decorator;
     }
 
     /**

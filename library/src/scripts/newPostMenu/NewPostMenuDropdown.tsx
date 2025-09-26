@@ -7,7 +7,7 @@ import React, { useLayoutEffect, useRef } from "react";
 import { NewPostMenuIcon } from "@library/icons/common";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { newPostMenuClasses } from "@library/newPostMenu/newPostMenuStyles";
+import { newPostMenuDropdownClasses } from "@library/newPostMenu/NewPostMenuDropdown.styles";
 import { t } from "@vanilla/i18n";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { INewPostMenuProps } from "@library/newPostMenu/NewPostMenu";
@@ -19,6 +19,7 @@ import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import Container from "@library/layout/components/Container";
 import { StackingContextProvider, useLastValue, useMeasure, useStackingContext } from "@vanilla/react-utils";
 import { pointerEventsClass } from "@library/styles/styleHelpersFeedback";
+import { buttonClasses } from "@library/forms/Button.styles";
 
 interface MenuButtonImplProps extends INewPostMenuProps, React.ComponentPropsWithoutRef<typeof MenuButton> {}
 
@@ -28,7 +29,8 @@ export const MenuButtonImpl = React.forwardRef(function MenuButtonImpl(
 ) {
     const { isExpanded } = useMenuButtonContext();
     const wasExpanded = useLastValue(isExpanded);
-    const classes = newPostMenuClasses(props.containerOptions);
+    const classes = newPostMenuDropdownClasses.useAsHook(props.containerOptions);
+    const classesButton = buttonClasses.useAsHook();
 
     // Kludge for interaction with old flyout system.
     useLayoutEffect(() => {
@@ -38,10 +40,7 @@ export const MenuButtonImpl = React.forwardRef(function MenuButtonImpl(
     }, [isExpanded, wasExpanded]);
 
     return (
-        <MenuButton
-            ref={ref}
-            className={cx(getClassForButtonType(ButtonTypes.PRIMARY), classes.button(props.borderRadius))}
-        >
+        <MenuButton ref={ref} className={cx(classesButton.primary, classes.button(props.borderRadius))}>
             <div className={classes.buttonContents}>
                 <div
                     className={classes.buttonIcon}
@@ -60,9 +59,8 @@ export const MenuButtonImpl = React.forwardRef(function MenuButtonImpl(
 
 export default function NewPostMenuDropDown(props: INewPostMenuProps) {
     const { title, items, borderRadius, containerOptions } = props;
-    const { zIndex } = useStackingContext();
 
-    const classes = newPostMenuClasses(containerOptions, zIndex);
+    const classes = newPostMenuDropdownClasses.useAsHook(containerOptions);
     const containerRef = useRef<HTMLDivElement>(null);
     const menuButtonRef = useRef<HTMLButtonElement>(null);
     const context = useLinkContext();

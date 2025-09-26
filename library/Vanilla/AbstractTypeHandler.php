@@ -6,6 +6,8 @@
 
 namespace Vanilla;
 
+use CategoryModel;
+
 /**
  * Class AbstractTypeHandler
  *
@@ -16,31 +18,22 @@ abstract class AbstractTypeHandler
     private $typeHandlerName = "";
 
     /**
-     * Handler the type conversion
-     *
-     * @param array $from
-     * @param string $to
-     * @param array|null $postMeta Optional array of custom post fields.
-     */
-    abstract public function handleTypeConversion(array $from, string $to, ?array $postMeta);
-
-    /**
      * Convert the handlers type.
      *
-     * @param array $record
-     * @param string $to
-     * @param array|null $postMeta
+     * @param PostTypeConversionPayload $payload
+     *
+     * @return void
      */
-    abstract public function convertTo(array $record, string $to, ?array $postMeta);
+    abstract public function convertTo(PostTypeConversionPayload $payload): void;
 
     /**
      * Convert any related records|data (ie. comments)
      *
-     * @param array $record
-     * @param string $to
-     * @return bool
+     * @param PostTypeConversionPayload $payload
+     *
+     * @return void
      */
-    abstract public function cleanUpRelatedData(array $record, string $to);
+    abstract public function cleanUpRelatedData(PostTypeConversionPayload $payload): void;
 
     /**
      * Return the type handler name.
@@ -60,5 +53,17 @@ abstract class AbstractTypeHandler
     public function setTypeHandlerName($name = "")
     {
         $this->typeHandlerName = $name;
+    }
+
+    /**
+     * @param PostTypeConversionPayload $payload
+     *
+     * @return bool
+     */
+    public function canConvert(PostTypeConversionPayload $payload): bool
+    {
+        $categoryModel = \Gdn::getContainer()->get(CategoryModel::class);
+
+        return $categoryModel->isPostTypeAllowed($payload->targetCategoryRow, $payload->toPostTypeID);
     }
 }

@@ -73,7 +73,7 @@ class SectionTwoColumnsEven extends AbstractLayoutSection implements HydrateAwar
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

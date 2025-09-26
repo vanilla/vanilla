@@ -26,7 +26,7 @@ export default function EmojiFlyout(props: IProps) {
     const id = useUniqueID("emojiFlyout");
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
 
     const label = t("Emoji Picker");

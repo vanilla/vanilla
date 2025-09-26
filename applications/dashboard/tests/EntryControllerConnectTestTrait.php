@@ -123,7 +123,8 @@ trait EntryControllerConnectTestTrait
         $body = [],
         string $subpath = self::PROVIDER_KEY,
         bool $throw = true,
-        bool $skipLastHtml = false
+        bool $skipLastHtml = false,
+        bool $skipInputCheck = false
     ): \EntryController {
         if (!empty($body)) {
             if ($this->bessy()->hasLastHtml() && $throw && !$skipLastHtml) {
@@ -136,7 +137,9 @@ trait EntryControllerConnectTestTrait
                         $fieldName = array_key_first($value);
                         $key = $key . "[" . $fieldName . "]";
                     }
-                    $html->assertFormInput($key);
+                    if (!$skipInputCheck) {
+                        $html->assertFormInput($key);
+                    }
                 }
 
                 // This is a kludge for our constantly appearing password input.

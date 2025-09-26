@@ -35,6 +35,7 @@ export const themeBuilderUploadClasses = useThemeCache(() => {
         ...Mixins.font(themeBuilderVars.input.fonts),
         borderRadius: "3px !important",
         cursor: "pointer",
+        marginBottom: 0,
         "&:hover, &:focus, &:active": {
             ...Mixins.border({
                 ...themeBuilderVars.border,

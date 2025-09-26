@@ -4,16 +4,17 @@
  * @license gpl-2.0-only
  */
 
-import { css } from "@emotion/css";
+import { css, cx } from "@emotion/css";
 
 interface IProps {
     children?: React.ReactNode;
     iconSize?: number | string;
+    className?: string;
 }
 
 export function IconHexGrid(props: IProps) {
     return (
-        <div className={classes.root} style={{ height: props.iconSize, width: props.iconSize }}>
+        <div className={cx(classes.root, props.className)} style={{ height: props.iconSize, width: props.iconSize }}>
             {props.children}
         </div>
     );

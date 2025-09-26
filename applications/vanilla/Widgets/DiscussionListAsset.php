@@ -186,7 +186,7 @@ class DiscussionListAsset extends AbstractLayoutAsset implements HydrateAwareInt
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

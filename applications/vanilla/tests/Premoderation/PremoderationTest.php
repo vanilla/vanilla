@@ -36,7 +36,7 @@ class PremoderationTest extends SiteTestCase
     use DatabaseTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -57,6 +57,12 @@ class PremoderationTest extends SiteTestCase
     public function testBasic(): void
     {
         $moderationUser = $this->createUser(["name" => "MyAutoMod"]);
+
+        $notifyUser = $this->createUser(
+            ["name" => "MyAutoMod1", "roleID" => \RoleModel::MOD_ID],
+            ["Admin" => 1],
+            ["report" => ["popup" => true, "email" => true]]
+        );
         $this->mockPremoderationResponse(
             new PremoderationResponse(PremoderationResponse::SPAM, $moderationUser["userID"])
         );
@@ -78,6 +84,9 @@ class PremoderationTest extends SiteTestCase
             $premodDiscussion,
             $expectedFields + ["reasons.0.reportReasonID" => ReportReasonModel::INITIAL_REASON_SPAM_AUTOMATION]
         );
+
+        $notification = $this->assertNotification($notifyUser["userID"], ["t.Name" => "Report"]);
+        $this->assertSame(url("/dashboard/content/reports", true), $notification["Url"]);
     }
 
     /**

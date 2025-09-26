@@ -73,7 +73,7 @@ class SectionThreeColumnsEven extends AbstractLayoutSection implements HydrateAw
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

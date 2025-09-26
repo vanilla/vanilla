@@ -4,9 +4,7 @@
  * @license GPL-2.0-only
  */
 
-use Garden\Web\Exception\ClientException;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Forum\Models\PostTypeModel;
+use Vanilla\PostTypeConversionPayload;
 
 /**
  * Class QnaTypeHandler
@@ -16,84 +14,27 @@ class QnaTypeHandler extends \Vanilla\AbstractTypeHandler
 {
     const HANDLER_TYPE = "Question";
 
-    /** @var DiscussionModel */
-    private $discussionModel;
-
-    /** @var \Gdn_Session */
-    private $session;
-
-    /** @var QnAPlugin */
-    private $qnaPlugin;
-
-    /** @var CategoryModel */
-    private $categoryModel;
-
     /**
-     * QnATypeHandler constructor.
-     *
-     * @param DiscussionModel $discussionModel
-     * @param \Gdn_Session $session
-     * @param QnAPlugin $qnAPlugin
-     * @param CategoryModel $categoryModel
+     * DI.
      */
-    public function __construct(
-        DiscussionModel $discussionModel,
-        \Gdn_Session $session,
-        QnAPlugin $qnAPlugin,
-        CategoryModel $categoryModel,
-        private \Vanilla\Forum\Models\PostMetaModel $postMetaModel
-    ) {
-        $this->discussionModel = $discussionModel;
-        $this->session = $session;
-        $this->qnaPlugin = $qnAPlugin;
-        $this->categoryModel = $categoryModel;
+    public function __construct(private QnAPlugin $qnaPlugin)
+    {
         $this->setTypeHandlerName(self::HANDLER_TYPE);
     }
 
     /**
-     * Handler the type conversion
-     *
-     * @param array $from
-     * @param string $to
-     * @param array|null $postMeta
-     * @throws ClientException If category doesn't allow record type.
+     * @inheritdoc
      */
-    public function handleTypeConversion(array $from, $to, ?array $postMeta)
+    public function convertTo(PostTypeConversionPayload $payload): void
     {
-        $categoryID = $from["CategoryID"] ?? null;
-        $category = $this->categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
-
-        if ($this->categoryModel->isPostTypeAllowed($category, $to)) {
-            $permissionCategoryID = $from["PermissionCategoryID"] ?? null;
-            $this->session->checkPermission("Vanilla.Discussions.Edit", true, "Category", $permissionCategoryID);
-            $this->convertTo($from, $to, $postMeta);
-        } else {
-            throw new ClientException("Category #{$categoryID} doesn't allow for $to type records");
-        }
+        $this->qnaPlugin->recalculateDiscussionQnA($payload->discussionRow);
     }
 
     /**
-     * Convert the handlers type.
-     *
-     * @param array $record
-     * @param string $to
-     * @param array|null $postMeta
+     * @inheritdoc
      */
-    public function convertTo(array $record, string $to, ?array $postMeta)
+    public function cleanUpRelatedData(PostTypeConversionPayload $payload): void
     {
-        $id = $record["DiscussionID"] ?? null;
-        $this->qnaPlugin->updateRecordType($id, $record, $to, $postMeta);
-    }
-
-    /**
-     * Convert any related records|data (ie. comments)
-     *
-     * @param array $record
-     * @param string $to
-     * @return bool
-     */
-    public function cleanUpRelatedData(array $record, string $to)
-    {
-        return true;
+        // Nothing to do here.
     }
 }

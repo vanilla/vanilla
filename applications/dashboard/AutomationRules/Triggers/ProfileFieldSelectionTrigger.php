@@ -28,7 +28,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger
 {
     use UserSearchTrait;
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -36,7 +36,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -44,7 +44,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -52,7 +52,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -60,7 +60,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -86,7 +86,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -175,7 +175,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {
@@ -210,7 +210,7 @@ class ProfileFieldSelectionTrigger extends AutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess($lastRecordId, array $where): iterable
     {

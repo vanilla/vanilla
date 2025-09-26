@@ -74,6 +74,8 @@ export const CommentsApi = {
 };
 
 export namespace CommentsApi {
+    export type Comment = IComment;
+
     export interface IndexParams {
         parentRecordType?: "discussion" | "escalation";
         parentRecordID?: string | number;

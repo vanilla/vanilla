@@ -29,7 +29,7 @@ use Vanilla\Salesforce\Action\EscalateSalesforceLeadAction;
 class DiscussionRuleDataType extends RuleDataType
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      * @psalm-suppress UndefinedClass
      */
     protected function getAllTriggerClasses(): array
@@ -44,7 +44,7 @@ class DiscussionRuleDataType extends RuleDataType
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      * @psalm-suppress UndefinedClass
      */
     protected function getAllActionsClasses(): array

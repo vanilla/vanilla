@@ -62,6 +62,16 @@ class ContentFilterTest extends SiteTestCase
     }
 
     /**
+     * Test https://higherlogic.atlassian.net/browse/VNLA-9721
+     *
+     * @return void
+     */
+    public function testReplaceNull(): void
+    {
+        $this->assertEquals(null, self::$contentFilter->replace(null));
+    }
+
+    /**
      * Test Civil Tongue via APIs for integration testing.
      */
     public function testActivityItems(): void

@@ -9,7 +9,7 @@ namespace Vanilla\Forums\Modules;
 
 use Garden\Container\Reference;
 use Vanilla\Forum\Modules\DiscussionWidgetModule;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\AbstractTabWidgetTabFactory;
 
 /**
@@ -67,9 +67,9 @@ class DiscussionTabFactory extends AbstractTabWidgetTabFactory
     }
 
     /**
-     * @return AbstractReactModule
+     * @return LegacyReactModule
      */
-    public function getTabModule(): AbstractReactModule
+    public function getTabModule(): LegacyReactModule
     {
         /** @var DiscussionWidgetModule $module */
         $module = parent::getTabModule();

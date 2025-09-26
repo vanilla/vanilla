@@ -17,6 +17,7 @@ import { tokensClasses } from "@library/forms/select/tokensStyles";
 import { css } from "@emotion/css";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import { Mixins } from "@library/styles/Mixins";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const inputBlockClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -34,7 +35,7 @@ export const inputBlockClasses = useThemeCache(() => {
     const labelAndDescription = css({
         display: "block",
         width: percent(100),
-        color: ColorsUtils.colorOut(formElementVars.colors.fg),
+        color: ColorsUtils.varOverride(ColorVar.Foreground, formElementVars.colors.fg),
         marginBottom: 4,
     });
 

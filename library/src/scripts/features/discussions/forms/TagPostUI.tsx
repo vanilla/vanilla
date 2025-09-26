@@ -21,6 +21,7 @@ import { useState, useMemo, ReactNode } from "react";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { tagPostUIClasses } from "@library/features/discussions/forms/TagPostUI.classes";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { RecordID } from "@vanilla/utils";
 
 export const tagLookup = {
     searchUrl: "/tags?query=%s&limit=500",
@@ -32,7 +33,7 @@ export const tagLookup = {
     },
 };
 interface TagPostUIProps {
-    initialTagIDs?: Array<ITag["tagID"]>;
+    initialTags?: Array<ITag["tagID"] | ITag["name"]>;
     onSelectedExistingTag?: (updatedExistingTags: Array<ITag["tagID"]>) => void;
     onSelectedNewTag?: (updatedNewTags: string[]) => void;
     fieldErrors?: IError | null;
@@ -47,31 +48,13 @@ interface TagPostUIProps {
 export function TagPostUI(props: TagPostUIProps) {
     const { hasPermission } = usePermissionsContext();
 
-    const TAG_POST_SCHEMA: JSONSchemaType<{ tags: string | number }> = {
-        type: "object",
-        properties: {
-            tags: {
-                type: ["string", "number"],
-                minLength: 1,
-                maxLength: 100,
-                "x-control": {
-                    labelType: "none",
-                    inputType: "select",
-                    multiple: true,
-                    optionsLookup: tagLookup,
-                    createable: hasPermission("tags.add"),
-                    isClearable: true,
-                    label: t("Tags"),
-                    noBorder: true,
-                    createableLabel: t("Create and add tag"),
-                },
-            },
-        },
-    };
+    const userCanCreateNewTags = hasPermission("tags.add");
 
-    const [values, setValues] = useState({ tags: props.initialTagIDs ?? [] });
+    const { initialTags = [] } = props;
 
-    const classes = tagPostUIClasses();
+    const [tags, setTags] = useState<RecordID[]>(initialTags);
+
+    const classes = tagPostUIClasses.useAsHook();
 
     const popularTagsQuery = useQuery({
         queryKey: ["popularTags"],
@@ -91,12 +74,12 @@ export function TagPostUI(props: TagPostUIProps) {
 
     const unselectedPopularTags: ITag[] = useMemo(() => {
         if (popularTagsQuery.data && popularTagsQuery.data.length > 0) {
-            return popularTagsQuery.data.filter((tag: ITag) => !values.tags.includes(tag.tagID));
+            return popularTagsQuery.data.filter((tag: ITag) => !tags.includes(tag.tagID));
         }
-    }, [popularTagsQuery.data, values]);
+    }, [popularTagsQuery.data, tags]);
 
-    const handleChange = (newValues) => {
-        setValues(newValues);
+    const handleChange = (newValues: { tags: typeof tags }) => {
+        setTags(newValues.tags);
         let existingTags: number[] = [];
         let newTags: string[] = [];
         newValues.tags.forEach((tag) => {
@@ -107,15 +90,62 @@ export function TagPostUI(props: TagPostUIProps) {
             }
         });
         props.onSelectedExistingTag?.(existingTags);
-        props.onSelectedNewTag?.(newTags);
+        if (userCanCreateNewTags) {
+            props.onSelectedNewTag?.(newTags);
+        }
     };
 
     const addPopularTag = (tagID: number) => {
-        setValues((prev) => {
-            return { tags: [...prev.tags, tagID] };
+        setTags((prev) => {
+            return Array.from(new Set([...prev, tagID]));
         });
-        const existingTagUpdateValues = [...values.tags.filter((tag) => typeof tag === "number"), tagID];
+        const existingTagUpdateValues = [...tags.filter((tag) => typeof tag === "number"), tagID];
         props.onSelectedExistingTag?.(existingTagUpdateValues);
+    };
+
+    const popularTagOptions = useMemo(() => {
+        if (popularTagsQuery.data && popularTagsQuery.data.length > 0) {
+            return popularTagsQuery.data.map((tag: ITag) => ({
+                label: tag.name,
+                value: tag.tagID,
+                data: { ...tag, type: "User" }, // Match the processOptions check
+            }));
+        }
+        return [];
+    }, [popularTagsQuery.data]);
+
+    // Include popular tags with the initial options for NestedSelect
+    const dynamicTagLookup = useMemo(
+        () => ({
+            ...tagLookup,
+            initialOptions: popularTagOptions,
+        }),
+        [popularTagOptions],
+    );
+
+    const TAG_POST_SCHEMA: JSONSchemaType<{ tags: string | number }> = {
+        type: "object",
+        properties: {
+            tags: {
+                type: ["string", "number"],
+                minLength: 1,
+                maxLength: 100,
+                "x-control": {
+                    labelType: "none",
+                    inputType: "select",
+                    multiple: true,
+                    optionsLookup: dynamicTagLookup,
+                    createable: userCanCreateNewTags,
+                    isClearable: true,
+                    label: t("Tags"),
+                    noBorder: true,
+                    createableLabel: t("Create and add tag"),
+                    checkIsOptionUserCreated: (value) => {
+                        return typeof value === "string";
+                    },
+                },
+            },
+        },
     };
 
     return (
@@ -126,11 +156,11 @@ export function TagPostUI(props: TagPostUIProps) {
                         tags: [{ message: props.fieldErrors.message, field: "tags" }],
                     }),
                 }}
-                instance={values}
+                instance={{ tags }}
                 onChange={(newValuesDispatch) => handleChange(newValuesDispatch())}
                 schema={TAG_POST_SCHEMA}
             />
-            {props.showPopularTags && unselectedPopularTags && unselectedPopularTags.length > 0 && (
+            {props.showPopularTags && !!unselectedPopularTags && !!(unselectedPopularTags.length > 0) && (
                 <>
                     {props.popularTagsTitle ? (
                         <>{props.popularTagsTitle}</>

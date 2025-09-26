@@ -22,7 +22,7 @@ class PasswordResetCompletedEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function eventType(): string
     {
@@ -30,7 +30,7 @@ class PasswordResetCompletedEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function formatAuditMessage(string $eventType, array $context, array $meta): string
     {

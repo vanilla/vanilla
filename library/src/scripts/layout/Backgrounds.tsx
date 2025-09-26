@@ -7,6 +7,7 @@
 import React, { ReactNode, useContext, useEffect, useState } from "react";
 import { fullBackgroundClasses, globalCSS, useBodyCSS } from "@library/layout/bodyStyles";
 import { useHistory } from "react-router";
+import { cx } from "@emotion/css";
 
 interface IProps {
     isHomePage?: boolean;
@@ -20,7 +21,7 @@ export const Backgrounds = () => {
     globalCSS();
     const backgroundInfo = useBackgroundContext();
     const classes = fullBackgroundClasses(backgroundInfo.isHomePage);
-    return <div className={classes.root} />;
+    return <div className={cx(classes.root, "fullBackground")} />;
 };
 
 const BackgroundContext = React.createContext<{ setIsHomePage: (value: boolean) => void; isHomePage: boolean }>({

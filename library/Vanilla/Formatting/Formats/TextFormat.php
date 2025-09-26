@@ -63,7 +63,7 @@ class TextFormat extends BaseFormat
         if ($contentOrParsed instanceof TextFormatParsed) {
             return $contentOrParsed->getRawText();
         } else {
-            return $contentOrParsed;
+            return $contentOrParsed ?? "";
         }
     }
 
@@ -160,7 +160,7 @@ class TextFormat extends BaseFormat
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseAllMentions($body): array
     {

@@ -26,7 +26,7 @@ class QnASiteTotalsTest extends AbstractAPIv2Test
     protected $cache;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

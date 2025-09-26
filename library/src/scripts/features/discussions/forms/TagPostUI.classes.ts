@@ -5,8 +5,9 @@
  */
 
 import { css } from "@emotion/css";
+import { useThemeCache } from "@library/styles/themeCache";
 
-export const tagPostUIClasses = () => {
+export const tagPostUIClasses = useThemeCache(() => {
     const layout = css({
         padding: "16px 0 0",
         display: "flex",
@@ -37,4 +38,4 @@ export const tagPostUIClasses = () => {
         transform: "translateY(2px)",
     });
     return { layout, title, token, button, icon };
-};
+});

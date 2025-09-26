@@ -13,7 +13,7 @@ namespace Vanilla\Web\Pagination;
 class FlatApiPaginationIterator extends ApiPaginationIterator
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function internalGenerator(): \Generator
     {

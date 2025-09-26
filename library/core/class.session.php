@@ -946,6 +946,43 @@ class Gdn_Session implements LoggerAwareInterface
     }
 
     /**
+     * Make sure the current user has a session. Create one if there are none.
+     *
+     * @param string $expireInternal
+     * @return string
+     * @throws Exception
+     */
+    public function ensureSession(string $expireInternal = ""): string
+    {
+        $sessionModel = new SessionModel();
+        $sessionID = Gdn::session()->SessionID;
+        $this->Session = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
+
+        // If there is no session, create one.
+        if (!$this->Session) {
+            $expireInternal =
+                $expireInternal !== "" ? $expireInternal : $sessionModel->getPersistExpiry()->format(MYSQL_DATE_FORMAT);
+            $this->Session = [
+                "UserID" => Gdn::session()->UserID,
+                "DateInserted" => CurrentTimeStamp::getMySQL(),
+                "Attributes" => [],
+                "DateExpires" => $expireInternal,
+            ];
+
+            // Save the session information to the database.
+            $sessionID = $sessionModel->insert($this->Session);
+            $this->Session["SessionID"] = $sessionID;
+            $this->SessionID = $sessionID;
+            trace("Inserting session stash $sessionID");
+
+            $expiry = new DateTime($expireInternal);
+
+            $this->setCookie("-sid", $sessionID, $expiry->getTimestamp());
+        }
+        return $sessionID;
+    }
+
+    /**
      * Local cookie and save to user meta after login.
      *
      * @return void

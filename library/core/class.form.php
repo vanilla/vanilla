@@ -1451,17 +1451,22 @@ class Gdn_Form extends Gdn_Pluggable
 
         $result = '<div class="table-wrap"><table class="table-data js-checkbox-grid table-checkbox-grid">';
         // Append the header.
-        $result .= "<thead><tr><th>" . htmlspecialchars(t($groupName)) . "</th>";
+        $result .=
+            "<thead><tr><th title='" .
+            htmlspecialchars(t($groupName)) .
+            "'>" .
+            htmlspecialchars(t($groupName)) .
+            "</th>";
         foreach ($columns as $columnName => $x) {
-            $result .= "<td>" . htmlspecialchars(t($columnName)) . "</td>";
+            $result .=
+                "<td title=" . htmlspecialchars(t($columnName)) . ">" . htmlspecialchars(t($columnName)) . "</td>";
         }
         $result . "</tr></thead>";
 
         // Append the rows.
         $result .= "<tbody>";
-        $checkCount = 0;
         foreach ($rows as $rowName => $x) {
-            $result .= "<tr><th>";
+            $result .= "<tr><th title='" . htmlspecialchars(t($rowName)) . "'>";
 
             // If the row name is still seperated by dots then put those in spans.
             $rowNames = explode(".", $rowName);
@@ -1482,8 +1487,6 @@ class Gdn_Form extends Gdn_Pluggable
                     if ($checkBox["Value"]) {
                         $attributes["checked"] = "checked";
                     }
-                    //               $Attributes['id'] = "{$GroupName}_{$FieldName}_{$CheckCount}";
-                    $checkCount++;
 
                     $result .= wrap(
                         $this->checkBox($fieldName . "[]", $rowName . "." . $columnName, $attributes),
@@ -2254,6 +2257,14 @@ PASSWORDMETER;
      */
     public function label($translationCode, $fieldName = "", $attributes = [])
     {
+        $isRequired = $attributes["required"] ?? false;
+        unset($attributes["required"]);
+        $requiredAriaLabel = t("required");
+        $requiredHtml = $isRequired ? "<span aria-label='{$requiredAriaLabel}' class='requiredAsterix'>*</span>" : "";
+
+        $afterHtml = $attributes["afterHtml"] ?? "";
+        unset($attributes["afterHtml"]);
+
         // Assume we always want a 'for' attribute because it's Good & Proper.
         // Precedence: 'for' attribute, 'id' attribute, $FieldName, $TranslationCode
         $defaultFor = $fieldName == "" ? $translationCode : $fieldName;
@@ -2265,7 +2276,9 @@ PASSWORDMETER;
             '"' .
             $this->_attributesToString($attributes) .
             ">" .
+            $requiredHtml .
             t($translationCode) .
+            $afterHtml .
             "</label>\n";
         return $return;
     }
@@ -3743,5 +3756,24 @@ PASSWORDMETER;
     public static function resetIDs(): void
     {
         self::$idCounters = [];
+    }
+
+    /**
+     * Return HTML for generating the post title form input.
+     *
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
+     */
+    public function postTitle(string $fieldName = "Name", array $attributes = []): string
+    {
+        return $this->textBox(
+            $fieldName,
+            $attributes + [
+                "maxlength" => DiscussionModel::getPostTitleMaxLength(),
+                "class" => "InputBox BigInput",
+                "spellcheck" => "true",
+            ]
+        );
     }
 }

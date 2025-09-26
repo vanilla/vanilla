@@ -23,11 +23,15 @@ import { SearchBarPresets } from "./SearchBarPresets";
 import { Property } from "csstype";
 import { inputVariables } from "@library/forms/inputStyles";
 import { LocalVariableMapping } from "@library/styles/VariableMapping";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { TitleBarPositioning } from "@library/headers/TitleBar.ParamContext";
 
-export enum BannerAlignment {
-    LEFT = "left",
-    CENTER = "center",
-}
+export const BannerAlignment = {
+    LEFT: "left",
+    CENTER: "center",
+} as const;
+
+export type BannerAlignment = (typeof BannerAlignment)[keyof typeof BannerAlignment];
 
 export type SearchPlacement = "middle" | "bottom";
 
@@ -63,11 +67,11 @@ export const bannerVariables = useThemeCache(
             new LocalVariableMapping({
                 [`padding`]: "spacing.padding",
             }),
-            !!altName,
         );
         const globalVars = globalVariables(forcedVars);
         const compactSearchVars = compactSearchVariables(forcedVars);
         const searchBarVars = searchBarVariables(forcedVars);
+        const titleBarVars = titleBarVariables(forcedVars);
 
         const backgroundsInit = makeThemeVars("backgrounds", {
             /**
@@ -166,7 +170,6 @@ export const bannerVariables = useThemeCache(
                  * @enum middle | bottom
                  */
                 searchPlacement: "middle" as SearchPlacement,
-                overlayTitleBar: true,
 
                 /**
                  * @var banner.options.url
@@ -251,6 +254,10 @@ export const bannerVariables = useThemeCache(
         const isTransparentButton = presets.button.preset === ButtonPreset.TRANSPARENT;
         const isSolidBordered = isBordered && isSolidButton;
 
+        const isTransparentTitlebar = [
+            TitleBarPositioning.StaticTransparent,
+            TitleBarPositioning.StickyTransparent,
+        ].includes(titleBarVars.positioning.mode as any);
         /**
          * @varGroup banner.padding
          * @commonTitle Padding
@@ -259,7 +266,7 @@ export const bannerVariables = useThemeCache(
         const padding = makeThemeVars(
             "padding",
             Variables.spacing({
-                top: globalVars.spacer.pageComponent * 1.5,
+                top: globalVars.spacer.pageComponent * 1.5 + (isTransparentTitlebar ? titleBarVars.fullHeight : 0),
                 bottom: globalVars.spacer.pageComponent,
                 horizontal: globalVars.gutter.half,
             }),

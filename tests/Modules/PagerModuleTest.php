@@ -22,7 +22,7 @@ class PagerModuleTest extends TestCase
     use HtmlNormalizeTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

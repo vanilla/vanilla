@@ -13,14 +13,19 @@ use Vanilla\Addon;
 use Vanilla\Dashboard\AiSuggestionModel;
 use Vanilla\Dashboard\DocumentModel;
 use Vanilla\Dashboard\Models\ActivityService;
+use Vanilla\Dashboard\Models\EmailTemplateModel;
 use Vanilla\Dashboard\Models\IconModel;
 use Vanilla\Dashboard\Models\InterestModel;
 use Vanilla\Dashboard\Models\ModerationMessageStructure;
+use Vanilla\Dashboard\Models\NexusRagSearchClient;
+use Vanilla\Dashboard\Models\AiConversationModel;
+use Vanilla\Dashboard\Models\ProductMessageModel;
 use Vanilla\Dashboard\Models\QueuedJobModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
+use Vanilla\Dashboard\Models\FragmentModel;
 use Vanilla\Forum\Models\ResourceModel;
 use Vanilla\Forum\Models\TranslationModel;
 use Vanilla\Forum\Models\TranslationPropertyModel;
@@ -28,6 +33,7 @@ use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Logging\AuditLogModel;
 use Vanilla\Models\ContentDraftModel;
+use Vanilla\Models\CustomPageModel;
 use Vanilla\Models\DeveloperProfileModel;
 use Vanilla\Models\InstallModel;
 use Vanilla\Scheduler\CronModel;
@@ -327,6 +333,9 @@ $Construct
     ->column("DateInserted", "datetime", false)
     ->column("DateUpdated", "datetime", false)
     ->set($Explicit, $Drop);
+
+$Construct->table("UserIP")->dropIndexIfExists("UX_UserIP_IPAddress");
+$Construct->table("UserIP")->createIndexIfNotExists("IX_UserIP_IPAddress", ["IPAddress"]);
 
 // UserRole Table
 $Construct->table("UserRole");
@@ -813,6 +822,7 @@ $Construct
     ->column("RecordType", "varchar(20)", true, "index.Record")
     ->column("RecordID", "int", true, "index.Record")
     ->column("ParentRecordID", "int", true)
+    ->column("Locale", "varchar(10)", true)
     ->column("BatchID", "varchar(20)", true)
     //   ->column('CountComments', 'int', '0')
     ->column("InsertUserID", "int", true, "key")
@@ -1281,7 +1291,7 @@ $Construct
     ->column("Active", "tinyint", 1)
     ->column("InsertUserID", "int(11)", false, "index")
     ->column("DateInserted", "datetime")
-    ->column("ForeignID", "int(11)", true, "index.Foreign")
+    ->column("ForeignID", "varchar(40)", true, "index.Foreign")
     ->column("ForeignTable", "varchar(24)", true, "index.Foreign")
     ->column("ImageWidth", "usmallint", null)
     ->column("ImageHeight", "usmallint", null)
@@ -1328,7 +1338,7 @@ $Construct
     ->column("Attributes", "text", true)
     ->column("DateInserted", "datetime")
     ->column("InsertUserID", "int", false, "key")
-    ->column("InsertIPAddress", "ipaddress")
+    ->column("InsertIPAddress", "ipaddress", true)
     ->column("DateUpdated", "datetime", true)
     ->column("UpdateUserID", "int", true)
     ->column("UpdateIPAddress", "ipaddress", true)
@@ -1369,9 +1379,11 @@ $Construct
 
 AiSuggestionModel::structure($Database, $Explicit, $Drop);
 // Automation Rules Structure
-AutomationRuleModel::structure($Database, $Explicit, $Drop);
 AutomationRuleRevisionModel::structure($Database, $Explicit, $Drop);
+AutomationRuleModel::structure($Database, $Explicit, $Drop);
 AutomationRuleDispatchesModel::structure($Database, $Explicit, $Drop);
+// Email Template Structure
+EmailTemplateModel::structure($Database, $Explicit, $Drop);
 RecordStatusModel::structure($Database);
 RecordStatusLogModel::structure($Database, $Explicit, $Drop);
 LayoutModel::structure($Database, $Explicit, $Drop);
@@ -1379,6 +1391,8 @@ LayoutViewModel::structure($Database, $Explicit, $Drop);
 LocaleModel::structure($Database, $Explicit, $Drop);
 DocumentModel::structure($Database, $Explicit, $Drop);
 IconModel::structure($Database);
+FragmentModel::structure($Database);
+ProductMessageModel::structure($Database);
 
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.
@@ -1467,6 +1481,9 @@ ReactionModel::structure($Construct);
 // Interests
 InterestModel::structure($Construct, $Explicit, $Drop);
 
+// Custom Pages
+CustomPageModel::structure($Database, $Explicit, $Drop);
+
 // Remove legacy Plugins
 Gdn::config()->removeFromConfig($LEGACYADDON);
 
@@ -1487,4 +1504,11 @@ if (!Gdn::config()->get("Garden.Installed")) {
         "Feature.newCommunityDrafts.Enabled" => true,
         "RichEditor.Quote.Enable" => false,
     ]);
+}
+
+AiConversationModel::structure($Construct);
+if (Gdn::config()->get(AiConversationModel::RAG_SEARCH_FEATURE_CONFIG)) {
+    // Force the token to refresh.
+    $nexusRagSearchClient = Gdn::getContainer()->get(NexusRagSearchClient::class);
+    $nexusRagSearchClient->createToken();
 }

@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { TLength } from "@library/styles/cssUtilsTypes";
 import { styleUnit } from "@library/styles/styleUnit";
 import { srOnlyMixin } from "@vanilla/ui";

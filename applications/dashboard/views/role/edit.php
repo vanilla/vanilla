@@ -66,7 +66,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->toggle("EnableType", "", ["value" => "1"]); ?>
         </div>
     </li>
-    <?php if (!in_array($this->Role->RoleID, RoleModel::DEFAULT_ROLE_IDS)) { ?>
+    <?php if (!in_array($this->Role?->RoleID ?? null, RoleModel::DEFAULT_ROLE_IDS)) { ?>
         <li class="form-group row AutomationType" role="presentation">
             <div class="label-wrap">
                 <?php echo $this->Form->label("Automatically assign this role to:", "Type"); ?>

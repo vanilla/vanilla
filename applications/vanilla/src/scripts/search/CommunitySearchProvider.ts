@@ -4,7 +4,7 @@
  */
 
 import { ISearchOptionProvider } from "@library/contexts/SearchContext";
-import { getSiteSection } from "@library/utility/appUtils";
+import { getMeta, getSiteSection } from "@library/utility/appUtils";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import pDebounce from "p-debounce";
@@ -49,12 +49,15 @@ export class CommunitySearchProvider implements ISearchOptionProvider {
         // TODO [VNLA-1313]: Fix this so that we don't need to wait for all calls to resolve before showing the results
         const searchSources = SearchService.sources
             .filter(shouldSearchAllSources ? () => true : ({ key }) => key === COMMUNITY_SEARCH_SOURCE.key)
-            .map((source) =>
-                source.performSearch(queryObj).then((response) => ({
+            .map((source) => {
+                if (getMeta("search.shouldAbortDuringAutocomplete") === true) {
+                    source.abort?.();
+                }
+                return source.performSearch(queryObj).then((response) => ({
                     ...response,
                     source: source.key,
-                })),
-            );
+                }));
+            });
 
         const responses = await Promise.all(searchSources);
 
@@ -88,7 +91,7 @@ export class CommunitySearchProvider implements ISearchOptionProvider {
     /**
      * A debounced version of the fetchSearch() function.
      */
-    private debounceFetchSearch = pDebounce(this.fetchSearch, 100);
+    private debounceFetchSearch = pDebounce(this.fetchSearch, getMeta("search.autocompleteDebounce") ?? 500);
 
     /**
      * Get autocomplete results.

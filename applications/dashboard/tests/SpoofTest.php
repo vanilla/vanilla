@@ -18,7 +18,7 @@ class SpoofTest extends \VanillaTests\SiteTestCase
     use \VanillaTests\UsersAndRolesApiTestTrait;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

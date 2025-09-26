@@ -235,10 +235,12 @@ export function UserCardFlyout(props: React.ComponentProps<typeof UserCard>) {
 
     useFocusWatcher(context.contentRef, handleFocusChange);
 
+    const classesDropdown = dropDownClasses.useAsHook();
+
     return (
         <div
             ref={context.contentRef as any}
-            className={cx(dropDownClasses().contentsBox, "isMedium")}
+            className={cx(classesDropdown.contentsBox, "isMedium")}
             onKeyDown={(e) => {
                 if (e.key === "Escape") {
                     e.preventDefault();

@@ -11,7 +11,7 @@ import ErrorMessages from "@library/forms/ErrorMessages";
 import { t } from "@library/utility/appUtils";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { IOptionalComponentID } from "@library/utility/idUtils";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 

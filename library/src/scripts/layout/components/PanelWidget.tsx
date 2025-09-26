@@ -9,9 +9,12 @@ import { useSection, withSection } from "@library/layout/LayoutContext";
 import { ILayoutContainer } from "@library/layout/components/interface.layoutContainer";
 import { panelWidgetClasses } from "@library/layout/panelWidgetStyles";
 
-export const PanelWidget = withSection(function PanelWidget(props: ILayoutContainer) {
+export function PanelWidget(props: { className?: string; raw?: true; children?: React.ReactNode }) {
     const classes = panelWidgetClasses(useSection().mediaQueries);
-    return <div className={classNames(classes.root, props.className)}>{props.children}</div>;
-});
+    if (props.raw) {
+        return <>{props.children}</>;
+    }
+    return <div className={classNames(classes.root, (props as ILayoutContainer).className)}>{props.children}</div>;
+}
 
 export default PanelWidget;

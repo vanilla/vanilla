@@ -19,7 +19,7 @@ class DashboardAccessEvent extends BasicAuditLogEvent
     private ?RequestInterface $overrideRequest = null;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function eventType(): string
     {
@@ -27,7 +27,7 @@ class DashboardAccessEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function formatAuditMessage(string $eventType, array $context, array $meta): string
     {
@@ -35,7 +35,7 @@ class DashboardAccessEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAuditContext(): array
     {

@@ -1,0 +1,363 @@
+openapi: 3.0.2
+info:
+x-resourceEvents:
+    emailTemplates:
+        x-feature: "Feature.emailTemplates.Enabled"
+        name: "Email Template"
+        type: "emailTemplate"
+paths:
+    /email-templates:
+        get:
+            parameters:
+                - description: >
+                      <p>Expand associated records using one or more valid field names. A
+                      value of "all" will expand all expandable fields.</p>
+                  in: query
+                  name: expand
+                  schema:
+                      items:
+                          enum:
+                              - -updateUser
+                              - -insertUser
+                              - all
+                          type: string
+                      type: array
+                  style: form
+                - name: emailTemplateID
+                  description: Filter by email template IDs.
+                  in: query
+                  schema:
+                      type: integer
+                - in: query
+                  name: limit
+                  required: true
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 100
+                      minimum: 1
+                - name: statuses
+                  description: Filter by particular statuses. Deleted email templates require mod  permission.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - active
+                              - inactive
+                              - deleted
+                  style: form
+                - name: emailType
+                  description: Filter by email type.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - system
+                          - custom
+                - name: sort
+                  description: Sort the output.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - name
+                          - -name
+                          - dateInserted
+                          - dateUpdated
+                          - -dateInserted
+                          - -dateUpdated
+                - description: |
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination">Pagination).
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      default: 1
+                      maximum: 100
+                      minimum: 1
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/emailTemplates"
+                                type: array
+                    description: Success
+            tags:
+                - emailTemplates
+            summary: List active email templates in a given knowledge category.
+        post:
+            responses:
+                "201":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/emailTemplates"
+                    description: Success
+            tags:
+                - emailTemplates
+            requestBody:
+                $ref: "#/components/requestBodies/emailTemplatesPost"
+            summary: Create a new email Templates .
+    "/email-templates/{id}":
+        get:
+            parameters:
+                - description: |
+                      <p>The email Templates ID.</p>
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/emailTemplates"
+                    description: Success
+            tags:
+                - email-templates
+            summary: Get an email Templates .
+        patch:
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/emailTemplates"
+                    description: Success
+            tags:
+                - emailTemplates
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/emailTemplatesPatch"
+                required: true
+            summary: Update an existing email Templates .
+        delete:
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "204":
+                    description: Success
+            tags:
+                - emailTemplates
+            summary: Delete an email template.
+    "/email-templates/{id}/preview":
+        post:
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "201":
+                    description: Success
+            tags:
+                - emailTemplates
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                destinationAddress:
+                                    description: Where the email should be sent.
+                                    type: string
+                            required:
+                                - destinationAddress
+                required: true
+            summary: Send email Templates as preview.
+components:
+    requestBodies:
+        emailTemplatesPost:
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/emailTemplatesPost"
+            required: true
+    schemas:
+        emailTemplates:
+            properties:
+                emailTemplatesID:
+                    description: Unique email Templates ID.
+                    type: integer
+                dateInserted:
+                    description: When the email template was created.
+                    format: date-time
+                    type: string
+                dateUpdated:
+                    description: When the email template was last updated.
+                    format: date-time
+                    type: string
+                emailLogo:
+                    description: Logo to be used in email template.
+                    minLength: 0
+                    nullable: true
+                    type: string
+                insertUser:
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                insertUserID:
+                    description: Unique ID of the user who originally created the email templates .
+                    type: integer
+                name:
+                    description: Title of the email templates .
+                    minLength: 0
+                    nullable: true
+                    type: string
+                subject:
+                    description: Subject of the email Templates .
+                    minLength: 0
+                    nullable: true
+                    type: string
+                body:
+                    description: Body of the email Templates .
+                    minLength: 0
+                    nullable: true
+                    type: string
+                footer:
+                    description: Footer of the email Templates .
+                    minLength: 0
+                    nullable: true
+                    type: string
+                emailConfig:
+                    description: >-
+                        Email config configuration.
+                    type: object
+                status:
+                    description: ""
+                    enum:
+                        - active
+                        - inactive
+                        - deleted
+                    minLength: 1
+                    nullable: true
+                    type: string
+                updateUser:
+                    $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                updateUserID:
+                    description: Unique ID of the last user to update the email Templates .
+                    type: integer
+            required:
+                - name
+                - body
+                - footer
+                - subject
+                - emailLogo
+                - insertUserID
+                - dateInserted
+                - updateUserID
+                - dateUpdated
+                - status
+            type: object
+        emailTemplatesPost:
+            properties:
+                body:
+                    description: Body content of the email template.
+                    minLength: 1
+                    type: string
+                name:
+                    description: Title of the email templates.
+                    minLength: 1
+                    type: string
+                subject:
+                    description: Subject of the email templates.
+                    minLength: 1
+                    type: string
+                footer:
+                    description: Footer of the email templates.
+                    minLength: 1
+                    type: string
+                emailLogo:
+                    description: Title of the email templates.
+                    minLength: 1
+                    type: string
+                emailConfig:
+                    description: Email configuration of the email templates.
+                    type: object
+                fromName:
+                    description: Title of the email templates.
+                    minLength: 1
+                    type: string
+                fromEmail:
+                    description: Title of the email templates.
+                    minLength: 1
+                    type: string
+                status:
+                    description: Status of the email templates.
+                    enum:
+                        - active
+                        - inactive
+                        - deleted
+                    minLength: 1
+                    nullable: true
+                    type: string
+            required:
+                - knowledgeCategoryID
+                - name
+                - subject
+                - body
+                - fromName
+                - fromEmail
+            type: object
+        emailTemplatesPatch:
+            properties:
+                body:
+                    description: Body content of the email template.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                subject:
+                    description: Subject of the email Templates.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                footer:
+                    description: Footer of the email Templates.
+                    nullable: true
+                    type: string
+                emailLogo:
+                    description: Title of the email templates.
+                    minLength: 1
+                    nullable: true
+                    type: string
+                emailConfig:
+                    description: Email configuration of the email templates.
+                    type: object
+                    nullable: true
+                fromName:
+                    description: Title of the email templates.
+                    minLength: 1
+                    type: string
+                    nullable: true
+                fromEmail:
+                    description: Title of the email templates.
+                    minLength: 1
+                    type: string
+                    nullable: true
+                status:
+                    description: Status of the email templates.
+                    enum:
+                        - active
+                        - inactive
+                        - deleted
+                    minLength: 1
+                    nullable: true
+                    type: string
+            type: object

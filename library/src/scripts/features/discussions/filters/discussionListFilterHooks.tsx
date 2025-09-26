@@ -10,7 +10,7 @@ import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useQuery } from "@tanstack/react-query";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import sortBy from "lodash-es/sortBy";
-import { IGroupOption } from "@library/forms/select/Tokens.loadable";
+import { IGroupOption } from "@library/forms/select/Tokens.types";
 import { t } from "@library/utility/appUtils";
 import { useConfigsByKeys } from "@library/config/configHooks";
 import { LoadStatus } from "@library/@types/api/core";

@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { AdminSidebarFilters } from "@dashboard/components/AdminSidebarFilters";
 import { DashboardSchemaForm } from "@dashboard/forms/DashboardSchemaForm";
 import { css } from "@emotion/css";
 import { SchemaFormBuilder } from "@library/json-schema-forms";
@@ -16,15 +17,6 @@ export interface IManageIconsForm {
     iconType: "all" | "custom" | "system";
 }
 
-const classes = {
-    heading: css({
-        marginTop: 12,
-        "&:first-child": {
-            marginTop: 0,
-        },
-    }),
-};
-
 interface IProps {
     value: IManageIconsForm;
     onChange: (value: IManageIconsForm) => void;
@@ -33,8 +25,8 @@ interface IProps {
 export function ManageIconsForm(props: IProps) {
     const { value, onChange } = props;
     return (
-        <>
-            <h3 className={classes.heading}>Filters</h3>
+        <AdminSidebarFilters>
+            <h3>{t("Filters")}</h3>
             <DashboardSchemaForm
                 forceVerticalLabels={true}
                 instance={value}
@@ -63,7 +55,7 @@ export function ManageIconsForm(props: IProps) {
                     .withoutBorder()
                     .getSchema()}
             />
-            <h3 className={classes.heading}>{t("Previews")}</h3>
+            <h3>{t("Previews")}</h3>
             <DashboardSchemaForm
                 forceVerticalLabels={true}
                 instance={value}
@@ -101,6 +93,6 @@ export function ManageIconsForm(props: IProps) {
                     .withoutBorder()
                     .getSchema()}
             />
-        </>
+        </AdminSidebarFilters>
     );
 }

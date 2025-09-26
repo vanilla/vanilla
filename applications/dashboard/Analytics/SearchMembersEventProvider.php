@@ -14,7 +14,7 @@ use Vanilla\Dashboard\Events\SearchMembersEvent;
 class SearchMembersEventProvider implements EventProviderInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getEvent(array $body): object
     {
@@ -24,7 +24,7 @@ class SearchMembersEventProvider implements EventProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function canHandleRequest(array $body): bool
     {

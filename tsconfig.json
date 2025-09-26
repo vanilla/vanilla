@@ -1,61 +1,24 @@
 {
-    "extends": "./packages/vanilla-tsconfig/base.json",
+    "extends": "./tsconfig.aliases.json",
     "compilerOptions": {
-        "baseUrl": "./",
-        "paths": {
-            "@library/*": ["./library/src/scripts/*"],
-            "@vanilla/addon-vanilla/*": ["./applications/vanilla/src/scripts/*"],
-            "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
-            "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
-            "@openapi-embed/*": ["./cloud/plugins/openapi-embed/src/scripts/*"],
-            "@knowledge/*": ["./cloud/plugins/knowledge/src/scripts/*"],
-            "@vanillaanalytics/*": ["./cloud/plugins/vanillaanalytics/src/scripts/*"],
-            "@FederatedSearch/*": ["./cloud/plugins/FederatedSearch/src/scripts/*"],
-            "@oauth2/*": ["./plugins/oauth2/src/scripts/*"],
-            "@webhooks/*": ["./cloud/plugins/webhooks/src/scripts/*"],
-            "@themingapi/*": ["./cloud/plugins/themingapi/src/scripts/*"],
-            "@subcommunities/*": ["./cloud/plugins/subcommunities/src/scripts/*"],
-            "@ideation/*": ["./plugins/ideation/src/scripts/*"],
-            "@groups/*": ["./applications/groups/src/scripts/*"],
-            "@Ranks/*": ["./cloud/plugins/Ranks/src/scripts/*"],
-            "@badges/*": ["./cloud/plugins/badges/src/scripts/*"],
-            "@Online/*": ["./cloud/plugins/Online/src/scripts/*"],
-            "@Jira/*": ["./cloud/plugins/Jira/src/scripts/*"],
-            "@SentimentAnalysis/*": ["./cloud/plugins/SentimentAnalysis/src/scripts/*"],
-            "@ElasticSearch/*": ["./cloud/plugins/ElasticSearch/src/scripts/*"],
-            "@Zendesk/*": ["./cloud/plugins/Zendesk/src/scripts/*"],
-            "@QnA/*": ["./plugins/QnA/src/scripts/*"],
-            "@vanilla-ai/*": ["./cloud/plugins/vanilla-ai/src/scripts/*"],
-            "@vfdeploy/*": ["./cloud/plugins/vfdeploy/src/scripts/*"],
-            "@zoom/*": ["./cloud/plugins/zoom/src/scripts/*"],
-            "typestyle": ["./library/src/scripts/styles/styleShim.ts"],
-            "@vanilla/dom-utils": ["./packages/vanilla-dom-utils/src/index.ts"],
-            "@vanilla/eslint-config": ["./packages/vanilla-eslint-config"],
-            "@vanilla/i18n": ["./packages/vanilla-i18n/src/index.ts"],
-            "@vanilla/prettier-config": ["./packages/vanilla-prettier-config"],
-            "@vanilla/react-utils": ["./packages/vanilla-react-utils/src/index.ts"],
-            "@vanilla/redux-utils": ["./packages/vanilla-redux-utils"],
-            "@vanilla/theme-core": ["./packages/vanilla-theme-core"],
-            "@vanilla/tsconfig": ["./packages/vanilla-tsconfig"],
-            "@vanilla/utils": ["./packages/vanilla-utils/index.ts"],
-            "@vanilla/icons": ["./packages/vanilla-icons/index.ts"],
-            "@icons/*": ["./packages/vanilla-icons/src/*"],
-            "@vanilla/ui": ["./packages/vanilla-ui/src/index.ts"],
-            "@vanilla/json-schema-forms": ["./library/src/scripts/json-schema-forms/index.ts"],
-            "@vanilla/json-schema-forms/src/*": ["./library/src/scripts/json-schema-forms/*"]
-        },
-        // Turning incremental on add 10+ minutes of emit time (because it requires emitting declarations).
-        // Our typecheck time is ~30 seconds. When we emit it takes much longer.
-        "incremental": false,
+        "incremental": true,
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
         "types": ["vitest/globals", "jquery"],
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "moduleResolution": "bundler"
     },
+    "files": [
+        "library/src/scripts/htmlWidget/HtmlWidgetEditor.d.ts",
+        "node_modules/vite/client.d.ts",
+        "library/src/scripts/@types/global.d.ts",
+        "library/src/scripts/@types/react-spring.d.ts"
+    ],
     "include": [
         "build/**/*.ts",
         "build/**/*.tsx",
         "build/**/*.mts",
+        "build/**/*.cjs",
         "library/src/scripts/**/*.ts",
         "library/src/scripts/**/*.tsx",
         "applications/*/src/scripts/**/*.ts",
@@ -65,10 +28,8 @@
         "cloud/applications/*/src/scripts/**/*.ts",
         "cloud/applications/*/src/scripts/**/*.tsx",
         "cloud/applications/groups/src/scripts/**/*.tsx",
-        "packages/vanilla-ui-library/**/*.ts",
-        "packages/vanilla-ui-library/**/*.tsx",
-        "packages/vanilla-icons/**/*.ts",
-        "packages/vanilla-icons/**/*.tsx",
+        "packages/**/*.ts",
+        "packages/**/*.tsx",
         "plugins/*/src/scripts/**/*.ts",
         "plugins/*/src/scripts/**/*.tsx",
         "themes/*/src/scripts/**/*.ts",
@@ -78,7 +39,6 @@
         ".storybookAppPages/*.ts*",
         "vitest.config.mts"
     ],
-    "files": ["library/src/scripts/htmlWidget/HtmlWidgetEditor.d.ts", "node_modules/vite/client.d.ts"],
     "exclude": [
         "**/*.js",
         "**/*.jsx",
@@ -88,7 +48,8 @@
         "./node_modules",
         "./node_modules/*",
         "./node_modules/@types/node/index.d.ts",
-        "packages/vanilla-ui-library/dist/**/*.ts",
-        "packages/vanilla-ui-library/dist/**/*.tsx"
+        "packages/**/dist/**/*.ts",
+        "packages/**/dist/**/*.tsx",
+        "packages/vanilla-ui-library-example"
     ]
 }

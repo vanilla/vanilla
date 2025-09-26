@@ -20,7 +20,7 @@ class TextBlot extends AbstractBlot
     /**
      * The TextBlot can only match on operations that are a plain string insert.
      *
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $operation): bool
     {
@@ -31,7 +31,7 @@ class TextBlot extends AbstractBlot
     /**
      * Parse out text formats, and get main initial content.
      *
-     * @inheritDoc
+     * @inheritdoc
      */
     public function __construct(
         array $currentOperation,
@@ -47,7 +47,7 @@ class TextBlot extends AbstractBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function render(): string
     {
@@ -65,7 +65,7 @@ class TextBlot extends AbstractBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function shouldClearCurrentGroup(BlotGroup $group): bool
     {

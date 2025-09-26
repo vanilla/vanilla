@@ -34,7 +34,7 @@ class AcceptedSiteTotalProvider implements \Vanilla\Contracts\Models\SiteSection
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int
     {
@@ -56,7 +56,7 @@ class AcceptedSiteTotalProvider implements \Vanilla\Contracts\Models\SiteSection
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTableName(): string
     {
@@ -64,7 +64,7 @@ class AcceptedSiteTotalProvider implements \Vanilla\Contracts\Models\SiteSection
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteTotalRecordType(): string
     {

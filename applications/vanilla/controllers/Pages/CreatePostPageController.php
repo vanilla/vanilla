@@ -8,6 +8,7 @@
 namespace Vanilla\Forum\Controllers\Pages;
 
 use Garden\Web\Data;
+use Garden\Web\Exception\Pass;
 use Vanilla\Forum\Controllers\Api\PostTypesApiController;
 use Vanilla\Http\InternalClient;
 use Vanilla\Layout\Asset\LayoutQuery;
@@ -43,6 +44,11 @@ class CreatePostPageController extends PageDispatchController
     {
         // For new posts
         [$postTypeID, $categorySlug] = array_filter(explode("/", trim($path, "/")));
+
+        if (in_array(strtolower($postTypeID), ["comment", "editcomment"])) {
+            // These are still handled in the old post controller.
+            throw new Pass();
+        }
 
         /**
          * This branch is needed to get the categoryID for the discussion being edited so that it

@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Dashboard\Models\UserMentionsModel;
 
 if (!function_exists("absoluteSource")) {
     /**
@@ -907,8 +908,16 @@ if (!function_exists("getAllMentions")) {
      * @param string $str The string to parse.
      * @return array The mentioned usernames.
      */
-    function getAllMentions($str)
+    function getAllMentions(string $str): array
     {
+        try {
+            if (!UserMentionsModel::canParseMentions()) {
+                return [];
+            }
+        } catch (Exception $e) {
+            // don't do anything
+        }
+
         $parts = preg_split("`\B@`", $str);
         $mentions = [];
         if (count($parts) == 1) {

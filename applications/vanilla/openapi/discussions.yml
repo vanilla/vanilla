@@ -52,6 +52,11 @@ paths:
                       type: string
                   x-filter:
                       field: d.Type
+                - name: postTypeID
+                  description: Filter by one or more postTypeIDs.
+                  in: query
+                  schema:
+                      type: string
                 - name: status
                   description: Filter questions by status (accepted, answered, unanswered).
                   in: query
@@ -221,6 +226,7 @@ paths:
                           - balanced
                           - positive
                           - stronglyPositive
+                - $ref: "#/components/parameters/PostFieldFilters"
             responses:
                 "200":
                     content:
@@ -576,9 +582,6 @@ paths:
                                         postType:
                                             description: Post type of the discussion.
                                             type: string
-                                        #postTypeID: Placeholder for custom post types.
-                                        #   description: Post type ID of the discussion.
-                                        #   type: integer
                                         authorType:
                                             description: Author of the new discussion.
                                             type: string
@@ -1287,6 +1290,16 @@ components:
                         - postMeta
                         - permissions
             style: form
+        PostFieldFilters:
+            x-hidden: true
+            name: postMeta
+            description: Filter by users' discussions by their post field meta values.
+            in: query
+            schema:
+                type: object
+                properties:
+                    postMeta:
+                        type: object
 
     schemas:
         PostMeta:
@@ -1622,6 +1635,10 @@ components:
                     type: string
                 postMeta:
                     $ref: "#/components/schemas/PostMeta"
+                tagIDs:
+                    type: array
+                    items:
+                        type: integer
             required:
                 - discussionID
                 - name
@@ -1682,6 +1699,14 @@ components:
                     type: string
                 postMeta:
                     $ref: "#/components/schemas/PostMeta"
+                newTagNames:
+                    type: array
+                    items:
+                        type: string
+                tagIDs:
+                    type: array
+                    items:
+                        type: integer
             required:
                 - name
                 - body
@@ -1733,6 +1758,14 @@ components:
                     type: boolean
                 postMeta:
                     $ref: "#/components/schemas/PostMeta"
+                newTagNames:
+                    type: array
+                    items:
+                        type: string
+                tagIDs:
+                    type: array
+                    items:
+                        type: integer
             type: object
         PostFragment:
             properties:

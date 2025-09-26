@@ -38,11 +38,7 @@ export function FilterFrame(props: React.PropsWithChildren<ISearchFilterPanel>) 
             header={
                 <FrameHeader titleID={titleID} title={title} className={classes.header} titleClass={classes.title} />
             }
-            body={
-                <FrameBody scrollable={false} className={classes.body}>
-                    {children}
-                </FrameBody>
-            }
+            body={<FrameBody className={classes.body}>{children}</FrameBody>}
             footer={
                 !hideFooter ? (
                     <FrameFooter className={classes.footer}>

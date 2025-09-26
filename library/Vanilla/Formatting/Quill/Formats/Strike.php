@@ -10,7 +10,7 @@ namespace Vanilla\Formatting\Quill\Formats;
 class Strike extends AbstractFormat
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getAttributeLookupKey(): string
     {
@@ -18,14 +18,14 @@ class Strike extends AbstractFormat
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getBlackListedNestedFormats(): array
     {
         return [Link::class, Code::class, Italic::class, Bold::class];
     }
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getTagName(): string
     {

@@ -20,7 +20,7 @@ class MessageController extends DashboardController
     public $Form;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct()
     {

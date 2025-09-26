@@ -6,7 +6,7 @@
 
 import { queryRichLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/queries/queryRichLink";
 import { useVirtualFloatingLink } from "@library/vanilla-editor/plugins/richEmbedPlugin/toolbar/useVirtualFloatingLink";
-import { useMyEditorRef } from "@library/vanilla-editor/typescript";
+import { useMyEditorRef } from "@library/vanilla-editor/getMyEditor";
 import { mergeProps, toDOMNode } from "@udecode/plate-common";
 import {
     UseVirtualFloatingOptions,

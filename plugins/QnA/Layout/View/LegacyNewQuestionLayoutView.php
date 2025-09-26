@@ -13,7 +13,7 @@ namespace Vanilla\QnA\Layout\View;
 class LegacyNewQuestionLayoutView implements \Vanilla\Layout\View\LegacyLayoutViewInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -21,7 +21,7 @@ class LegacyNewQuestionLayoutView implements \Vanilla\Layout\View\LegacyLayoutVi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -29,7 +29,7 @@ class LegacyNewQuestionLayoutView implements \Vanilla\Layout\View\LegacyLayoutVi
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLegacyType(): string
     {

@@ -31,7 +31,7 @@ class OAuth2Authenticator extends ShimAuthenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getAuthenticatorTypeInfoImpl(): array
     {
@@ -53,7 +53,7 @@ class OAuth2Authenticator extends ShimAuthenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isUnique(): bool
     {

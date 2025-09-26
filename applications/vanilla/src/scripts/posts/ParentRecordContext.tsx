@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { ICreatePostForm } from "@vanilla/addon-vanilla/createPost/CreatePostFormAsset.hooks";
+import { IGetEditPostResponse } from "@vanilla/addon-vanilla/createPost/CreatePostFormAsset.hooks";
 import { logDebug } from "@vanilla/utils";
 import { createContext, useContext } from "react";
 
@@ -13,7 +13,7 @@ interface IParentRecordContext<T> {
     parentRecordID?: string;
     recordType?: string;
     recordID?: string;
-    record?: ICreatePostForm;
+    record?: IGetEditPostResponse;
     getExternalData: (key: string, args: unknown[]) => T | undefined;
 }
 

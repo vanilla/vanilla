@@ -12,7 +12,7 @@ import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { LoaderIcon } from "@library/icons/common";
 import { cx } from "@emotion/css";
 
-interface IProps {
+interface IButtonLoaderProps {
     className?: string;
     buttonType?: ButtonTypes;
     alignLeft?: boolean;
@@ -21,7 +21,7 @@ interface IProps {
 /**
  * A smart loading component. Takes up the full page and only displays in certain scenarios.
  */
-export default function ButtonLoader(props: IProps) {
+export default function ButtonLoader(props: IButtonLoaderProps) {
     const classes = buttonLoaderClasses();
     return (
         <span

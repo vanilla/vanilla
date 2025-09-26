@@ -5,7 +5,6 @@
  */
 
 import { userContentClasses } from "@library/content/UserContent.styles";
-import { ensureBuiltinEmbeds } from "@library/embeddedContent/embedService.loadable";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import getStore from "@library/redux/getStore";
 import { cx } from "@library/styles/styleShim";
@@ -24,7 +23,8 @@ import { RichLinkAppearance } from "@library/vanilla-editor/plugins/richEmbedPlu
 import { FloatingElementToolbar } from "@library/vanilla-editor/toolbars/ElementToolbar";
 import { MarkToolbar } from "@library/vanilla-editor/toolbars/MarkToolbar";
 import { PersistentToolbar } from "@library/vanilla-editor/toolbars/PersistentToolbar";
-import { MyEditor, MyValue, createMyPlateEditor } from "@library/vanilla-editor/typescript";
+import { MyEditor, MyValue, type IVanillaEditorRef } from "@library/vanilla-editor/typescript";
+import { createMyPlateEditor } from "./getMyEditor";
 import {
     Plate,
     PlateProvider,
@@ -39,13 +39,27 @@ import { ELEMENT_LINK } from "@udecode/plate-link";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
 import { logError } from "@vanilla/utils";
-import React, { useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
 import { Provider } from "react-redux";
 import { Path } from "slate";
-import { VanillaEditorContainer } from "./VanillaEditorContainer";
+import { VanillaEditorContainer } from "@library/vanilla-editor/VanillaEditorContainer";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
 import { useIsInModal } from "@library/modal/Modal.context";
-import { t } from "@library/utility/appUtils";
+import { TableToolbar } from "@library/vanilla-editor/plugins/tablePlugin/toolbar/TableToolbar";
+import { VanillaEditorTableProvider } from "@library/vanilla-editor/VanillaEditorTableContext";
+import { getMeta, t } from "@library/utility/appUtils";
+import classNames from "classnames";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import {
+    cleanTableRowspanColspan,
+    needsInitialNormalizationForTables,
+    needsRowspanColspanCleaning,
+} from "@library/vanilla-editor/plugins/tablePlugin/tableUtils";
+import { ensureBuiltinEmbedsSync } from "@library/embeddedContent/embedService.loadable";
+
+const userMentionsEnabled: boolean = getMeta("ui.userMentionsEnabled", true);
+
+const isRichTableEnabled = getMeta("featureFlags.RichTable.Enabled", false);
 
 /**
  * @todo
@@ -105,8 +119,8 @@ export function createVanillaEditor(options?: { initialValue?: MyEditor; id?: st
     });
 }
 
-export function LegacyFormVanillaEditor(props: IVanillaEditorProps) {
-    const { legacyTextArea, initialFormat, needsHtmlConversion, ...rest } = props;
+export function LegacyFormVanillaEditorLoadable(props: IVanillaEditorProps) {
+    const { legacyTextArea, initialFormat, needsHtmlConversion, containerClasses, ...rest } = props;
     const store = getStore();
 
     return (
@@ -116,13 +130,20 @@ export function LegacyFormVanillaEditor(props: IVanillaEditorProps) {
                 needsHtmlConversion={needsHtmlConversion}
                 textArea={legacyTextArea}
             >
-                <VanillaEditorLoadable legacyTextArea={legacyTextArea} {...rest} />
+                <VanillaEditorLoadable
+                    legacyTextArea={legacyTextArea}
+                    containerClasses={classNames(containerClasses, "is-legacy")}
+                    {...rest}
+                />
             </SynchronizationProvider>
         </Provider>
     );
 }
 
-export function VanillaEditorLoadable(props: IVanillaEditorProps) {
+export const VanillaEditorLoadable = forwardRef(function VanillaEditorLoadable(
+    props: IVanillaEditorProps,
+    ref: React.RefObject<IVanillaEditorRef>,
+) {
     const { uploadEnabled = true, legacyTextArea, inEditorContent } = props;
     const syncContext = useSynchronizationContext();
     const { syncTextArea, initialValue } = syncContext;
@@ -130,14 +151,18 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    ensureBuiltinEmbeds();
-
     const editorID = useUniqueID("editor");
 
     const editor = useMemo(() => {
         return props.editor ?? createVanillaEditor({ id: editorID });
     }, [props.editor]);
     useImperativeHandle(props.editorRef, () => editor, [editor]);
+
+    useImperativeHandle(ref, () => ({
+        focusEditor: () => {
+            focusEditor(editor);
+        },
+    }));
 
     const isInModal = useIsInModal();
     const device = useDevice();
@@ -214,6 +239,25 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
         }
     };
 
+    const initValue = useMemo(() => {
+        const value = props.initialContent ? ensureMyValue(props.initialContent) : initialValue;
+
+        // we need to run normalizers for initial tables manually for backwords compatibility
+        if (needsInitialNormalizationForTables(editor, value) && needsRowspanColspanCleaning(value as MyValue)) {
+            return cleanTableRowspanColspan(editor, value as MyValue) as MyValue;
+        }
+        return value;
+    }, [props.initialContent, initialValue]);
+
+    useEffect(() => {
+        if (initValue) {
+            props.onChange?.(initValue);
+        }
+    }, [initValue]);
+
+    const classesUserContent = userContentClasses.useAsHook();
+    const classesEditor = vanillaEditorClasses.useAsHook();
+
     return (
         <div id="vanilla-editor-root" ref={scrollRef} data-testid={"vanilla-editor"}>
             <PlateProvider<MyValue>
@@ -227,46 +271,47 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
                         props.onChange(newValue);
                     }
                 }}
-                initialValue={props.initialContent ? ensureMyValue(props.initialContent) : initialValue}
+                initialValue={initValue}
+                normalizeInitialValue={needsInitialNormalizationForTables(editor, initValue)}
             >
                 <ConversionNotice showConversionNotice={showConversionNotice} />
                 <VanillaEditorBoundsContext>
                     <VanillaEditorContainer boxShadow className={props.containerClasses}>
                         {props?.isPreview ? (
                             <div
-                                className={cx(
-                                    userContentClasses().root,
-                                    vanillaEditorClasses().root({ horizontalPadding: true }),
-                                )}
+                                className={cx(classesUserContent.root, classesEditor.root({ horizontalPadding: true }))}
                             >
                                 {t("This is a preview and cannot be edited.")}
                             </div>
                         ) : (
                             <VanillaEditorFocusContext>
-                                <Plate<MyValue>
-                                    id={editorID}
-                                    editor={editor}
-                                    editableProps={{
-                                        onBlur: props.onBlur,
-                                        autoFocus: props.autoFocus,
-                                        className: cx(
-                                            userContentClasses().root,
-                                            vanillaEditorClasses().root({ horizontalPadding: true }),
-                                            props.editorClasses,
-                                        ),
-                                        "aria-label": t(
-                                            "To access the paragraph format menu, press control, shift, and P. To access the text format menu, press control, shift, and I. Use the arrow keys to navigate in each menu.",
-                                        ),
-                                    }}
-                                >
-                                    <VanillaEditorPlaceholder />
-                                    <MarkToolbar />
-                                    <MentionToolbar pluginKey="@" />
-                                    <QuoteEmbedToolbar />
-                                </Plate>
+                                <ConditionalWrap component={VanillaEditorTableProvider} condition={isRichTableEnabled}>
+                                    <Plate<MyValue>
+                                        id={editorID}
+                                        editor={editor}
+                                        editableProps={{
+                                            onBlur: props.onBlur,
+                                            autoFocus: props.autoFocus,
+                                            className: cx(
+                                                classesUserContent.root,
+                                                classesEditor.root({ horizontalPadding: true }),
+                                                props.editorClasses,
+                                            ),
+                                            "aria-label": t(
+                                                "To access the paragraph format menu, press control, shift, and P. To access the text format menu, press control, shift, and I. Use the arrow keys to navigate in each menu.",
+                                            ),
+                                        }}
+                                    >
+                                        <VanillaEditorPlaceholder />
+                                        <MarkToolbar />
+                                        {userMentionsEnabled && <MentionToolbar pluginKey="@" />}
+                                        <QuoteEmbedToolbar />
+                                        {isRichTableEnabled && <TableToolbar />}
+                                    </Plate>
+                                </ConditionalWrap>
                             </VanillaEditorFocusContext>
                         )}
-                        <div className={vanillaEditorClasses().footer}>
+                        <div className={classesEditor.footer}>
                             {!followMobileRenderingRules && <FloatingElementToolbar />}
                             <PersistentToolbar
                                 uploadEnabled={uploadEnabled}
@@ -280,7 +325,7 @@ export function VanillaEditorLoadable(props: IVanillaEditorProps) {
             </PlateProvider>
         </div>
     );
-}
+});
 
 /**
  * Pass this method HTML and it should return it back valid Rich2

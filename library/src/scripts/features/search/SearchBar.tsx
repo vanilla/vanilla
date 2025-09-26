@@ -124,7 +124,7 @@ export default React.forwardRef(function SearchBar(
     const isMenuVisible: boolean | undefined =
         forceMenuClosed || props.value.length === 0 || props.disableAutocomplete ? false : undefined;
 
-    const classes = searchBarClasses(props.overwriteSearchBar);
+    const classes = searchBarClasses.useAsHook(props.overwriteSearchBar);
 
     // Stash the props in a a ref so the inner components can use the latest value, but still have a stable identity.
     const controlProps = {

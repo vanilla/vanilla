@@ -1,14 +1,14 @@
 /**
  * @author Maneesh Chiba <mchiba@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { PostField, PostType } from "@dashboard/postTypes/postType.types";
 import { CreatableFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
-import { IFormControl, JsonSchema } from "@library/json-schema-forms";
-import { visibility } from "@library/styles/styleHelpersVisibility";
+import { IFormControl, JsonSchema, type ICheckBoxControl } from "@library/json-schema-forms";
 import { labelize, notEmpty } from "@vanilla/utils";
+import { spec } from "node:test/reporters";
 
 /**
  * Get the POST url for a given post type
@@ -48,6 +48,7 @@ const makeControl = (postField: PostField): IFormControl => {
         inputType: getInputType(postField.formType),
         label: postField.label,
         description: postField.description,
+        ...(postField.formType === CreatableFieldFormType.TEXT_MULTILINE && { type: "textarea" }),
     };
     let specificControl = {};
 
@@ -58,10 +59,17 @@ const makeControl = (postField: PostField): IFormControl => {
                 value: option,
             }));
             specificControl = {
+                options: choices,
                 choices,
                 multiple: postField.formType === CreatableFieldFormType.TOKENS,
             };
         }
+    }
+
+    if (commonControl.inputType === "checkBox") {
+        specificControl = {
+            checkPosition: "right",
+        } as ICheckBoxControl;
     }
 
     return {

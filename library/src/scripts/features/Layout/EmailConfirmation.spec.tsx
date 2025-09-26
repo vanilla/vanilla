@@ -28,6 +28,7 @@ describe("EmailConfirmation", () => {
                             addToast,
                             updateToast: () => null,
                             removeToast: () => null,
+                            setIsInModal: () => null,
                         }}
                     >
                         {children}
@@ -52,6 +53,7 @@ describe("EmailConfirmation", () => {
                             addToast,
                             updateToast: () => null,
                             removeToast: () => null,
+                            setIsInModal: () => null,
                         }}
                     >
                         {children}
@@ -76,6 +78,7 @@ describe("EmailConfirmation", () => {
                             addToast,
                             updateToast: () => null,
                             removeToast: () => null,
+                            setIsInModal: () => null,
                         }}
                     >
                         {children}

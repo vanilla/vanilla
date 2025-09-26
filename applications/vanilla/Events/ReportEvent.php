@@ -26,7 +26,7 @@ class ReportEvent extends ResourceEvent implements LoggableEventInterface, Track
     const COLLECTION_NAME = "report";
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {
@@ -59,7 +59,7 @@ class ReportEvent extends ResourceEvent implements LoggableEventInterface, Track
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -67,7 +67,7 @@ class ReportEvent extends ResourceEvent implements LoggableEventInterface, Track
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getTrackablePayload(
         TrackableCommunityModel $trackableCommunity,

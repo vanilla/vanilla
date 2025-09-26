@@ -64,6 +64,9 @@ export const layoutSettingsSlice = createSlice({
                     name: t("My Layout"),
                     layoutViewType: initialLayout.layoutViewType as LayoutViewType,
                     layout: [],
+                    titleBar: {
+                        $hydrate: "react.titleBar",
+                    } as any,
                     ...initialLayout,
                 };
             })

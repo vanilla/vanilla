@@ -17,6 +17,8 @@ import {
     LayoutEditorRoute,
     LayoutOverviewRoute,
     ManageIconsRoute,
+    FragmentEditorRoute,
+    WidgetBuilderRoute,
 } from "@dashboard/appearance/routes/appearanceRoutes";
 import { sliceLayoutsByViewType, useLayoutsQuery } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { LayoutViewType, LAYOUT_VIEW_TYPES } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
@@ -427,6 +429,16 @@ export function useAppearanceNavItems(parentID: RecordID): INavigationTreeItem[]
         url: getRelativeUrl(ManageIconsRoute.url(undefined)),
     };
 
+    const fragmentEditorEnabled = getMeta("featureFlags.widgetBuilder.Enabled", false);
+    const fragmentEditor: INavigationTreeItem = {
+        name: t("Widget Builder"),
+        parentID: 0,
+        sort: 0,
+        recordID: "widgetBuilder",
+        recordType: "customLink",
+        url: getRelativeUrl(WidgetBuilderRoute.url(undefined)),
+    };
+
     //Branding & SEO and Style Guides should be part of parent named Branding & Assets
     const brandingAndAssetsTreeItem = {
         name: t("Branding & Assets"),
@@ -434,7 +446,9 @@ export function useAppearanceNavItems(parentID: RecordID): INavigationTreeItem[]
         sort: 0,
         recordID: 0,
         recordType: "panelMenu",
-        children: [brandingPageLink, manageIcons, ...otherNavItems],
+        children: [brandingPageLink, manageIcons, ...(fragmentEditorEnabled ? [fragmentEditor] : []), ...otherNavItems]
+            .flat()
+            .filter((val) => !!val),
     };
 
     const layoutTreeItem = useLayoutEditorNavTree(1, parentID);

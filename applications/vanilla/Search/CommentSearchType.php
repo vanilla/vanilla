@@ -7,12 +7,13 @@
 
 namespace Vanilla\Forum\Search;
 
+use CommentsApiController;
 use Garden\Web\Exception\HttpException;
+use Vanilla\Forum\Models\PostFieldModel;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
-use Vanilla\Search\SearchResultItem;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Contracts\ConfigurationInterface;
@@ -26,33 +27,28 @@ class CommentSearchType extends DiscussionSearchType
      * @var string Class used to construct search result items.
      */
     public static $searchItemClass = DiscussionSearchResultItem::class;
-
-    /** @var \CommentsApiController */
-    private $commentsApi;
-
-    /** @var \CommentModel */
-    private $commentModel;
-
-    /** @var ConfigurationInterface */
-    protected $config;
-
     /**
      * @inheritdoc
      */
     public function __construct(
-        \CommentsApiController $commentsApi,
-        \CommentModel $commentModel,
+        private CommentsApiController $commentsApi,
         \DiscussionsApiController $discussionsApi,
         \CategoryModel $categoryModel,
         \UserModel $userModel,
         \TagModel $tagModel,
         BreadcrumbModel $breadcrumbModel,
-        ConfigurationInterface $config
+        protected ConfigurationInterface $config,
+        PostFieldModel $postFieldModel
     ) {
-        parent::__construct($discussionsApi, $categoryModel, $userModel, $tagModel, $breadcrumbModel, $config);
-        $this->commentsApi = $commentsApi;
-        $this->commentModel = $commentModel;
-        $this->config = $config;
+        parent::__construct(
+            $discussionsApi,
+            $categoryModel,
+            $userModel,
+            $tagModel,
+            $breadcrumbModel,
+            $config,
+            $postFieldModel
+        );
     }
 
     /**
@@ -212,7 +208,7 @@ class CommentSearchType extends DiscussionSearchType
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getIndex(): string
     {
@@ -249,5 +245,13 @@ class CommentSearchType extends DiscussionSearchType
     public function guidToRecordID(int $guid): ?int
     {
         return ($guid - 2) / 10;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function applyToQuery(SearchQuery $query)
+    {
+        parent::applyToQuery($query);
     }
 }

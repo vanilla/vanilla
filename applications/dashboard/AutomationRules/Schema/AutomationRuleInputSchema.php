@@ -18,7 +18,7 @@ use Vanilla\Schema\RangeExpression;
 class AutomationRuleInputSchema extends Schema
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function __construct()
     {

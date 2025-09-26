@@ -13,10 +13,10 @@ use Vanilla\Models\GenericRecord;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Site\SiteSectionModel;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
-class BreadcrumbWidget extends AbstractReactModule implements HydrateAwareInterface
+class BreadcrumbWidget extends LegacyReactModule implements HydrateAwareInterface
 {
     use HydrateAwareTrait;
     use HomeWidgetContainerSchemaTrait;

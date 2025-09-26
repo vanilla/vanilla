@@ -5,33 +5,39 @@
  */
 
 import { useLayoutEditor } from "@dashboard/layout/editor/LayoutEditor";
-import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.classes";
-import { LayoutEditorDirection, LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
+import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
+import { LayoutEditorToolbar } from "@dashboard/layout/editor/LayoutEditorToolbar";
+import { LayoutEditorWidgetMeta } from "@dashboard/layout/editor/LayoutEditorWidgetMeta";
 import { WidgetSettingsModal } from "@dashboard/layout/editor/widgetSettings/WidgetSettingsModal";
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { ILayoutEditorWidgetPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { cx } from "@emotion/css";
-import { EmbedMenu } from "@library/editor/pieces/EmbedMenu";
-import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
+import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 import { extractSchemaDefaults } from "@library/json-schema-forms";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { useWidgetContext } from "@library/layout/LayoutWidget";
+import { ClearThemeOverrideContext } from "@library/theming/ThemeOverrideContext";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import { useState } from "react";
-import isEmpty from "lodash/isEmpty";
 import { mergeAndReplaceArrays } from "@vanilla/utils";
+import isEmpty from "lodash-es/isEmpty";
+import { forwardRef, useState } from "react";
 
 interface IProps {
     path: ILayoutEditorWidgetPath;
+    positionRelativeTo?: HTMLElement | null;
+    positionAbsolute?: boolean;
+    noDrag?: boolean;
+    noDelete?: boolean;
+    dragAttributes?: React.HTMLAttributes<any>;
 }
 
-export function LayoutEditorWidgetToolbar(props: IProps) {
+export const LayoutEditorWidgetToolbar = forwardRef(function LayoutEditorWidgetToolbar(
+    props: IProps,
+    ref: React.Ref<HTMLDivElement>,
+) {
     const { editorContents, editorSelection, layoutViewType } = useLayoutEditor();
-    const pathRight = editorSelection.getWidgetPathInDirection(props.path, LayoutEditorDirection.RIGHT);
-    const pathLeft = editorSelection.getWidgetPathInDirection(props.path, LayoutEditorDirection.LEFT);
-    const pathDown = editorSelection.getWidgetPathInDirection(props.path, LayoutEditorDirection.DOWN);
-    const pathUp = editorSelection.getWidgetPathInDirection(props.path, LayoutEditorDirection.UP);
 
     const catalog = useLayoutCatalog(layoutViewType);
     const widgetSpec = editorContents.getWidget(props.path);
@@ -42,7 +48,8 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
     const widgetProps = isEmpty(rest) ? undefined : rest;
 
     const trashButton = (
-        <EmbedButton
+        <Button
+            buttonType={ButtonTypes.ICON}
             disabled={isRequired}
             onClick={(e) => {
                 e.preventDefault();
@@ -52,68 +59,31 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
             }}
         >
             <Icon icon={"delete"} />
-        </EmbedButton>
+        </Button>
     );
+
+    const widgetContext = useWidgetContext();
 
     return (
         <>
-            <EmbedMenu
-                onClick={(e) => {
-                    // Prevent this click from bubbling up.
-                    e.preventDefault();
-                    e.stopPropagation();
-                }}
-                className={cx(layoutEditorClasses().toolbarMenu, "layoutEditorToolbarMenu")}
+            <LayoutEditorToolbar
+                positionAbsolute={props.positionAbsolute}
+                positionRelativeTo={widgetContext.widgetRef.current}
             >
-                <EmbedButton
-                    disabled={!pathLeft}
-                    onClick={() => {
-                        if (!pathLeft) {
-                            return;
-                        }
-                        editorContents.moveWidget(props.path, pathLeft);
-                        editorSelection.moveSelectionTo(pathLeft, LayoutEditorSelectionMode.WIDGET);
-                    }}
-                >
-                    <Icon icon={"move-left"} />
-                </EmbedButton>
-                <EmbedButton
-                    disabled={!pathUp}
-                    onClick={() => {
-                        if (!pathUp) {
-                            return;
-                        }
-                        editorContents.moveWidget(props.path, pathUp);
-                        editorSelection.moveSelectionTo(pathUp, LayoutEditorSelectionMode.WIDGET);
-                    }}
-                >
-                    <Icon icon={"move-up"} />
-                </EmbedButton>
-                <EmbedButton
-                    disabled={!pathDown}
-                    onClick={() => {
-                        if (!pathDown) {
-                            return;
-                        }
-                        editorContents.moveWidget(props.path, pathDown);
-                        editorSelection.moveSelectionTo(pathDown, LayoutEditorSelectionMode.WIDGET);
-                    }}
-                >
-                    <Icon icon={"move-down"} />
-                </EmbedButton>
-                <EmbedButton
-                    disabled={!pathRight}
-                    onClick={() => {
-                        if (!pathRight) {
-                            return;
-                        }
-                        editorContents.moveWidget(props.path, pathRight);
-                        editorSelection.moveSelectionTo(pathRight, LayoutEditorSelectionMode.WIDGET);
-                    }}
-                >
-                    <Icon icon={"move-right"} />
-                </EmbedButton>
-                <EmbedButton
+                <LayoutEditorWidgetMeta widgetPath={props.path} />
+                {!props.noDrag && (
+                    <span data-draggable="button" {...props.dragAttributes}>
+                        <ToolTip label={t("Drag Widget")}>
+                            <span>
+                                <Button buttonType={ButtonTypes.ICON} style={{ cursor: "grab" }}>
+                                    <Icon icon={"move-drag"} />
+                                </Button>
+                            </span>
+                        </ToolTip>
+                    </span>
+                )}
+                <Button
+                    buttonType={ButtonTypes.ICON}
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -121,39 +91,41 @@ export function LayoutEditorWidgetToolbar(props: IProps) {
                     }}
                 >
                     <Icon icon={"edit"} />
-                </EmbedButton>
-                <ConditionalWrap
-                    component={ToolTip}
-                    condition={!!isRequired}
-                    componentProps={{ label: t("You cannot delete this required widget") }}
-                >
-                    {isRequired ? <span>{trashButton}</span> : trashButton}
-                </ConditionalWrap>
-            </EmbedMenu>
+                </Button>
+                {!props.noDelete && (
+                    <ConditionalWrap
+                        component={ToolTip}
+                        condition={!!isRequired}
+                        componentProps={{ label: t("You cannot delete this required widget") }}
+                    >
+                        {isRequired ? <span>{trashButton}</span> : trashButton}
+                    </ConditionalWrap>
+                )}
+            </LayoutEditorToolbar>
             {!!catalog && !!$hydrate && !!widget && (
-                <WidgetSettingsModal
-                    key={$hydrate}
-                    exitHandler={() => {
-                        setWidgetSettingsModalOpen(false);
-                    }}
-                    onSave={(settings) => {
-                        editorContents.modifyWidget(props.path, {
-                            $hydrate: $hydrate,
-                            ...settings,
-                        });
-                        editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
-                        setWidgetSettingsModalOpen(false);
-                    }}
-                    isVisible={isWidgetSettingsModalOpen}
-                    schema={widget.schema}
-                    name={widget.name}
-                    initialValues={mergeAndReplaceArrays(extractSchemaDefaults(widget.schema), widgetProps ?? {})}
-                    widgetCatalog={catalog.widgets}
-                    middlewaresCatalog={catalog.middlewares ?? {}}
-                    widgetID={$hydrate}
-                    assetCatalog={catalog.assets}
-                />
+                <ClearThemeOverrideContext>
+                    <WidgetSettingsModal
+                        key={$hydrate}
+                        exitHandler={() => {
+                            setWidgetSettingsModalOpen(false);
+                        }}
+                        onSave={(settings) => {
+                            editorContents.modifyWidget(props.path, {
+                                $hydrate: $hydrate,
+                                ...settings,
+                            });
+                            editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
+                            setWidgetSettingsModalOpen(false);
+                        }}
+                        isVisible={isWidgetSettingsModalOpen}
+                        schema={widget.schema}
+                        name={widget.name}
+                        initialValues={mergeAndReplaceArrays(extractSchemaDefaults(widget.schema), widgetProps ?? {})}
+                        layoutCatalog={catalog}
+                        widgetID={$hydrate}
+                    />
+                </ClearThemeOverrideContext>
             )}
         </>
     );
-}
+});

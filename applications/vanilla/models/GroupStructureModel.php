@@ -70,6 +70,11 @@ class GroupStructureModel
             ->set();
 
         $structure
+            ->table("UserGroup")
+            ->createIndexIfNotExists("IX_UserGroup_UserID_GroupID_Notification", ["UserID", "GroupID", "Notification"])
+            ->createIndexIfNotExists("IX_UserGroup_UserID_GroupID_Followed", ["UserID", "GroupID", "Followed"]);
+
+        $structure
             ->table("GroupApplicant")
             ->primaryKey("GroupApplicantID")
             ->column("GroupID", "int", false, "unique")

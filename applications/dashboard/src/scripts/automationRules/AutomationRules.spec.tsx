@@ -77,7 +77,7 @@ describe("AutomationRules", () => {
 
     beforeAll(() => {
         mockAdapter = mockAPI();
-        mockAdapter.onGet("/automation-rules/recipes?expand=all").reply((config) => {
+        mockAdapter.onGet(/automation-rules\/recipes/).reply((config) => {
             return config.params.escalations ? [200, [mockRecipesList[5]]] : [200, mockRecipesList];
         });
         mockAdapter.onGet(/automation-rules\/1\/recipe/).reply(200, mockRecipesList[0]);
@@ -130,7 +130,7 @@ describe("AutomationRules", () => {
 
     it("Escalation Rules List Page - Only rules having escalation actions", async () => {
         renderInProvider(<AutomationRulesList isEscalationRulesList />);
-
+        await vi.dynamicImportSettled();
         const table = await screen.findByRole("table");
         const tableRows = table.querySelectorAll("tbody tr");
         expect(tableRows).toHaveLength(1);

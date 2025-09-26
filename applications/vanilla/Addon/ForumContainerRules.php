@@ -21,6 +21,7 @@ use Vanilla\AutomationRules\Triggers\ReportPostTrigger;
 use Vanilla\Dashboard\AutomationRules\Actions\AddRemoveUserRoleAction;
 use Vanilla\Dashboard\AutomationRules\EscalationRuleService;
 use Vanilla\Dashboard\AutomationRules\Triggers\ProfileFieldSelectionTrigger;
+use Vanilla\Dashboard\AutomationRules\Triggers\TimeSinceLastActiveTrigger;
 use Vanilla\Dashboard\AutomationRules\Triggers\TimeSinceUserRegistrationTrigger;
 use Vanilla\Dashboard\AutomationRules\Triggers\UserEmailDomainTrigger;
 use Vanilla\Dashboard\Controllers\Api\GpcApiController;
@@ -41,6 +42,7 @@ use Vanilla\Dashboard\Models\AutomationRuleModel;
 use Vanilla\Forum\Controllers\Pages\CategoryListPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionPageController;
+use Vanilla\Forum\Controllers\Pages\DraftsAndSchedulePageController;
 use Vanilla\Forum\Controllers\Pages\CreatePostPageController;
 use Vanilla\Forum\Controllers\Pages\UnsubscribePageController;
 use Vanilla\Forum\Controllers\Pages\ConvertHTMLPageController;
@@ -60,18 +62,18 @@ use Vanilla\Forum\Models\DiscussionCollectionProvider;
 use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\Forum\Models\ForumQuickLinksProvider;
 use Vanilla\Forum\Models\PostFieldsExpander;
+use Vanilla\Forum\Models\PostFieldsOpenApi;
 use Vanilla\Forum\Models\PostingSiteMetaExtra;
-use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Forum\Models\ReactionsQuickLinksProvider;
 use Vanilla\Forum\Models\Totals\CategorySiteTotalProvider;
 use Vanilla\Forum\Models\Totals\CommentSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\DiscussionSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\PostSiteTotalProvider;
 use Vanilla\Forum\Models\VanillaEscalationAttachmentProvider;
+use Vanilla\Forum\Widgets\SearchWidget;
 use Vanilla\Forum\Widgets\DiscussionAnnouncementsWidget;
 use Vanilla\Forum\Widgets\DiscussionDiscussionsWidget;
 use Vanilla\Forum\Widgets\PostTagsAsset;
-use Vanilla\Forum\Widgets\CreatePostFormAsset;
 use Vanilla\Forum\Widgets\SuggestedContentWidget;
 use Vanilla\Forum\Widgets\TagWidget;
 use Vanilla\Forum\Widgets\CategoriesWidget;
@@ -94,6 +96,7 @@ use Vanilla\Layout\View\HomeLayoutView;
 use Vanilla\Models\CollectionModel;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
+use Vanilla\OpenAPIBuilder;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Utility\DebugUtils;
@@ -129,6 +132,7 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addReactResolver", [BreadcrumbWidget::class])
             ->addCall("addReactResolver", [PostTagsAsset::class])
             ->addCall("addReactResolver", [SuggestedContentWidget::class])
+            ->addCall("addReactResolver", [SearchWidget::class])
             ->addCall("addMiddleware", [new Reference(CategoryFilterMiddleware::class)])
 
             // Modern layout views.
@@ -250,6 +254,14 @@ class ForumContainerRules extends AddonContainerRules
             "/dashboard/content" => AdminContentPageController::class,
         ]);
 
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            [
+                "/drafts" => DraftsAndSchedulePageController::class,
+            ],
+            "DraftScheduling"
+        );
+
         $container
             ->rule(SiteMeta::class)
             ->addCall("addExtra", [new Reference(PostingSiteMetaExtra::class)])
@@ -281,6 +293,7 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addAutomationTrigger", [StaleCollectionTrigger::class])
             ->addCall("addAutomationTrigger", [StaleDiscussionTrigger::class])
             ->addCall("addAutomationTrigger", [TimeSinceUserRegistrationTrigger::class])
+            ->addCall("addAutomationTrigger", [TimeSinceLastActiveTrigger::class])
             ->addCall("addAutomationTrigger", [UserEmailDomainTrigger::class])
             ->addCall("addAutomationAction", [AddDiscussionToCollectionAction::class])
             ->addCall("addAutomationAction", [AddRemoveUserRoleAction::class])
@@ -315,6 +328,7 @@ class ForumContainerRules extends AddonContainerRules
         $container
             ->rule(APIExpandMiddleware::class)
             ->addCall("addExpander", [new Reference(PostFieldsExpander::class)]);
+        $container->rule(OpenAPIBuilder::class)->addCall("addFilter", [new Reference(PostFieldsOpenApi::class)]);
 
         if (!DebugUtils::isTestMode() && !function_exists("writeReactions")) {
             include PATH_APPLICATIONS . "/dashboard/views/reactions/reaction_functions.php";

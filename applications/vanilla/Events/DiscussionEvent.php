@@ -52,7 +52,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     public function __construct(string $action, array $payload, $sender = null)
     {
         parent::__construct($action, $payload, $sender);
-        $this->addApiParams(["expand" => "tagIDs,crawl,vectorize,roles"]);
+        $this->addApiParams(["expand" => "tagIDs,crawl,vectorize,roles,postMeta"]);
     }
 
     /**
@@ -66,7 +66,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {
@@ -114,7 +114,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTrackableCollection(): ?string
     {

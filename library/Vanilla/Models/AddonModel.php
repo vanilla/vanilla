@@ -294,8 +294,7 @@ class AddonModel implements LoggerAwareInterface
                 if ($addon->getInfoValue("oldType") === "application") {
                     $this->config->saveToConfig(
                         "EnabledApplications." . $addon->getRawKey(),
-                        $enabled ? trim(basename($addon->getSubdir()), "/") : null,
-                        ["RemoveEmpty" => true]
+                        $enabled ? trim(basename($addon->getSubdir()), "/") : false
                     );
                 } else {
                     $this->config->saveToConfig("EnabledPlugins." . $addon->getRawKey(), $enabled);

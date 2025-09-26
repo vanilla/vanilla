@@ -75,7 +75,7 @@ class UserModelTest extends SiteTestCase
     private $config;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setup(): void
     {

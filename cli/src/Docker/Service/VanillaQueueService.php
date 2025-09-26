@@ -15,70 +15,26 @@ use Webmozart\PathUtil\Path;
  */
 class VanillaQueueService extends AbstractLaravelService
 {
-    const SERVICE_NAME = "queue";
+    const SERVICE_ID = "queue";
 
     /**
-     * @inheritDoc
+     * Constructor.
      */
-    public function start()
+    public function __construct()
     {
-        parent::start();
-        $queueDir = $this->getTargetDirectory();
-        if (!file_exists($queueDir . "/public/vendor/horizon")) {
-            DockerUtils::artisan($queueDir, $this->getContainerName(), "/var/www/html", "horizon:publish");
-        }
+        parent::__construct(
+            new LaravelServiceDescriptor(
+                serviceID: self::SERVICE_ID,
+                label: "Queue Service",
+                containerName: "vanilla-queue",
+                url: "https://queue.vanilla.local",
+                gitUrl: "git@github.com:vanilla/vanilla-queue-service.git"
+            )
+        );
     }
 
     /**
-     * @inheritDoc
-     */
-    function getName(): string
-    {
-        return "vanilla-queue-service";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    function getTargetDirectory(): string
-    {
-        return Path::canonicalize(PATH_ROOT . "/../vanilla-queue-service");
-    }
-
-    /**
-     * @inheritDoc
-     */
-    function getGitUrl(): string
-    {
-        return "git@github.com:vanilla/vanilla-queue-service.git";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    function getInstallConfig(): string
-    {
-        return "docker.wasQueueCloned";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    function getHostname(): string
-    {
-        return "queue.vanilla.local";
-    }
-
-    /**
-     * @inheritDoc
-     */
-    function getContainerName(): string
-    {
-        return "vanilla-queue";
-    }
-
-    /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getVanillaConfigDefaults(): array
     {

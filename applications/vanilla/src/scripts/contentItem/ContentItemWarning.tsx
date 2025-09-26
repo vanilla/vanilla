@@ -17,7 +17,6 @@ import Modal from "@library/modal/Modal";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import FrameBody from "@library/layout/frame/FrameBody";
-import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import SmartLink from "@library/routing/links/SmartLink";
@@ -25,9 +24,10 @@ import UserContent from "@library/content/UserContent";
 import { cx } from "@emotion/css";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import ContentItemClasses from "@vanilla/addon-vanilla/contentItem/ContentItem.classes";
+import type { VanillaSanitizedHtml } from "@vanilla/dom-utils";
 
 export interface IPostWarning {
-    body: string;
+    body: VanillaSanitizedHtml;
     dateInserted: string;
     format: string;
     insertUser?: IUserFragment;
@@ -102,7 +102,7 @@ export function ContentItemWarning(props: IProps) {
                             />
                         }
                         body={
-                            <FrameBody className={frameBodyClasses().root}>
+                            <FrameBody>
                                 <div
                                     className={cx(classes.postWarningTopSpace(16), classes.postWarningBottomSpace(16))}
                                 >
@@ -129,7 +129,7 @@ export function ContentItemWarning(props: IProps) {
                                     <div className={classes.postWarningBottomSpace(12)}>
                                         <div className={classes.postWarningBold}>{t("Warning Content")}</div>
                                         <UserContent
-                                            content={warning.body}
+                                            vanillaSanitizedHtml={warning.body}
                                             className={classes.postWarningTopSpace(8)}
                                         />
                                     </div>

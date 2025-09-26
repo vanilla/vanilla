@@ -4,36 +4,39 @@
  * @license gpl-2.0-only
  */
 
-import { IReaction } from "@dashboard/@types/api/reaction";
-import { IUserFragment } from "@library/@types/api/users";
-import { CollapsableContent } from "@library/content/CollapsableContent";
-import UserContent from "@library/content/UserContent";
+import { AcceptedAnswerComment, IAcceptedAnswerProps } from "@library/suggestedAnswers/AcceptedAnswerComment";
+import { Devices, useDevice } from "@library/layout/DeviceContext";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+
+import { BorderType } from "@library/styles/styleHelpersBorders";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
-import { Devices, useDevice } from "@library/layout/DeviceContext";
+import { CollapsableContent } from "@library/content/CollapsableContent";
+import { ContentItemActions } from "@vanilla/addon-vanilla/contentItem/ContentItemActions";
+import ContentItemClasses from "@vanilla/addon-vanilla/contentItem/ContentItem.classes";
+import { ContentItemHeader } from "@vanilla/addon-vanilla/contentItem/ContentItemHeader";
 import FlexSpacer from "@library/layout/FlexSpacer";
+import { IBoxOptions } from "@library/styles/cssUtilsTypes";
+import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { IReaction } from "@dashboard/@types/api/reaction";
+import { IUserFragment } from "@library/@types/api/users";
 import { PageBox } from "@library/layout/PageBox";
 import ProfileLink from "@library/navigation/ProfileLink";
-import { IBoxOptions } from "@library/styles/cssUtilsTypes";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { BorderType } from "@library/styles/styleHelpersBorders";
-import { AcceptedAnswerComment, IAcceptedAnswerProps } from "@library/suggestedAnswers/AcceptedAnswerComment";
-import { getMeta } from "@library/utility/appUtils";
-import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import ContentItemClasses from "@vanilla/addon-vanilla/contentItem/ContentItem.classes";
-import { ContentItemActions } from "@vanilla/addon-vanilla/contentItem/ContentItemActions";
-import { ContentItemHeader } from "@vanilla/addon-vanilla/contentItem/ContentItemHeader";
-import { t } from "@vanilla/i18n";
 import React from "react";
+import UserContent from "@library/content/UserContent";
+import type { VanillaSanitizedHtml } from "@vanilla/dom-utils";
+import { getMeta } from "@library/utility/appUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { t } from "@vanilla/i18n";
 import { useContentItemContext } from "./ContentItemContext";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
-interface IProps {
-    beforeContent?: React.ReactNode;
-    content: string;
+export interface IContentItemProps {
+    warnings?: React.ReactNode;
+    content: VanillaSanitizedHtml;
     editor?: React.ReactNode;
     user: IUserFragment;
-    userPhotoLocation: "header" | "left";
+    userPhotoLocation?: "header" | "left";
     collapsed?: boolean;
     boxOptions?: Partial<IBoxOptions>;
     options?: React.ReactNode;
@@ -62,9 +65,9 @@ function getDomID(recordType: string, recordID: string | number) {
     return `${prefix}_${recordID}`;
 }
 
-export function ContentItem(props: IProps) {
+export function ContentItem(props: IContentItemProps) {
     const {
-        beforeContent,
+        warnings,
         content,
         user,
         userPhotoLocation,
@@ -79,15 +82,16 @@ export function ContentItem(props: IProps) {
     const domID = getDomID(recordType, recordID);
     const device = useDevice();
     const isMobile = [Devices.XS, Devices.MOBILE].includes(device);
+    const permissions = usePermissionsContext();
 
     const headerHasUserPhoto = userPhotoLocation === "header";
 
-    const classes = ContentItemClasses(headerHasUserPhoto);
+    const classes = ContentItemClasses.useAsHook(headerHasUserPhoto);
 
     let userContent = suggestionContent ? (
         <AcceptedAnswerComment {...suggestionContent} className={classes.userContent} />
     ) : (
-        <UserContent content={content} className={classes.userContent} />
+        <UserContent vanillaSanitizedHtml={content} className={classes.userContent} />
     );
 
     const signatureContent = user.signature?.body;
@@ -99,7 +103,7 @@ export function ContentItem(props: IProps) {
     if (signatureContent && showSignature) {
         signature = (
             <div className={classes.signature}>
-                <UserContent content={signatureContent} />
+                <UserContent vanillaSanitizedHtml={signatureContent} />
             </div>
         );
     }
@@ -127,7 +131,7 @@ export function ContentItem(props: IProps) {
             />
             {props.editor || (
                 <>
-                    {beforeContent}
+                    {warnings}
                     {userContent}
                     {signature}
                     {props.actions}
@@ -135,7 +139,7 @@ export function ContentItem(props: IProps) {
                         <div className={classes.footerWrapper}>
                             {props.reactions && <ContentItemActions reactions={props.reactions} />}
                             <FlexSpacer actualSpacer />
-                            {props.onReply && (
+                            {props.onReply && permissions.hasPermission("comments.add") && (
                                 <Button
                                     className={classes.replyButton}
                                     onClick={() => props.onReply && props.onReply()}

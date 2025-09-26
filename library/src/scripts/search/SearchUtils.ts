@@ -5,7 +5,7 @@
 
 import { NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
 import { formatUrl } from "@library/utility/appUtils";
-import qs from "qs";
+import * as qs from "qs-esm";
 
 /**
  * This will convert an object with start date string and end date string into string.

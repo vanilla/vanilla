@@ -46,7 +46,7 @@ class CommentThreadStructureHole implements \JsonSerializable
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function jsonSerialize(): array
     {

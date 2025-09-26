@@ -25,18 +25,13 @@ use UserModel;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Bootstrap;
-use Vanilla\Cli\Commands;
-use Vanilla\Cli\Docker\Service\VanillaVanillaService;
-use Vanilla\Cli\Utils\InstallData;
+use Vanilla\Cli\Docker\Service\AbstractService;
 use Vanilla\Cli\Utils\ScriptLoggerTrait;
 use Vanilla\Cli\Utils\SimpleScriptLogger;
 use Vanilla\Contracts;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
-use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
-use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
-use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Models\Model;
 use Vanilla\Scheduler\SchedulerInterface;
@@ -68,6 +63,11 @@ class VanillaCli extends Console\Application
         foreach ($this->getCommandClasses() as $commandClass) {
             $this->add($this->container->get($commandClass));
         }
+
+        foreach (Commands\DockerCommand::allServiceInstances() as $service) {
+            $this->addCommands($service->getContainerCommands());
+        }
+
         $this->addPlaceholderCommands();
     }
 
@@ -94,6 +94,7 @@ class VanillaCli extends Console\Application
             Commands\SpawnSiteCommand::class,
             Commands\ValidateDataCommand::class,
             Commands\GenerateDataCommand::class,
+            Commands\NpmPublishCommand::class,
         ];
     }
 

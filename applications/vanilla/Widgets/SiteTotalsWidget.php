@@ -9,8 +9,8 @@ namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
 use Vanilla\Forms\FieldMatchConditional;
+use Vanilla\Forms\NoCustomFragmentCondition;
 use Vanilla\Http\InternalClient;
-use Vanilla\InjectableInterface;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
@@ -21,52 +21,40 @@ use Vanilla\Layout\Section\SectionThreeColumnsEven;
 use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Layout\Section\SectionTwoColumnsEven;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Widgets\Fragments\SiteTotalsFragmentMeta;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
+use Vanilla\Widgets\React\ReactWidget;
 use Vanilla\Widgets\Schema\WidgetBackgroundSchema;
-use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
-use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
-use Vanilla\Widgets\React\DefaultSectionTrait;
-use Vanilla\Widgets\React\ReactWidgetInterface;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\Site\SiteSectionModel;
 
 /**
  * Widget to display site totals
  */
-class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, InjectableInterface
+class SiteTotalsWidget extends ReactWidget
 {
     use HomeWidgetContainerSchemaTrait;
-    use CombinedPropsWidgetTrait;
-    use DefaultSectionTrait;
-
-    /** @var InternalClient */
-    private $api;
-
-    /** @var SiteTotalService */
-    private $siteTotalService;
-
-    /** @var SiteSectionModel */
-    private $siteSectionModel;
 
     /**
      * DI.
-     *
-     * @param InternalClient $api
-     * @param SiteTotalService $siteTotalService
-     * @param SiteSectionModel $siteSectionModel
      */
-    public function setDependencies(
-        InternalClient $api,
-        SiteTotalService $siteTotalService,
-        SiteSectionModel $siteSectionModel
+    public function __construct(
+        private InternalClient $api,
+        private SiteTotalService $siteTotalService,
+        private SiteSectionModel $siteSectionModel
     ) {
-        $this->api = $api;
-        $this->siteTotalService = $siteTotalService;
-        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [SiteTotalsFragmentMeta::class];
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -74,7 +62,7 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -82,7 +70,7 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -90,7 +78,7 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): string
     {
@@ -183,7 +171,7 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
      *
      * @return array
      */
-    private static function getRecordOptions(): array
+    public static function getRecordOptions(): array
     {
         $siteTotalService = \Gdn::getContainer()->get(SiteTotalService::class);
         $choices = [];
@@ -206,34 +194,25 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
         $siteTotalService = \Gdn::getContainer()->get(SiteTotalService::class);
         $recordTypes = $siteTotalService->getCountRecordTypes();
 
-        $options = array_filter($defaultOptions, function ($recordType) use ($recordTypes) {
-            return in_array($recordType, $recordTypes);
-        });
+        $results = [];
 
-        if (count($options) < count($recordTypes) && count($options) < count($defaultOptions)) {
-            $extraCount = count($defaultOptions) - count($options);
-            $otherRecords = array_filter($recordTypes, function ($recordType) use ($defaultOptions) {
-                return !in_array($recordType, $defaultOptions);
-            });
-            $options = array_merge($options, array_slice($otherRecords, 0, $extraCount));
+        foreach ($recordTypes as $recordType) {
+            $results[] = [
+                "recordType" => $recordType,
+                "label" => self::getRecordDefaults($recordType)["label"],
+                "isHidden" => in_array(haystack: $defaultOptions, needle: $recordType),
+            ];
         }
 
-        $defaultShow = array_map(function ($recordType) {
-            return [
-                "recordType" => $recordType,
-                "label" => self::getRecordDefaults($recordType)["label"],
-            ];
-        }, array_slice($options, 0, 3));
+        uasort($results, function (array $a, array $b) {
+            if ($a["isHidden"] === $b["isHidden"]) {
+                return 0;
+            }
 
-        $defaultHide = array_map(function ($recordType) {
-            return [
-                "recordType" => $recordType,
-                "label" => self::getRecordDefaults($recordType)["label"],
-                "isHidden" => true,
-            ];
-        }, array_slice($options, 3, 3));
+            return $a["isHidden"] ? 1 : -1;
+        });
 
-        return array_merge($defaultShow, $defaultHide);
+        return $results;
     }
 
     /**
@@ -323,9 +302,21 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                         "both" => "Icon and Text",
                         "icon" => "Icon only",
                         "text" => "Text only",
-                    ])
+                    ]),
+                    conditions: new NoCustomFragmentCondition(SiteTotalsFragmentMeta::getFragmentType())
                 ),
             ],
+        ]);
+    }
+
+    /**
+     * Widget specific options
+     *
+     * @return Schema
+     */
+    public static function formatNumbersSchema(): Schema
+    {
+        return Schema::parse([
             "formatNumbers:b?" => [
                 "default" => false,
                 "x-control" => SchemaForm::checkBox(
@@ -379,13 +370,14 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
         $schema = SchemaUtils::composeSchemas(
             Schema::parse(["apiParams" => self::getApiSchema()]),
             self::widgetOptionsSchema(),
+            self::formatNumbersSchema(),
             self::widgetContainerSchema()
         );
 
@@ -441,7 +433,7 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

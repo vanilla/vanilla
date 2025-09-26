@@ -12,8 +12,10 @@ use Garden\Http\HttpResponseException;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\OpenAIContentFilterException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Logging\ErrorLogger;
 
 /**
  * Client used to make calls to OpenAI.
@@ -23,9 +25,16 @@ class OpenAIClient
     const MODELS = [self::MODEL_GPT35, self::MODEL_GPT4];
     const MODEL_GPT4 = "gpt4";
     const MODEL_GPT4OMINI = "gpt4omini";
+    const MODEL_GPTTEXTEMBED = "TEXTEMBED";
+
     const MODEL_GPT35 = "gpt35";
 
     const CONF_GPT4OMINI_ENDPOINT = "azure.gpt4omini.deploymentUrl";
+
+    const CONF_GPT4OMINI_SECRET = "azure.gpt4omini.secret";
+
+    const CONF_TEXTEMBED_ENDPOINT = "azure.textEmbed.deploymentUrl";
+    const CONF_TEXTEMBED_SECRET = "azure.textEmbed.secret";
     const CONF_GPT4_ENDPOINT = "azure.gpt4.deploymentUrl";
 
     const CONF_GPT4_SECRET = "azure.gpt4.secret";
@@ -59,19 +68,97 @@ class OpenAIClient
     /**
      * Call the OpenAI API to generate a response. The response will be validated against the given schema.
      *
+     * See:  See: https://platform.openai.com/docs/api-reference/embeddings/create
+     *
+     * @param string $model
+     * @param string $message
+     * @param int $dimensions
+     * @return array
+     * @throws ClientException
+     */
+    public function embeds(string $model, string $message, int $dimensions): array
+    {
+        $message = str_replace("\s+", " ", $message);
+        $message = str_replace(". ,", "", $message);
+        # remove all instances of multiple spaces
+        $message = str_replace("..", ".", $message);
+        $message = str_replace(". .", ".", $message);
+        $message = str_replace("\n", "", $message);
+        $message = trim($message);
+        $body = ["input" => $message, "dimensions" => $dimensions];
+        $result = $this->promptEmbeddingInternal($model, $body);
+
+        return $result;
+    }
+
+    /**
+     * Make an API call to OpenAI for a embedding.
+     *
+     * @param string $model
+     * @param array $body
+     * @return array
+     * @throws ClientException
+     */
+    protected function promptEmbeddingInternal(string $model, array $body): array
+    {
+        if ($model === self::MODEL_GPTTEXTEMBED) {
+            $client = $this->gptTextEmbedClient();
+        } else {
+            throw new ClientException("Invalid AI model selected");
+        }
+
+        try {
+            $response = $client->post("embeddings?api-version=2023-05-15", $body);
+            if ($this->currentTransaction) {
+                $this->currentTransaction->trackResponse($response);
+            }
+            $embedding = $response["data"][0]["embedding"];
+            return $embedding;
+        } catch (HttpResponseException $ex) {
+            if ($this->currentTransaction) {
+                $this->currentTransaction->trackResponse($ex->getResponse());
+            }
+            $body = $ex->getResponse()->getBody();
+            if ($ex->getResponse()->isResponseClass("4xx") && is_array($body) && isset($body["error"])) {
+                $message = $body["error"]["message"];
+                if (isset($message)) {
+                    throw new ClientException($message);
+                }
+
+                ErrorLogger::error(
+                    "Error generating Vanilla vector",
+                    ["OpenAI", "vectorization"],
+                    [
+                        "exception" => $ex->getMessage(),
+                        "response" => $body,
+                    ]
+                );
+            }
+
+            throw $ex;
+        }
+    }
+
+    /**
+     * Call the OpenAI API to generate a response. The response will be validated against the given schema.
+     *
      * @param string $model
      * @param OpenAIPrompt $prompt
      * @param Schema $responseSchema
      * @return array
      */
-    public function prompt(string $model, OpenAIPrompt $prompt, Schema $responseSchema)
-    {
+    public function prompt(
+        string $model,
+        OpenAIPrompt $prompt,
+        Schema $responseSchema,
+        ?array $promptOverrides = []
+    ): array {
         $prompt = clone $prompt;
         $prompt->instruct(
             "Response only in valid JSON. Never respond in plaintext, or markdown under any circumstance. Provide a response exclusively in the format of the following JSON schema: " .
                 json_encode($responseSchema)
         );
-        $result = $this->promptInternal($model, $prompt);
+        $result = $this->promptInternal($model, $prompt, $promptOverrides);
         $decoded = json_decode($result, true);
         // Validate the result
         try {
@@ -113,9 +200,9 @@ class OpenAIClient
      * @param OpenAIPrompt $prompt
      * @return string
      */
-    private function promptInternal(string $model, OpenAIPrompt $prompt)
+    private function promptInternal(string $model, OpenAIPrompt $prompt, ?array $promptOverrides = [])
     {
-        $body = $this->getPromptBody($model, $prompt);
+        $body = $this->getPromptBody($model, $prompt, $promptOverrides);
 
         if ($model === self::MODEL_GPT35) {
             $client = $this->gpt35Client();
@@ -142,7 +229,18 @@ class OpenAIClient
             if ($ex->getResponse()->isResponseClass("4xx") && is_array($body) && isset($body["error"])) {
                 $message = $body["error"]["message"];
                 if (isset($message)) {
-                    throw new ClientException($message);
+                    if ($body["error"]["code"] === "content_filter" && isset($body["error"]["innererror"])) {
+                        $filterName = $this->getContentFilter($body["error"]["innererror"]["content_filter_result"]);
+                        if ($filterName) {
+                            throw new OpenAIContentFilterException(
+                                $filterName,
+                                400,
+                                ["openAiFilter" => $filterName],
+                                $ex
+                            );
+                        }
+                    }
+                    throw new ClientException($message, 400, [], $ex);
                 }
             }
 
@@ -150,16 +248,30 @@ class OpenAIClient
         }
     }
 
-    private function getPromptBody(string $model, OpenAIPrompt $prompt)
+    private function getContentFilter(array $filterArray): string|bool
     {
-        $body = [
-            "messages" => $prompt->getMessages(),
-            "temperature" => 0.3,
-            "top_p" => 0.3,
-            "frequency_penalty" => 0.2,
-            "presence_penalty" => 0.35,
-            "max_tokens" => 4000,
-        ];
+        foreach ($filterArray as $filterReason => $filterData) {
+            if ($filterData["filtered"]) {
+                return $filterReason;
+            }
+        }
+
+        return false;
+    }
+
+    private function getPromptBody(string $model, OpenAIPrompt $prompt, ?array $overrides = [])
+    {
+        $body = array_merge(
+            [
+                "messages" => $prompt->getMessages(),
+                "temperature" => 0.3,
+                "top_p" => 0.3,
+                "frequency_penalty" => 0.2,
+                "presence_penalty" => 0.35,
+                "max_tokens" => 4000,
+            ],
+            $overrides
+        );
 
         if ($model === self::MODEL_GPT4) {
             // Need the newer GPT models for this.
@@ -215,7 +327,19 @@ class OpenAIClient
     private function gpt4OMiniClient(): HttpClient
     {
         $baseUrl = $this->configuration->get(self::CONF_GPT4OMINI_ENDPOINT);
-        $secret = $this->configuration->get(self::CONF_GPT4_SECRET);
+        $secret = $this->configuration->get(self::CONF_GPT4OMINI_SECRET);
+        return $this->gptClient($baseUrl, $secret);
+    }
+
+    /**
+     * Get an authenticated GPT-TextEmbedding client.
+     *
+     * @return HttpClient
+     */
+    private function gptTextEmbedClient(): HttpClient
+    {
+        $baseUrl = $this->configuration->get(self::CONF_TEXTEMBED_ENDPOINT);
+        $secret = $this->configuration->get(self::CONF_TEXTEMBED_SECRET);
         return $this->gptClient($baseUrl, $secret);
     }
 

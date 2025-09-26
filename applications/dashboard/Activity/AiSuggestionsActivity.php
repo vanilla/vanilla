@@ -12,7 +12,7 @@ use Vanilla\Dashboard\Models\AiSuggestionSourceService;
 class AiSuggestionsActivity extends Activity
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityTypeID(): string
     {
@@ -20,7 +20,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreference(): string
     {
@@ -28,7 +28,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceDescription(): string
     {
@@ -36,7 +36,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getGroupClass(): string
     {
@@ -44,7 +44,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function allowsComments(): bool
     {
@@ -52,7 +52,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getProfileHeadline(): ?string
     {
@@ -60,7 +60,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getFullHeadline(): ?string
     {
@@ -68,7 +68,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityReason(): ?string
     {
@@ -76,7 +76,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPluralHeadline(): ?string
     {
@@ -84,7 +84,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isNotificationType(): bool
     {
@@ -92,7 +92,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isPublicActivity(): bool
     {
@@ -100,7 +100,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceSchemaProperties(): array
     {
@@ -110,7 +110,7 @@ class AiSuggestionsActivity extends Activity
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getNotificationRequiredSettings(): array
     {

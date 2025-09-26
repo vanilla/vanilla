@@ -20,7 +20,7 @@ class IgnorePluginTest extends \VanillaTests\SiteTestCase
     private $ignorePlugin;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

@@ -8,7 +8,7 @@
 namespace VanillaTests\Addons\Pockets;
 
 use Vanilla\Addons\Pockets\PocketsModel;
-use Vanilla\Widgets\AbstractWidgetModule;
+use Vanilla\Widgets\LegacyWidgetModule;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\EventSpyTestTrait;

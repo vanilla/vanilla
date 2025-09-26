@@ -8,7 +8,6 @@ import apiv2 from "@library/apiv2";
 import { LongRunnerClient } from "@library/LongRunnerClient";
 import { applyAnyFallbackError, mockAPI } from "@library/__tests__/utility";
 import MockAdapter from "axios-mock-adapter/types";
-import { spy } from "sinon";
 
 describe("LongRunnerClient", () => {
     let mockAdapter: MockAdapter;
@@ -66,15 +65,15 @@ describe("LongRunnerClient", () => {
         applyAnyFallbackError(mockAdapter);
 
         const client = new LongRunnerClient(apiv2);
-        const successSpy = spy();
+        const successSpy = vitest.fn();
         client.onSuccessIDs(successSpy);
-        const failedSpy = spy();
+        const failedSpy = vitest.fn();
         client.onFailedIDs(failedSpy);
 
         const response = await client.request({ method: "POST", url: "/bulk/thing" });
         // const response = err.response;
         expect(response.status).toBe(200);
-        expect(successSpy.getCalls()).toHaveLength(2);
-        expect(failedSpy.getCalls()).toHaveLength(1);
+        expect(successSpy.mock.calls).toHaveLength(2);
+        expect(failedSpy.mock.calls).toHaveLength(1);
     });
 });

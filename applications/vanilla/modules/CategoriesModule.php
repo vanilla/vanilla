@@ -102,7 +102,7 @@ class CategoriesModule extends AbstractHomeWidgetModule
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {

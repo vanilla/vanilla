@@ -5,7 +5,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import qs from "qs";
+import * as qs from "qs-esm";
 import { useHistory, useLocation } from "react-router";
 import debounce from "lodash-es/debounce";
 import { useLastValue } from "@vanilla/react-utils";

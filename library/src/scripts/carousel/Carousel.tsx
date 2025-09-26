@@ -22,6 +22,7 @@ import { CarouselArrowNav } from "@library/carousel/CarouselArrowNav";
 
 import { useCarousel } from "@library/carousel/useCarousel";
 import clamp from "lodash-es/clamp";
+import Translate from "@library/content/Translate";
 
 /**
  * Configurable Carousel component.
@@ -73,16 +74,14 @@ export function Carousel(props: IProps) {
             ? measureSliderWrapper.width - (30 / 100) * (measureSliderWrapper.width - 16)
             : (measureSliderWrapper.width - 16 * (toShow - 1) - 4) / toShow;
 
+    const isReady = measureSliderWrapper.width > 0 && measureSectionWrapper.width > 0;
+
     //Carousel Sliders position update
-    const { activeIndex, desiredIndex, actions, handlers, sliderPosition } = useCarousel(
-        slides.length,
-        measureSliderWrapper.width,
-        {
-            toShow,
-            childWidth,
-            sliderWrapper,
-        },
-    );
+    const { activeIndex, desiredIndex, actions, handlers, sliderPosition } = useCarousel(slides.length, {
+        toShow,
+        childWidth,
+        sliderWrapper,
+    });
 
     //PagingDots update currentPagingDot
     const [state, setState] = useState(initCarouselState);
@@ -135,7 +134,7 @@ export function Carousel(props: IProps) {
     };
 
     return (
-        <CarouselSectionSliderWrapper sectionWrapperRef={sectionWrapper}>
+        <CarouselSectionSliderWrapper visuallyHidden={!isReady} sectionWrapperRef={sectionWrapper}>
             <a className={classes.skipCarousel} href="#carouselEnd">
                 {t("Skip to end of Carousel")}
             </a>
@@ -144,7 +143,7 @@ export function Carousel(props: IProps) {
 
             <CarouselSliderWrapper
                 sliderStyle={{
-                    height: sliderWrapper.current ? sliderWrapper.current.children[0].clientHeight + 20 : 0,
+                    height: sliderWrapper.current ? sliderWrapper.current.children[0].clientHeight + 20 : "auto",
                     margin: toShow === 1 ? "0 -20px" : "0 0",
                 }}
             >
@@ -159,6 +158,7 @@ export function Carousel(props: IProps) {
                 )}
 
                 <CarouselSlider
+                    isReady={isReady}
                     sliderWrapperRef={sliderWrapper}
                     childWidth={childWidth ? childWidth : 0}
                     slideDesiredIndex={desiredIndex}
@@ -213,7 +213,12 @@ export function Carousel(props: IProps) {
 
             <ScreenReaderContent>
                 <div aria-live="polite" aria-atomic="true">
-                    {t(`${toShow} Slides on display, initial Slide ${desiredIndex + 1} of ${slides.length}`)}
+                    <Translate
+                        source={"%d slides on display initial slide %d of %d"}
+                        c0={toShow}
+                        c1={desiredIndex + 1}
+                        c2={slides.length}
+                    />
                 </div>
             </ScreenReaderContent>
 

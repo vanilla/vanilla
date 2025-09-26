@@ -27,7 +27,7 @@ use Vanilla\Models\Model;
 class StaleCollectionTrigger extends TimedAutomationTrigger
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -35,7 +35,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -43,7 +43,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -51,7 +51,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -59,7 +59,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -117,7 +117,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -128,7 +128,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getObjectModel(): Model
     {
@@ -136,7 +136,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getWhereArray(array $triggerValue, ?DateTimeImmutable $lastRunDate = null): array
     {
@@ -148,7 +148,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {
@@ -156,7 +156,7 @@ class StaleCollectionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess($lastRecordId, array $where): iterable
     {

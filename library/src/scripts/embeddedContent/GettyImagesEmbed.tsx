@@ -96,3 +96,9 @@ async function loadGettyImages(props: IProps) {
     /// This will turn totally sideways if window.gie is not populated before the script is initially loaded.
     await ensureScript("https://embed-cdn.gettyimages.com/widgets.js");
 }
+
+declare global {
+    interface Window {
+        gie: any;
+    }
+}

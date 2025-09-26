@@ -30,7 +30,7 @@ class AiSuggestionAccessEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAuditEventType(): string
     {
@@ -38,7 +38,7 @@ class AiSuggestionAccessEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function eventType(): string
     {
@@ -46,7 +46,7 @@ class AiSuggestionAccessEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function formatAuditMessage(string $eventType, array $context, array $meta): string
     {
@@ -54,7 +54,7 @@ class AiSuggestionAccessEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAuditContext(): array
     {

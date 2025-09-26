@@ -8,7 +8,7 @@ import SuggestedContentWidget, { ISuggestedContentWidgetProps } from "./Suggeste
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { QueryClient } from "@tanstack/react-query";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import WidgetPreviewNoPointerEventsWrapper from "@library/layout/WidgetPreviewNoPointerEventsWrapper";
 
 interface IProps extends Omit<ISuggestedContentWidgetProps, "categories" | "discussions"> {}
@@ -25,7 +25,7 @@ const mockQueryClient = new QueryClient({
 
 export function SuggestedContentWidgetPreview(props: IProps) {
     return (
-        <Widget>
+        <LayoutWidget>
             <QueryClientProvider client={mockQueryClient}>
                 <WidgetPreviewNoPointerEventsWrapper>
                     <SuggestedContentWidget
@@ -36,6 +36,6 @@ export function SuggestedContentWidgetPreview(props: IProps) {
                     />
                 </WidgetPreviewNoPointerEventsWrapper>
             </QueryClientProvider>
-        </Widget>
+        </LayoutWidget>
     );
 }

@@ -13,7 +13,6 @@ use Vanilla\EmbeddedContent\Embeds\BrightcoveEmbed;
 use Vanilla\EmbeddedContent\Embeds\CodePenEmbed;
 use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
-use Vanilla\EmbeddedContent\Embeds\FileEmbedFilter;
 use Vanilla\EmbeddedContent\Embeds\GiphyEmbed;
 use Vanilla\EmbeddedContent\Embeds\IFrameEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
@@ -215,7 +214,6 @@ class EmbedService implements EmbedCreatorInterface
             ->registerEmbed(LinkEmbed::class, LinkEmbed::TYPE)
             // Files - No factory for the file embed. Only comes from media endpoint.
             ->registerEmbed(FileEmbed::class, FileEmbed::TYPE)
-            ->registerFilter($dic->get(FileEmbedFilter::class))
             // This one is extended but still gets registered
             ->registerEmbed(IFrameEmbed::class, IFrameEmbed::TYPE)
 

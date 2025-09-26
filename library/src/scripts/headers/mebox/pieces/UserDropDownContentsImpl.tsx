@@ -149,6 +149,8 @@ function UserDropDownContentsImpl(props: IUserDropDownContentsProps) {
         }
     }
 
+    const canScheduleDraft = getMeta("featureFlags.DraftScheduling.Enabled", false) && hasPermission("schedule.allow");
+
     return (
         <ul className={cx(classesDropDown.verticalPadding, props.className)}>
             <DropDownUserCard className="userDropDown-userCard" />
@@ -163,7 +165,11 @@ function UserDropDownContentsImpl(props: IUserDropDownContentsProps) {
                         count={getCountByName("Bookmarks")}
                     />
                     <Permission permission="discussions.add">
-                        <DropDownItemLinkWithCount to="/drafts" name={t("Drafts")} count={getCountByName("Drafts")} />
+                        <DropDownItemLinkWithCount
+                            to="/drafts"
+                            name={canScheduleDraft ? t("Drafts and Scheduled Content") : t("Drafts")}
+                            count={getCountByName("Drafts")}
+                        />
                     </Permission>
                     <DropDownItemLinkWithCount
                         to="/discussions/mine"

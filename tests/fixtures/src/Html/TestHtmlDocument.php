@@ -350,7 +350,12 @@ class TestHtmlDocument extends HtmlDocument
     public function assertCssSelectorNotExists(string $cssSelector, ?string $message = null): void
     {
         $resultNode = $this->queryCssSelector($cssSelector)->item(0);
-        TestCase::assertNull($resultNode, $message ?? "Nothing matched the provided CSS selector");
+        $message = $message ?? "Expected to find 0 matches for selector: $cssSelector";
+        if ($resultNode) {
+            $message .= "\nInstead found element: " . $this->getOuterHtml($resultNode);
+        }
+
+        TestCase::assertNull($resultNode, $message);
     }
 
     /**

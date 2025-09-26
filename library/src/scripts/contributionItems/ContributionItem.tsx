@@ -24,11 +24,11 @@ export function ContributionItem(
     const classes = contributionItemClasses(themingVariables);
 
     return (
-        <SmartLink to={url} title={name} className={cx(classes.link, props.className)}>
+        <SmartLink to={url} title={t(name)} className={cx(classes.link, props.className)}>
             <div className={classes.imageAndCountWrapper}>
-                <img alt={name} src={photoUrl} className={classes.image} />
+                <img alt={t(name)} src={photoUrl} className={classes.image} />
                 {themingVariables.count.display && (count ?? 0) > 0 && (
-                    <Count label={name} count={count} className={classes.count} useFormatted={true} useMax={false} />
+                    <Count label={t(name)} count={count} className={classes.count} useFormatted={true} useMax={false} />
                 )}
             </div>
             {themingVariables.name.display && <div className={classes.name}>{t(name)}</div>}

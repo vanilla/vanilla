@@ -43,6 +43,7 @@ class ThemeServiceParentTest extends BootstrapTestCase
                     "fsParent" => true,
                     "fsChild" => true,
                 ],
+                "globalFragmentImpls" => [],
             ],
             $basicTheme->getAsset("variables")
         );
@@ -69,7 +70,7 @@ CSS;
     /**
      * Assert asset contents.
      *
-     * @param string $expected
+     * @param string|array $expected
      * @param ThemeAsset $asset
      */
     private function assertAssetContents($expected, ThemeAsset $asset)

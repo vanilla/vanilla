@@ -14,13 +14,13 @@ use Vanilla\Forum\Widgets\UserSpotlightWidgetTrait;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 /**
  * Widget to spotlight a user.
  */
-class UserSpotlightModule extends AbstractReactModule implements InjectableInterface
+class UserSpotlightModule extends LegacyReactModule implements InjectableInterface
 {
     use UserSpotlightWidgetTrait;
     use HomeWidgetContainerSchemaTrait;

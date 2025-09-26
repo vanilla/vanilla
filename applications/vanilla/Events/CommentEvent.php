@@ -20,6 +20,14 @@ use Vanilla\Logging\LoggerUtils;
  */
 class CommentEvent extends ResourceEvent implements LoggableEventInterface, TrackingEventInterface
 {
+    const ACTION_MOVE = "move";
+
+    /** @var int|null */
+    private $sourceDiscussionID = null;
+
+    /** @var int|null */
+    private $destinationDiscussionID = null;
+
     public function __construct(string $action, array $payload, $sender = null)
     {
         parent::__construct($action, $payload, $sender);
@@ -27,7 +35,7 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {
@@ -61,6 +69,7 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
             case ResourceEvent::ACTION_INSERT:
                 return "post";
             case ResourceEvent::ACTION_UPDATE:
+            case self::ACTION_MOVE:
             case ResourceEvent::ACTION_DELETE:
                 return "post-modify";
             default:
@@ -90,6 +99,18 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
         if (isset($this->payload["comment"]["siteSectionIDs"])) {
             $trackingData["siteSectionID"] = $this->payload["comment"]["siteSectionIDs"][0];
         }
+
+        // If we have a source discussion ID, we add a trackable discussion data structure to the payload.
+        if (isset($this->sourceDiscussionID)) {
+            $trackingData["sourceDiscussion"] = $trackableCommunity->getTrackableDiscussion($this->sourceDiscussionID);
+        }
+
+        // If we have a destination discussion ID, we add a trackable discussion data structure to the payload.
+        if (isset($this->destinationDiscussionID)) {
+            $trackingData["destinationDiscussion"] = $trackableCommunity->getTrackableDiscussion(
+                $this->destinationDiscussionID
+            );
+        }
         return $trackingData;
     }
 
@@ -107,6 +128,8 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
                 return "comment_edit";
             case ResourceEvent::ACTION_DELETE:
                 return "comment_delete";
+            case self::ACTION_MOVE:
+                return "comment_move";
             default:
                 return $this->getAction();
         }
@@ -146,7 +169,7 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {
@@ -154,5 +177,23 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
             return $this->payload["comment"]["siteSectionIDs"][0] ?? null;
         }
         return null;
+    }
+
+    /**
+     * @param int|null $sourceDiscussionID
+     */
+    public function setSourceDiscussionID(?int $sourceDiscussionID): void
+    {
+        $this->sourceDiscussionID = $sourceDiscussionID;
+        $this->payload["sourceDiscussionID"] = $sourceDiscussionID;
+    }
+
+    /**
+     * @param int|null $destinationDiscussionID
+     */
+    public function setDestinationDiscussionID(?int $destinationDiscussionID): void
+    {
+        $this->destinationDiscussionID = $destinationDiscussionID;
+        $this->payload["destinationDiscussionID"] = $destinationDiscussionID;
     }
 }

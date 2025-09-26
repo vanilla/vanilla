@@ -6,7 +6,7 @@
 import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import DocumentTitle from "@library/routing/DocumentTitle";
 import { t } from "@library/utility/appUtils";
@@ -26,7 +26,7 @@ export default function NotFoundPage(props: IProps) {
         <div className="Center SplashInfo">
             <WidgetLayout>
                 <SectionOneColumn isNarrow>
-                    <Widget>
+                    <LayoutWidget>
                         <PageBoxDepthContextProvider depth={0}>
                             <PageHeadingBox
                                 options={{
@@ -39,7 +39,7 @@ export default function NotFoundPage(props: IProps) {
                                 }
                             ></PageHeadingBox>
                         </PageBoxDepthContextProvider>
-                    </Widget>
+                    </LayoutWidget>
                 </SectionOneColumn>
             </WidgetLayout>
         </div>

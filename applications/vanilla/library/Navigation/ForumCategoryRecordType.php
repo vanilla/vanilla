@@ -29,7 +29,7 @@ class ForumCategoryRecordType implements RecordInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRecordID(): int
     {
@@ -37,7 +37,7 @@ class ForumCategoryRecordType implements RecordInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRecordType(): string
     {

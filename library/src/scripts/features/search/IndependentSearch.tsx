@@ -104,7 +104,7 @@ function IndependentSearch(props: IIndependentSearchProps) {
         }
     }, [forceMenuOpen, searchOptionProvider]);
 
-    const classesSearchBar = searchBarClasses(
+    const classesSearchBar = searchBarClasses.useAsHook(
         merge(clone(props.overwriteSearchBar), { scope: hasScope ? scope : undefined }),
     );
 

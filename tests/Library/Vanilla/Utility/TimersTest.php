@@ -25,7 +25,7 @@ class TimersTest extends SiteTestCase
     private $timers;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

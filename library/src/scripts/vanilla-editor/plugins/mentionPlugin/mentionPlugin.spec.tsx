@@ -1,6 +1,6 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -46,7 +46,13 @@ describe("Vanilla Editor - Mention Plugin", () => {
                             children: [{ text: "" }],
                             name: "testuser",
                         },
-                        { text: " \nline with @mention in middle\n" },
+                        { text: " \nline with " },
+                        {
+                            type: "@",
+                            children: [{ text: "" }],
+                            name: "mention in middle",
+                        },
+                        { text: " \n" },
                         {
                             type: "@",
                             children: [{ text: "" }],
@@ -57,7 +63,145 @@ describe("Vanilla Editor - Mention Plugin", () => {
                 },
             ];
 
-            expect(editor.children).toStrictEqual(expected);
+            // Using toMatchObject to ignore the unique IDs added to mentions in insertDataCustom
+            expect(editor.children).toMatchObject(expected);
+        });
+
+        it("converts multiple mentions in the same line", async () => {
+            const editor = createVanillaEditor();
+            insertHtml(editor, {
+                text: "@testuser @another user",
+            });
+            const expected = [
+                {
+                    type: "p",
+                    children: [
+                        { text: "" },
+                        {
+                            type: "@",
+                            children: [{ text: "" }],
+                            name: "testuser ",
+                        },
+                        { text: " " },
+                        {
+                            type: "@",
+                            children: [{ text: "" }],
+                            name: "another user",
+                        },
+                        { text: " " },
+                    ],
+                },
+            ];
+            expect(editor.children).toMatchObject(expected);
+        });
+
+        it("converts mentions with spaces in the name", async () => {
+            const editor = createVanillaEditor();
+            insertHtml(editor, {
+                text: "@test user",
+            });
+            const expected = [
+                {
+                    type: "p",
+                    children: [
+                        { text: "" },
+                        {
+                            type: "@",
+                            children: [{ text: "" }],
+                            name: "test user",
+                        },
+                        { text: " " },
+                    ],
+                },
+            ];
+            expect(editor.children).toMatchObject(expected);
+        });
+
+        it("won't include punctuation in the mention name", async () => {
+            const editor = createVanillaEditor();
+            insertHtml(editor, {
+                text: "@testuser, @another user!",
+            });
+            const expected = [
+                {
+                    type: "p",
+                    children: [
+                        { text: "" },
+                        {
+                            type: "@",
+                            children: [{ text: "" }],
+                            name: "testuser",
+                        },
+                        { text: " , " },
+                        {
+                            type: "@",
+                            children: [{ text: "" }],
+                            name: "another user",
+                        },
+                        { text: " !" },
+                    ],
+                },
+            ];
+
+            expect(editor.children).toMatchObject(expected);
+        });
+
+        it("does not delete text after a mention with quotes", async () => {
+            const editor = createVanillaEditor();
+
+            insertHtml(editor, {
+                text: '@cell<> "", HAS(@cell, Status@row)',
+            });
+
+            const expected = [
+                {
+                    type: "p",
+                    children: [
+                        {
+                            text: "",
+                        },
+                        {
+                            type: "@",
+                            children: [
+                                {
+                                    text: "",
+                                },
+                            ],
+                            name: "cell",
+                        },
+
+                        {
+                            text: ' <> "", HAS(',
+                        },
+                        {
+                            type: "@",
+                            children: [
+                                {
+                                    text: "",
+                                },
+                            ],
+                            name: "cell",
+                        },
+                        {
+                            text: " , Status",
+                        },
+                        {
+                            type: "@",
+                            children: [
+                                {
+                                    text: "",
+                                },
+                            ],
+                            name: "row",
+                        },
+                        {
+                            text: " )",
+                        },
+                    ],
+                },
+            ];
+
+            expect(editor.children).toMatchObject(expected);
         });
 
         it("converts CSV table with possible mentions", () => {
@@ -138,7 +282,7 @@ describe("Vanilla Editor - Mention Plugin", () => {
                 { type: "p", children: [{ text: "" }] },
             ];
 
-            expect(editor.children).toStrictEqual(expected);
+            expect(editor.children).toMatchObject(expected);
         });
 
         it("converts markdown with list with possible mentions", () => {
@@ -200,7 +344,7 @@ describe("Vanilla Editor - Mention Plugin", () => {
                 { type: "p", children: [{ text: "" }] },
             ];
 
-            expect(editor.children).toStrictEqual(expected);
+            expect(editor.children).toMatchObject(expected);
         });
 
         it("converts plain html with possible mentions", () => {
@@ -224,10 +368,21 @@ describe("Vanilla Editor - Mention Plugin", () => {
                     ],
                 },
                 { type: "p", children: [{ text: "username" }] },
-                { type: "p", children: [{ text: "mention in @middle of line" }] },
+                {
+                    type: "p",
+                    children: [
+                        { text: "mention in " },
+                        {
+                            type: "@",
+                            children: [{ text: "" }],
+                            name: "middle of line",
+                        },
+                        { text: " " },
+                    ],
+                },
             ];
 
-            expect(editor.children).toStrictEqual(expected);
+            expect(editor.children).toMatchObject(expected);
         });
     });
 

@@ -30,7 +30,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
     private MockAttachmentProvider $mockExternalIssueProvier;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

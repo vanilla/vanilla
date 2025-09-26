@@ -31,8 +31,7 @@ import { css } from "@emotion/css";
 import { usePostTypeDelete, usePostTypeQuery } from "@dashboard/postTypes/postType.hooks";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import apiv2 from "@library/apiv2";
-import { queryClient } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@library/features/toaster/ToastContext";
 
 interface IProps {}
@@ -49,6 +48,7 @@ export function PostTypeSettings(props: IProps) {
         postTypeID: PostType["postTypeID"];
         isActive: boolean;
     }
+    const queryClient = useQueryClient();
 
     const mutatePostTypeActive = useMutation({
         mutationFn: async (mutationArgs: IPostTypeActiveMutationArgs) => {

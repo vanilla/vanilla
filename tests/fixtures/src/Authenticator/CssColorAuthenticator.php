@@ -35,7 +35,7 @@ class CssColorAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function isActive(): bool
     {
@@ -43,7 +43,7 @@ class CssColorAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setActive(bool $active)
     {
@@ -71,7 +71,7 @@ class CssColorAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected static function getAuthenticatorTypeInfoImpl(): array
     {
@@ -85,7 +85,7 @@ class CssColorAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isUnique(): bool
     {
@@ -93,7 +93,7 @@ class CssColorAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getAuthenticatorInfoImpl(): array
     {
@@ -105,7 +105,7 @@ class CssColorAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getRegisterUrl()
     {
@@ -113,7 +113,7 @@ class CssColorAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSignInUrl()
     {
@@ -121,7 +121,7 @@ class CssColorAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSignOutUrl()
     {
@@ -129,7 +129,7 @@ class CssColorAuthenticator extends Authenticator
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function validateAuthenticationImpl(RequestInterface $request)
     {

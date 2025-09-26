@@ -3,6 +3,7 @@
  * @license gpl-2.0-only
  */
 
+import type { CSSObject } from "@emotion/css/create-instance";
 import { buttonGlobalVariables } from "@library/forms/Button.variables";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { IButton } from "@library/forms/styleHelperButtonInterface";
@@ -21,13 +22,41 @@ import {
     IStateColors,
     IPartialBoxOptions,
 } from "@library/styles/cssUtilsTypes";
+import type { ColorVar } from "@library/styles/CssVar";
 import { BorderType } from "@library/styles/styleHelpers";
+import { ColorHelper } from "csx";
 import { DeepPartial } from "redux";
 
 export class Variables {
     constructor() {
         throw new Error("Not to be instantiated");
     }
+
+    /**
+     * Define global variables from the theme for use in third party widgets and fragments
+     */
+    static colorDefinition = <VarType extends string = ColorVar>(
+        definition: Record<VarType, string | ColorHelper>,
+    ): CSSObject => {
+        return Object.fromEntries(
+            Object.entries(definition).map(([key, value]) => [
+                key,
+                value instanceof ColorHelper ? value.toString() : value,
+            ]),
+        ) as CSSObject;
+    };
+
+    /**
+     * Define overrides of some global variables for a specific first party area of the app.
+     */
+    static colorOverride = (definition: Partial<Record<ColorVar, string | ColorHelper>>): CSSObject => {
+        return Object.fromEntries(
+            Object.entries(definition).flatMap(([key, value]) => [
+                [`${key}`, value instanceof ColorHelper ? value.toString() : value],
+                [`${key}-override`, value instanceof ColorHelper ? value.toString() : value],
+            ]),
+        );
+    };
 
     static button = (vars: IButton): IButton => {
         const buttonGlobalVars = buttonGlobalVariables();
@@ -91,7 +120,7 @@ export class Variables {
 
     static spacing = (vars: ISpacing): ISpacing => ({ ...EMPTY_SPACING, ...vars });
 
-    static font = (vars: IFont): IFont => ({ ...EMPTY_FONTS, ...vars });
+    static font = <T extends IFont>(vars: T): T & IFont => ({ ...EMPTY_FONTS, ...vars });
 
     static border = (vars: Partial<IBorderStyles>): Partial<IBorderStyles> => ({ ...EMPTY_BORDER, ...vars });
 
@@ -121,7 +150,8 @@ export class Variables {
         // We have a clearly defined box of sometype.
         // Anything that makes the box stand out from the background on all side
         // Means we should apply some default behaviours, like paddings, and borderRadius.
-        const hasFullOutline = [BorderType.BORDER, BorderType.SHADOW].includes(box.borderType) || hasBackground;
+        const hasFullOutline =
+            ([BorderType.BORDER, BorderType.SHADOW] as BorderType[]).includes(box.borderType) || hasBackground;
         return hasFullOutline;
     }
 

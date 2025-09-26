@@ -81,18 +81,44 @@ class ThemesApiController extends AbstractApiController
      * @param int $themeID The unique theme key or theme ID.
      * @return array
      */
-    public function get_revisions(int $themeID): array
+    public function get_revisions(int $themeID, array $query = []): array
     {
         $this->permission();
-        $in = $this->schema([], "in");
-        $out = $this->schema([":a" => $this->themeResultSchema()]);
+        $in = $this->schema(
+            [
+                "limit:i?" => [
+                    "description" => "Desired number of items per page.",
+                    "default" => 100,
+                    "maximum" => ThemeService::MAX_REVISIONS,
+                ],
+                "page:i?" => [
+                    "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                    "default" => 1,
+                    "minimum" => 1,
+                ],
+            ],
+            "in"
+        );
+        $query = $in->validate($query);
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
-        $themeRevisions = $this->themeService->getThemeRevisions($themeID);
+        $themeRevisions = $this->themeService->getThemeRevisions($themeID, $limit, $offset);
         foreach ($themeRevisions as $theme) {
             $this->handleAssetExpansions($theme, false);
         }
-        $result = $out->validate($themeRevisions);
-        return $result;
+
+        $results = [];
+        /** @var Theme $themeRevision */
+        foreach ($themeRevisions as $themeRevision) {
+            $result = $themeRevision->jsonSerialize();
+            unset($result["assets"]);
+            unset($result["preview"]);
+            unset($result["features"]);
+            unset($result["supportedSections"]);
+            $results[] = $result;
+        }
+
+        return $results;
     }
 
     /**

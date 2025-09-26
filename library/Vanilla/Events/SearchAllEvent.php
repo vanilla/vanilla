@@ -22,7 +22,7 @@ class SearchAllEvent implements TrackingEventInterface
     protected $payload;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function __construct(array $payload)
     {
@@ -50,7 +50,7 @@ class SearchAllEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -58,7 +58,7 @@ class SearchAllEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {

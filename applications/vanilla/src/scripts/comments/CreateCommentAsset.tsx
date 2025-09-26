@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { useToast } from "@library/features/toaster/ToastContext";
+import { useToast, useToastErrorHandler } from "@library/features/toaster/ToastContext";
 import { MyValue } from "@library/vanilla-editor/typescript";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import isEqual from "lodash-es/isEqual";
@@ -24,9 +24,16 @@ import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import Translate from "@library/content/Translate";
 import { useCreateCommentContext } from "@vanilla/addon-vanilla/posts/CreateCommentContext";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { logDebug } from "@vanilla/utils";
 import { useDebouncedInput } from "@dashboard/hooks";
 import ModalConfirm from "@library/modal/ModalConfirm";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { IError } from "@library/errorPages/CoreErrorMessages";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import Message from "@library/messages/Message";
+import { ErrorIcon } from "@library/icons/common";
+import { commentEditorClasses } from "@vanilla/addon-vanilla/comments/CommentEditor.classes";
+import { IFieldError } from "@library/json-schema-forms";
+import { IApiError } from "@library/@types/api/core";
 
 interface IProps {
     isPreview?: boolean;
@@ -47,9 +54,13 @@ export function CreateCommentAsset(props: IProps) {
     const { createCommentLocation, setCreateCommentLocation } = useCreateCommentContext();
 
     const { draft } = useDraftContext();
+    const { hasPermission } = usePermissionsContext();
+    const canReply = hasPermission("comments.add");
 
     if (closed) {
-        return null;
+        if (!canReply) {
+            return null;
+        }
     }
 
     const isTopLevelComment = draft ? !(draft?.attributes?.draftMeta ?? {}).hasOwnProperty("commentPath") : false;
@@ -151,16 +162,23 @@ export function AddComment(props: IProps & { replyTo?: string }) {
     const { addToast } = useToast();
     const [value, setValue] = useState<MyValue | undefined>();
     const [editorKey, setEditorKey] = useState(0);
+    const [error, setError] = useState<IError | null>(null);
+    const [fieldError, setFieldError] = useState<IFieldError[] | null>(null);
+    const classes = commentEditorClasses();
 
-    const { draftID, draft, updateDraft, removeDraft, enable, disable } = useDraftContext();
+    const { draftID, draft, updateDraft, removeDraft, enableAutosave, disableAutosave } = useDraftContext();
     const { setVisibleReplyFormRef, draftToRemove, setDraftToRemove } = useCreateCommentContext();
+
     const queryClient = useQueryClient();
+    const toastError = useToastErrorHandler();
 
     const resetState = () => {
         setValue(undefined);
         setInputCache(undefined);
         setEditorKey(new Date().getTime());
         setVisibleReplyFormRef && setVisibleReplyFormRef({ current: null });
+        setError(null);
+        setFieldError(null);
     };
 
     useEffect(() => {
@@ -177,7 +195,7 @@ export function AddComment(props: IProps & { replyTo?: string }) {
 
     const postMutation = useMutation({
         mutationFn: async (body: string) => {
-            disable();
+            setError(null);
             const response = await CommentsApi.post({
                 format: "rich2",
                 parentRecordType: commentParent.recordType,
@@ -185,7 +203,6 @@ export function AddComment(props: IProps & { replyTo?: string }) {
                 ...(draftID && { draftID }),
                 body,
             });
-            removeDraft(draftID ?? window.location.pathname, true);
 
             if ("status" in response && response.status === 202) {
                 addToast({
@@ -197,9 +214,15 @@ export function AddComment(props: IProps & { replyTo?: string }) {
             await queryClient.invalidateQueries({ queryKey: ["discussion"] });
             await queryClient.invalidateQueries({ queryKey: ["commentList"] });
             await queryClient.invalidateQueries({ queryKey: ["commentThread"] });
+            // It is important to remove the draft here before resetting the state, otherwise the props will be not change and restore the previous draft value creating a new draft in the process.
+            removeDraft(true);
             resetState();
-            enable();
             return response;
+        },
+        onError: (error: IApiError) => {
+            toastError(error);
+            setError(error);
+            setFieldError(error?.errors?.body ?? null);
         },
     });
 
@@ -239,14 +262,14 @@ export function AddComment(props: IProps & { replyTo?: string }) {
     }, [debouncedValue]);
 
     const removeActiveDraft = () => {
-        if (draftID && draft && isTopLevelDraft) {
-            const removed = removeDraft(draftID);
-            if (removed) {
-                resetState();
-                props.onDiscard?.();
-            }
+        disableAutosave();
+        const removed = removeDraft();
+        if (removed) {
+            resetState();
+            props.onDiscard?.();
         }
         setDeleteDraftModal(false);
+        enableAutosave();
     };
 
     // Create drafts props for the editor
@@ -262,6 +285,15 @@ export function AddComment(props: IProps & { replyTo?: string }) {
 
     return (
         <>
+            {error && fieldError && (
+                <Message
+                    className={classes.errorMessages}
+                    type="error"
+                    stringContents={error.message}
+                    icon={<ErrorIcon />}
+                    contents={<ErrorMessages errors={fieldError} />}
+                />
+            )}
             <CommentEditor
                 ref={editorHandlerRef}
                 title={
@@ -277,7 +309,9 @@ export function AddComment(props: IProps & { replyTo?: string }) {
                 onValueChange={setValue}
                 format={"rich2"}
                 onPublish={async (value) => {
+                    disableAutosave();
                     await postMutation.mutateAsync(JSON.stringify(value));
+                    enableAutosave();
                 }}
                 publishLoading={postMutation.isLoading}
                 isPreview={props.isPreview}
@@ -288,6 +322,9 @@ export function AddComment(props: IProps & { replyTo?: string }) {
                                 removeActiveDraft();
                             }}
                             buttonType={ButtonTypes.TEXT_PRIMARY}
+                            // Waiting for value to equal debounced value indicates the user stopped typing
+                            // so we aren't trying to save a draft and discard it at the same time
+                            disabled={isEqual(value, EMPTY_RICH2_BODY) || value !== debouncedValue}
                         >
                             {t("Discard Reply")}
                         </Button>

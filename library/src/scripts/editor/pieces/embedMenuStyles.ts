@@ -31,6 +31,7 @@ export const embedMenuClasses = useThemeCache(() => {
         ...Mixins.margin({ horizontal: "auto" }),
         transform: "translate(-50%, -50%)",
         background: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
         ...Mixins.border(),
         ...shadowOrBorderBasedOnLightness(undefined, undefined, shadowHelper().toolbar()),
         zIndex: 100,

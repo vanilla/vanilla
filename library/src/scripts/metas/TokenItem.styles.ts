@@ -7,14 +7,16 @@
 import { css } from "@emotion/css";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { ColorVar } from "@library/styles/CssVar";
 import { Mixins } from "@library/styles/Mixins";
 import { GlobalPreset, globalVariables } from "@library/styles/globalStyleVars";
+import { useThemeCache } from "@library/styles/themeCache";
 
-export const TokenItemClasses = () => {
+export const TokenItemClasses = useThemeCache(() => {
     const metaVars = metasVariables();
     const root = css({
         display: "inline-flex",
-        backgroundColor: "#eeefef",
+        backgroundColor: ColorsUtils.var(ColorVar.InputTokenBackground),
         borderRadius: 2,
         alignItems: "center",
         maxWidth: "85%",
@@ -26,9 +28,7 @@ export const TokenItemClasses = () => {
             horizontal: 8,
         }),
         ...Mixins.font(metaVars.font),
-        ...(globalVariables().options.preset === GlobalPreset.DARK && {
-            color: ColorsUtils.colorOut(globalVariables().elementaryColors.darkText),
-        }),
+        color: ColorsUtils.var(ColorVar.InputTokenForeground),
     });
 
     const textContentCompact = css({
@@ -58,4 +58,4 @@ export const TokenItemClasses = () => {
         button,
         icon,
     };
-};
+});

@@ -5,8 +5,8 @@
 
 import { AboutMeWidget } from "@library/aboutMeWidget/AboutMeWidget";
 import { AccountSettings } from "@library/accountSettings/AccountSettings";
-import { CallToAction } from "@library/callToAction/CallToAction";
-import CallToActionWidget from "@library/callToAction/CallToActionWidget";
+import { CallToAction } from "@library/widgets/CallToAction";
+import CallToActionWidget from "@library/widgets/CallToActionWidget";
 import { CategoriesWidget } from "@library/categoriesWidget/CategoriesWidget";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { EditProfileFields } from "@library/editProfileFields/EditProfileFields";
@@ -14,7 +14,7 @@ import { CollectionRecordTypes } from "@library/featuredCollections/Collections.
 import { CollectionsOptionButton } from "@library/featuredCollections/CollectionsOptionButton";
 import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
 import { DiscussionsWidget } from "@library/features/discussions/DiscussionsWidget";
-import { FollowedContent } from "@library/followedContent/FollowedContent";
+import FollowedContent from "@library/followedContent/FollowedContent";
 import { CategoryPicker } from "@library/forms/select/CategoryPicker";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { LeaderboardWidget } from "@library/leaderboardWidget/LeaderboardWidget";
@@ -48,6 +48,9 @@ import {
 } from "@vanilla/addon-vanilla/legacy/LegacyAttachments";
 import { TrollComment } from "@vanilla/addon-vanilla/legacy/LegacyTrollComment";
 import { LegacyPostMetaAsset } from "@vanilla/addon-vanilla/legacy/LegacyPostMetaAsset";
+import { DraftsPageRoute } from "@vanilla/addon-vanilla/drafts/DraftsRoutes";
+import DiscussionOptionsPostSettings from "@library/features/discussions/DiscussionOptionsPostSettings";
+import { useDiscussionQuery } from "@library/features/discussions/discussionHooks";
 
 registerReducer("forum", forumReducer);
 
@@ -87,7 +90,7 @@ onReady(() => {
     triggerLegacyHashScrolling();
 });
 
-RouterRegistry.addRoutes([UnsubscribePageRoute.route]);
+RouterRegistry.addRoutes([UnsubscribePageRoute.route, DraftsPageRoute.route]);
 
 delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElement) => {
     event.preventDefault();
@@ -107,3 +110,44 @@ delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElemen
         />,
     );
 });
+
+delegateEvent("click", ".js-postSettingsMove", (event, triggeringElement) => {
+    event.preventDefault();
+    const discussionID = triggeringElement.getAttribute("data-discussionID") || null;
+
+    if (discussionID === null) {
+        return;
+    }
+
+    void mountModal(<DiscussionFetch discussionID={discussionID} initialAction={"move"} />);
+});
+
+delegateEvent("click", ".js-postSettingsChange", (event, triggeringElement) => {
+    event.preventDefault();
+    const discussionID = triggeringElement.getAttribute("data-discussionID") || null;
+
+    if (discussionID === null) {
+        return;
+    }
+
+    void mountModal(<DiscussionFetch discussionID={discussionID} initialAction={"change"} />);
+});
+
+/**
+ * Wrapper component to fetch discussion data and render PostSettingsModal
+ */
+function DiscussionFetch({
+    discussionID,
+    initialAction,
+}: {
+    discussionID: string;
+    initialAction?: "move" | "change" | null;
+}) {
+    const { data: discussion, isLoading } = useDiscussionQuery(discussionID);
+
+    if (isLoading || !discussion) {
+        return <></>;
+    }
+
+    return <DiscussionOptionsPostSettings discussion={discussion} initialAction={initialAction} modalOnly />;
+}

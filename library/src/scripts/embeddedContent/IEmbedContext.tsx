@@ -4,6 +4,7 @@ export interface IEmbedContext {
     inEditor?: boolean;
     isNewEditor?: boolean;
     descriptionID?: string;
+    isInRichTable?: boolean;
     onRenderComplete?: () => void;
     syncBackEmbedValue?: (values: object) => void;
     isSelected?: boolean;

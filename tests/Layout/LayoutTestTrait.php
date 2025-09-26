@@ -72,6 +72,12 @@ trait LayoutTestTrait
 
         // Strip off seoHtml. We'll assert against these separately.
         $expected = $this->getLayoutService()->stripSeoHtmlFromHydratedLayout($expected);
+
+        if (isset($actual["titleBar"]) && !isset($expected["titleBar"])) {
+            // The assertion wasn't actually making assertions about the titlebar.
+            unset($actual["titleBar"]);
+        }
+
         // See things as an API client sees things.
         $expected = ApiUtils::jsonFilter($expected);
         $expected = ArrayUtils::jsonNormalizeArray($expected);

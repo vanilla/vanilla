@@ -21,7 +21,7 @@ class RichFormatExtraTests extends SiteTestCase
     use UserMentionTestTraits;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function prepareFormatter(): FormatInterface
     {

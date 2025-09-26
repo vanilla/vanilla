@@ -8,7 +8,7 @@ import { render } from "@testing-library/react";
 import DateTime from "@library/content/DateTime";
 import { setCurrentLocale } from "@vanilla/i18n";
 
-const timeStamp = "2020-04-22T14:31:19Z";
+const timeStamp = "2020-04-22T14:31:19.000Z";
 
 describe("DateTime", () => {
     afterEach(() => {

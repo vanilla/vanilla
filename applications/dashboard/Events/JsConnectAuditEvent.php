@@ -25,7 +25,7 @@ class JsConnectAuditEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function eventType(): string
     {
@@ -33,7 +33,7 @@ class JsConnectAuditEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAuditEventType(): string
     {
@@ -41,7 +41,7 @@ class JsConnectAuditEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function canFormatAuditMessage(string $eventType, array $context, array $meta): bool
     {
@@ -49,7 +49,7 @@ class JsConnectAuditEvent extends BasicAuditLogEvent
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function formatAuditMessage(string $eventType, array $context, array $meta): string
     {

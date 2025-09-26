@@ -222,7 +222,7 @@ describe("CategoryDropdown", async () => {
     });
 
     it("Get default category list nested", async () => {
-        mockAdapter.onGet("/categories?outputFormat=flat&limit=50").reply(200, MOCK_CATEGORY_ALL);
+        mockAdapter.onGet("/categories?outputFormat=flat&limit=500").reply(200, MOCK_CATEGORY_ALL);
         renderComponent();
 
         const input = screen.getByTestId("inputContainer");
@@ -239,7 +239,7 @@ describe("CategoryDropdown", async () => {
     });
 
     it("Skips heading when using keyboard navigation", async () => {
-        mockAdapter.onGet("/categories?outputFormat=flat&limit=50").reply(200, MOCK_CATEGORY_ALL);
+        mockAdapter.onGet("/categories?outputFormat=flat&limit=500").reply(200, MOCK_CATEGORY_ALL);
         renderComponent();
 
         const input = screen.getByRole("textbox");

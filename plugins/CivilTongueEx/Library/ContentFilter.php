@@ -26,18 +26,19 @@ class ContentFilter
     /**
      * Replace black-listed words according to pattern
      *
-     * @param string $text
+     * @param string|null $text
+     * @param bool $isHtml
      *
      * @return ?string
      */
-    public function replace($text = ""): ?string
+    public function replace(string|null $text = "", bool $isHtml = false): ?string
     {
         if (!isset($text)) {
             return $text;
         }
 
         $patterns = $this->getPatterns();
-        $result = preg_replace($patterns, $this->replacement, $text);
+        $result = preg_replace($patterns, $isHtml ? htmlspecialchars($this->replacement) : $this->replacement, $text);
         return $result;
     }
 

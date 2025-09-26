@@ -47,8 +47,8 @@ export function SiteNav(props: IProps) {
 
     const activeRecord = useActiveNavRecord(children, _activeRecord);
     const hasChildren = children && children.length > 0;
-    const classes = siteNavClasses();
-    const classesPanelList = panelListClasses(useSection().mediaQueries);
+    const classes = siteNavClasses.useAsHook();
+    const classesPanelList = panelListClasses.useAsHook(useSection().mediaQueries);
 
     const siteNavContext = useSiteNavContext();
     useEffect(() => {

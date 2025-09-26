@@ -58,7 +58,7 @@ final class RoleRequestMetaModel extends \Vanilla\Models\PipelineModel
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function insert(array $set, array $options = [])
     {
@@ -110,7 +110,7 @@ final class RoleRequestMetaModel extends \Vanilla\Models\PipelineModel
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function handleInnerOperation(Operation $op)
     {

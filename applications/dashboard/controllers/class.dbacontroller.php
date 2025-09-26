@@ -44,6 +44,7 @@ class DbaController extends DashboardController
      */
     public function counts($table = false, $column = false, $from = false, $to = false, $max = false)
     {
+        Gdn_Theme::section("VanillaStaff");
         increaseMaxExecutionTime(300);
         $this->permission("Garden.Settings.Manage");
 

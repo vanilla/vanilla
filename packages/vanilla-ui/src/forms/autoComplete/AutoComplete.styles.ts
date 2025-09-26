@@ -30,7 +30,7 @@ export const autoCompleteClasses = ({
         width: "100%",
         alignItems: "baseline",
         justifyContent: "flex-start",
-        border: "solid 1px #bfcbd8",
+        border: "solid 1px rgb(190,194,206)",
         borderRadius: 6,
         flexWrap: "wrap",
         opacity: isDisabled ? 0.5 : 1,

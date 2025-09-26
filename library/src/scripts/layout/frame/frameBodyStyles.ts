@@ -15,6 +15,7 @@ import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { percent } from "csx";
 import { Mixins } from "@library/styles/Mixins";
 import { css } from "@emotion/css";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const frameBodyClasses = useThemeCache(() => {
     const vars = frameVariables();
@@ -82,7 +83,7 @@ export const frameBodyClasses = useThemeCache(() => {
         }),
         fontSize: importantUnit(globalVars.fonts.size.medium),
         minHeight: styleUnit(50),
-        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        color: ColorsUtils.var(ColorVar.Foreground),
 
         "& p:last-child": {
             marginBottom: 0,

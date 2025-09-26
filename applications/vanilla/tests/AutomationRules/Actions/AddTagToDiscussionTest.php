@@ -29,7 +29,7 @@ class AddTagToDiscussionTest extends SiteTestCase
     private LogModel $logModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

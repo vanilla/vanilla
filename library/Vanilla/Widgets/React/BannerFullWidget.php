@@ -11,30 +11,29 @@ use Gdn;
 use Garden\Schema\Schema;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\Forms\NoCustomFragmentCondition;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
-use Vanilla\Layout\HydrateAwareInterface;
-use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Layout\Section\SectionFullWidth;
 use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\DynamicContainerSchemaOptions;
+use Vanilla\Widgets\Fragments\BannerFragmentMeta;
+use Vanilla\Widgets\Fragments\SearchFragmentMeta;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\Schema\WidgetBackgroundSchema;
 
 /**
  * Class BannerFullWidget
  */
-class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, HydrateAwareInterface
+class BannerFullWidget extends ReactWidget
 {
-    use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
-    use HydrateAwareTrait;
 
     const IMAGE_SOURCE_STYLEGUIDE = "styleGuide";
     const IMAGE_SOURCE_SITE_SECTION = "siteSection";
@@ -44,31 +43,19 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     const IMAGE_SOURCE_KNOWLEDGE_BASE = "knowledgeBase/bannerImage";
     const IMAGE_SOURCE_KNOWLEDGE_HOME = "knowledgeImage";
 
-    /** @var SiteSectionModel */
-    private $siteSectionModel;
-
-    /** @var ConfigurationInterface */
-    private $config;
-
-    /** @var ImageSrcSetService */
-    private $imageSrcSetService;
-
     /**
      * DI.
-     *
-     * @param SiteSectionModel $siteSectionModel
-     * @param ConfigurationInterface $config
      */
-    public function __construct(SiteSectionModel $siteSectionModel, ConfigurationInterface $config)
-    {
-        $this->siteSectionModel = $siteSectionModel;
-        $this->config = $config;
-        $this->imageSrcSetService = Gdn::getContainer()->get(ImageSrcSetService::class);
+    public function __construct(
+        private SiteSectionModel $siteSectionModel,
+        private ConfigurationInterface $config,
+        private ImageSrcSetService $imageSrcSetService
+    ) {
         $this->addChildComponentName("Banner");
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -76,7 +63,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -100,7 +87,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -158,7 +145,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                     new FormOptions(
                         "Text Color",
                         "The color for foreground text in the banner.",
-                        "Style Guide default."
+                        "Style Guide default"
                     ),
                     new FieldMatchConditional(
                         "titleType",
@@ -255,6 +242,29 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                         )
                     ),
                 ],
+                "spacing?" => [
+                    "type" => "object",
+                    "properties" => [
+                        "top?" => [
+                            "type" => "integer",
+                            "x-control" => SchemaForm::textBox(
+                                new FormOptions("Top", placeholder: "Style Guide Default"),
+                                "number"
+                            ),
+                        ],
+                        "bottom?" => [
+                            "type" => "integer",
+                            "x-control" => SchemaForm::textBox(
+                                new FormOptions("Bottom", placeholder: "Style Guide Default"),
+                                "number"
+                            ),
+                        ],
+                    ],
+                    "x-control" => SchemaForm::section(
+                        new FormOptions("Spacing"),
+                        conditions: new NoCustomFragmentCondition("BannerFragment")
+                    ),
+                ],
             ]),
             self::getBackgroundSchema()
         );
@@ -322,7 +332,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getProps(): ?array
     {
@@ -435,7 +445,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -452,10 +462,26 @@ TWIG;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
         return "BannerWidget";
+    }
+
+    /**
+     * @return array
+     */
+    public static function getFragmentTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getFragmentClasses(): array
+    {
+        return [BannerFragmentMeta::class, SearchFragmentMeta::class];
     }
 }

@@ -89,6 +89,12 @@ export default function ProfileFieldsListClasses() {
 
     return {
         root,
+        name: css({
+            position: "relative",
+        }),
+        nameAsterix: css({
+            left: -10,
+        }),
         extendTableRows,
         highlightLabels,
         scrollTable,

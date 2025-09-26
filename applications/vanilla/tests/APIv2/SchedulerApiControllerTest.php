@@ -28,7 +28,7 @@ class SchedulerApiControllerTest extends AbstractAPIv2Test
     protected $userModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

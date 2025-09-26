@@ -11,6 +11,7 @@ import { mockAPI } from "@library/__tests__/utility";
 import MockAdapter from "axios-mock-adapter";
 import { act } from "@testing-library/react-hooks";
 import { ComponentProps } from "react";
+import { DraftRecordType } from "@vanilla/addon-vanilla/drafts/types";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -24,9 +25,11 @@ const queryClient = new QueryClient({
 let mockApi: MockAdapter;
 
 const draftContextProps: ComponentProps<typeof DraftContextProvider> = {
-    recordType: "comment",
+    recordType: DraftRecordType.COMMENT,
     parentRecordID: 0,
 };
+
+const MOCK_PATH_NAME = "/discussion/mock-discussion-id/";
 
 describe("DraftContext", () => {
     beforeAll(() => {
@@ -35,12 +38,12 @@ describe("DraftContext", () => {
     });
     beforeEach(() => {
         mockApi = mockAPI();
-        // @ts-ignore
-        delete window.location;
-        window.location = {
-            pathname: "/discussion/mock-discussion-id/",
-            search: "",
-        } as any;
+        vitest.mock("react-router-dom", () => ({
+            ...vitest.importActual("react-router-dom"),
+            useLocation: () => ({
+                pathname: MOCK_PATH_NAME,
+            }),
+        }));
         vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb: any) => {
             return cb();
         });
@@ -69,7 +72,7 @@ describe("DraftContext", () => {
             recordType: "comment",
         };
 
-        const { result, rerender } = renderHook(() => useDraftContext(), {
+        const { result } = renderHook(() => useDraftContext(), {
             wrapper,
         });
 
@@ -85,18 +88,7 @@ describe("DraftContext", () => {
         expect(localStore).not.toBeNull();
         const parsed = localStore && JSON.parse(localStore);
         expect(parsed).toMatchObject({
-            "/discussion/mock-discussion-id/": {
-                attributes: {
-                    body: '[{"type":"p","children":[{"text":"Hello World"}]}]',
-                    draftMeta: {
-                        format: "rich2",
-                    },
-                    draftType: "comment",
-                    format: "rich2",
-                    lastSaved: "2025-02-15T00:00:00.000Z",
-                },
-                recordType: "comment",
-            },
+            [MOCK_PATH_NAME]: expectedDraft,
         });
     });
 
@@ -161,7 +153,7 @@ describe("DraftContext", () => {
         });
 
         await act(async () => {
-            result.current.disable();
+            result.current.disableAutosave();
         });
 
         await act(async () => {

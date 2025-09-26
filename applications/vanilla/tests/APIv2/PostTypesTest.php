@@ -28,7 +28,7 @@ class PostTypesTest extends AbstractAPIv2Test
     private $category;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -40,7 +40,7 @@ class PostTypesTest extends AbstractAPIv2Test
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {
@@ -64,6 +64,7 @@ class PostTypesTest extends AbstractAPIv2Test
             "isDeleted" => false,
             "roleIDs" => [$this->role["roleID"]],
             "categoryIDs" => [$this->category["categoryID"]],
+            "postButtonLabel" => "Create Post $salt",
         ];
     }
 

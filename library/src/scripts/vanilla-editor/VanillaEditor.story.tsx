@@ -5,11 +5,11 @@
  */
 
 import React from "react";
-import { LegacyFormVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
+import { LegacyFormVanillaEditorLoadable } from "@library/vanilla-editor/VanillaEditor.loadable";
 import { loadTranslations } from "@vanilla/i18n";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { ensureBuiltinEmbeds } from "@library/embeddedContent/embedService.loadable";
+import { ensureBuiltinEmbedsSync } from "@library/embeddedContent/embedService.loadable";
 import { setMeta } from "@library/utility/appUtils";
 
 export default {
@@ -43,7 +43,7 @@ setMeta("upload.allowedExtensions", [
     "rar",
     "7z",
 ]);
-ensureBuiltinEmbeds();
+ensureBuiltinEmbedsSync();
 loadTranslations({});
 export function EditorPlayground() {
     return (
@@ -52,7 +52,7 @@ export function EditorPlayground() {
             <StoryParagraph>
                 This is a demo of the new version of Rich Editor. A lot of functionality is still a work in progress.
             </StoryParagraph>
-            <LegacyFormVanillaEditor />
+            <LegacyFormVanillaEditorLoadable />
         </div>
     );
 }

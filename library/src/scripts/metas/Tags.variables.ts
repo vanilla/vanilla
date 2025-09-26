@@ -130,14 +130,15 @@ export interface ITag extends ITagSimple {
 
 export type TagType = ITag;
 
-export enum TagPreset {
-    STANDARD = "standard",
-    PRIMARY = "primary",
-    GREYSCALE = "greyscale",
-    COLORED = "colored",
-    SUCCESS = "success",
-    ERROR = "error",
-}
+export const TagPreset = {
+    STANDARD: "standard",
+    PRIMARY: "primary",
+    GREYSCALE: "greyscale",
+    COLORED: "colored",
+    SUCCESS: "success",
+    ERROR: "error",
+} as const;
+export type TagPreset = (typeof TagPreset)[keyof typeof TagPreset];
 
 export const tagPresetVariables = useThemeCache(function (): { [key in TagPreset]: TagType } {
     const makeThemeVars = variableFactory("tags", undefined, [

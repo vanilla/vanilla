@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { useThrowError } from "@vanilla/react-utils";
 
 interface IGroupContext {

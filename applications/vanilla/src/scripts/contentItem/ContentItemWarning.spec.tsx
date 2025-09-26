@@ -4,14 +4,15 @@
  */
 
 import { render } from "@testing-library/react";
-import { ContentItemWarning } from "@vanilla/addon-vanilla/contentItem/ContentItemWarning";
+import { ContentItemWarning, type IPostWarning } from "@vanilla/addon-vanilla/contentItem/ContentItemWarning";
+import { blessStringAsSanitizedHtml } from "@vanilla/dom-utils";
 
 describe("<ContentItemWarning />", () => {
     const mockModalData = {
         warning: {
             dateInserted: "2021-10-01",
             format: "rich2",
-            body: "<p>Test content here</p>",
+            body: blessStringAsSanitizedHtml("<p>Test content here</p>"),
             user: {
                 userID: 1,
                 name: "Test User",
@@ -26,7 +27,7 @@ describe("<ContentItemWarning />", () => {
             },
             userNoteID: 2,
             conversationID: 3,
-        },
+        } as IPostWarning,
         recordName: "Test Post",
         recordUrl: "https://test.com",
     };

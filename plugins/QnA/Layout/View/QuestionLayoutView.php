@@ -40,7 +40,7 @@ class QuestionLayoutView extends DiscussionLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getExpands(): array
     {
@@ -48,7 +48,7 @@ class QuestionLayoutView extends DiscussionLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTemplateID(): string
     {
@@ -56,7 +56,7 @@ class QuestionLayoutView extends DiscussionLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -64,7 +64,7 @@ class QuestionLayoutView extends DiscussionLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {

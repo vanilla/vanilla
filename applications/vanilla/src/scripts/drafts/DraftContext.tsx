@@ -8,29 +8,32 @@ import { useDebouncedInput } from "@dashboard/hooks";
 import {
     useDraftDeleteMutation,
     useDraftPostPatchMutation,
-    useDraftQuery,
     useLocalDraft,
+    useLocalDraftStore,
 } from "@vanilla/addon-vanilla/drafts/Draft.hooks";
 import { DraftsApi } from "@vanilla/addon-vanilla/drafts/DraftsApi";
-import { IDraft } from "@vanilla/addon-vanilla/drafts/types";
-import { getParamsFromPath, isEditExistingPostParams } from "@vanilla/addon-vanilla/drafts/utils";
+import { IDraft, ILegacyDraft } from "@vanilla/addon-vanilla/drafts/types";
+import { getParamsFromPath, isEditExistingPostParams, isLegacyDraft } from "@vanilla/addon-vanilla/drafts/utils";
 import { useIsMounted } from "@vanilla/react-utils";
 import { logDebug, logError, RecordID } from "@vanilla/utils";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 
 interface IDraftContext {
     /** When this is null, there is no current draft */
     draftID: RecordID | null;
     updateDraft: (draftPayload: DraftsApi.PostParams) => void;
-    updateImmediate: (draftPayload: DraftsApi.PostParams) => Promise<void>;
-    removeDraft: (draftID: RecordID, localOnly?: boolean) => boolean;
-    draft?: IDraft | DraftsApi.PostParams | null;
-    draftLoaded?: boolean;
-    draftLastSaved: string | null;
-    enable: () => void;
-    disable: () => void;
-    getDraftByMatchers: (matchers: Record<string, unknown>) => Array<[RecordID, DraftsApi.PostParams]>;
+    updateImmediate: (draftPayload: DraftsApi.PostParams, forceUpdateLocal?: boolean) => Promise<void>;
+    removeDraft: (localOnly?: boolean) => boolean;
+    draft?: IDraft | null;
+    draftLoaded: boolean;
+    draftLastSavedToServer?: string;
+    enableAutosave: () => void;
+    disableAutosave: () => void;
+    getDraftByMatchers: (matchers: Record<string, unknown>) => Array<[RecordID, IDraft]>;
+    recordID?: RecordID;
 }
 
 export const DraftContext = createContext<IDraftContext>({
@@ -40,10 +43,12 @@ export const DraftContext = createContext<IDraftContext>({
     removeDraft: () => false,
     draft: null,
     draftLoaded: false,
-    draftLastSaved: "",
-    enable: () => null,
-    disable: () => null,
+    draftLastSavedToServer: undefined,
+    enableAutosave: () => null,
+    disableAutosave: () => null,
     getDraftByMatchers: () => [],
+
+    recordID: undefined,
 });
 
 export function useDraftContext() {
@@ -52,109 +57,188 @@ export function useDraftContext() {
 
 type DraftProviderProps = PropsWithChildren<{
     serverDraftID?: RecordID;
-    serverDraft?: IDraft;
-    recordType: "discussion" | "comment";
+    serverDraft?: IDraft | ILegacyDraft;
+    recordType: IDraft["recordType"];
     parentRecordID: RecordID;
+    recordID?: RecordID;
+    autosaveEnabled?: boolean;
+
+    /** Use this to disable attempting to load a draft from local storage, when no draft ID is supplied, using matchers */
+    loadLocalDraftByMatchers?: boolean;
 }>;
 
 export function DraftContextProvider(props: DraftProviderProps) {
-    const { children, serverDraftID, serverDraft, recordType, parentRecordID } = props;
+    const {
+        children,
+        serverDraftID,
+        serverDraft,
+        recordType,
+        parentRecordID,
+        recordID,
+        autosaveEnabled: autosaveInitiallyEnabled = true,
+        loadLocalDraftByMatchers = true,
+    } = props;
 
-    const [enabled, setEnabled] = useState(true);
-
-    const draftID = useRef<RecordID | null>(serverDraftID ?? null);
+    const initialServerDraft: IDraft | undefined =
+        serverDraft && isLegacyDraft(serverDraft) ? convertLegacyPostDraft(serverDraft) : serverDraft;
 
     // Can't pass drafts from the server on new posts, need to look them up here.
-    const { pathname, search } = window.location;
-    const parameters = getParamsFromPath(pathname, search);
 
-    // Only on first mount
-    useEffect(() => {
-        // If none on server, check local
-        if (!serverDraftID && !parameters) {
-            const matchers = {
-                recordType,
-                parentRecordID,
-                "attributes.draftType": "discussion",
-            };
-            const lookup = getDraftByMatchers(matchers);
-            if (lookup && lookup.length > 0) {
-                const firstMatched = lookup[0];
-                const id = firstMatched[0];
-                draftID.current = id;
-            }
-        }
-        // We only get parameter values for create post pages
+    const { pathname, search } = useLocation();
+
+    const [autosaveEnabled, setAutosaveEnabled] = useState(autosaveInitiallyEnabled);
+
+    const { getDraftByMatchers } = useLocalDraftStore();
+
+    let initialDraftID = serverDraftID;
+    if (!initialDraftID) {
+        const parameters = getParamsFromPath(pathname, search);
+        // We only get parameter values for create/edit post pages
         if (parameters && isEditExistingPostParams(parameters)) {
-            draftID.current = parameters.draftID ?? null;
-        }
-    }, []);
-
-    // Recover draft from local storage if not on server
-    useEffect(() => {
-        if (!serverDraftID && !serverDraft && !draftID.current) {
+            initialDraftID = parameters.draftID ?? undefined;
+        } else if (loadLocalDraftByMatchers) {
+            // Recover draft from local storage if not on server
             const matchers = {
                 recordType,
                 parentRecordID,
-                "attributes.draftType": "comment",
+                "attributes.draftType": recordType,
             };
             const lookup = getDraftByMatchers(matchers);
             if (lookup && lookup.length > 0) {
                 const firstMatched = lookup[0];
                 const id = firstMatched[0];
-                draftID.current = id;
+                initialDraftID = id;
             }
         }
-    }, [serverDraftID, serverDraft]);
+    }
 
-    const draft = useDraftQuery(
-        draftID.current !== window.location.pathname ? draftID.current : undefined,
-        serverDraft,
-    );
+    const draftID = useRef<RecordID | null>(initialDraftID ?? null);
+
+    const { localDraft, setLocalDraft, updateUnsavedDraftID, removeDraftAtID } = useLocalDraft(draftID.current);
+
     const draftMutation = useDraftPostPatchMutation();
     const draftServerDelete = useDraftDeleteMutation();
 
-    const { localDraft, setLocalDraft, updateUnsavedDraftID, removeDraftAtID, getDraftByMatchers } = useLocalDraft(
-        draftID.current,
-    );
-    const serverLastSaved = useRef<string | null>(null);
+    const unsavedLocalDraftID = !draftID.current && !!localDraft ? pathname : undefined;
 
-    const saveServerDraft = async (payload: DraftsApi.PostParams) => {
+    const saveServerDraft = async (payload: DraftsApi.PostParams, forcePost?: boolean) => {
         if (!draftMutation.isLoading && !draftServerDelete.isLoading && payload) {
             const response = await draftMutation.mutateAsync({
-                ...(draftID.current && draftID.current !== window.location.pathname && { draftID: draftID.current }),
-                body: payload,
+                ...(draftID.current &&
+                    draftID.current !== unsavedLocalDraftID &&
+                    !forcePost && { draftID: draftID.current }),
+                body: {
+                    ...payload,
+                    ...(forcePost && { draftID: undefined }),
+                },
             });
-            // If we get a new ID back, update the local store
-            if (`${response.draftID}` !== `${draftID.current}`) {
-                draftID.current && removeDraftAtID(draftID.current);
-            }
-            draftID.current = response.draftID;
-            serverLastSaved.current = new Date().toISOString();
-            updateUnsavedDraftID(response.draftID);
+            handleServerDraftChange(response);
         }
     };
+
+    const draftLastSavedToServer = useRef<string | undefined>(undefined);
+
+    function handleServerDraftChange(draft: IDraft) {
+        const shouldRemoveDraft = !!draftID.current && `${draft.draftID}` !== `${draftID.current}`;
+        const shouldUpdateUnsavedDraft = !!localDraft && !draftID.current;
+
+        setLocalDraft(draft);
+
+        // If we get a new ID back, update the local store
+        if (shouldRemoveDraft) {
+            removeDraftAtID(draftID.current!);
+        }
+
+        draftID.current = draft.draftID;
+        draftLastSavedToServer.current = new Date().toISOString();
+
+        if (shouldUpdateUnsavedDraft) {
+            updateUnsavedDraftID(draft.draftID);
+        }
+    }
+
+    async function handleServerDraftFetched(serverDraft: IDraft) {
+        if (localDraft && new Date(localDraft.attributes.lastSaved) > new Date(serverDraft.attributes.lastSaved)) {
+            // if we have a local draft and it's more recent than the server draft, save it to the server
+            const autosaveEnabledBefore = autosaveEnabled;
+            setAutosaveEnabled(false);
+            await saveServerDraft(localDraft);
+            setAutosaveEnabled(autosaveEnabledBefore);
+        } else {
+            handleServerDraftChange(serverDraft);
+        }
+    }
+
+    // this is like the success callback for the query, but we have the initialServerDraft as initialData.
+    useEffect(() => {
+        if (initialServerDraft) {
+            void handleServerDraftFetched(initialServerDraft);
+        }
+    }, []);
+
+    const serverDraftQuery = useQuery({
+        queryKey: ["draft", draftID.current],
+        queryFn: async () => {
+            try {
+                const serverDraft = await DraftsApi.getEdit({ draftID: draftID.current! });
+                await handleServerDraftFetched(serverDraft);
+                return serverDraft;
+            } catch (err) {
+                logError("Error fetching draft from server", err);
+
+                if (localDraft) {
+                    // If for some reason, we had a local draft (that matched serverID), but it's not on the server,
+                    // then POST it to the server
+                    await saveServerDraft(localDraft, true);
+                } else {
+                    // If there was neither a local draft nor a server draft,clear the draftID.
+                    draftID.current = null;
+                }
+                return null;
+            }
+        },
+
+        enabled: !!draftID.current,
+        initialData: initialServerDraft ?? undefined,
+    });
 
     const debouncedToSendToServer = useDebouncedInput(localDraft, 5000);
 
     useEffect(() => {
         void (async () => {
+            if (!localDraft) {
+                return;
+            }
+            if (!autosaveEnabled) {
+                return;
+            }
+            if (serverDraftQuery.isFetching) {
+                return;
+            }
+            if (
+                draftLastSavedToServer.current &&
+                new Date(localDraft.attributes.lastSaved) < new Date(draftLastSavedToServer.current)
+            ) {
+                return;
+            }
             try {
                 await saveServerDraft(localDraft);
             } catch (err) {
-                logError("Error saving draft", err);
+                logError("Error autosaving draft", err);
             }
         })();
     }, [debouncedToSendToServer]);
 
-    const updateDraftImpl = (payload: DraftsApi.PostParams) => {
+    const updateDraftImpl = (payload: IDraft) => {
         // Stop updating the draft if disabled or its being deleted
-        if (!enabled || draftServerDelete.isLoading) {
-            logDebug("Error updating draft");
-            return false;
+        if (!autosaveEnabled || draftServerDelete.isLoading) {
+            return;
         }
-        setLocalDraft(payload);
-        return true;
+        try {
+            setLocalDraft(payload);
+        } catch (e) {
+            logDebug("Error updating draft");
+        }
     };
 
     // This whole little dance is to make sure that we aren't actually triggered state updates to this context very frequently, as it can cause a LOT of stuff to need to re-render.
@@ -163,26 +247,36 @@ export function DraftContextProvider(props: DraftProviderProps) {
 
     const isMounted = useIsMounted();
     const updateDraft = useMemo(() => {
-        return debounce((payload: DraftsApi.PostParams) => {
-            requestAnimationFrame(() => {
-                if (isMounted()) {
-                    updateDraftImplRef.current(payload);
-                }
-            });
-        }, 1000);
+        return debounce(
+            (payload: IDraft) => {
+                requestAnimationFrame(() => {
+                    if (isMounted()) {
+                        updateDraftImplRef.current(payload);
+                    }
+                });
+            },
+            1000,
+            {
+                leading: true,
+            },
+        );
     }, []);
 
-    // Needed for immediate updates, when draft buttons are clicked, etc.
-    const updateImmediate = async (payload: DraftsApi.PostParams) => {
-        updateDraftImpl(payload);
-        await saveServerDraft(payload);
-    };
+    function enableAutosave() {
+        setAutosaveEnabled(true);
+    }
 
-    const removeDraft = (id: RecordID, localOnly?: boolean) => {
+    function disableAutosave() {
+        updateDraft.cancel(); // Remove any pending updates to the local draft
+        setAutosaveEnabled(false);
+    }
+
+    const removeDraft = (localOnly?: boolean) => {
+        const id = draftID.current ?? unsavedLocalDraftID;
         // Short circuit if the draft is already being mutated or deleted
-        if (!id || !enabled || draftMutation.isLoading || draftServerDelete.isLoading) return false;
+        if (!id || draftMutation.isLoading || draftServerDelete.isLoading) return false;
         removeDraftAtID(id);
-        !localOnly && id !== window.location.pathname && draftServerDelete.mutate(id);
+        if (!(localOnly || id === unsavedLocalDraftID)) draftServerDelete.mutate(id);
         draftID.current = null;
         return true;
     };
@@ -191,18 +285,22 @@ export function DraftContextProvider(props: DraftProviderProps) {
         <DraftContext.Provider
             value={{
                 draftID: draftID.current,
+                updateImmediate: saveServerDraft,
                 updateDraft,
-                updateImmediate,
                 removeDraft,
                 draft: localDraft,
                 draftLoaded: !!localDraft,
-                draftLastSaved: serverLastSaved.current,
-                enable: () => setEnabled(true),
-                disable: () => setEnabled(false),
+                draftLastSavedToServer: draftLastSavedToServer.current,
+                enableAutosave,
+                disableAutosave,
                 getDraftByMatchers,
+                recordID: localDraft?.recordID ?? recordID,
             }}
         >
             {children}
         </DraftContext.Provider>
     );
+}
+function convertLegacyPostDraft(serverDraft: ILegacyDraft): IDraft {
+    throw new Error("Function not implemented.");
 }

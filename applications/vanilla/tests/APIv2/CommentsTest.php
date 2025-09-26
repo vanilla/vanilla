@@ -16,7 +16,9 @@ use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Gdn;
+use MediaModel;
 use Vanilla\Models\DirtyRecordModel;
+use Vanilla\Utility\ModelUtils;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -25,7 +27,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class CommentsTest extends AbstractResourceTest
 {
-    public static $addons = ["stubcontent", "test-mock-issue"];
+    public static $addons = ["stubcontent", "test-mock-issue", "editor"];
 
     use TestExpandTrait;
     use AssertLoggingTrait;
@@ -762,6 +764,60 @@ class CommentsTest extends AbstractResourceTest
     }
 
     /**
+     * Test that you can still post a comment when including a non-existent draftID.
+     *
+     * @return void
+     */
+    public function testPostingCommentFromDeletedDraft(): void
+    {
+        $discussion = $this->createDiscussion();
+        $commentBody = "This is a comment";
+
+        // Post the comment
+        $this->api()
+            ->post("/comments", [
+                "body" => $commentBody,
+                "discussionID" => $discussion["discussionID"],
+                "format" => "markdown",
+                "draftID" => 9999,
+            ])
+            ->assertSuccess();
+    }
+
+    /**
+     * Test that you cannot delete a draft that belongs to another user if you don't have the correct permission.
+     *
+     * @return void
+     */
+    public function testPostingWithAnotherUsersDraft(): void
+    {
+        $discussion = $this->createDiscussion();
+        $commentDraftData = [
+            "recordType" => "comment",
+            "parentRecordID" => $discussion["discussionID"],
+            "attributes" => [
+                "body" => "Hello world. I am a comment.",
+                "format" => "Markdown",
+            ],
+        ];
+        $draft = $this->api()
+            ->post("/drafts", $commentDraftData)
+            ->assertSuccess()
+            ->getBody();
+
+        $user = $this->createUser();
+        $this->runWithUser(function () use ($draft, $discussion) {
+            $this->expectExceptionCode(403);
+            $this->expectExceptionMessage("Permission Problem");
+            $this->createComment([
+                "body" => "Should not post",
+                "discussionID" => $discussion["discussionID"],
+                "draftID" => $draft["draftID"],
+            ]);
+        }, $user);
+    }
+
+    /**
      * Provide reaction data to test permissions.
      *
      * @return array[]
@@ -781,5 +837,87 @@ class CommentsTest extends AbstractResourceTest
             ],
             "flags" => ["spam", "flag.add", "You need the Reactions.Flag.Add permission to do that"],
         ];
+    }
+
+    /**
+     * Test joining of media onto comments.
+     *
+     * @return void
+     */
+    public function testJoiningOfMedia(): void
+    {
+        $discussion = $this->createDiscussion();
+        $comment = $this->createComment();
+        // Create some media rows for the comments.
+        $this->createMedia("Comment", $comment["commentID"], "/test1");
+        $this->createMedia("Comment", $comment["commentID"], "/test2");
+
+        // Fetching the comment list will join the media to the post.
+        $comment = $this->api()
+            ->get("/comments?commentID={$comment["commentID"]}")
+            ->getBody()[0];
+
+        $this->assertStringContainsString("/test1", $comment["body"]);
+        $this->assertStringContainsString("/test2", $comment["body"]);
+
+        // Joining the table will result in
+
+        // Now let's add a malformed attachment.
+        $this->createMedia(
+            "Comment",
+            $comment["commentID"],
+            "/test3",
+            overrides: [
+                // The bad type should be normalized.
+                "Type" => "",
+            ]
+        );
+
+        $comment = $this->api()
+            ->get("/comments", [
+                "commentID" => $comment["commentID"],
+            ])
+            ->getBody()[0];
+
+        $this->assertStringContainsString("/test1", $comment["body"]);
+        $this->assertStringContainsString("/test2", $comment["body"]);
+        $this->assertStringContainsString("/test3", $comment["body"]);
+
+        // We do not join these when crawling (performance issues).
+        $comment = $this->api()
+            ->get("/comments", [
+                "commentID" => $comment["commentID"],
+                "expand" => "crawl",
+            ])
+            ->getBody()[0];
+
+        $this->assertStringNotContainsString("/test1", $comment["body"]);
+        $this->assertStringNotContainsString("/test2", $comment["body"]);
+        $this->assertStringNotContainsString("/test3", $comment["body"]);
+    }
+
+    /**
+     * Create a media record.
+     *
+     * @param string $foreignTable
+     * @param int $foreignID
+     * @param string $url
+     * @param array $overrides
+     * @return void
+     */
+    private function createMedia(string $foreignTable, int $foreignID, string $url, array $overrides = []): void
+    {
+        $mediaModel = \Gdn::getContainer()->get(MediaModel::class);
+        $mediaID = $mediaModel->save([
+            "Name" => $url,
+            "Path" => $url,
+            "Type" => "test",
+            "Size" => 500,
+            "Active" => 1,
+            "ForeignTable" => $foreignTable,
+            "ForeignID" => $foreignID,
+        ]);
+        ModelUtils::validationResultToValidationException($mediaModel);
+        $mediaModel->setField($mediaID, $overrides);
     }
 }

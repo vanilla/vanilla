@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef, useLayoutEffect } from "react";
 import { numberedPagerClasses } from "@library/features/numberedPager/NumberedPager.styles";
 import { numberedPagerVariables } from "@library/features/numberedPager/NumberedPager.variables";
 import { numberWithCommas, humanReadableNumber } from "@library/content/NumberFormatted";
@@ -17,7 +17,8 @@ import { t } from "@vanilla/i18n";
 import NextPrevButton from "@library/features/numberedPager/NextPrevButton";
 import NumberedPagerJumper from "@library/features/numberedPager/NumberedPagerJumper";
 import { RecordID } from "@vanilla/utils";
-import { useMeasure } from "@vanilla/react-utils";
+import { useDeferredFocuser, useMeasure } from "@vanilla/react-utils";
+import { useUniqueID } from "@library/utility/idUtils";
 
 export interface INumberedPagerProps {
     onChange?: (page: number) => void;
@@ -25,7 +26,6 @@ export interface INumberedPagerProps {
     currentPage?: number;
     pageLimit?: number;
     totalResults?: number;
-    isMobile?: boolean;
     rangeOnly?: boolean;
 
     /** This one indicates that actual results might be more than totalResults, as normally we have a limit from APIs*/
@@ -42,22 +42,15 @@ export function NumberedPager(props: INumberedPagerProps) {
         pageLimit = 10,
         totalResults = 0,
         rangeOnly = false,
-        isMobile: _isMobile,
         showNextButton = true,
         className,
         hasMorePages,
     } = props;
-    const selfRef = useRef<HTMLDivElement>(null);
-    const measure = useMeasure(selfRef, false, true);
 
-    //in test environment, measure.width is 0. so we must be able to force mobile/not mobile through props
-    const isMobile = _isMobile !== undefined ? _isMobile : measure.width < 600;
-
-    const classes = numberedPagerClasses(isMobile);
-    const vars = numberedPagerVariables();
+    const classes = numberedPagerClasses.useAsHook();
+    const vars = numberedPagerVariables.useAsHook();
     const [showJumper, setShowJumper] = useState<boolean>(false);
     const [pageNumber, setPageNumber] = useState<number>(1);
-    const [displayRange, setDisplayRange] = useState<string>("0 - 0 of 0");
 
     useEffect(() => {
         if (currentPage && currentPage !== pageNumber) {
@@ -73,7 +66,12 @@ export function NumberedPager(props: INumberedPagerProps) {
         return 1;
     }, [totalResults, pageLimit]);
 
-    useEffect(() => {
+    const jumperInputID = useUniqueID("jumperInput");
+    const showJumperID = useUniqueID("jumperButton");
+    const deferredFocuser = useDeferredFocuser();
+    const [displayRange, setDisplayRange] = useState<string>("0 - 0 of 0");
+
+    useLayoutEffect(() => {
         let minNumber: RecordID = 0;
         let maxNumber: RecordID = 0;
 
@@ -125,15 +123,18 @@ export function NumberedPager(props: INumberedPagerProps) {
         setPageNumber(page);
         onChange(page);
         setShowJumper(false);
+        deferredFocuser.focusElementBySelector(`#${showJumperID}`);
     };
 
     // Only return the result count range if `rangeOnly` is true
-    if (rangeOnly) return <div className={cx(classes.resultCount, className)}>{displayRange}</div>;
+    if (rangeOnly) {
+        return <div className={cx(classes.resultCount, className)}>{displayRange}</div>;
+    }
 
     // Return a full pager component
     return (
-        <div className={cx(classes.root, className)} ref={selfRef}>
-            {!isMobile && <div aria-hidden="true" />}
+        <div className={cx(classes.root, className)}>
+            <div aria-hidden="true" className={"noMobile"} />
             {showNextButton && (
                 <div className={classes.nextPageWrapper}>
                     <Button
@@ -149,38 +150,45 @@ export function NumberedPager(props: INumberedPagerProps) {
             <div className={classes.resultCount}>
                 {showJumper ? (
                     <NumberedPagerJumper
+                        inputID={jumperInputID}
                         currentPage={pageNumber}
                         totalPages={numberWithCommas(totalPages)}
                         selectPage={handlePageJump}
-                        close={() => setShowJumper(false)}
+                        close={() => {
+                            deferredFocuser.focusElementBySelector(`#${showJumperID}`);
+                            setShowJumper(false);
+                        }}
                         hasMorePages={hasMorePages}
                     />
                 ) : (
                     <>
                         {displayRange}
-                        {!isMobile && (
-                            <>
-                                <NextPrevButton
-                                    direction="prev"
-                                    onClick={handlePrevPage}
-                                    disabled={pageNumber === 1}
-                                    tooltip={t("Previous Page")}
-                                />
-                                <span className={classes.pageNumber}>{pageNumber}</span>
-                                <NextPrevButton
-                                    direction="next"
-                                    onClick={handleNextPage}
-                                    disabled={pageNumber === totalPages && !hasMorePages}
-                                    tooltip={t("Next Page")}
-                                />
-                            </>
-                        )}
+
+                        <NextPrevButton
+                            className={"noMobile"}
+                            direction="prev"
+                            onClick={handlePrevPage}
+                            disabled={pageNumber === 1}
+                            tooltip={t("Previous Page")}
+                        />
+                        <span className={cx(classes.pageNumber, "noMobile")}>{pageNumber}</span>
+                        <NextPrevButton
+                            className={"noMobile"}
+                            direction="next"
+                            onClick={handleNextPage}
+                            disabled={pageNumber === totalPages && !hasMorePages}
+                            tooltip={t("Next Page")}
+                        />
                         <ToolTip label={t("Jump to a specific page")}>
                             <span>
                                 <Button
                                     buttonType={vars.buttons.iconButton.name as ButtonTypes}
                                     className={classes.iconButton}
-                                    onClick={() => setShowJumper(true)}
+                                    id={showJumperID}
+                                    onClick={() => {
+                                        deferredFocuser.focusElementBySelector(`#${jumperInputID}`);
+                                        setShowJumper(true);
+                                    }}
                                     ariaLabel={t("Jump to a specific page")}
                                 >
                                     <Icon icon={"pager-skip" as IconType} />

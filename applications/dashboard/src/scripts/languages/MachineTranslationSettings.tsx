@@ -5,7 +5,7 @@
  */
 
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardFormListItem } from "@dashboard/forms/DashboardFormListItem";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";

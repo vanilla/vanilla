@@ -35,7 +35,7 @@ interface IProps extends IOptionalComponentID {
  */
 export function RadioButton(props: IProps) {
     const labelID = useUniqueID("radioButton-label");
-    const classes = checkRadioClasses();
+    const classes = checkRadioClasses.useAsHook();
     const { isHorizontal, note } = props;
 
     const noteID = useUniqueID("radioButtonNote");

@@ -13,7 +13,7 @@ class ManageController extends DashboardController
     public const FEATURE_ROLE_APPLICATIONS = "roleApplications";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function initialize()
     {

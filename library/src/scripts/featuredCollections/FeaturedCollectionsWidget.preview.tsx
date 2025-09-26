@@ -6,7 +6,7 @@
 
 import React from "react";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { FeaturedCollectionsWidget } from "@library/featuredCollections/FeaturedCollectionsWidget";
 import { CollectionRecordTypes } from "@library/featuredCollections/Collections.variables";
@@ -17,7 +17,7 @@ export function FeaturedCollectionsWidgetPreview(props: IProps) {
     const { containerOptions } = props;
 
     return (
-        <Widget>
+        <LayoutWidget>
             <FeaturedCollectionsWidget
                 {...props}
                 containerOptions={{
@@ -44,7 +44,7 @@ export function FeaturedCollectionsWidgetPreview(props: IProps) {
                     })),
                 }}
             />
-        </Widget>
+        </LayoutWidget>
     );
 }
 

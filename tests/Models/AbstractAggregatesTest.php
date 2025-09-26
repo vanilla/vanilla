@@ -40,7 +40,7 @@ abstract class AbstractAggregatesTest extends SiteTestCase
     protected $sql;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

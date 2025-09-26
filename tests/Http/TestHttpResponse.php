@@ -23,6 +23,15 @@ class TestHttpResponse extends InternalResponse
     }
 
     /**
+     * @return $this
+     */
+    public function assertFailure(): self
+    {
+        VanillaTestCase::assertFalse($this->isSuccessful(), "Response is not OK");
+        return $this;
+    }
+
+    /**
      * @param int $status
      * @return $this
      */
@@ -32,12 +41,31 @@ class TestHttpResponse extends InternalResponse
         return $this;
     }
 
+    /**
+     * @param string $expectedHeaderName
+     * @param string $expectedHeaderValue
+     * @return $this
+     */
     public function assertHeader(string $expectedHeaderName, string $expectedHeaderValue): self
     {
         VanillaTestCase::assertEquals(
             $expectedHeaderValue,
             $this->getHeader($expectedHeaderName),
             "Response header does not match"
+        );
+        return $this;
+    }
+
+    /**
+     * @param int $expectedCode
+     * @return $this
+     */
+    public function assertResponseCode(int $expectedCode): self
+    {
+        VanillaTestCase::assertEquals(
+            $expectedCode,
+            $this->getStatusCode(),
+            "Expected response code $expectedCode, got {$this->getStatusCode()} instead."
         );
         return $this;
     }
@@ -78,14 +106,27 @@ class TestHttpResponse extends InternalResponse
     }
 
     /**
-     * @param array $expected A mapping of "key" => ["row1Value", "row2Value"].
-     * @param string $message
+     * Assert that a json array is empty.
+     *
      * @return $this
      */
-    public function assertJsonArrayValues(array $expected, string $message = ""): self
+    public function assertEmptyJsonArray(): self
     {
         $this->assertJsonArray();
-        VanillaTestCase::assertRowsLike($expected, $this->getBody(), $message);
+        VanillaTestCase::assertEmpty($this->getBody(), "Response was not an empty array.");
+        return $this;
+    }
+
+    /**
+     * @param array $expected A mapping of "key" => ["row1Value", "row2Value"].
+     * @param bool $strictOrder
+     * @param int|null $count
+     * @return $this
+     */
+    public function assertJsonArrayValues(array $expected, bool $strictOrder = false, ?int $count = null): self
+    {
+        $this->assertJsonArray();
+        VanillaTestCase::assertRowsLike($expected, $this->getBody(), $strictOrder, $count);
         return $this;
     }
 
@@ -109,6 +150,29 @@ class TestHttpResponse extends InternalResponse
     {
         $this->assertJsonArray();
         VanillaTestCase::assertCount($expectedCount, $this->getBody(), $message);
+        return $this;
+    }
+
+    /**
+     * @param array $expected
+     * @param string $message
+     * @return $this
+     */
+    public function assertJsonObjectHasKeys(array $expected, string $message = ""): self
+    {
+        $this->assertJsonObject();
+        VanillaTestCase::assertArrayHasKeys($expected, $this->getBody(), $message);
+        return $this;
+    }
+
+    /**
+     * @param string $message
+     * @return $this
+     */
+    public function assertJsonArrayEmpty(string $message = ""): self
+    {
+        $this->assertJsonArray();
+        VanillaTestCase::assertEmpty($this->getBody(), $message);
         return $this;
     }
 }

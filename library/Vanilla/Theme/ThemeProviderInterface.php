@@ -41,9 +41,11 @@ interface ThemeProviderInterface
      * Get list of theme revisions
      *
      * @param string|int $themeKey
+     * @param int $limit
+     * @param int $offset
      * @return Theme[]
      */
-    public function getThemeRevisions($themeKey): array;
+    public function getThemeRevisions(string|int $themeKey, int $limit, int $offset): array;
 
     /**
      * Set current theme.

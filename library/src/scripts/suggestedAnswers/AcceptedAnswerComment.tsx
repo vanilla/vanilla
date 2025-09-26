@@ -30,7 +30,7 @@ export interface IAcceptedAnswerProps {
 
 export function AcceptedAnswerComment(props: IAcceptedAnswerProps) {
     const { suggestion, className, comment, commentParent, onMutateSuccess, commentID } = props;
-    const classes = suggestedAnswersClasses();
+    const classes = suggestedAnswersClasses.useAsHook();
     const acceptAnswer = useAcceptSuggestion(commentParent.recordID);
     const toastError = useToastErrorHandler();
     const currentUser = useCurrentUser();

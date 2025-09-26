@@ -56,7 +56,7 @@ class SpoofMiddlewareTest extends TestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

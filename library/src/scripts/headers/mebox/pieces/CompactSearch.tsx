@@ -12,7 +12,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { compactSearchClasses } from "@library/headers/mebox/pieces/compactSearchStyles";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { titleBarClasses } from "@library/headers/TitleBar.classes";
 import { useLinkContext } from "@library/routing/links/LinkContextProvider";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
@@ -130,11 +130,11 @@ export function CompactSearch(props: ICompactSearchProps) {
         }
     });
 
-    const classesTitleBar = titleBarClasses();
-    const classes = compactSearchClasses();
-    const classesSearchBar = searchBarClasses(props.overwriteSearchBar);
-    const classesDropDown = dropDownClasses();
-    const classesMebox = meBoxClasses();
+    const classesTitleBar = titleBarClasses.useAsHook();
+    const classes = compactSearchClasses.useAsHook();
+    const classesSearchBar = searchBarClasses.useAsHook(props.overwriteSearchBar);
+    const classesDropDown = dropDownClasses.useAsHook();
+    const classesMebox = meBoxClasses.useAsHook();
     const isCompactMebox = props.overwriteSearchBar?.compact;
     const label = withLabel && !isGuest && !isCompactMebox && <div className={classesMebox.label}>{t("Search")}</div>;
 
@@ -145,7 +145,7 @@ export function CompactSearch(props: ICompactSearchProps) {
                     <Button
                         onClick={props.onSearchButtonClick}
                         className={classNames(classesTitleBar.centeredButton, props.buttonClass)}
-                        title={t("CompactSearchPlaceHolder", "Search")}
+                        title={t("CompactSearchPlaceHolder", { optional: true, fallback: t("Search") })}
                         aria-expanded={false}
                         aria-haspopup="true"
                         buttonType={ButtonTypes.CUSTOM}

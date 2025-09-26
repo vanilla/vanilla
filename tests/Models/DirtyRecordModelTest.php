@@ -23,7 +23,7 @@ class DirtyRecordModelTest extends SiteTestCase
     private $dirtyRecordModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

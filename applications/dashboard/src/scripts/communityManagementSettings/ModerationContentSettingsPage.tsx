@@ -6,9 +6,8 @@
 
 import { ReportReasonList } from "@dashboard/communityManagementSettings/ReportReasonList";
 import { ModerationAdminLayout } from "@dashboard/components/navigation/ModerationAdminLayout";
-import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
@@ -25,6 +24,7 @@ import { getMeta } from "@library/utility/appUtils";
 import { useMutation } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
 import { useEffect, useState } from "react";
+import { DashboardMenusApi } from "@dashboard/DashboardMenusApi";
 
 const BETA_ENABLED = getMeta("featureFlags.CommunityManagementBeta.Enabled", false);
 export const CONF_ESCALATIONS_ENABLED = "escalations.enabled";
@@ -41,7 +41,7 @@ export default function ModerationContentSettingsPage() {
     const configs = useConfigsByKeys([CONF_ESCALATIONS_ENABLED, CONF_DISCUSSION_THREAD, CONF_TRIAGE_ENABLED]);
     const escalationsPatcher = useConfigPatcher();
     const triagePatcher = useConfigPatcher();
-    const { fetchDashboardSections } = useDashboardSectionActions();
+    const sectionUtils = DashboardMenusApi.useUtils();
     const isCmdHighlighted = new URL(window.location.href).searchParams.get("highlight");
 
     const isConfigLoading = [LoadStatus.PENDING, LoadStatus.LOADING].includes(configs.status);
@@ -61,7 +61,7 @@ export default function ModerationContentSettingsPage() {
                     [CONF_ESCALATIONS_ENABLED]: false,
                 })
                 .then(() => {
-                    fetchDashboardSections();
+                    return sectionUtils.invalidate();
                 });
         }
     }, [isEscalationsEnabled]);
@@ -106,7 +106,7 @@ export default function ModerationContentSettingsPage() {
                                         })
                                         .then(() => {
                                             // reload dashboard sections.
-                                            fetchDashboardSections();
+                                            void sectionUtils.invalidate();
                                         });
                                 }}
                                 tooltip={
@@ -134,7 +134,7 @@ export default function ModerationContentSettingsPage() {
                                     })
                                     .then(() => {
                                         // reload dashboard sections.
-                                        fetchDashboardSections();
+                                        void sectionUtils.invalidate();
                                     });
                             }}
                         />
@@ -159,7 +159,7 @@ export default function ModerationContentSettingsPage() {
 }
 
 function ResolveAllModal(props: { isVisible: boolean; setIsVisible: (isVisible: boolean) => void }) {
-    const { fetchDashboardSections } = useDashboardSectionActions();
+    const sectionUtils = DashboardMenusApi.useUtils();
     const toast = useToast();
     const resolveAllMutation = useMutation({
         mutationFn: async () => {
@@ -170,7 +170,7 @@ function ResolveAllModal(props: { isVisible: boolean; setIsVisible: (isVisible: 
                 body: t("All posts have been resolved."),
                 autoDismiss: true,
             });
-            fetchDashboardSections();
+            void sectionUtils.invalidate();
             props.setIsVisible(false);
         },
     });

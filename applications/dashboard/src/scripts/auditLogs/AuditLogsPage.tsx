@@ -15,7 +15,7 @@ import { IUserFragment } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
 import DateTime, { DateFormats } from "@library/content/DateTime";
 import UserContent from "@library/content/UserContent";
-import { codeMixin } from "@library/content/UserContent.styles";
+import { codeMixin, userContentClasses } from "@library/content/UserContent.styles";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
 import Button from "@library/forms/Button";
@@ -100,10 +100,7 @@ export function AuditLogsPage() {
                     action: (
                         <div
                             style={{
-                                // maxWidth: 500,
                                 maxWidth: mainColumnSize,
-                                // width: "100%",
-                                // overflow: "hidden",
                             }}
                         >
                             <TableAccordion
@@ -187,9 +184,7 @@ export function AuditLogsPage() {
         <div>
             <DashboardHeaderBlock
                 title={t("Audit Logs")}
-                actionButtons={
-                    <NumberedPager showNextButton={false} onChange={setPage} isMobile={false} {...paginationProps} />
-                }
+                actionButtons={<NumberedPager showNextButton={false} onChange={setPage} {...paginationProps} />}
             />
             <div ref={tableWrapRef}>
                 {auditLogQuery.isLoading && <div>{t("Loading...")}</div>}
@@ -325,6 +320,13 @@ const classes = {
         gap: 4,
         flexWrap: "wrap",
         alignItems: "center",
+    }),
+    auditLogJson: css({
+        fontSize: 12,
+        maxWidth: "100%",
+        width: "100%",
+        overflow: "hidden",
+        marginTop: 2,
     }),
 };
 
@@ -485,10 +487,11 @@ function FormattedContextValue(props: { value: any }) {
 
     if (typeof value === "object") {
         return (
-            <UserContent
-                className={css({ fontSize: 12, maxWidth: "100%", width: "100%", overflow: "hidden", marginTop: 2 })}
-                content={`<pre><code class="code codeBlock">${JSON.stringify(value, null, 4)}</code></pre>`}
-            />
+            <UserContent className={classes.auditLogJson}>
+                <pre>
+                    <code className={"code codeBlock"}>{JSON.stringify(value, null, 4)}</code>
+                </pre>
+            </UserContent>
         );
     }
     return <TokenItem>{value}</TokenItem>;

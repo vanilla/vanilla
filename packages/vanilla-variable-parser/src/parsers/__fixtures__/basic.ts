@@ -70,6 +70,4 @@ const options = makeThemeVars("options", {
      * @type string
      */
     url: "",
-
-    overlayTitleBar: true,
 });

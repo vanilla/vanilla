@@ -8,24 +8,75 @@
 namespace Vanilla\Cli\Docker\Service;
 
 use Symfony\Component\Process\Process;
-use Vanilla\Cli\Commands\DockerCommand;
-use Vanilla\Cli\Utils\DockerUtils;
-use Vanilla\Cli\Utils\ShellUtils;
+use Vanilla\Setup\ComposerHelper;
 
 /**
  * Service for dev.vanilla.local
  */
 class VanillaVanillaService extends AbstractService
 {
-    const SERVICE_NAME = "vanilla";
+    const SERVICE_ID = "vanilla";
+
+    public static array $requiredServiceIDs = [VanillaMySqlService::SERVICE_ID];
 
     /**
-     * @inheritDoc
+     * Constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(
+            new ServiceDescriptor(
+                serviceID: self::SERVICE_ID,
+                label: "Vanilla",
+                containerName: "vanilla-cloud-php",
+                url: $this->getUrls()
+            )
+        );
+    }
+
+    /**
+     * Get all of our localhost site urls based of the configurations we have.
+     *
+     * @return array
+     */
+    private function getUrls(): array
+    {
+        $urls = [];
+        $confPaths = [...glob(PATH_CONF . "/**/*.php"), ...glob(PATH_CONF . "/*.php")];
+        foreach ($confPaths as $confPath) {
+            $baseUrl = self::baseUrlForConfigPath($confPath);
+            if ($baseUrl === null) {
+                continue;
+            }
+            $urls[] = $baseUrl;
+        }
+        return $urls;
+    }
+
+    /**
+     * Get a base url for a config path if possible.
+     *
+     * @param string $config_path
+     * @return string|null
+     */
+    private function baseUrlForConfigPath(string $config_path): string|null
+    {
+        if (preg_match("/\\/config.php$/", $config_path)) {
+            return "https://dev.vanilla.local";
+        } elseif (preg_match("/\\/vanilla.local\\/(.*)\\.php$/", $config_path, $matches)) {
+            $node_name = $matches[1];
+            return "https://vanilla.local/$node_name";
+        }
+        return null;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getEnv(): array
     {
         return [
-            "COMPOSE_FILE" => "./docker-compose.yml:./docker-compose.nginx.yml",
+            "COMPOSE_FILE" => "./docker-compose.yml",
             "WWWGROUP" => getmygid(),
             "WWWUSER" => getmyuid(),
             "COMPOSE_IGNORE_ORPHANS" => true,
@@ -33,21 +84,14 @@ class VanillaVanillaService extends AbstractService
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getName(): string
-    {
-        return "Vanilla";
-    }
-
-    /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getVanillaConfigDefaults(): array
     {
         return [
             // Typically captcha isn't configured on localhost.
             "Garden.Registration.SkipCaptcha" => true,
+            "EnabledPlugins.themingapi" => true,
 
             // Bunch of feature flags to enable.
             "Feature.CommunityManagementBeta.Enabled" => true,
@@ -58,45 +102,40 @@ class VanillaVanillaService extends AbstractService
             "Feature.layoutEditor.discussionThread.Enabled" => true,
             "Feature.escalations.Enabled" => true,
             "Feature.CustomProfileFields.Enabled" => true,
-            "Feature.discussionSiteMaps.Enable" => true,
+            "Feature.discussionSiteMaps.Enabled" => true,
             "Feature.NewUserManagement.Enabled" => true,
+            "Feature.Digest.Enabled" => true,
+            "Feature.UnsubscribeLink.Enabled" => true,
+            "Feature.widgetBuilder.Enabled" => true,
+            "Agent.Configuration" => "/srv/vanilla-repositories/vanilla/docker/agent.stub.json",
         ];
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
-    public function getTargetDirectory(): string
+    public function start(): void
     {
-        return DockerCommand::VNLA_DOCKER_CWD;
-    }
+        // Clear our caches while we're at it.
+        ComposerHelper::clearPhpCache();
+        ComposerHelper::clearTwigCache();
+        ComposerHelper::clearJsDepsCache();
 
-    /**
-     * @inheritDoc
-     */
-    public function getHostname(): string
-    {
-        return "dev.vanilla.local";
-    }
-
-    public function start()
-    {
-        parent::startDocker();
-    }
-
-    public function ensureCloned()
-    {
+        // Make sure we have all our symlinks
         $this->ensureSymlinks();
+
+        parent::start();
     }
 
     /**
      * Ensure our config bootstrapping classes are symlinked.
      */
-    private function ensureSymlinks()
+    private function ensureSymlinks(): void
     {
-        $this->forceSymlink("../docker/bootstrap.before.php", PATH_CONF . "/bootstrap.before.php");
-        $earlySource = "../docker/bootstrap.docker.php";
-        $this->forceSymlink($earlySource, PATH_CONF . "/bootstrap.early.php");
+        $bootstrapBeforePath = PATH_CONF . "/bootstrap.before.php";
+        $bootstrapEarlyPath = PATH_CONF . "/bootstrap.early.php";
+        $this->forceSymlink("../docker/bootstrap.before.php", $bootstrapBeforePath);
+        $this->forceSymlink("../docker/bootstrap.docker.php", $bootstrapEarlyPath);
 
         $cloudLinkScript = PATH_ROOT . "/cloud/scripts/symlink-addons";
         if (file_exists($cloudLinkScript)) {
@@ -113,7 +152,7 @@ class VanillaVanillaService extends AbstractService
      * @param string $symlinkTarget
      * @param string $symlinkFile
      */
-    private function forceSymlink(string $symlinkTarget, string $symlinkFile)
+    private function forceSymlink(string $symlinkTarget, string $symlinkFile): void
     {
         if (file_exists($symlinkFile)) {
             unlink($symlinkFile);

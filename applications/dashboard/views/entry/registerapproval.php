@@ -6,6 +6,7 @@
 
     <div class="FormWrapper">
         <?php
+
         $TermsOfServiceUrl = Gdn::config("Garden.TermsOfService", "#");
         $TermsOfServiceText = sprintf(
             t('I agree to the <a id="TermsOfService" class="Popup" target="terms" href="%s">terms of service</a>'),
@@ -21,8 +22,8 @@
             <?php if (!$this->data("NoEmail")): ?>
                 <li>
                     <?php
-                    echo $this->Form->label("Email", "Email");
-                    echo $this->Form->textBox("Email", ["type" => "email", "Wrap" => true]);
+                    echo $this->Form->label("Email", "Email", ["required" => true]);
+                    echo $this->Form->textBox("Email", ["type" => "email", "Wrap" => true, 'required' => true]);
                     echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">' .
                         t("Email Unavailable") .
                         "</span>";
@@ -31,8 +32,8 @@
             <?php endif; ?>
             <li>
                 <?php
-                echo $this->Form->label("Username", "Name");
-                echo $this->Form->textBox("Name", ["Wrap" => true]);
+                echo $this->Form->label("Username", "Name", ["required" => true]);
+                echo $this->Form->textBox("Name", ["Wrap" => true, 'required' => true]);
                 echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">' .
                     t("Name Unavailable") .
                     "</span>";
@@ -47,7 +48,7 @@
             ?>
             <li>
                 <?php
-                echo $this->Form->label("Password", "Password");
+                echo $this->Form->label("Password", "Password", ["required" => true]);
                 echo wrap(
                     sprintf(t("Your password must be at least %d characters long."), c("Garden.Password.MinLength")) .
                         " " .
@@ -57,13 +58,13 @@
                     "div",
                     ["class" => "Gloss"]
                 );
-                echo $this->Form->input("Password", "password", ["Wrap" => true, "Strength" => true]);
+                echo $this->Form->input("Password", "password", ["Wrap" => true, "Strength" => true, 'required' => true]);
                 ?>
             </li>
             <li>
                 <?php
-                echo $this->Form->label("Confirm Password", "PasswordMatch");
-                echo $this->Form->input("PasswordMatch", "password", ["Wrap" => true]);
+                echo $this->Form->label("Confirm Password", "PasswordMatch", ['required' => true]);
+                echo $this->Form->input("PasswordMatch", "password", ["Wrap" => true, 'required' => true]);
                 echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">' .
                     t("Passwords don't match") .
                     "</span>";
@@ -72,18 +73,19 @@
             <?php $this->fireEvent("ExtendedRegistrationFields"); ?>
             <li>
                 <?php
-                echo $this->Form->label("Why do you want to join?", "DiscoveryText");
-                echo $this->Form->textBox("DiscoveryText", ["MultiLine" => true, "Wrap" => true]);
+                echo $this->Form->label("Why do you want to join?", "DiscoveryText", ['required' => true]);
+                echo $this->Form->textBox("DiscoveryText", ["MultiLine" => true, "Wrap" => true, 'required' => true]);
                 ?>
             </li>
 
             <?php Captcha::render($this); ?>
 
             <?php $this->fireEvent("RegisterFormBeforeTerms"); ?>
-
+            <?php  if(Gdn::config('Garden.Registration.RequireTermsOfService', true)) { ?>
             <li>
                 <?php echo $this->Form->checkBox("TermsOfService", $TermsOfServiceText, ["value" => "1"], false); ?>
             </li>
+            <?php } ?>
             <li class="Buttons">
                 <?php echo $this->Form->button("Apply for Membership", ["class" => "Button Primary"]); ?>
             </li>

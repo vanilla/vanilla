@@ -9,6 +9,7 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
+import { inputMixin } from "@library/forms/inputStyles";
 
 export const layoutThumbnailsClasses = useThemeCache(() => {
     const container = css({
@@ -95,21 +96,13 @@ export const layoutThumbnailsClasses = useThemeCache(() => {
     const searchLabel = css({
         width: "100%",
         ...Mixins.font({ weight: 400 }),
+        marginBottom: 0,
     });
 
     const searchInput = css({
         width: "100%",
-        outline: 0,
+        ...inputMixin(),
         ...Mixins.padding({ vertical: 8, horizontal: 40 }),
-        ...Mixins.border({
-            color: globalVariables().border.color,
-            radius: 6,
-        }),
-        [`&:hover, &:active, &:focus, &.focus-visible, &.isSelected`]: {
-            ...Mixins.border({
-                color: ColorsUtils.colorOut(globalVariables().mainColors.primary),
-            }),
-        },
     });
 
     const clearButton = css({
@@ -138,5 +131,12 @@ export const layoutThumbnailsClasses = useThemeCache(() => {
         searchLabel,
         searchInput,
         clearButton,
+        groupHeading: css({
+            width: "100%",
+            minWidth: "100%",
+            gridColumn: "1 / -1",
+            margin: 12,
+            marginTop: 0,
+        }),
     };
 });

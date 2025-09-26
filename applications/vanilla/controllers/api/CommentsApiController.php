@@ -10,11 +10,12 @@ use Garden\Web\Data;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\DateFilterSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Events\BeforeCommentPostEvent;
-use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\RichFormat;
@@ -29,7 +30,6 @@ use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\LegacyModelUtils;
 use Vanilla\Models\Model;
-use Vanilla\Permissions;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Schema\RangeExpression;
@@ -44,10 +44,11 @@ use Vanilla\Web\APIExpandMiddleware;
 /**
  * API Controller for the `/comments` resource.
  */
-class CommentsApiController extends AbstractApiController
+class CommentsApiController extends AbstractApiController implements LoggerAwareInterface
 {
     use CommunitySearchSchemaTrait;
     use \Vanilla\Formatting\FormatCompatTrait;
+    use LoggerAwareTrait;
 
     /** @var Schema */
     private $commentSchema;
@@ -340,14 +341,15 @@ class CommentsApiController extends AbstractApiController
         $this->getEventManager()->fireFilter("commentsApiController_getFilters", $this, $comment["DiscussionID"], []);
 
         if ($comment["InsertUserID"] !== $this->getSession()->UserID) {
-            $discussion = $this->discussionByID($comment["DiscussionID"]);
-            $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $discussion["CategoryID"]);
+            $this->commentModel
+                ->getParentHandler($comment["parentRecordType"])
+                ->hasViewPermission($comment["parentRecordID"]);
         }
 
         $comment["Url"] = commentUrl($comment);
         $isRich = strcasecmp($comment["Format"], RichFormat::FORMAT_KEY) === 0;
-        $comment["bodyRaw"] = $isRich ? json_decode($comment["Body"], true) : $comment["Body"];
-        $comment["bodyRaw"] = Gdn::formatService()->renderPlainText($comment["bodyRaw"], "text");
+        $comment["bodyRaw"] = Gdn::formatService()->renderPlainText($comment["Body"], "text");
+        $comment["bodyRaw"] = $isRich ? json_decode($comment["bodyRaw"], true) : $comment["bodyRaw"];
 
         $this->userModel->expandUsers($comment, ["InsertUserID"]);
         $result = $out->validate($comment);
@@ -762,11 +764,13 @@ class CommentsApiController extends AbstractApiController
         foreach ($rows as &$currentRow) {
             $currentRow = $this->normalizeOutput($currentRow, $query["expand"]);
 
-            // Render the parent as a quote.
-            $parentCommentID = $currentRow["parentCommentID"] ?? false;
-            if ($quoteParent && $parentCommentID) {
-                $quote = $this->threadModel->renderParentCommentAsQuote($currentRow);
-                $currentRow["body"] = $quote . $currentRow["body"];
+            if (!ModelUtils::isExpandOption("crawl", $query["expand"] ?? [])) {
+                // Render the parent as a quote.
+                $parentCommentID = $currentRow["parentCommentID"] ?? false;
+                if ($quoteParent && $parentCommentID) {
+                    $quote = $this->threadModel->renderParentCommentAsQuote($currentRow);
+                    $currentRow["body"] = $quote . $currentRow["body"];
+                }
             }
         }
 
@@ -926,7 +930,10 @@ class CommentsApiController extends AbstractApiController
         $this->commentModel->getParentHandler($parentRecordType)->hasAddPermission($parentRecordID, throw: true);
 
         if (isset($body["parentCommentID"])) {
-            if (!FeatureFlagHelper::featureEnabled("customLayout.post")) {
+            if (
+                ($parentRecordType !== "event" && !FeatureFlagHelper::featureEnabled("customLayout.post")) ||
+                ($parentRecordType === "event" && !FeatureFlagHelper::featureEnabled("customLayout.event"))
+            ) {
                 throw new ClientException("Parent comments are not allowed without custom discussion threads.", 400);
             }
 
@@ -965,13 +972,20 @@ class CommentsApiController extends AbstractApiController
             excludedKeys: ["parentRecordType", "parentRecordID", "parentCommentID"]
         );
 
-        $id = $this->commentModel->save($commentData);
-        $this->validateModel($this->commentModel);
-
         // Comments drafts should be deleted after the comment is made
         if ($draftID = $body["draftID"] ?? null) {
-            $this->contentDraftModel->deleteDraftWithPermissionCheck($draftID);
+            try {
+                $this->contentDraftModel->deleteDraftWithPermissionCheck($draftID);
+            } catch (NotFoundException $e) {
+                $this->logger->error("Unable to delete comment draft with ID {$draftID}.", [
+                    "exception" => $e,
+                    "draftID" => $draftID,
+                ]);
+            }
         }
+
+        $id = $this->commentModel->save($commentData);
+        $this->validateModel($this->commentModel);
 
         ModelUtils::validateSaveResultPremoderation($id, "comment");
         if (!$id) {

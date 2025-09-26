@@ -44,8 +44,8 @@ export function PasswordForm(props: IProps) {
     const { loginWithPassword } = useAuthActions();
     const { signin: signinState } = useAuthStoreState();
 
-    const usernameRef = useRef<InputTextBlock | null>(null);
-    const passwordRef = useRef<InputTextBlock | null>(null);
+    const usernameRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+    const passwordRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
 
     const formDescriptionID = useUniqueID("passwordFormDescription");
 
@@ -94,8 +94,8 @@ export function PasswordForm(props: IProps) {
             <InputTextBlock
                 label={t("Email/Username")}
                 errors={usernameErrors}
-                ref={usernameRef}
                 inputProps={{
+                    inputRef: usernameRef,
                     required: true,
                     disabled: !allowEdit,
                     onChange: (event) => {
@@ -106,9 +106,9 @@ export function PasswordForm(props: IProps) {
             />
             <InputTextBlock
                 label={t("Password")}
-                ref={passwordRef}
                 errors={passwordErrors}
                 inputProps={{
+                    inputRef: passwordRef,
                     required: true,
                     disabled: !allowEdit,
                     type: "password",

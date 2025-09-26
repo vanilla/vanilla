@@ -7,4 +7,9 @@
 import { onReady } from "@library/utility/appUtils";
 
 // Kludge needed for on of these entries.
-(window as any).onVanillaReady = onReady;
+window.onVanillaReady = onReady;
+declare global {
+    interface Window {
+        onVanillaReady: typeof onReady;
+    }
+}

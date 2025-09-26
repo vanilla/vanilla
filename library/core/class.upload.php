@@ -10,7 +10,11 @@
  * @since 2.0
  */
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\EventManager;
+use Vanilla\Storage\StorageProviderInterface;
+use Vanilla\Storage\StorageService;
 use Vanilla\Utility\StringUtils;
 
 /**
@@ -35,6 +39,8 @@ class Gdn_Upload extends Gdn_Pluggable
 
     /** @var EventManager */
     private $eventManager;
+
+    private StorageService $storageService;
 
     /**
      * Class constructor.
@@ -110,6 +116,7 @@ class Gdn_Upload extends Gdn_Pluggable
      *
      * @param string $name Filename to be copied.
      * @return string Local file path.
+     * @throws Exception
      */
     public function copyLocal($name)
     {
@@ -119,7 +126,15 @@ class Gdn_Upload extends Gdn_Pluggable
         $this->EventArguments["Parsed"] = $parsed;
         $this->EventArguments["Path"] = &$localPath;
 
-        $this->fireAs("Gdn_Upload")->fireEvent("CopyLocal");
+        $storageProvider = $this->getStorageProvider();
+        // Use the new storage provider system if it's enabled.
+        if ($storageProvider) {
+            $localPath = $storageProvider->copyLocal($parsed);
+        } else {
+            // Fall back to the old system.
+            $this->fireAs("Gdn_Upload")->fireEvent("CopyLocal");
+        }
+
         if (!$localPath) {
             $localPath = PATH_UPLOADS . "/" . $parsed["Name"];
         }
@@ -131,6 +146,7 @@ class Gdn_Upload extends Gdn_Pluggable
      *
      * @param string $name The name of the upload as saved in the database.
      * @return bool
+     * @throws Exception
      */
     public function delete($name)
     {
@@ -140,7 +156,15 @@ class Gdn_Upload extends Gdn_Pluggable
         $this->EventArguments["Parsed"] = &$parsed;
         $handled = false;
         $this->EventArguments["Handled"] = &$handled;
-        $this->fireAs("Gdn_Upload")->fireEvent("Delete");
+
+        $storageProvider = $this->getStorageProvider();
+        // Use the new storage provider system if it's enabled.
+        if ($storageProvider) {
+            $storageProvider->delete($parsed);
+        } else {
+            // Fall back to the old system.
+            $this->fireAs("Gdn_Upload")->fireEvent("Delete");
+        }
 
         if (!$handled) {
             $path = PATH_UPLOADS . "/" . ltrim($name, "/");
@@ -326,6 +350,7 @@ class Gdn_Upload extends Gdn_Pluggable
      * @param $source
      * @param $target
      * @param array $options
+     * @param bool $copy
      * @return array|bool
      * @throws Exception
      */
@@ -338,24 +363,35 @@ class Gdn_Upload extends Gdn_Pluggable
         $this->EventArguments["OriginalFilename"] = val("OriginalFilename", $options);
         $handled = false;
         $this->EventArguments["Handled"] = &$handled;
-        $this->fireAs("Gdn_Upload")->fireEvent("SaveAs");
+        $this->EventArguments["Copy"] = $copy;
 
-        // Check to see if the event handled the save.
-        if (!$handled) {
-            $target = PATH_UPLOADS . "/" . $parsed["Name"];
-            if (!file_exists(dirname($target))) {
-                mkdir(dirname($target), 0777, true);
-            }
+        $storageProvider = $this->getStorageProvider();
+        // Use the new storage provider system if it's enabled.
+        if ($storageProvider) {
+            $parsed = $storageProvider->saveAs($source, $target, $options);
+        } else {
+            // Fall back to the old system.
+            $this->fireAs("Gdn_Upload")->fireEvent("SaveAs");
 
-            if ($copy) {
-                $result = copy($source, $target);
-            } elseif (stringBeginsWith($source, PATH_UPLOADS)) {
-                $result = rename($source, $target);
-            } else {
-                $result = $this->fileUtils->moveUploadedFile($source, $target);
-            }
-            if (!$result) {
-                throw new Exception(sprintf(t("Failed to save uploaded file to target destination (%s)."), $target));
+            // Check to see if the event handled the save.
+            if (!$handled) {
+                $target = PATH_UPLOADS . "/" . $parsed["Name"];
+                if (!file_exists(dirname($target))) {
+                    mkdir(dirname($target), 0777, true);
+                }
+
+                if ($copy) {
+                    $result = copy($source, $target);
+                } elseif (stringBeginsWith($source, PATH_UPLOADS)) {
+                    $result = rename($source, $target);
+                } else {
+                    $result = $this->fileUtils->moveUploadedFile($source, $target);
+                }
+                if (!$result) {
+                    throw new Exception(
+                        sprintf(t("Failed to save uploaded file to target destination (%s)."), $target)
+                    );
+                }
             }
         }
 
@@ -380,6 +416,8 @@ class Gdn_Upload extends Gdn_Pluggable
      * The default and most common directory is https://mysite.com/forum/uploads.
      *
      * @return array
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function getUploadWebPaths(): array
     {
@@ -393,7 +431,15 @@ class Gdn_Upload extends Gdn_Pluggable
             $sender->Returns = [];
             $sender->EventArguments = [];
             $sender->EventArguments["Urls"] = &$this->uploadWebPaths;
-            $this->eventManager->fire("Gdn_Upload_GetUrls", $sender, $sender->EventArguments);
+
+            $storageProvider = $this->getStorageProvider();
+            // Use the new storage provider system if it's enabled.
+            if ($storageProvider) {
+                $this->uploadWebPaths += $storageProvider->getUrls();
+            } else {
+                // Fall back to the old system.
+                $this->eventManager->fire("Gdn_Upload_GetUrls", $sender, $sender->EventArguments);
+            }
         }
         return $this->uploadWebPaths;
     }
@@ -404,6 +450,8 @@ class Gdn_Upload extends Gdn_Pluggable
      * @param string $url
      *
      * @return bool
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function isOwnWebPath(string $url): bool
     {
@@ -412,7 +460,7 @@ class Gdn_Upload extends Gdn_Pluggable
             $parsedOwnUrl = parse_url($ownUrl);
 
             $isSameHost = strcasecmp($parsedUrl["host"] ?? "", $parsedOwnUrl["host"]) === 0;
-            $hasRootPath = stringBeginsWith($parsedUrl["path"] ?? "", $parsedOwnUrl["path"], true);
+            $hasRootPath = stringBeginsWith($parsedUrl["path"] ?? "", $parsedOwnUrl["path"] ?? "", true);
             if ($isSameHost && $hasRootPath) {
                 return true;
             }
@@ -554,5 +602,25 @@ class Gdn_Upload extends Gdn_Pluggable
             $this->_UploadedFile = $_FILES[$inputName] ?? null;
             return $this->_UploadedFile["tmp_name"] ?? null;
         }
+    }
+
+    /**
+     * Returns the appropriate StorageProviderInterface based on the configuration, if there is one.
+     *
+     * @return StorageProviderInterface|null
+     * @throws ContainerException
+     * @throws NotFoundException
+     */
+    private function getStorageProvider(): StorageProviderInterface|null
+    {
+        $storageProvider = Gdn::config("Garden.Storage.Provider") ?? false;
+
+        // Use the new storage provider system if it's enabled.
+        if ($storageProvider) {
+            $this->storageService = Gdn::getContainer()->get(StorageService::class);
+            return $this->storageService->getStorage();
+        }
+
+        return null;
     }
 }

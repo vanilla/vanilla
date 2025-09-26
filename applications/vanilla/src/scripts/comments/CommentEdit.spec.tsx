@@ -13,6 +13,7 @@ import { mockAPI } from "@library/__tests__/utility";
 import MockAdapter from "axios-mock-adapter";
 import { CommentFixture } from "@vanilla/addon-vanilla/comments/__fixtures__/Comment.Fixture";
 import { vitest } from "vitest";
+import { CommentSpecFixture } from "@vanilla/addon-vanilla/comments/__fixtures__/CommentSpecFixture";
 
 const MOCK_COMMENT_EDIT: ICommentEdit = {
     commentID: 1,
@@ -35,7 +36,7 @@ describe("CommentEditor", () => {
     });
 
     it("Renders the editable comment", async () => {
-        await CommentFixture.wrapInProvider(
+        await CommentSpecFixture.wrapInProvider(
             <CommentEdit
                 comment={LayoutEditorPreviewData.comments(1)[0]}
                 commentEdit={MOCK_COMMENT_EDIT}
@@ -52,7 +53,7 @@ describe("CommentEditor", () => {
         mockAdapter.onPatch(/(.+)/).reply(200, CommentFixture.comment({}));
         const mockOnSuccess = vitest.fn();
 
-        await CommentFixture.wrapInProvider(
+        await CommentSpecFixture.wrapInProvider(
             <CommentEdit
                 comment={LayoutEditorPreviewData.comments(1)[0]}
                 commentEdit={MOCK_COMMENT_EDIT}

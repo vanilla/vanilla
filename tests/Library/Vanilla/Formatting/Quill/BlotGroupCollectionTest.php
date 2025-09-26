@@ -23,7 +23,7 @@ class BlotGroupCollectionTest extends BootstrapTestCase
     private $parser;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

@@ -194,7 +194,7 @@ export const EditUsername = forwardRef(function UsernameEditImpl(
                     </span>
                 }
                 noteAfterInput={t("Your new username must be unique")}
-                errors={patchErrors?.errors?.username || usernameErrors}
+                errors={patchErrors?.errors?.name || usernameErrors}
                 inputProps={{
                     required: true,
                     onChange: (event) => {

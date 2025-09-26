@@ -272,7 +272,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     protected function getPermissions(): ?Permissions
     {

@@ -212,7 +212,7 @@ final class DisplayFormat extends BaseFormat implements ParsableDOMInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseAllMentions($body): array
     {

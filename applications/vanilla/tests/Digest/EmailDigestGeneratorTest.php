@@ -12,6 +12,7 @@ use Garden\Container\NotFoundException;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Forum\Digest\DigestModel;
 use Vanilla\Forum\Digest\EmailDigestGenerator;
 use Vanilla\Forum\Digest\UserDigestModel;
@@ -39,7 +40,7 @@ class EmailDigestGeneratorTest extends SiteTestCase
     private UserDigestModel $userDigestModel;
     private EmailDigestGenerator $emailDigestGenerator;
     private \CategoryModel $categoryModel;
-
+    private UserNotificationPreferencesModel $userNotificationPreferencesModel;
     private DigestModel $digestModel;
 
     public function setUp(): void
@@ -49,6 +50,7 @@ class EmailDigestGeneratorTest extends SiteTestCase
         $this->categoryModel = \Gdn::getContainer()->get(\CategoryModel::class);
         $this->digestModel = $this->container()->get(DigestModel::class);
         $this->emailDigestGenerator = \Gdn::getContainer()->get(EmailDigestGenerator::class);
+        $this->userNotificationPreferencesModel = $this->container()->get(UserNotificationPreferencesModel::class);
         $config = [
             "Garden.Email.Disabled" => false,
             "Garden.Digest.Enabled" => true,
@@ -215,6 +217,7 @@ class EmailDigestGeneratorTest extends SiteTestCase
         $this->runWithConfig($config, function () use ($config) {
             $expected = [
                 "siteUrl" => \Gdn::request()->getSimpleUrl(),
+                "digestSubscribeReason" => "*/digest_subscribe_reason/*",
                 "digestUnsubscribeLink" => "*/digest_unsubscribe/*",
                 "notificationPreferenceLink" => url("/profile/preferences", true),
                 "imageUrl" => $config["Garden.EmailTemplate.Image"],
@@ -604,6 +607,58 @@ class EmailDigestGeneratorTest extends SiteTestCase
         $userDigestData = $this->userDigestModel->selectSingle(["userID" => $user["userID"]]);
         $this->assertEquals(-1, $userDigestData["digestContentID"]);
         $this->assertEquals("skipped", $userDigestData["status"]);
+    }
+
+    /**
+     * Test that the digest subscribe reason reflects the user's `Email.DigestEnabled` preference.
+     *
+     * @return void
+     */
+    public function testSubscribeReasonMessage(): void
+    {
+        $autoSubscribedUser = $this->createUser();
+        $optedInUser = $this->createUser();
+        $this->resetTable("UserCategory");
+
+        $cat1 = $this->createCategory(["name" => "Cat 1"]);
+        $this->createDiscussion(["name" => "Cat 1 discussion"]);
+        $cat2 = $this->createCategory(["name" => "Cat 2"]);
+        $this->createDiscussion(["name" => "Cat 2 discussion"]);
+
+        $this->enableDigestForUser($autoSubscribedUser);
+        $this->setCategoryPreference($autoSubscribedUser, $cat1, $this->followingPreferences(true));
+        $this->setCategoryPreference($autoSubscribedUser, $cat2, $this->followingPreferences(true));
+        $this->userNotificationPreferencesModel->save($autoSubscribedUser["userID"], ["Email.DigestEnabled" => 3]);
+
+        $this->enableDigestForUser($optedInUser);
+        $this->setCategoryPreference($optedInUser, $cat1, $this->followingPreferences(true));
+        $this->setCategoryPreference($optedInUser, $cat2, $this->followingPreferences(true));
+
+        $this->userNotificationPreferencesModel->save($optedInUser["userID"], ["Email.DigestEnabled" => 1]);
+
+        // Message should reflect that the user is auto-subscribed.
+        $autoEmail = $this->emailDigestGenerator->prepareSingleUserDigest($autoSubscribedUser["userID"]);
+        $this->assertStringContainsString(
+            "You are receiving this email because you were opted in to receive email digests.",
+            $autoEmail->getHtmlContent()
+        );
+
+        $this->assertStringContainsString(
+            "You are receiving this email because you were opted in to receive email digests.",
+            $autoEmail->getTextContent()
+        );
+
+        // Message should reflect that the user opted in.
+        $optedInEmail = $this->emailDigestGenerator->prepareSingleUserDigest($optedInUser["userID"]);
+        $this->assertStringContainsString(
+            "You are receiving this email because you opted in to receive email digests.",
+            $optedInEmail->getHtmlContent()
+        );
+
+        $this->assertStringContainsString(
+            "You are receiving this email because you opted in to receive email digests.",
+            $optedInEmail->getTextContent()
+        );
     }
 
     /**

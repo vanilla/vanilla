@@ -122,7 +122,6 @@ function TriagePage(props: IProps) {
                         />
                         <NumberedPager
                             className={cmdClasses.pager}
-                            isMobile={false}
                             showNextButton={false}
                             onChange={setPage}
                             {...paginationProps}

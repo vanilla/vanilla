@@ -8,7 +8,7 @@ import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import PageLoader from "@library/routing/PageLoader";
 import type { UseQueryResult } from "@tanstack/react-query";
 
-interface IProps<T, T2, T3> {
+interface IQueryLoaderProps<T, T2, T3> {
     query: UseQueryResult<T>;
     query2?: UseQueryResult<T2>;
     query3?: UseQueryResult<T3>;
@@ -20,7 +20,7 @@ interface IProps<T, T2, T3> {
 /**
  * Component to unwrap a react query and display either a loader, error, or custom component with the data.
  */
-export function QueryLoader<T, T2, T3>(props: IProps<T, T2, T3>) {
+export function QueryLoader<T, T2, T3>(props: IQueryLoaderProps<T, T2, T3>) {
     const { query, query2, query3, loader, error, success } = props;
 
     if (query.isLoading || query2?.isLoading) {

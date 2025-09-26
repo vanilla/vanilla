@@ -57,7 +57,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
 
     const active = !!expanded && !!expanded.children?.length && expanded;
 
-    const firstItemDimensions = useMeasure(firstItemRef as any, false, true);
+    const firstItemDimensions = useMeasure(firstItemRef as any, { watchRef: true });
     const { hasPermission } = usePermissionsContext();
 
     const classes = titleBarNavClasses();
@@ -102,9 +102,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
                     event.preventDefault();
                     if (item.children && item.children.length > 0) {
                         onActive(event.target);
-                        setTimeout(() => {
-                            megaMenuRef.current?.focusFirstItem();
-                        });
+                        megaMenuRef.current?.focusFirstItem();
                     } else {
                         (event.target as HTMLElement).click();
                     }
@@ -117,9 +115,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
                 case "ArrowDown":
                     event.preventDefault();
                     onActive(event.target);
-                    setTimeout(() => {
-                        megaMenuRef.current?.focusFirstItem();
-                    });
+                    megaMenuRef.current?.focusFirstItem();
                     break;
                 case "ArrowUp":
                     event.preventDefault();

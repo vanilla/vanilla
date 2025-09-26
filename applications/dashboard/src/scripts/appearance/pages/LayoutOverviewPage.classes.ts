@@ -18,6 +18,10 @@ export const layoutOverviewPageClasses = useThemeCache(() => {
         padding: 0,
         margin: 0,
         maxWidth: "initial",
+        flex: 1,
+        height: "100%",
+        maxHeight: "calc(100vh - 110px)", // 110px is an estimate for the admin header height (60px) + overview header height.
+        overflow: "auto",
     });
 
     const titleLabel = css({

@@ -12,7 +12,7 @@ import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { important, percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { CSSProperties } from "react";
@@ -67,6 +67,7 @@ export const userPhotoMixins = (vars = userPhotoVariables()) => {
             width: styleUnit(size),
             height: styleUnit(size),
             flexBasis: styleUnit(size),
+            minWidth: styleUnit(size),
         };
     };
 

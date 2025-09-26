@@ -22,7 +22,7 @@ use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 class CategoryFollowAsset extends AbstractLayoutAsset implements HydrateAwareInterface
 {
-    use HomeWidgetContainerSchemaTrait;
+    use FollowContentWidgetSchemaTrait;
     use HydrateAwareTrait;
 
     /** @var SiteSectionModel */
@@ -44,7 +44,15 @@ class CategoryFollowAsset extends AbstractLayoutAsset implements HydrateAwareInt
     }
 
     /**
-     * @inheritDoc
+     * @return bool
+     */
+    public static function isRequired(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
      * @return string
      */
     public static function getComponentName(): string
@@ -53,16 +61,16 @@ class CategoryFollowAsset extends AbstractLayoutAsset implements HydrateAwareInt
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      * @return string|null
      */
     public static function getWidgetIconPath(): ?string
     {
-        return "";
+        return "/applications/dashboard/design/images/widgetIcons/followbutton.svg";
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      * @return string
      */
     public static function getWidgetName(): string
@@ -71,7 +79,7 @@ class CategoryFollowAsset extends AbstractLayoutAsset implements HydrateAwareInt
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      * @return string
      */
     public static function getWidgetID(): string
@@ -80,7 +88,7 @@ class CategoryFollowAsset extends AbstractLayoutAsset implements HydrateAwareInt
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      * @param array $props
      * @return string|null
      */
@@ -99,7 +107,7 @@ TWIG
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      * @return array|null
      */
     public function getProps(): ?array
@@ -127,15 +135,15 @@ TWIG
 
         return [
             "userID" => $userID,
-            "categoryID" => $categoryID,
-            "categoryName" => $categoryName,
+            "recordID" => $categoryID,
+            "name" => $categoryName,
             "notificationPreferences" => $normalizedPreferences,
             "emailDigestEnabled" => $emailDigestEnabled,
         ] + $this->props;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      * @return Schema
      */
     public static function getWidgetSchema(): Schema
@@ -147,7 +155,7 @@ TWIG
                     new FormOptions(
                         t("Border Radius"),
                         t("Set border radius for the button."),
-                        t("Style Guide default.")
+                        t("Style Guide default")
                     ),
                     "number"
                 ),
@@ -158,7 +166,7 @@ TWIG
                     new FormOptions(
                         t("Button border color"),
                         t("The color for button border."),
-                        t("Style Guide default.")
+                        t("Style Guide default")
                     )
                 ),
             ],

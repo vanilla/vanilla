@@ -35,7 +35,7 @@ class CurrentIPAddressProcessorTest extends TestCase
     private $model;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -48,7 +48,7 @@ class CurrentIPAddressProcessorTest extends TestCase
             $this->processor->setUpdateFields(["updateIP"]);
             $this->model = new class ("test") extends Model {
                 /**
-                 * {@inheritDoc}
+                 * {@inheritdoc}
                  */
                 public function getWriteSchema(): Schema
                 {

@@ -16,6 +16,11 @@
 import { sheet } from "@emotion/css";
 import { logDebug } from "@vanilla/utils";
 
+declare global {
+    interface Window {
+        __REACT_DEVTOOLS_COMPONENT_FILTERS__: any;
+    }
+}
 const hasDevTools = window.__REACT_DEVTOOLS_COMPONENT_FILTERS__;
 
 if (process.env.NODE_ENV === "development") {

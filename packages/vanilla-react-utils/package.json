@@ -1,21 +1,27 @@
 {
     "name": "@vanilla/react-utils",
-    "main": "./src/index.ts",
-    "module": "./src/index.ts",
-    "version": "3.0.2",
-    "license": "MIT",
-    "dependencies": {
-        "@vanilla/dom-utils": "*"
-    },
-    "peerDependencies": {
-        "lodash-es": "*",
-        "react": "^17.0.2",
-        "react-dom": "^17.0.2"
-    },
-    "devDependencies": {
-        "@vanilla/tsconfig": "^3.0.1"
+    "description": "Utility functions for Higher Logic Vanilla React applications.",
+    "version": "4.0.2",
+    "main": "dist/index.mjs",
+    "type": "module",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "author": {
+        "name": "Adam (charrondev) Charron",
+        "email": "acharron@higherlogic.com"
     },
     "publishConfig": {
         "access": "public"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "@vanilla/dom-utils": ">=4.0.2"
+    },
+    "peerDependencies": {
+        "lodash-es": "*",
+        "react": ">=17.0.2",
+        "react-dom": ">=17.0.2"
     }
 }

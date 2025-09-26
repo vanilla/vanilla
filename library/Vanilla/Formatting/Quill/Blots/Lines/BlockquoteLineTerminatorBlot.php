@@ -15,7 +15,7 @@ use Vanilla\Formatting\Quill\Parser;
 class BlockquoteLineTerminatorBlot extends AbstractLineTerminatorBlot
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function matches(array $operation): bool
     {
@@ -23,7 +23,7 @@ class BlockquoteLineTerminatorBlot extends AbstractLineTerminatorBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupOpeningTag(): string
     {
@@ -36,7 +36,7 @@ class BlockquoteLineTerminatorBlot extends AbstractLineTerminatorBlot
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupClosingTag(): string
     {

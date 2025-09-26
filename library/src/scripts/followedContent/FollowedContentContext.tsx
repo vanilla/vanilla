@@ -7,9 +7,13 @@
 import React, { ReactNode, useContext, useState } from "react";
 import { IUser } from "@library/@types/api/users";
 
+interface IFollowedContentRegistryItem {
+    contentName: string;
+    contentRenderer: React.ComponentType;
+}
 interface IFollowedContentContext {
     userID: number;
-    additionalFollowedContent: Array<{ contentName: string; contentRenderer: React.ComponentType }>;
+    additionalFollowedContent: IFollowedContentRegistryItem[];
 }
 
 export const FollowedContentContext = React.createContext<IFollowedContentContext>({
@@ -20,8 +24,9 @@ export const FollowedContentContext = React.createContext<IFollowedContentContex
 /**
  * This is responsible for adding additional content to Followed Content (e.g. groups)
  */
-let additionalFollowedContent: Array<{ contentName: string; contentRenderer: React.ComponentType }> = [];
-FollowedContentProvider.addAdditionalContent = (additionalContent) => {
+let additionalFollowedContent: IFollowedContentRegistryItem[] = [];
+
+FollowedContentProvider.addAdditionalContent = (additionalContent: IFollowedContentRegistryItem) => {
     additionalFollowedContent.push(additionalContent);
 };
 

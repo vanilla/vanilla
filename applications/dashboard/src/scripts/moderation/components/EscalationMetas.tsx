@@ -23,12 +23,7 @@ export function EscalationMetas(props: IProps) {
             <MetaItem>
                 <Translate
                     source="Escalated by <0/>"
-                    c0={
-                        <ProfileLink
-                            userFragment={escalation.insertUser ?? deletedUserFragment()}
-                            className={metasClasses().metaLink}
-                        />
-                    }
+                    c0={<ProfileLink userFragment={escalation.insertUser ?? deletedUserFragment()} asMeta />}
                 />
             </MetaItem>
             <MetaIcon icon="meta-time" aria-label="Date Updated">

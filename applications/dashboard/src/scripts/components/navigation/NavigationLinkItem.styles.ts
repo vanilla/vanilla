@@ -11,6 +11,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
+import { css } from "@emotion/css";
 
 export const navigationLinkItemVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -56,18 +57,18 @@ export default useThemeCache(() => {
         flexGrow: 0,
         flexShrink: 0,
         flexBasis: 224,
-        marginLeft: -6,
         marginRight: 6,
-        ...Mixins.padding({
-            horizontal: 2,
-        }),
+        lineHeight: "28px",
+        ".isChild &": {
+            flexBasis: 224 - 24,
+        },
     });
 
     const urlColumn = style("urlColumn", {
         flexGrow: 0,
         flexShrink: 0,
         flexBasis: 224,
-        marginLeft: -6,
+        lineHeight: "28px",
         marginRight: 6,
         ...Mixins.padding({
             horizontal: 2,
@@ -82,36 +83,34 @@ export default useThemeCache(() => {
         flexGrow: 0,
         flexShrink: 0,
         flexBasis: 160,
-        visibility: "hidden",
         display: "flex",
         justifyContent: "flex-end",
         paddingRight: 4,
+        gap: 8,
     });
 
     const expandCollapseButton = style("expandCollapseButton", {
-        ...Mixins.padding({ horizontal: 12 }),
+        marginRight: 4,
+        marginLeft: 6,
+        display: "inline-flex",
+        alignItems: "center",
     });
 
-    const cancelButton = style("cancelButton", {
-        ...Mixins.margin({ horizontal: 8 }),
+    const linkIcon = css({
+        display: "inline-flex",
+        alignItems: "center",
+        marginRight: 4,
+        marginLeft: 6,
     });
 
-    const applyButton = style("applyButton", {
-        ...Mixins.margin({ horizontal: 8 }),
-    });
+    const cancelButton = style("cancelButton", {});
 
-    const showButton = style("showButton", {
-        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-        ...Mixins.margin({ horizontal: 8 }),
-    });
+    const applyButton = style("applyButton", {});
 
-    const editButton = style("editButton", {
-        ...Mixins.margin({ horizontal: 8 }),
-    });
+    const editButton = style("editButton", {});
 
     const deleteButton = style("deleteButton", {
         color: ColorsUtils.colorOut(globalVars.messageColors.deleted.bg),
-        ...Mixins.margin({ horizontal: 8 }),
     });
 
     const editableInput = style("editableInput", {
@@ -146,39 +145,41 @@ export default useThemeCache(() => {
         alignItems: "center",
         minHeight: 28,
         ...userSelect("none"),
-        ...{
-            [`&:hover .${actions}, &.isEditing .${actions}`]: {
-                visibility: "visible",
-            },
-            "&&&.isDragging": {
-                minWidth: styleUnit(300),
-                opacity: 0.65,
-                boxShadow: vars.states.dragged.shadow,
-                ...Mixins.border(vars.dragging.border),
-                fontWeight: vars.dragging.fontWeight,
-                backgroundColor: ColorsUtils.colorOut(vars.states.dragged.bg),
-            },
-            "&.isHiddenItem": {
-                color: ColorsUtils.colorOut(globalVars.mainColors.fg.fade(0.5)),
-            },
-            "&.hasChildren": {
-                ...Mixins.font({
-                    weight: globalVars.fonts.weights.bold,
-                }),
-            },
-            "&:hover, &&.isCombining": {
-                backgroundColor: ColorsUtils.colorOut(vars.states.hover.bg),
-            },
-            "&:focus-within, &.isEditing": {
-                backgroundColor: ColorsUtils.colorOut(vars.states.active.bg),
-            },
-            "&.hasError": {
-                color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
-            },
+        [`&:focus`]: {
+            boxShadow: `0 0 0 1px ${globalVars.mainColors.primary}`,
+        },
+        "&.isChild": {
+            paddingLeft: "24px !important",
+        },
+        "&&&.isDragging": {
+            minWidth: styleUnit(300),
+            opacity: 0.65,
+            boxShadow: vars.states.dragged.shadow,
+            ...Mixins.border(vars.dragging.border),
+            fontWeight: vars.dragging.fontWeight,
+            backgroundColor: ColorsUtils.colorOut(vars.states.dragged.bg),
+        },
+        "&.isHiddenItem": {
+            color: ColorsUtils.colorOut(globalVars.mainColors.fg.fade(0.5)),
+        },
+        "&.hasChildren": {
+            ...Mixins.font({
+                weight: globalVars.fonts.weights.bold,
+            }),
+        },
+        "&:hover, &&.isCombining": {
+            backgroundColor: ColorsUtils.colorOut(vars.states.hover.bg),
+        },
+        "&:focus-within, &.isEditing": {
+            backgroundColor: ColorsUtils.colorOut(vars.states.active.bg),
+        },
+        "&.hasError": {
+            color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
         },
     });
 
     return {
+        linkIcon,
         container,
         expandCollapseButton,
         nameColumn,
@@ -188,7 +189,6 @@ export default useThemeCache(() => {
         cancelButton,
         applyButton,
         editButton,
-        showButton,
         deleteButton,
         actions,
     };

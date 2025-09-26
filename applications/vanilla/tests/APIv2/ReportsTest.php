@@ -305,4 +305,50 @@ class ReportsTest extends SiteTestCase
             $newReport
         );
     }
+
+    /**
+     * Make sure that deleted reasons are not coming back.
+     *
+     * @return void
+     */
+    public function testDeletingDefaultReasons(): void
+    {
+        $this->api()
+            ->delete("/report-reasons/abuse")
+            ->assertSuccess();
+
+        $response = $this->api()
+            ->get("/report-reasons/abuse", options: ["throw" => false])
+            ->assertFailure()
+            ->assertResponseCode(404);
+
+        //Run the structure part to create default reasons.
+        ReportReasonModel::structure(\Gdn::structure());
+
+        // Make sure the reason is still gone.
+        $response = $this->api()
+            ->get("/report-reasons/abuse", options: ["throw" => false])
+            ->assertFailure()
+            ->assertResponseCode(404);
+    }
+
+    /**
+     * Make sure that NULL noteBody are not returned.
+     *
+     * @return void
+     */
+    public function testNoNoteBody(): void
+    {
+        $discussion = $this->createDiscussion();
+        $report = $this->createReport($discussion, [
+            "reportReasonIDs" => ["spam"],
+            "noteBody" => null,
+        ]);
+
+        $report = $this->api()
+            ->get("reports/$report[reportID]")
+            ->assertSuccess()
+            ->getBody();
+        $this->assertTrue(!isset($report["noteBody"]));
+    }
 }

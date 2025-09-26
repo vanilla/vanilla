@@ -16,17 +16,12 @@ use Vanilla\Forms\SchemaForm;
 use Vanilla\Http\InternalClient;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
-use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
-use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
-use Vanilla\Widgets\React\DefaultSectionTrait;
-use Vanilla\Widgets\React\ReactWidgetInterface;
+use Vanilla\Widgets\React\ReactWidget;
 use Vanilla\Widgets\ToggledWidgetInterface;
 
-class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, ToggledWidgetInterface
+class SuggestedContentWidget extends ReactWidget implements ToggledWidgetInterface
 {
     use HomeWidgetContainerSchemaTrait;
-    use CombinedPropsWidgetTrait;
-    use DefaultSectionTrait;
     use DiscussionsWidgetSchemaTrait;
 
     /**
@@ -39,7 +34,7 @@ class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -47,7 +42,7 @@ class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetIconPath(): ?string
     {
@@ -55,7 +50,7 @@ class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -231,7 +226,7 @@ class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -239,7 +234,7 @@ class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -247,7 +242,7 @@ class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getProps(): ?array
     {
@@ -273,7 +268,7 @@ class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
@@ -282,7 +277,7 @@ class SuggestedContentWidget implements ReactWidgetInterface, CombinedPropsWidge
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function isEnabled(): bool
     {

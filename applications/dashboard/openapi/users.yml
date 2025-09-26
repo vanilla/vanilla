@@ -29,7 +29,7 @@ paths:
                       type: array
                       items:
                           type: integer
-                - name: banned
+                - name: isBanned
                   description: Filter by the banned status of a user. Pass true to filter only banned users, and false to exclude banned users.
                   in: query
                   schema:
@@ -1137,6 +1137,15 @@ components:
                     description: UserID of the user that invited this user if applicable.
                     type: integer
                     nullable: true
+                label:
+                    description: The label of the user as plaintext.
+                    type: string
+                labelHtml:
+                    description: The label of the user in HTML format.
+                    type: string
+                private:
+                    description: Whether the user profile is private or not.
+                    type: boolean
             required:
                 - userID
                 - name

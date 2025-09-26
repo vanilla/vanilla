@@ -8,7 +8,9 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent, px } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
-import { css } from "@emotion/css";
+import { css, cx } from "@emotion/css";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const selectBoxClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -34,6 +36,9 @@ export const selectBoxClasses = useThemeCache(() => {
                 },
             },
         },
+        "&:hover, &:focus": {
+            color: ColorsUtils.varOverride(ColorVar.Primary, globalVars.mainColors.primary),
+        },
     });
 
     const buttonItem = css({
@@ -52,13 +57,13 @@ export const selectBoxClasses = useThemeCache(() => {
         },
     });
 
-    const selectBoxDropdown = css({});
+    const selectBoxDropdown = cx("selectBoxDropdown");
 
     const checkContainer = css({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        color: globalVars.mainColors.primary.toString(),
+        color: ColorsUtils.varOverride(ColorVar.Primary, globalVars.mainColors.primary),
         width: percent(100),
         height: px(18),
         flexBasis: px(18),

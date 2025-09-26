@@ -14,7 +14,7 @@ use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\HttpStrictTransportSecurityModel as HstsModel;
 use Vanilla\Theme\FsThemeProvider;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetService;
 use Vanilla\Dashboard\Controllers\Api\ChurnExportApiController;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -51,7 +51,7 @@ class SettingsController extends DashboardController
      */
     private $addonModel;
 
-    /** @var WidgetService */
+    /** @var LegacyWidgetService */
     private $widgetService;
 
     /** @var LocaleModel */
@@ -64,7 +64,7 @@ class SettingsController extends DashboardController
     {
         parent::__construct();
         $this->addonModel = \Gdn::getContainer()->get(AddonModel::class);
-        $this->widgetService = \Gdn::getContainer()->get(WidgetService::class);
+        $this->widgetService = \Gdn::getContainer()->get(LegacyWidgetService::class);
         $this->localeModel = Gdn::getContainer()->get(LocaleModel::class);
     }
 
@@ -1569,6 +1569,7 @@ class SettingsController extends DashboardController
             "Garden.Registration.InviteTarget",
             "Garden.Registration.ConfirmEmail",
             "Garden.Registration.SSOConfirmEmail",
+            "Garden.Registration.RequireTermsOfService",
         ];
         $configurationModel->setField($registrationOptions);
 

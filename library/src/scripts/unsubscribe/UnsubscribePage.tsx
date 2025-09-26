@@ -198,7 +198,7 @@ export function UnsubscribePageImpl(props: IProps) {
                     title = t("Unfollow Successful");
                     body = (
                         <>
-                            <p className={classes.infoLight}>{data.followedContent.label}</p>
+                            <div className={classes.infoLight}>{data.followedContent.label}</div>
                             {undoContent}
                         </>
                     );
@@ -208,9 +208,9 @@ export function UnsubscribePageImpl(props: IProps) {
                     title = t("Email Digest Preferences Updated");
                     body = (
                         <>
-                            <p className={classes.infoLight}>
+                            <div className={classes.infoLight}>
                                 {t("This content will no longer appear in your email digest.")}
-                            </p>
+                            </div>
                             {data.followedContent.label}
                             {undoContent}
                         </>

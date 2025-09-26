@@ -6,7 +6,7 @@
 
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { IApiError } from "@library/@types/api/core";
-import { tagDiscussionFormClasses } from "@library/features/discussions/forms/TagDiscussionForm.loadable.styles";
+import { tagDiscussionFormClasses } from "@library/features/discussions/forms/TagDiscussionForm.styles";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";

@@ -42,11 +42,11 @@ class NotFoundFormat implements FormatInterface
     /**
      * Constructor.
      *
-     * @param string $searchedFormat The format that could not be found.
+     * @param string|null $searchedFormat The format that could not be found.
      */
-    public function __construct(string $searchedFormat)
+    public function __construct(string|null $searchedFormat = "unknown")
     {
-        $this->searchedFormat = $searchedFormat;
+        $this->searchedFormat = $searchedFormat ?? "unknown";
     }
 
     /**
@@ -177,7 +177,7 @@ class NotFoundFormat implements FormatInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function parseAllMentions($body): array
     {

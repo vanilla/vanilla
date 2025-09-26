@@ -169,6 +169,11 @@ class ReportModel extends PipelineModel
             $where["rrj.reportReasonID"] = $where["reportReasonID"];
             unset($where["reportReasonID"]);
         }
+
+        if (isset($where["categoryID"])) {
+            $where["placeRecordID"] = $where["categoryID"];
+            unset($where["categoryID"]);
+        }
         $wherePrefixes = [];
         foreach ($where as $key => $value) {
             $wherePrefixes[] = explode(".", $key)[0] ?? null;
@@ -315,7 +320,12 @@ class ReportModel extends PipelineModel
             $reportID = $report["reportID"];
             $report["reasons"] = $reasonFragmentsByReportID[$reportID] ?? [];
 
-            $report["noteHtml"] = trim($this->formatService->renderHTML($report["noteBody"], $report["noteFormat"]));
+            if (isset($report["noteBody"])) {
+                $report["noteHtml"] = trim(
+                    $this->formatService->renderHTML($report["noteBody"], $report["noteFormat"])
+                );
+            }
+
             $report["recordHtml"] = trim(
                 $this->formatService->renderHTML($report["recordBody"], $report["recordFormat"])
             );
@@ -581,7 +591,7 @@ class ReportModel extends PipelineModel
             "PluralHeadlineFormat" => sprintf(ReportActivity::getPluralHeadline(), $report["recordName"]),
             "RecordType" => $report["recordType"],
             "RecordID" => $report["recordID"],
-            "Route" => $report["recordUrl"],
+            "Route" => $report["recordUrl"] ?? url("/dashboard/content/reports", true),
             "Data" => [
                 "escalationID" => $report["reportID"],
                 "name" => $report["recordName"],

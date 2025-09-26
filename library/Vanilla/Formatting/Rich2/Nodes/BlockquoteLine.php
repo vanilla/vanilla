@@ -15,7 +15,7 @@ class BlockquoteLine extends AbstractNode
     const TYPE_KEY = "blockquote-line";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlStart(): string
     {
@@ -26,7 +26,7 @@ class BlockquoteLine extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getHtmlEnd(): string
     {
@@ -34,7 +34,7 @@ class BlockquoteLine extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function getTextEnd(): string
     {
@@ -42,7 +42,7 @@ class BlockquoteLine extends AbstractNode
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getDefaultTypeName(): string
     {

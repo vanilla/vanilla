@@ -23,7 +23,7 @@ import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContai
 import QuickLinks from "@library/navigation/QuickLinks";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import keyBy from "lodash/keyBy";
+import keyBy from "lodash-es/keyBy";
 import { GlobalPreset } from "@library/styles/globalStyleVars";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
 
@@ -33,6 +33,7 @@ export default {
 
 setMeta("ui.useAdminCheckboxes", true);
 setMeta("triage.enabled", true);
+setMeta("tagging.enabled", true);
 
 const loggedInStoreState = {
     users: {

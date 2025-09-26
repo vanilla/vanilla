@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -12,14 +12,12 @@ import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { useUserCanStillEditDiscussionOrComment } from "@library/features/discussions/discussionHooks";
 import { IPermission, IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
 import DiscussionOptionsAnnounce from "@library/features/discussions/DiscussionOptionsAnnounce";
-import DiscussionOptionsMove from "@library/features/discussions/DiscussionOptionsMove";
 import DiscussionOptionsDelete from "@library/features/discussions/DiscussionOptionsDelete";
 import { useCurrentUserID } from "@library/features/users/userHooks";
 import { DiscussionOptionsClose } from "@library/features/discussions/DiscussionOptionsClose";
 import { DiscussionOptionsSink } from "@library/features/discussions/DiscussionOptionsSink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import { DiscussionOptionsChangeLog } from "@library/features/discussions/DiscussionOptionsChangeLog";
-import DiscussionChangeType from "@library/features/discussions/DiscussionOptionsChangeType";
 import { DiscussionOptionsTag } from "@library/features/discussions/DiscussionOptionsTag";
 import { CollectionsOptionButton } from "@library/featuredCollections/CollectionsOptionButton";
 import { CollectionRecordTypes } from "@library/featuredCollections/Collections.variables";
@@ -40,8 +38,8 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DiscussionOptionsResolve } from "@library/features/discussions/DiscussionOptionsResolve";
 import { css } from "@emotion/css";
-import DiscussionOptionsConvert from "@library/features/discussions/DiscussionOptionsConvert";
 import { useQueryClient } from "@tanstack/react-query";
+import DiscussionOptionsPostSettings from "@library/features/discussions/DiscussionOptionsPostSettings";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -93,6 +91,8 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         mode: PermissionMode.RESOURCE_IF_JUNCTION,
     };
 
+    const taggingEnabled = getMeta("tagging.enabled", false);
+
     const writeableIntegrations = useWriteableAttachmentIntegrations();
 
     const currentUserID = useCurrentUserID();
@@ -103,8 +103,9 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
 
     const canClose = canModerate || (isAuthor && hasPermission("discussions.closeOwn", permOptions));
 
-    const canMove = hasPermission("community.moderate", { mode: PermissionMode.GLOBAL });
-    const canManageDiscussion = hasPermission("discussions.manage", permOptions);
+    const canChangeAuthor = hasPermission("site.manage", permOptions);
+    const canEdit = hasPermission("discussions.edit", permOptions);
+    const canDelete = hasPermission("discussions.delete", permOptions);
 
     const canBump = hasPermission("curation.manage");
 
@@ -114,13 +115,6 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
 
     // These items appear in the first section in the menu, Edit - Dismiss - Move - Resolve - Delete - Tag etc
     const firstGroupItems: React.ReactNode[] = [];
-
-    const allowedDiscussionTypes = discussion?.category?.allowedDiscussionTypes ?? [];
-    const filteredDiscussionTypes = allowedDiscussionTypes.filter((type) => {
-        return !NON_CHANGE_TYPE.includes(type);
-    });
-
-    const canChangeType = filteredDiscussionTypes.length > 1 && canStillEdit;
 
     const canAddToCollection = hasPermission("community.manage", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
 
@@ -136,28 +130,15 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         firstGroupItems.push(<DiscussionOptionsDismiss discussion={discussion} onSuccess={onMutateSuccess} />);
     }
 
-    if (canMove) {
-        firstGroupItems.push(
-            <DiscussionOptionsMove
-                discussion={discussion}
-                onSuccess={async () => {
-                    await onMutateSuccess?.();
-                    if (onDiscussionPage) {
-                        // We may be getting redirected here.
-                        window.location.reload();
-                    }
-                }}
-            />,
-        );
-    }
-
-    if (canManageDiscussion) {
+    if (canDelete) {
         firstGroupItems.push(
             <DiscussionOptionsDelete discussion={discussion} redirectAfterDelete={onDiscussionPage} />,
         );
+    }
 
+    if (canEdit) {
         firstGroupItems.push(
-            <DiscussionOptionsConvert
+            <DiscussionOptionsPostSettings
                 discussion={discussion}
                 onSuccess={async () => {
                     await onMutateSuccess?.();
@@ -170,8 +151,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         );
     }
 
-    //FIXME: this looks like it should be a permission check
-    if (canStillEdit && getMeta("TaggingAdd", true)) {
+    if (canStillEdit && taggingEnabled) {
         firstGroupItems.push(<DiscussionOptionsTag discussion={discussion} onSuccess={onMutateSuccess} />);
     }
 
@@ -187,12 +167,8 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         moderationItems.push(<DiscussionOptionsAnnounce discussion={discussion} onSuccess={onMutateSuccess} />);
     }
 
-    if (canManageDiscussion) {
+    if (canChangeAuthor) {
         moderationItems.push(<DiscussionOptionsChangeAuthor discussion={discussion} onSuccess={onMutateSuccess} />);
-    }
-
-    if (canChangeType) {
-        moderationItems.push(<DiscussionChangeType discussion={discussion} onSuccess={onMutateSuccess} />);
     }
 
     if (canAddToCollection) {

@@ -36,17 +36,18 @@ export const QUICK_LINKS_LIST_AS_MODAL = {
                         {control["modalTriggerLabel"]}
                     </Button>
                 </DashboardInputWrap>
-                <NavigationLinksModal
-                    title={"Quick Links"}
-                    isNestingEnabled={false}
-                    navigationItems={(instance ?? quickLinksVariables().links ?? []) as any}
-                    isVisible={isOpen}
-                    onCancel={closeModal}
-                    onSave={(newData) => {
-                        props.onChange(newData);
-                        closeModal();
-                    }}
-                />
+                {isOpen && (
+                    <NavigationLinksModal
+                        title={"Quick Links"}
+                        isNestingEnabled={false}
+                        navigationItems={(instance ?? quickLinksVariables().links ?? []) as any}
+                        onCancel={closeModal}
+                        onSave={(newData) => {
+                            props.onChange(newData);
+                            closeModal();
+                        }}
+                    />
+                )}
             </>
         );
     },

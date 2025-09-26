@@ -4,11 +4,13 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  */
 
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\Contracts\Web\FileUploadHandler;
+use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\FloodControlTrait;
 use Vanilla\Models\VanillaMediaSchema;
 use Vanilla\Scheduler\LongRunner;
@@ -48,7 +50,7 @@ class MediaModel extends Gdn_Model implements FileUploadHandler, SystemCallableI
     {
         parent::__construct("Media");
         $this->upload = \Gdn::getContainer()->get(Gdn_Upload::class);
-        $this->floodGate = FloodControlHelper::configure($this, "Vanilla", "Media", false);
+        $this->floodGate = FloodControlHelper::configure($this, "Vanilla", "Media");
         $this->setFloodControlEnabled(true);
         $this->setPostCountThreshold(250);
         $this->setTimeSpan(3600);
@@ -188,6 +190,28 @@ class MediaModel extends Gdn_Model implements FileUploadHandler, SystemCallableI
     private function normalizeAndValidate(array $row): array
     {
         return VanillaMediaSchema::normalizeFromDbRecord($row);
+    }
+
+    /**
+     * Assosciate some media rows with a record.
+     *
+     * @param array $where
+     * @param string $foreignType
+     * @param string $foreignID
+     * @return void
+     */
+    public function assosciateWithRecord(array $where, string $foreignType, string $foreignID): void
+    {
+        $this->createSql()
+            ->update(
+                $this->getTableName(),
+                set: [
+                    "ForeignTable" => $foreignType,
+                    "ForeignID" => $foreignID,
+                ],
+                where: $where
+            )
+            ->put();
     }
 
     /**
@@ -409,5 +433,102 @@ class MediaModel extends Gdn_Model implements FileUploadHandler, SystemCallableI
             return new LongRunnerNextArgs([array_diff($urls, $completedURLs), $deleteFile]);
         }
         return LongRunner::FINISHED;
+    }
+
+    /**
+     * Add the attachment files at the end of a post if it's not already in the body.
+     *
+     * @param string $body Fully rendered HTML.
+     * @param array $attachments
+     * @return string
+     * @throws ValidationException
+     */
+    public function appendMediaToPost(string $body, array $attachments): string
+    {
+        $result = $body;
+        $attachedFileNames = [];
+
+        $filesToAttach = [];
+        foreach ($attachments as $attachment) {
+            // Only process active attachments
+            if (empty($attachment["Active"]) || $attachment["Active"] != 1) {
+                continue;
+            }
+
+            $fileUrl = Gdn_Upload::url($attachment["Path"]);
+            $inbody = str_contains($body, $fileUrl);
+
+            // Check for protocol-relative versions of the URL
+            if (!$inbody) {
+                $urlParts = parse_url($fileUrl);
+                $protocolRelativeUrl =
+                    ($urlParts["host"] ?? "") .
+                    ($urlParts["path"] ?? "") .
+                    (isset($urlParts["query"]) ? "?" . $urlParts["query"] : "") .
+                    (isset($urlParts["fragment"]) ? "#" . $urlParts["fragment"] : "");
+                $inbody |= str_contains($body, $protocolRelativeUrl);
+            }
+
+            // Check for URL-encoded versions
+            if (!$inbody) {
+                $encodedUrl = urlencode($fileUrl);
+                $inbody |= str_contains($body, $encodedUrl);
+                $partiallyEncodedUrl = str_replace(["&", " "], ["%26", "%20"], $fileUrl);
+                $inbody |= str_contains($body, $partiallyEncodedUrl);
+            }
+
+            // Check for JSON-escaped versions of the URL
+            if (!$inbody) {
+                $jsonEscapedUrl = str_replace("/", "\/", $fileUrl);
+                $inbody |= str_contains($body, $jsonEscapedUrl);
+
+                $protocolRelativeJsonEscaped = str_replace("/", "\/", $protocolRelativeUrl);
+                $inbody |= str_contains($body, $protocolRelativeJsonEscaped);
+            }
+
+            // Check for HTML-encoded versions
+            if (!$inbody) {
+                $htmlEncodedUrl = htmlspecialchars($fileUrl, ENT_QUOTES);
+                $inbody |= str_contains($body, $htmlEncodedUrl);
+            }
+
+            if ($inbody) {
+                continue;
+            }
+
+            // Check if we already have a file with the same name attached
+            $fileName = $attachment["Name"];
+            if (in_array($fileName, $attachedFileNames)) {
+                continue;
+            }
+
+            // Add this filename to our tracking array
+            $attachedFileNames[] = $fileName;
+
+            $attachment = VanillaMediaSchema::normalizeFromDbRecord($attachment);
+            $attachment["embedType"] = "file";
+
+            // Use existing HTML rendering for non-rich formats
+            $file = new FileEmbed($attachment);
+            $filesToAttach[] = $file;
+            // $result .= $file->renderHtml();
+        }
+
+        // Render all file attachments together to prevent extra paragraph separators
+        if (!empty($filesToAttach)) {
+            if (count($filesToAttach) > 1) {
+                $result .= '<div class="file-attachments-group">';
+                foreach ($filesToAttach as $attachment) {
+                    $result .= $attachment->renderHtml();
+                }
+                $result .= "</div>";
+            } else {
+                // Single file, render normally
+                $file = $filesToAttach[0];
+                $result .= $file->renderHtml();
+            }
+        }
+
+        return $result;
     }
 }

@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { IApiError, IServerError, LoadStatus } from "@library/@types/api/core";
+import { IServerError } from "@library/@types/api/core";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
 import { userContentVariables } from "@library/content/UserContent.variables";
@@ -18,10 +18,9 @@ import Heading from "@library/layout/Heading";
 import Paragraph from "@library/layout/Paragraph";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { t } from "@library/utility/appUtils";
-import { escapeHTML } from "@vanilla/dom-utils";
 import { debug, logError } from "@vanilla/utils";
 import classNames from "classnames";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 
 export function CoreErrorMessages(props: IProps) {
     const classes = pageErrorMessageClasses();
@@ -32,7 +31,7 @@ export function CoreErrorMessages(props: IProps) {
     const { message, messageAsParagraph, description } = error;
     return (
         <main className={classNames(props.className, classes.root)}>
-            {error.icon}
+            {!props.noIcon && error.icon}
             {!messageAsParagraph && <Heading depth={1} className={classes.title} title={message} />}
             {messageAsParagraph && <Paragraph className={classes.titleAsParagraph}>{message}</Paragraph>}
             {error.description && <Paragraph className={classes.description}>{description}</Paragraph>}
@@ -41,9 +40,9 @@ export function CoreErrorMessages(props: IProps) {
                 <div className={classes.trace}>
                     <h2>Stack Trace</h2>
                     <CollapsableContent maxHeight={300} bgColor={userContentVariables().codeBlock.bg}>
-                        <UserContent
-                            content={`<pre class="code codeBlock">${escapeHTML(error.trace)}</pre>`}
-                        ></UserContent>
+                        <UserContent>
+                            <pre className={"code codeBlock"}>{error.trace}</pre>
+                        </UserContent>
                     </CollapsableContent>
                 </div>
             )}
@@ -187,4 +186,5 @@ export enum DefaultError {
 
 interface IProps extends IErrorMessageProps {
     className?: string;
+    noIcon?: boolean;
 }

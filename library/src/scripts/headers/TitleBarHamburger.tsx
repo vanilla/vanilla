@@ -14,7 +14,7 @@ interface IProps {
 export function TitleBarHamburger(props: IProps) {
     return (
         <MemoryRouter>
-            <TitleBar useMobileBackButton={false} />
+            <TitleBar />
         </MemoryRouter>
     );
 }

@@ -24,7 +24,7 @@ class NonValidatingDirtyCacheTest extends SimpleCacheTest {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function createSimpleCache() {
         $cache = new CacheCacheAdapter($this->createLegacyCache());
@@ -32,7 +32,7 @@ class NonValidatingDirtyCacheTest extends SimpleCacheTest {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function createLegacyCache(): \Gdn_Cache {
         return new \Gdn_Dirtycache();

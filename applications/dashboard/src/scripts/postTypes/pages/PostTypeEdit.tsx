@@ -131,7 +131,7 @@ function PostTypeEditImpl(props: IProps) {
                             <div>
                                 <Button
                                     buttonType={ButtonTypes.OUTLINE}
-                                    onClick={() => handleSubmit()}
+                                    onClick={async () => await handleSubmit()}
                                     disabled={isSaving || isLoading}
                                 >
                                     {isSaving ? <ButtonLoader /> : t("Save")}

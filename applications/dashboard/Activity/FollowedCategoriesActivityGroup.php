@@ -15,7 +15,7 @@ use Gdn;
 class FollowedCategoriesActivityGroup extends ActivityGroup
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getActivityGroupID(): string
     {
@@ -23,7 +23,7 @@ class FollowedCategoriesActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceLabel(): string
     {
@@ -31,7 +31,7 @@ class FollowedCategoriesActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getPreferenceDescription(): ?string
     {
@@ -43,7 +43,7 @@ class FollowedCategoriesActivityGroup extends ActivityGroup
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getParentGroupClass(): ?string
     {

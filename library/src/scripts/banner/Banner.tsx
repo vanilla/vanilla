@@ -4,19 +4,18 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect, useMemo } from "react";
+import React, { useContext, useEffect, useLayoutEffect, useMemo } from "react";
 import IndependentSearch from "@library/features/search/IndependentSearch";
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Container from "@library/layout/components/Container";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import Heading from "@library/layout/Heading";
-import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
 import { bannerVariables, IBannerOptions } from "@library/banner/Banner.variables";
 import { bannerClasses } from "@library/banner/Banner.styles";
 import { assetUrl, createSourceSetValue, ImageSourceSet, t } from "@library/utility/appUtils";
 import classNames from "classnames";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { titleBarClasses } from "@library/headers/TitleBar.classes";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { DefaultBannerBg } from "@library/banner/DefaultBannerBg";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -28,9 +27,10 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { styleUnit } from "@library/styles/styleUnit";
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
 import SmartLink from "@library/routing/links/SmartLink";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { twoColumnVariables } from "@library/layout/types/layout.twoColumns";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { TitleBarTransparentContext } from "@library/headers/TitleBar.TransparentContext";
 
 export interface IBannerProps {
     action?: React.ReactNode;
@@ -60,28 +60,28 @@ export interface IBannerProps {
  */
 export default function Banner(props: IBannerProps) {
     const { isCompact } = useSection();
-    const bannerContextRef = useBannerContainerDivRef();
-    const { setOverlayTitleBar } = useBannerContext();
     const { action, className, isContentBanner } = props;
-    const varsTitleBar = titleBarVariables();
-    const classesTitleBar = titleBarClasses();
     if (!props.backgroundImage && props.options) {
         // Don't use an overlay if we don't have an image.
         props.options.useOverlay = false;
     }
-    const classes = isContentBanner ? contentBannerClasses(props.options) : bannerClasses(undefined, props.options);
+    const classes = isContentBanner
+        ? contentBannerClasses.useAsHook(props.options, props.forcedVars)
+        : bannerClasses.useAsHook(undefined, props.options, props.forcedVars);
     const vars = isContentBanner
-        ? contentBannerVariables(props.options)
-        : bannerVariables(props.options, props.forcedVars);
+        ? contentBannerVariables.useAsHook(props.options, props.forcedVars)
+        : bannerVariables.useAsHook(props.options, props.forcedVars);
     const { options } = vars;
     const device = useDevice();
 
     const { title = vars.title.text } = props;
 
+    const titleBarContext = useContext(TitleBarTransparentContext);
+    useLayoutEffect(() => {
+        titleBarContext.setAllowTransparency(options.enabled);
+    }, []);
+
     useComponentDebug({ vars });
-    useEffect(() => {
-        setOverlayTitleBar(options.overlayTitleBar);
-    }, [options.overlayTitleBar]);
 
     //src-sets for icon and background image
     const iconUrlSrcSet = useMemo(() => {
@@ -206,13 +206,7 @@ export default function Banner(props: IBannerProps) {
     );
 
     return (
-        <Widget
-            customContainer
-            ref={bannerContextRef}
-            className={classNames(className, classes.root, {
-                [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled && options.overlayTitleBar,
-            })}
-        >
+        <LayoutWidget interWidgetSpacing="none" className={classNames(className, classes.root)}>
             {/* First container holds:
                 - Background.
                 - Right image if there is one.
@@ -222,11 +216,7 @@ export default function Banner(props: IBannerProps) {
             */}
             <div className={classes.bannerContainer}>
                 <div className={classes.overflowRightImageContainer}>
-                    <div
-                        className={classNames(classes.middleContainer, {
-                            [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
-                        })}
-                    >
+                    <div className={classNames(classes.middleContainer)}>
                         <div className={classNames(classes.outerBackground())}>{backgroundImage}</div>
                         {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                         <Container className={classes.fullHeight}>
@@ -263,11 +253,7 @@ export default function Banner(props: IBannerProps) {
                 - Note that background is up in the previous grouping.
                 - Overflow hidden CAN NEVER BE APPLIED HERE.
             */}
-                <div
-                    className={classNames(classes.middleContainer, {
-                        [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
-                    })}
-                >
+                <div className={classNames(classes.middleContainer)}>
                     <Container fullGutter>
                         <div className={classes.imagePositioner}>
                             {/*For SEO & accessibility*/}
@@ -363,7 +349,7 @@ export default function Banner(props: IBannerProps) {
                     })}
                 </>
             )}
-        </Widget>
+        </LayoutWidget>
     );
 }
 

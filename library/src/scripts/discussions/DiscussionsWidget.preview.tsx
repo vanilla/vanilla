@@ -6,7 +6,7 @@
 
 import React, { useMemo } from "react";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { DiscussionsWidget } from "@library/features/discussions/DiscussionsWidget";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
@@ -39,7 +39,7 @@ export function DiscussionsWidgetPreview(props: IProps) {
     }, [isAsset, props.apiParams, discussions]);
 
     return (
-        <Widget>
+        <LayoutWidget>
             <DiscussionsWidget
                 {...props}
                 noCheckboxes={true}
@@ -55,6 +55,6 @@ export function DiscussionsWidgetPreview(props: IProps) {
                 }}
                 disableButtonsInItems
             />
-        </Widget>
+        </LayoutWidget>
     );
 }

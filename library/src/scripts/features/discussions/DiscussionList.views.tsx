@@ -24,7 +24,7 @@ interface IProps {
 
 export function DiscussionListView(props: IProps) {
     const { discussions } = props;
-    const variables = discussionListVariables(props.discussionOptions);
+    const variables = discussionListVariables.useAsHook(props.discussionOptions);
 
     return (
         <List

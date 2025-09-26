@@ -12,7 +12,7 @@ import { useThemeVariableField } from "@library/forms/themeEditor/ThemeBuilderCo
 import { themeInputNumberClasses } from "@library/forms/themeEditor/ThemeInputNumber.styles";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n/src";
-import { useInterval } from "@vanilla/react-utils";
+import { useInterval, useLastValue } from "@vanilla/react-utils";
 import classNames from "classnames";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
@@ -27,6 +27,7 @@ interface IProps
     min?: number;
     max?: number;
     disabled?: boolean;
+    floatPrecision?: number;
 }
 
 enum StepAction {
@@ -36,86 +37,97 @@ enum StepAction {
 
 export function ThemeInputNumber(_props: IProps) {
     const builderClasses = themeBuilderClasses();
-    const { step = 1, min = 0, max, variableKey, ...inputProps } = _props;
+    const { step = 1, floatPrecision = 0, min = 0, max, variableKey, ...inputProps } = _props;
 
     const { rawValue, generatedValue, error, setError, setValue } = useThemeVariableField<number | string>(variableKey);
-
-    const ensureInteger = (val: number | string) => {
+    const ensureInteger = (val: number | string): number => {
+        if (floatPrecision) {
+            const floatVal = parseFloat(val?.toString());
+            return floatVal;
+        }
         return parseInt(val?.toString());
     };
-    /**
-     * Check if is valid number, respecting parameters.
-     * @param number
-     */
-    const isValidValue = (numberVal: number | string, shouldThrow: boolean = false) => {
-        const intVal = ensureInteger(numberVal ?? "");
-        if (numberVal !== undefined && Number.isInteger(intVal)) {
-            const validStep = intVal % step === 0;
-            const overMin = intVal >= min;
-            const underMax = !max || intVal <= max;
-            const result = validStep && overMin && underMax;
-            if (shouldThrow) {
-                if (!validStep) {
-                    return t("Invalid Step");
-                } else if (!overMin) {
-                    return t("Too Small");
-                } else if (!underMax) {
-                    return t("Too Large");
-                }
+    const intValue = ensureInteger(rawValue ?? generatedValue ?? 0);
+    const lastIntValue = useLastValue(intValue);
+    const [textValue, setTextValue] = useState<string>(
+        floatPrecision > 0 ? intValue.toFixed(floatPrecision) : intValue.toString(),
+    );
+
+    useEffect(() => {
+        if (intValue !== lastIntValue) {
+            updateValue(textValue);
+        }
+    }, [intValue, lastIntValue]);
+
+    function updateValue(newValue: string | number, rerenderText: boolean = false) {
+        if (newValue === "") {
+            setTextValue("");
+            setError(null);
+            return;
+        }
+        try {
+            const newIntVal = validateNumber(newValue);
+            if (rerenderText) {
+                setTextValue(floatPrecision > 0 ? newIntVal.toFixed(floatPrecision) : newIntVal.toString());
+            } else {
+                setTextValue(newValue.toString());
             }
 
-            return result;
+            if (newIntVal !== intValue) {
+                setValue(newIntVal);
+                setError(null);
+            }
+        } catch (e) {
+            setTextValue(newValue.toString());
+            setError(e.message);
         }
-        return false;
+    }
+
+    /**
+     * Check if is valid number, respecting parameters.
+     */
+    const validateNumber = (numberVal: number | string): number => {
+        const intVal = ensureInteger(numberVal ?? "");
+        if (numberVal !== undefined && !Number.isNaN(intVal)) {
+            const overMin = intVal >= min;
+            const underMax = !max || intVal <= max;
+
+            if (!overMin) {
+                throw new Error(t("Too Small"));
+            } else if (!underMax) {
+                throw new Error(t("Too Large"));
+            }
+            return intVal;
+        } else {
+            throw new Error(floatPrecision ? t("Invalid Number") : t("Invalid Integer"));
+        }
     };
 
     const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const intVal = ensureInteger(e.target.value);
-        if (Number.isInteger(intVal)) {
-            setValue(intVal);
-        } else if (e.target.value === "") {
-            // Clearing the input is always allowed.
-            setValue("");
-        } else {
-            e.preventDefault();
-        }
+        updateValue(e.target.value);
     };
 
     const [_, dispatch] = useReducer((state: number, action: StepAction) => {
         switch (action) {
             case StepAction.DECR: {
                 const value = Math.max(min ?? 0, state - step);
-                setValue(value);
+                updateValue(value, true);
+
                 return value;
             }
             case StepAction.INCR: {
                 const value = max !== undefined ? Math.min(max ?? 100000, state + step) : state + step;
-                setValue(value);
+                updateValue(value, true);
                 return value;
             }
         }
-    }, ensureInteger(rawValue ?? generatedValue ?? 0));
+    }, intValue);
 
     const stepUp = useCallback(() => dispatch(StepAction.INCR), []);
     const stepDown = useCallback(() => dispatch(StepAction.DECR), []);
 
     const stepUpIntervalProps = usePressInterval(stepUp);
     const stepDownIntervalProps = usePressInterval(stepDown);
-
-    // Check initial value for errors
-    useEffect(() => {
-        if (generatedValue == null) {
-            // No errors if we have a nullish value.
-            return;
-        }
-        try {
-            isValidValue(generatedValue);
-        } catch (e) {
-            setError(e.message);
-        }
-        // Initial value only
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const errorID = useUniqueID("inputNumberError");
     const { labelID, inputID } = useThemeBlock();
@@ -125,6 +137,12 @@ export function ThemeInputNumber(_props: IProps) {
         <>
             <span className={classes.root}>
                 <input
+                    onBlur={() => {
+                        if (textValue === "") {
+                            setValue(undefined);
+                            setError(null);
+                        }
+                    }}
                     {...inputProps}
                     type="number"
                     id={inputID}
@@ -133,7 +151,7 @@ export function ThemeInputNumber(_props: IProps) {
                         [builderClasses.invalidField]: !!error,
                     })}
                     placeholder={String(generatedValue)}
-                    value={rawValue ?? ""}
+                    value={textValue}
                     onChange={handleTextChange}
                     autoCorrect="false"
                     step={step}

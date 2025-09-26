@@ -30,11 +30,11 @@ import { t } from "@library/utility/appUtils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Icon } from "@vanilla/icons";
 import { communityManagementPageClasses } from "@dashboard/moderation/CommunityManagementPage.classes";
-import { useDashboardSectionActions } from "@dashboard/DashboardSectionHooks";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import BlurContainer from "@dashboard/moderation/components/BlurContainerUserContent";
 import { PermissionMode } from "@library/features/users/Permission";
 import { ContentItemAttachment } from "@vanilla/addon-vanilla/contentItem/ContentItemAttachment";
+import { DashboardMenusApi } from "@dashboard/DashboardMenusApi";
 
 interface IProps {
     discussion: IDiscussion;
@@ -48,7 +48,7 @@ export function TriageListItem(props: IProps) {
     const isResolved = discussion.internalStatusID?.toString() == TriageInternalStatus.RESOLVED;
     const toast = useToast();
     const queryClient = useQueryClient();
-    const { fetchDashboardSections } = useDashboardSectionActions();
+    const sectionUtils = DashboardMenusApi.useUtils();
     const resolveMutation = useMutation({
         mutationFn: async (options: {
             discussionID: IDiscussion["discussionID"];
@@ -61,7 +61,7 @@ export function TriageListItem(props: IProps) {
             return result;
         },
         onSuccess() {
-            fetchDashboardSections();
+            void sectionUtils.invalidate();
             toast.addToast({
                 autoDismiss: true,
                 body: "Post marked as resolved.",
@@ -80,6 +80,7 @@ export function TriageListItem(props: IProps) {
             <div className={classes.main}>
                 <ListItemContext.Provider value={{ layout: ListItemLayout.TITLE_METAS_DESCRIPTION }}>
                     <ListItem
+                        className={classes.triageItem}
                         as={"div"}
                         url={detailUrl}
                         name={discussion.name}
@@ -88,7 +89,7 @@ export function TriageListItem(props: IProps) {
                             <BlurContainer>
                                 <UserContent
                                     className={classes.description}
-                                    content={discussion.body!}
+                                    vanillaSanitizedHtml={discussion.body!}
                                     moderateEmbeds
                                 />
                             </BlurContainer>
@@ -100,16 +101,14 @@ export function TriageListItem(props: IProps) {
                                     <MetaIcon
                                         icon={isResolved ? "resolved" : "unresolved"}
                                         aria-label={isResolved ? t("Resolved") : t("Unresolved")}
+                                        style={{ marginLeft: 1 }}
                                     />
                                     <MetaItem flex>
                                         <Translate
                                             source="Posted by <0/> in <1/>"
                                             c0={<MetaProfile user={discussion.insertUser ?? deletedUserFragment()} />}
                                             c1={
-                                                <SmartLink
-                                                    to={`${discussion.category?.url}`}
-                                                    className={metasClasses().metaLink}
-                                                >
+                                                <SmartLink to={`${discussion.category?.url}`} asMeta>
                                                     {discussion.category?.name}
                                                 </SmartLink>
                                             }

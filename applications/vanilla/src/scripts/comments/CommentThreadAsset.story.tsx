@@ -8,7 +8,7 @@ import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPr
 import type { IUserFragment } from "@library/@types/api/users";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import { CurrentUserContextProvider } from "@library/features/users/userHooks";
-import { STORY_COMMENTS } from "@library/storybook/storyData";
+import { STORY_COMMENTS, STORY_ME_ADMIN } from "@library/storybook/storyData";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CommentThreadAsset from "@vanilla/addon-vanilla/comments/CommentThreadAsset";
 import React from "react";
@@ -54,7 +54,7 @@ export const GuestView = () => {
 
 export const MemberView = () => {
     return (
-        <CurrentUserContextProvider currentUser={STORY_COMMENTS[0].insertUser}>
+        <CurrentUserContextProvider currentUser={{ ...STORY_ME_ADMIN, ...STORY_COMMENTS[0].insertUser }}>
             <StoryCommentList />
         </CurrentUserContextProvider>
     );

@@ -1,0 +1,77 @@
+.originalPostFragment__root {
+    --component-inner-half-space: calc(var(--vnla-component-inner-space) / 2);
+
+    & .originalPostFragment__footer {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        gap: var(--vnla-component-inner-space);
+        margin-block-start: 12px;
+        margin-inline-end: 10px;
+    }
+
+    & .originalPostFragment__title {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: start;
+        gap: var(--component-inner-half-space);
+        margin-bottom: var(--vnla-component-inner-space);
+
+        & .originalPostFragment__resolvedStatus {
+            max-height: 24px;
+        }
+
+        & .originalPostFragment__post-meta {
+            display: flex;
+            gap: var(--component-inner-half-space);
+            align-items: center;
+        }
+
+        & .originalPostFragment__action-lockup {
+            display: flex;
+            align-items: center;
+            justify-self: center;
+            margin-inline-start: auto;
+        }
+    }
+
+    & .originalPostFragment__replyButton {
+        margin-inline-start: auto;
+    }
+}
+
+.postHeader__root {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: repeat(2, auto);
+    grid-template-areas:
+        "photo author-lockup"
+        "photo meta-lockup";
+    gap: var(--component-inner-half-space);
+    row-gap: 0;
+    margin-bottom: 12px;
+
+    & .postHeader__userPhoto {
+        grid-area: photo;
+    }
+
+    & .postHeader__author-lockup {
+        grid-area: author-lockup;
+        display: flex;
+        gap: var(--component-inner-half-space);
+    }
+
+    & .postHeader__userName a {
+        font-weight: 600;
+        color: var(--vnla-foreground-color);
+    }
+
+    & .postHeader__meta-lockup {
+        grid-area: meta-lockup;
+        display: flex;
+        & > div:first-child {
+            margin-inline-start: 0;
+        }
+    }
+}

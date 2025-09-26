@@ -56,12 +56,17 @@ class ReportPostTriggerTest extends SiteTestCase
         string $actionType,
         int $countReports,
         string $reportReasonID,
+        int $categoryID,
         array $triggerValue
     ): array {
         return [
             "trigger" => [
                 "type" => ReportPostTrigger::getType(),
-                "value" => ["countReports" => $countReports, "reportReasonID" => [$reportReasonID]],
+                "value" => [
+                    "countReports" => $countReports,
+                    "reportReasonID" => [$reportReasonID],
+                    "categoryID" => [$categoryID],
+                ],
             ],
             "action" => [
                 "type" => $actionType,
@@ -76,14 +81,20 @@ class ReportPostTriggerTest extends SiteTestCase
      */
     public function testAutomationRuleIsProcessedReportedPosts(): void
     {
-        $this->createCategory();
+        $category = $this->createCategory();
         $discussion = $this->createDiscussion();
 
         $this->createDiscussion();
         $comment = $this->createComment();
-        $automationRecord = $this->getAutomationRecord(CreateEscalationAction::getType(), 1, "spam", [
-            "recordIsLive" => true,
-        ]);
+        $automationRecord = $this->getAutomationRecord(
+            CreateEscalationAction::getType(),
+            1,
+            "spam",
+            $category["categoryID"],
+            [
+                "recordIsLive" => true,
+            ]
+        );
 
         $automationRule = $this->createAutomationRule($automationRecord["trigger"], $automationRecord["action"]);
 
@@ -98,7 +109,7 @@ class ReportPostTriggerTest extends SiteTestCase
             "noteBody" => "*Bold*",
         ]);
 
-        //Should create exactly two dispatch and a log
+        // Should create exactly two dispatch and a log
         $dispatches = $this->getDispatchedRules($automationRule["automationRuleID"], ["success"]);
         $this->assertCount(2, $dispatches);
         $this->assertRowsLike(
@@ -132,7 +143,7 @@ class ReportPostTriggerTest extends SiteTestCase
     {
         $reportReason = $this->createReportReason();
 
-        $this->createCategory();
+        $category = $this->createCategory();
         $discussion = $this->createDiscussion();
 
         $this->createReport($discussion, [
@@ -144,6 +155,7 @@ class ReportPostTriggerTest extends SiteTestCase
             CreateEscalationAction::getType(),
             1,
             $reportReason["reportReasonID"],
+            $category["categoryID"],
             [
                 "recordIsLive" => true,
             ]

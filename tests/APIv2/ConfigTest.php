@@ -18,7 +18,7 @@ use Vanilla\Dashboard\Controllers\API\ConfigApiController;
 class ConfigTest extends AbstractAPIv2Test
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -39,7 +39,7 @@ class ConfigTest extends AbstractAPIv2Test
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public static function getAddons(): array
     {

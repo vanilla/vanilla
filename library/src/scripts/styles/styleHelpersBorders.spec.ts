@@ -10,6 +10,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { IBorderRadiusOutput, IBorderRadiusValue, IRadiusShorthand } from "@library/styles/cssUtilsTypes";
 import { Mixins } from "@library/styles/Mixins";
+import { ColorVar } from "@library/styles/CssVar";
 
 describe("styleHelperBorders", () => {
     describe("standardizeBorderRadius", () => {
@@ -210,7 +211,7 @@ describe("styleHelperBorders", () => {
     });
 
     describe("borders", () => {
-        const defaultColor = ColorsUtils.colorOut(globalVariables().border.color);
+        const defaultColor = ColorsUtils.varOverride(ColorVar.Border, globalVariables().border.color);
         it("Returns default values when there are no arguments", () => {
             const input = {};
 

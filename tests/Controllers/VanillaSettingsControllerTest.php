@@ -24,7 +24,7 @@ class VanillaSettingsControllerTest extends SiteTestCase
 {
     use CommunityApiTestTrait;
 
-    /** @inheritDoc */
+    /** @inheritdoc */
     protected static $addons = ["vanilla"];
 
     /** @var CategoryModel */
@@ -53,7 +53,7 @@ class VanillaSettingsControllerTest extends SiteTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -234,6 +234,7 @@ class VanillaSettingsControllerTest extends SiteTestCase
                 "Garden.MobileInputFormatter" => "rich",
                 "Vanilla.Discussions.PerPage" => 10,
                 "Vanilla.Comments.PerPage" => 10,
+                "Vanilla.Discussion.Title.MaxLength" => 100,
                 \VanillaSettingsController::CONFIG_KALTURA_DOMAINS => implode("\n", $newCustomDomains),
             ];
 

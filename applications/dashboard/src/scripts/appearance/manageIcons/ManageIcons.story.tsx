@@ -41,13 +41,15 @@ export function FormWithTable() {
     );
 }
 
-export function Modal() {
+export function ModalStory() {
     useMockedApi((mock) => {
         mock.onGet("/icons/by-name").reply(200, MOCK_MANAGED_ICONS_REVISIONS);
     });
 
     return <ManageIconModal activeIcon={MOCK_MANAGED_ICONS[0]} onClose={() => {}}></ManageIconModal>;
 }
+
+ModalStory.storyName = "Modal";
 
 export function BulkActions() {
     useMockedApi((mock) => {

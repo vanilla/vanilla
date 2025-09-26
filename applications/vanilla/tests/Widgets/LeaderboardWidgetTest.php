@@ -54,9 +54,12 @@ class LeaderboardWidgetTest extends SiteTestCase
     public function testDefaultLeaderboardTypeOptions()
     {
         $schema = UserPointsModel::leaderboardTypeSchema();
-        $staticOptions = $schema["x-control"]["choices"]["staticOptions"];
+        $staticOptions = $schema["x-control"]["options"];
 
-        $this->assertEquals([UserLeaderService::LEADERBOARD_TYPE_REPUTATION => "Reputation points"], $staticOptions);
+        $this->assertEquals(
+            [["value" => UserLeaderService::LEADERBOARD_TYPE_REPUTATION, "label" => "Reputation points"]],
+            $staticOptions
+        );
     }
 
     /**
@@ -66,12 +69,18 @@ class LeaderboardWidgetTest extends SiteTestCase
     {
         $this->enableAddon("vanillaanalytics");
         $schema = UserPointsModel::leaderboardTypeSchema();
-        $staticOptions = $schema["x-control"]["choices"]["staticOptions"];
+        $staticOptions = $schema["x-control"]["options"];
 
         $this->assertEquals(
             [
-                UserLeaderService::LEADERBOARD_TYPE_REPUTATION => "Reputation points",
-                UserLeaderService::LEADERBOARD_TYPE_ACCEPTED_ANSWERS => "Accepted answers count",
+                [
+                    "label" => "Reputation points",
+                    "value" => UserLeaderService::LEADERBOARD_TYPE_REPUTATION,
+                ],
+                [
+                    "label" => "Accepted answers count",
+                    "value" => UserLeaderService::LEADERBOARD_TYPE_ACCEPTED_ANSWERS,
+                ],
             ],
             $staticOptions
         );

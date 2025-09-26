@@ -8,9 +8,18 @@ import { css } from "@emotion/css";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Mixins } from "@library/styles/Mixins";
 import { numberedPagerVariables } from "@library/features/numberedPager/NumberedPager.variables";
+import { CSSObject } from "@emotion/serialize";
 
-export const numberedPagerClasses = useThemeCache((isMobile?: boolean) => {
+export const numberedPagerClasses = useThemeCache(() => {
     const vars = numberedPagerVariables();
+
+    const mobileMixin = (styles: CSSObject): CSSObject => {
+        return {
+            "@container(max-width: 600px)": {
+                ...styles,
+            },
+        };
+    };
 
     const root = css({
         ...Mixins.background(vars.background),
@@ -21,12 +30,20 @@ export const numberedPagerClasses = useThemeCache((isMobile?: boolean) => {
         ...Mixins.font(vars.font),
         lineHeight: 1,
         ...Mixins.padding({ vertical: 16 }),
+        containerType: "normal",
+
         "& > div": {
             // the first and last divs should flex to ensure proper alignment of the controls
             "&:first-child, &:last-child": {
                 flex: 1,
             },
         },
+
+        ...mobileMixin({
+            "& .noMobile": {
+                display: "none",
+            },
+        }),
     });
 
     const resultCount = css({
@@ -55,7 +72,13 @@ export const numberedPagerClasses = useThemeCache((isMobile?: boolean) => {
 
     const nextPageWrapper = css({
         display: "flex",
-        justifyContent: isMobile ? "flex-start" : "center",
+        justifyContent: "center",
+        ...mobileMixin({
+            justifyContent: "flex-start",
+        }),
+        "@container(max-width: 340px)": {
+            display: "none",
+        },
     });
 
     const nextPageButton = css({
@@ -83,6 +106,8 @@ export const numberedPagerClasses = useThemeCache((isMobile?: boolean) => {
         ...Mixins.margin({ left: 8 }),
     });
 
+    const jumperForm = css({ display: "contents" });
+
     return {
         root,
         resultCount,
@@ -92,5 +117,6 @@ export const numberedPagerClasses = useThemeCache((isMobile?: boolean) => {
         nextPageButton,
         jumperInput,
         jumperButton,
+        jumperForm,
     };
 });

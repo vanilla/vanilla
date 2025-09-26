@@ -47,13 +47,13 @@ describe("Language preferences", () => {
             { label: "French", value: "fr" },
         ]);
 
-        const languageTitle = await screen.findByText("Email Language");
+        const languageTitle = await screen.findByText("Notification Language");
         expect(languageTitle).toBeInTheDocument();
     });
 
     it("Does not display the language preferences when only 1 localeOption", async () => {
         await renderInProvider([{ label: "English", value: "en" }]);
 
-        expect(await screen.queryByText("Email Language")).not.toBeInTheDocument();
+        expect(await screen.queryByText("Notification Language")).not.toBeInTheDocument();
     });
 });

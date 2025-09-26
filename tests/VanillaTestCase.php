@@ -465,4 +465,29 @@ class VanillaTestCase extends TestCase
 
         self::assertEquals($expected, $actual, $message);
     }
+
+    /**
+     * Assert that an array has a set of keys.
+     *
+     * @param array $keys
+     * @param $array
+     * @param string $message
+     * @return void
+     */
+    public static function assertArrayHasKeys(array $keys, $array, string $message = ""): void
+    {
+        foreach ($keys as $key) {
+            self::assertArrayHasKey($key, $array, $message);
+        }
+    }
+
+    /**
+     * Use for concatenating with field values that need to be unique.
+     *
+     * @return string
+     */
+    public static function makeRandomKey($prefix = ""): string
+    {
+        return $prefix . round(microtime(true) * 1000) . rand(1, 1000);
+    }
 }

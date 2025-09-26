@@ -36,18 +36,21 @@ async function renderInProvider() {
         },
     });
 
-    return render(
+    const rendered = render(
         <ToastProvider>
             <QueryClientProvider client={queryClient}>
                 <CommentOptionsChangeStatus comment={rejectedComment} onSuccess={onSuccess} />
             </QueryClientProvider>
         </ToastProvider>,
     );
+    await vi.dynamicImportSettled();
+    return rendered;
 }
 
 async function clickOptionButtonToOpenForm() {
     const button = await screen.findByText("Change Status");
     await userEvent.click(button);
+    await vitest.dynamicImportSettled();
 }
 
 async function fillAndSubmitForm() {

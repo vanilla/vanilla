@@ -4,7 +4,7 @@
  */
 
 import { em, quote } from "csx";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { negative } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";

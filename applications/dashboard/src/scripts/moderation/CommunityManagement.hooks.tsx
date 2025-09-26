@@ -17,6 +17,7 @@ import { IApiError } from "@library/@types/api/core";
 import type { IUserFragment } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
 import DateTime, { DateFormats } from "@library/content/DateTime";
+import type { VanillaSanitizedHtml } from "@vanilla/dom-utils";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { deletedUserFragment } from "@library/features/users/constants/userFragment";
@@ -131,7 +132,7 @@ export interface IPostRevisionOption {
     value: string;
     recordRevisionDate: string;
     reportIDs: number[];
-    recordHtml: string;
+    recordHtml: VanillaSanitizedHtml;
     recordName: string;
     recordUser: IUserFragment;
     placeRecordName: string;

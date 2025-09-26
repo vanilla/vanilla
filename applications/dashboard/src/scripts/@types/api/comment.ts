@@ -5,11 +5,12 @@
 
 import { IDiscussion, IReportMeta } from "@dashboard/@types/api/discussion";
 import { IReaction } from "@dashboard/@types/api/reaction";
-import { IUserFragment } from "@library/@types/api/users";
+import { IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import { ISuggestedAnswer } from "@library/suggestedAnswers/SuggestedAnswers.variables";
 import { ICategory, type ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import type { IPostWarning } from "@vanilla/addon-vanilla/contentItem/ContentItemWarning";
+import type { VanillaSanitizedHtml } from "@vanilla/dom-utils";
 import type { RecordID } from "@vanilla/utils";
 
 export interface IPremoderatedRecordResponse {
@@ -25,14 +26,14 @@ export interface IComment {
     parentRecordID: RecordID;
     categoryID: ICategory["categoryID"];
     category?: ICategoryFragment;
-    body: string;
+    body: VanillaSanitizedHtml;
     dateInserted: string;
     dateUpdated: string | null;
     insertUserID: number;
     updateUserID?: number;
-    updateUser?: IUserFragment;
+    updateUser?: IUserFragment | IUserFragmentAndRoles;
     score: number | null;
-    insertUser: IUserFragment;
+    insertUser: IUserFragment | IUserFragmentAndRoles;
     url: string;
     attributes: any;
     reactions?: IReaction[];

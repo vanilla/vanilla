@@ -26,39 +26,37 @@ interface IProps {
 /**
  * Implement mobile next/previous nav to articles
  */
-export default class NextPrevious extends React.Component<IProps> {
-    public render() {
-        const { accessibleTitle, className, prevItem, nextItem } = this.props;
-        if (!nextItem && !prevItem) {
-            return null; // skip if no sibling pages exist
-        }
-        const classes = nextPreviousClasses();
-        return (
-            <nav className={classNames(className, classes.root)}>
-                <ScreenReaderContent>
-                    <Heading title={accessibleTitle} />
-                </ScreenReaderContent>
-                {/* Left */}
-                {prevItem && (
-                    <AdjacentLink
-                        className={classes.previous}
-                        classes={classes}
-                        direction={LeftRight.LEFT}
-                        to={prevItem.url || ""}
-                        title={prevItem.name}
-                    />
-                )}
-                {/* Right */}
-                {nextItem && (
-                    <AdjacentLink
-                        className={classes.next}
-                        classes={classes}
-                        direction={LeftRight.RIGHT}
-                        to={nextItem.url || ""}
-                        title={nextItem.name}
-                    />
-                )}
-            </nav>
-        );
+export default function NextPrevious(props: IProps) {
+    const { accessibleTitle, className, prevItem, nextItem } = props;
+    const classes = nextPreviousClasses.useAsHook();
+    if (!nextItem && !prevItem) {
+        return null; // skip if no sibling pages exist
     }
+    return (
+        <nav className={classNames(className, classes.root)}>
+            <ScreenReaderContent>
+                <Heading title={accessibleTitle} />
+            </ScreenReaderContent>
+            {/* Left */}
+            {prevItem && (
+                <AdjacentLink
+                    className={classes.previous}
+                    classes={classes}
+                    direction={LeftRight.LEFT}
+                    to={prevItem.url || ""}
+                    title={prevItem.name}
+                />
+            )}
+            {/* Right */}
+            {nextItem && (
+                <AdjacentLink
+                    className={classes.next}
+                    classes={classes}
+                    direction={LeftRight.RIGHT}
+                    to={nextItem.url || ""}
+                    title={nextItem.name}
+                />
+            )}
+        </nav>
+    );
 }

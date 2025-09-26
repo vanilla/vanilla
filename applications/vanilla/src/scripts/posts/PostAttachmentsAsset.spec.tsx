@@ -10,10 +10,12 @@ import { INTEGRATIONS_META_KEY } from "@library/features/discussions/integration
 import {
     FAKE_ATTACHMENT,
     FAKE_INTEGRATIONS_CATALOG,
+} from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
+import {
+    integrationsFixtureQueryClient,
     IntegrationsTestWrapper,
     mockApi,
-    queryClient,
-} from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
+} from "@library/features/discussions/integrations/fixtures/IntegrationsSpec.fixtures";
 import { setMeta } from "@library/utility/appUtils";
 import { RenderResult, act, render } from "@testing-library/react";
 import PostAttachmentsAsset from "@vanilla/addon-vanilla/posts/PostAttachmentsAsset";
@@ -27,7 +29,7 @@ beforeAll(() => {
 
 afterEach(() => {
     vitest.clearAllMocks();
-    queryClient.clear();
+    integrationsFixtureQueryClient.clear();
 });
 
 describe("PostAttachmentsAsset", () => {

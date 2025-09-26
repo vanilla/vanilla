@@ -34,7 +34,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     private int $categoryID;
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -42,7 +42,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -50,7 +50,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -58,7 +58,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -88,7 +88,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -147,7 +147,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -181,7 +181,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function addWhereArray(array $where, array $actionValue): array
     {
@@ -190,7 +190,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {
@@ -209,7 +209,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setDiscussionID(int $discussionID): void
     {
@@ -217,7 +217,7 @@ class MoveDiscussionToCategoryAction extends AutomationAction implements Discuss
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getDiscussionID(): int
     {

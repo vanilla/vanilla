@@ -11,13 +11,13 @@ use Vanilla\Contracts\Addons\WidgetInterface;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
-use Vanilla\Widgets\AbstractWidgetModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
+use Vanilla\Widgets\LegacyWidgetModule;
 
 /**
  * Class MockWidget1
  */
-class MockWidget1 extends AbstractWidgetModule
+class MockWidget1 extends LegacyWidgetModule
 {
     /** @var string */
     private $name;

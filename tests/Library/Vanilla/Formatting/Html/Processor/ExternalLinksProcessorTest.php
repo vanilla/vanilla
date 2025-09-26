@@ -33,7 +33,7 @@ class ExternalLinksProcessorTest extends VanillaTestCase
     private $request;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

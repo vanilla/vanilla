@@ -17,37 +17,40 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { css, cx } from "@emotion/css";
 
-interface IProps extends IOptionalComponentID {
-    id?: string;
-    className?: string;
-    checked?: boolean;
-    disabled?: boolean;
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    onBlur?: React.InputHTMLAttributes<HTMLInputElement>["onBlur"];
-    label?: React.ReactNode;
-    "aria-labelledby"?: string;
-    "aria-describedby"?: string;
-    labelBold?: boolean;
-    hideLabel?: boolean;
-    isHorizontal?: boolean;
-    fakeFocus?: boolean;
-    defaultChecked?: boolean;
-    tooltipLabel?: boolean;
-    excludeFromICheck?: boolean;
-    fullWidth?: boolean;
+namespace CheckBox {
+    export interface Props extends IOptionalComponentID {
+        id?: string;
+        className?: string;
+        checked?: boolean;
+        disabled?: boolean;
+        onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+        onBlur?: React.InputHTMLAttributes<HTMLInputElement>["onBlur"];
+        label?: React.ReactNode;
+        "aria-labelledby"?: string;
+        "aria-describedby"?: string;
+        labelBold?: boolean;
+        hideLabel?: boolean;
+        isHorizontal?: boolean;
+        fakeFocus?: boolean;
+        defaultChecked?: boolean;
+        tooltipLabel?: boolean;
+        excludeFromICheck?: boolean;
+        fullWidth?: boolean;
 
-    tooltip?: string;
-    tooltipIcon?: IconType;
+        tooltip?: string;
+        tooltipIcon?: IconType;
 
-    name?: string;
+        name?: string;
+        required?: boolean;
+    }
 }
 
-export default function CheckBox(props: IProps) {
+function CheckBox(props: CheckBox.Props) {
     const ownInputID = useUniqueID("checkbox");
     const inputID = props.id ?? ownInputID;
     const ownLabelID = useUniqueID("checkbox_label");
     const labelID = props["aria-labelledby"] ?? ownLabelID;
-    const classes = checkRadioClasses();
+    const classes = checkRadioClasses.useAsHook();
 
     const {
         isHorizontal,
@@ -74,7 +77,7 @@ export default function CheckBox(props: IProps) {
     const icon = (
         <span className={classes.iconContainer} aria-hidden="true">
             <svg className={classNames(classes.checkIcon)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
-                <title>{t("✓")}</title>
+                <title>{t("✓", { optional: true })}</title>
                 <path
                     fill="currentColor"
                     d="M10,2.7c0-0.2-0.1-0.3-0.2-0.4L8.9,1.3c-0.2-0.2-0.6-0.2-0.9,0L3.8,5.6L1.9,3.7c-0.2-0.2-0.6-0.2-0.9,0L0.2,4.6c-0.2,0.2-0.2,0.6,0,0.9l3.2,3.2c0.2,0.2,0.6,0.2,0.9,0l5.5-5.5C9.9,3,10,2.8,10,2.7z"
@@ -107,6 +110,7 @@ export default function CheckBox(props: IProps) {
                 tabIndex={0}
                 name={name}
                 id={inputID}
+                required={props.required}
             />
             {tooltipLabel && label ? <ToolTip label={label}>{icon}</ToolTip> : icon}
             {!!label && (
@@ -133,3 +137,5 @@ export default function CheckBox(props: IProps) {
         </label>
     );
 }
+
+export default CheckBox;

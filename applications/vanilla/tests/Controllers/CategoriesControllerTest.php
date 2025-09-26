@@ -25,7 +25,7 @@ class CategoriesControllerTest extends TestCase
     use SiteTestTrait, SetupTraitsTrait, CommunityApiTestTrait, TestCategoryModelTrait;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {
@@ -38,7 +38,7 @@ class CategoriesControllerTest extends TestCase
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function tearDown(): void
     {

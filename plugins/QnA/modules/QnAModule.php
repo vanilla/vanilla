@@ -11,12 +11,12 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Logging\ErrorLogger;
-use Vanilla\Widgets\AbstractWidgetModule;
+use Vanilla\Widgets\LegacyWidgetModule;
 
 /**
  * Question & Answer Module
  */
-class QnAModule extends AbstractWidgetModule
+class QnAModule extends LegacyWidgetModule
 {
     const ALL_QUESTIONS = "all";
 
@@ -79,6 +79,7 @@ class QnAModule extends AbstractWidgetModule
     {
         $this->discussionModel = $discussionModel;
         $this->categoryModel = $categoryModel;
+        $this->_ApplicationFolder = "plugins/QnA";
     }
 
     /**

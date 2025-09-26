@@ -14,7 +14,6 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
-import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import FrameHeader from "@library/layout/frame/FrameHeader";
@@ -99,7 +98,7 @@ export function CategoryListModal(props: IProps) {
                     />
                 }
                 body={
-                    <FrameBody className={frameBodyClasses().root}>
+                    <FrameBody>
                         {categoryQuery.isLoading ? (
                             <div style={{ padding: 16 }}>
                                 <Loader small />

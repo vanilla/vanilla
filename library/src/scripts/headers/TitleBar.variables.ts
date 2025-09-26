@@ -14,12 +14,14 @@ import { getPixelNumber, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { color, px, rgba, viewHeight } from "csx";
 import { media, TLength } from "@library/styles/styleShim";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { IButton } from "@library/forms/styleHelperButtonInterface";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LogoAlignment } from "./LogoAlignment";
 import { Property } from "csstype";
 import { IThemeVariables } from "@library/theming/themeReducer";
+import { TitleBarPositioning } from "@library/headers/TitleBar.ParamContext";
+import { LocalVariableMapping } from "@library/styles/VariableMapping";
 
 /**
  * @varGroup titleBar
@@ -31,7 +33,13 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
     const formElementVars = formElementsVariables(forcedVars);
-    const makeThemeVars = variableFactory("titleBar", forcedVars);
+    const makeThemeVars = variableFactory(
+        "titleBar",
+        forcedVars,
+        new LocalVariableMapping({
+            "positioning.startingOpacity": "fullBleed.startingOpacity",
+        }),
+    );
 
     const meBox = makeThemeVars("meBox", {
         /**
@@ -198,7 +206,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
          * @type string
          * @enum none|border|shadow
          */
-        type: BorderType.NONE,
+        type: BorderType.NONE as BorderType,
         color: globalVars.border.color,
         width: globalVars.border.width,
     });
@@ -246,21 +254,21 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         swoopOffset: (16 * swoopInit.amount) / 50,
     });
 
+    const legacyFullBleedValue = makeThemeVars("fullBleed", {
+        enabled: false,
+    }).enabled;
+
     /**
-     * @varGroup titleBar.fullBleed
+     * @varGroup titleBar.positioning
      * @title TitleBar - Full Bleed
      */
-    const fullBleed = makeThemeVars("fullBleed", {
-        /**
-         * @var titleBar.fullBleed.enabled
-         * @description Enable a "full bleed" title bar.
-         * This caused to titlebar to be transparent or semi-transparent and site *on top* of the banner.
-         * @type boolean
-         */
-        enabled: false,
+    const positioning = makeThemeVars("positioning", {
+        mode: (legacyFullBleedValue
+            ? TitleBarPositioning.StickyTransparent
+            : TitleBarPositioning.StickySolid) as TitleBarPositioning,
 
         /**
-         * @var titleBar.fullBleed.startingOpacity
+         * @var titleBar.positioning.startingOpacity
          * @type number
          * @description An opacity value between 0 and 1 that determins how transparent the full bleed titlebar is
          * when sitting on top of the banner.
@@ -268,40 +276,12 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
          * 0 - Fully transparent.
          * 0.3 - Semi transparent.
          * 1 - Completely solid
+         *
+         * Only applies with modes of "StickyTransparent" and "StaticTransparent".
+         *
          * @default 0
          */
         startingOpacity: 0,
-
-        /**
-         * @var titleBar.fullBleed.endingOpacity
-         * @type number
-         * @description An opacity value between 0 and 1 that determins how transparent the full bleed titlebar is
-         * as the banner is scrolled out of view.
-         *
-         * The banner *always* becomes completely solid after the transition,
-         * so this value only affects the transition between states.
-         *
-         * This value cannot be less than the `titleBar.fullBleed.startingOpacity` value.
-         *
-         * 0 - Fully transparent.
-         * 0.3 - Semi transparent.
-         * 1 - Completely solid
-         * @default 0.15
-         */
-        endingOpacity: 0.15,
-
-        /**
-         * @var titleBar.fullBleed.bgColor
-         * @title Background Color
-         * @description The background color of the full bleed titlebar when it is transparent/semi-transparent.
-         * This defaults to the normal titleBar.colors.bg color, but can be a different color.
-         *
-         * For example, you may want to use a semi-transparent white/black while overlaying the banner,
-         * but want the titlebar to transition a brand color when on it's own or scrolled down the page.
-         * @type string
-         * @format hex-color
-         */
-        bgColor: colors.bg,
     });
 
     const clearBorder = {
@@ -341,13 +321,10 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         }),
     });
 
-    // Fix up the ending opacity so it is always darker than the starting one.
-    fullBleed.endingOpacity = Math.max(fullBleed.startingOpacity, fullBleed.endingOpacity);
-
     const guest = makeThemeVars("guest", {
         spacer: 8,
-        signInButtonType: ButtonTypes.TRANSPARENT,
-        registerButtonType: ButtonTypes.TRANSLUCID,
+        signInButtonType: ButtonTypes.TRANSPARENT as ButtonTypes,
+        registerButtonType: ButtonTypes.TRANSLUCID as ButtonTypes,
     });
 
     const buttonSize = globalVars.buttonIcon.size;
@@ -594,7 +571,7 @@ export const titleBarVariables = useThemeCache((forcedVars?: IThemeVariables) =>
     });
 
     return {
-        fullBleed,
+        positioning,
         titleBarContainer,
         border,
         sizing,

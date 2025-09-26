@@ -19,7 +19,7 @@ use Vanilla\Logging\LoggerUtils;
 class LayoutEvent extends ResourceEvent implements LoggableEventInterface
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {

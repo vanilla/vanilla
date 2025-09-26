@@ -23,7 +23,7 @@ use Vanilla\Forum\Models\PostTypeModel;
 class LastActiveDiscussionTrigger extends TimedAutomationTrigger
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -31,7 +31,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -39,7 +39,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -47,7 +47,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -55,7 +55,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -66,7 +66,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getPrimaryKey(): string
     {
@@ -74,7 +74,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getObjectModel(): \Gdn_Model
     {
@@ -82,7 +82,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getWhereArray(array $triggerValue, ?DateTimeImmutable $lastRunDate = null): array
     {
@@ -95,7 +95,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess($lastRecordId, array $where): \Generator
     {
@@ -112,7 +112,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {
@@ -126,7 +126,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     static function getSchema(): Schema
     {
@@ -134,7 +134,7 @@ class LastActiveDiscussionTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggerValueSchema(): Schema
     {

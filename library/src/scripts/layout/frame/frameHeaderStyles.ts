@@ -14,6 +14,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { calc, em, percent } from "csx";
 import { frameVariables } from "@library/layout/frame/frameStyles";
 import { Mixins } from "@library/styles/Mixins";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const frameHeaderClasses = useThemeCache(() => {
     const vars = frameVariables();
@@ -73,6 +74,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         }),
         "&:focus-visible": {
             outline: "none",
+            boxShadow: `0 0 0 2px ${ColorsUtils.colorOut(globalVars.mainColors.primary)}`,
         },
     });
 
@@ -120,7 +122,7 @@ export const frameHeaderClasses = useThemeCache(() => {
         height: styleUnit(formElVars.sizing.height),
         width: styleUnit(formElVars.sizing.height),
         flexBasis: styleUnit(formElVars.sizing.height),
-        color: ColorsUtils.colorOut(vars.colors.fg),
+        color: ColorsUtils.varOverride(ColorVar.Foreground, vars.colors.fg),
         transform: `translateX(10px)`,
         marginLeft: "auto",
         ...{

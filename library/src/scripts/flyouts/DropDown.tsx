@@ -14,7 +14,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { Icon } from "@vanilla/icons";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
-import { useMeasure, useStackingContext } from "@vanilla/react-utils";
+import { useMeasure, useStackingContext, type MeasuredRect } from "@vanilla/react-utils";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { cx } from "@emotion/css";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -62,7 +62,7 @@ export interface IDropDownProps extends IOpenDirectionProps {
     openAsModal?: boolean;
     title?: string;
     mobileTitle?: string;
-    flyoutType: FlyoutType;
+    flyoutType?: FlyoutType;
     selfPadded?: boolean;
     isSmall?: boolean;
     handleID?: string;
@@ -75,10 +75,12 @@ export interface IDropDownProps extends IOpenDirectionProps {
     preventFocusOnVisible?: boolean; //in some cases focus will be handled through parent components, so we'll prevent the responsibility in FlyoutToggle
 }
 
-export enum FlyoutType {
-    LIST = "list",
-    FRAME = "frame",
-}
+export const FlyoutType = {
+    LIST: "list",
+    FRAME: "frame",
+} as const;
+
+export type FlyoutType = (typeof FlyoutType)[keyof typeof FlyoutType];
 
 export interface IState {
     selectedText: string;
@@ -103,11 +105,11 @@ export function useDropdownContext() {
  */
 export default function DropDown(props: IDropDownProps) {
     const device = useDevice();
-    const { title, preferredDirection } = props;
+    const { title, preferredDirection, flyoutType = "list" } = props;
 
     const mobileTitle = props.mobileTitle ?? title;
-    const classes = dropDownClasses();
-    const ContentTag = props.flyoutType === FlyoutType.FRAME ? "div" : "ul";
+    const classes = dropDownClasses.useAsHook();
+    const ContentTag = flyoutType === FlyoutType.FRAME ? "div" : "ul";
     const openAsModal = props.openAsModal || device === Devices.MOBILE || device === Devices.XS;
     const buttonRef = useRef<HTMLButtonElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -211,7 +213,7 @@ export default function DropDown(props: IDropDownProps) {
                                     {...params}
                                     contentRef={ownContentRef}
                                     id={contentID}
-                                    className={cx(props.contentsClassName)}
+                                    className={props.contentsClassName}
                                     renderCenter={positionCenter}
                                     renderLeft={positionLeft}
                                     renderAbove={positionAbove}
@@ -219,10 +221,10 @@ export default function DropDown(props: IDropDownProps) {
                                     selfPadded={
                                         props.selfPadded !== undefined
                                             ? props.selfPadded
-                                            : props.flyoutType === FlyoutType.FRAME
+                                            : flyoutType === FlyoutType.FRAME
                                     }
                                     size={
-                                        props.flyoutType === FlyoutType.FRAME && !props.isSmall
+                                        flyoutType === FlyoutType.FRAME && !props.isSmall
                                             ? DropDownContentSize.MEDIUM
                                             : DropDownContentSize.SMALL
                                     }
@@ -236,7 +238,7 @@ export default function DropDown(props: IDropDownProps) {
                                             {mobileTitle ?? title}
                                         </FrameHeaderMinimal>
                                     )}
-                                    {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
+                                    {openAsModal && flyoutType === FlyoutType.FRAME ? (
                                         props.children
                                     ) : (
                                         <ContentTag
@@ -259,8 +261,8 @@ export default function DropDown(props: IDropDownProps) {
 
 interface IResolveDirectionProps {
     props: IOpenDirectionProps;
-    buttonRect: DOMRect;
-    contentRect: DOMRect;
+    buttonRect: MeasuredRect;
+    contentRect: MeasuredRect;
     setFlyoutHasPlacement?: (positioned: boolean) => void;
     dropDownID: string;
 }

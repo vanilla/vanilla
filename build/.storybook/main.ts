@@ -8,6 +8,8 @@ import fs from "fs";
 import { globbySync } from "globby";
 import type { StorybookConfig } from "@storybook/react-vite";
 import { makeViteCommonConfig } from "../vite.commonConfig";
+import reactPlugin from "@vitejs/plugin-react-swc";
+
 const VANILLA_ROOT = path.resolve(__dirname, "../../");
 
 const isProd = process.env.NODE_ENV === "production";
@@ -64,13 +66,39 @@ const config: StorybookConfig = {
     async viteFinal(config) {
         const { mergeConfig } = await import("vite");
         // Merge custom configuration into the default config
-        const finalConfig = mergeConfig(makeViteCommonConfig(), config);
+        const commonConfig = makeViteCommonConfig();
+        commonConfig.plugins!.push(
+            reactPlugin({
+                plugins: [
+                    [
+                        "@swc/plugin-emotion",
+                        {
+                            // default is true. It will be disabled when build type is production.
+                            sourceMap: false,
+                            // default is 'dev-only'.
+                            autoLabel: "always",
+                            // default is '[local]'.
+                            // Allowed values: `[local]` `[filename]` and `[dirname]`
+                            // This option only works when autoLabel is set to 'dev-only' or 'always'.
+                            // It allows you to define the format of the resulting label.
+                            // The format is defined via string where variable parts are enclosed in square brackets [].
+                            // For example labelFormat: "my-classname--[local]", where [local] will be replaced with the name of the variable the result is assigned to.
+                            labelFormat: "[filename]-[local]",
+                        },
+                    ],
+                ],
+            }),
+        );
+        const finalConfig = mergeConfig(commonConfig, config);
         return finalConfig;
     },
 
     framework: getAbsolutePath("@storybook/react-vite"),
 
     docs: {},
+    core: {
+        disableTelemetry: true,
+    },
 };
 
 export default config;

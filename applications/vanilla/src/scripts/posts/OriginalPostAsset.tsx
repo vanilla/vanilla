@@ -37,6 +37,10 @@ import CreateCommentAsset, { CreateOriginalPostReply } from "@vanilla/addon-vani
 import { useCreateCommentContext } from "@vanilla/addon-vanilla/posts/CreateCommentContext";
 import { useDraftContext } from "@vanilla/addon-vanilla/drafts/DraftContext";
 import isEmpty from "lodash-es/isEmpty";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
+import { IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
+import { useFragmentImpl } from "@library/utility/FragmentImplContext";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 
 interface IProps {
     discussion: IDiscussion;
@@ -68,7 +72,13 @@ const classes = {
     }),
 };
 
-export function OriginalPostAsset(props: IProps) {
+export default function OriginalPostAsset(props: IProps) {
+    const Impl = useFragmentImpl("OriginalPostFragment", OriginalPostAssetImpl);
+
+    return <Impl {...props} />;
+}
+
+export function OriginalPostAssetImpl(props: IProps) {
     const { discussion: discussionPreload, discussionApiParams, category, authorBadges } = props;
     const { discussionID } = discussionPreload;
 
@@ -91,6 +101,17 @@ export function OriginalPostAsset(props: IProps) {
 
     const discussion = data!;
 
+    const permissionOptions: IPermissionOptions = {
+        mode: PermissionMode.RESOURCE_IF_JUNCTION,
+        resourceType: "category",
+        resourceID: category.categoryID,
+    };
+
+    const replyPermission = hasPermission("comments.add", permissionOptions);
+    const closePermission = hasPermission("discussions.close", permissionOptions);
+
+    const canReply = discussion.closed ? closePermission : replyPermission;
+
     // Hide discussion (e.g. from ignored users)
     const discussionIsFromIgnoredUser =
         getMeta("ignoredUserIDs", []).includes(discussion.insertUserID) && !props.isPreview;
@@ -98,21 +119,26 @@ export function OriginalPostAsset(props: IProps) {
 
     const showResolved = hasPermission("staff.allow") && getMeta("triage.enabled", false);
     const showWarningStatus = discussion.insertUserID === currentUser?.userID || hasPermission("community.moderate");
+    const classesCommentThread = commentThreadClasses.useAsHook();
 
     const postMeta = (
         <>
             {showResolved && (
-                <span className={commentThreadClasses().resolved}>
-                    <Icon icon={discussion.resolved ? "resolved" : "unresolved"} />
+                <span className={classesCommentThread.resolved}>
+                    <ToolTip label={discussion.resolved ? t("Resolved") : t("Unresolved")}>
+                        <ToolTipIcon>
+                            <Icon icon={discussion.resolved ? "resolved" : "unresolved"} />
+                        </ToolTipIcon>
+                    </ToolTip>
                 </span>
             )}
             {discussion.pinned && (
-                <Tag className={commentThreadClasses().closedTag} preset={discussionListVariables().labels.tagPreset}>
+                <Tag className={classesCommentThread.closedTag} preset={discussionListVariables().labels.tagPreset}>
                     {t("Announced")}
                 </Tag>
             )}
             {discussion.closed && (
-                <Tag className={commentThreadClasses().closedTag} preset={discussionListVariables().labels.tagPreset}>
+                <Tag className={classesCommentThread.closedTag} preset={discussionListVariables().labels.tagPreset}>
                     {t("Closed")}
                 </Tag>
             )}
@@ -136,7 +162,7 @@ export function OriginalPostAsset(props: IProps) {
         </div>
     );
 
-    const replyProps = !discussion.closed && {
+    const replyProps = canReply && {
         onReply: () => {
             setCreateCommentLocation("original-post");
         },
@@ -144,87 +170,89 @@ export function OriginalPostAsset(props: IProps) {
     };
 
     return (
-        <HomeWidgetContainer
-            options={{ ...props.containerOptions }}
-            depth={1}
-            title={
-                props.titleType !== "none" ? (
-                    <>
-                        <span>{props.title ?? discussion.name}</span>
-                        {postMeta}
-                    </>
-                ) : undefined
-            }
-            actions={props.titleType !== "none" ? actions : undefined}
-        >
-            <ContentItemContextProvider
-                recordType={"discussion"}
-                recordID={discussion.discussionID}
-                recordUrl={discussion.url}
-                name={discussion.name}
-                timestamp={discussion.dateInserted}
-                dateUpdated={discussion.dateUpdated}
-                updateUser={discussion.updateUser}
-                attributes={discussion.attributes}
-                authorID={discussion.insertUserID}
+        <LayoutWidget>
+            <HomeWidgetContainer
+                options={{ ...props.containerOptions }}
+                depth={1}
+                title={
+                    props.titleType !== "none" ? (
+                        <>
+                            <span>{props.title ?? discussion.name}</span>
+                            {postMeta}
+                        </>
+                    ) : undefined
+                }
+                actions={props.titleType !== "none" ? actions : undefined}
             >
-                <ContentItem
-                    boxOptions={{
-                        borderType: BorderType.NONE,
-                    }}
-                    user={discussion.insertUser!}
-                    beforeContent={
-                        discussion.warning &&
-                        showWarningStatus && (
-                            <ContentItemWarning
-                                warning={discussion.warning}
-                                recordName={discussion.name}
-                                recordUrl={discussion.url}
-                                moderatorNoteVisible={hasPermission("community.moderate")}
-                            />
-                        )
-                    }
-                    content={discussion.body!}
-                    userPhotoLocation={"header"}
-                    collapsed={currentPage > 1}
-                    reactions={discussion.reactions}
-                    categoryID={discussion.categoryID}
-                    options={props.titleType === "none" ? actions : undefined}
-                    additionalAuthorMeta={
-                        authorBadges?.display &&
-                        discussion.insertUser?.badges?.length && (
-                            <>
-                                {discussion.insertUser.badges
-                                    .map((badge, index) => (
-                                        <ContributionItem
-                                            key={index}
-                                            name={badge.name}
-                                            url={badge.url}
-                                            photoUrl={badge.photoUrl}
-                                            themingVariables={reactionsVariables()}
-                                            className={ContentItemClasses().authorBadgesMeta}
-                                        />
-                                    ))
-                                    .slice(0, authorBadges.limit ?? 5)}
-                            </>
-                        )
-                    }
-                    isHidden={isDiscussionHidden}
-                    visibilityHandlerComponent={
-                        discussionIsFromIgnoredUser && (
-                            <ContentItemVisibilityRenderer
-                                onVisibilityChange={setIsDiscussionHidden}
-                                contentText={t("Content from Ignored User.")}
-                                isPostHidden={isDiscussionHidden}
-                            />
-                        )
-                    }
-                    {...replyProps}
-                />
+                <ContentItemContextProvider
+                    recordType={"discussion"}
+                    recordID={discussion.discussionID}
+                    recordUrl={discussion.url}
+                    name={discussion.name}
+                    timestamp={discussion.dateInserted}
+                    dateUpdated={discussion.dateUpdated}
+                    insertUser={discussion.insertUser}
+                    updateUser={discussion.updateUser}
+                    attributes={discussion.attributes}
+                    authorID={discussion.insertUserID}
+                >
+                    <ContentItem
+                        boxOptions={{
+                            borderType: BorderType.NONE,
+                        }}
+                        user={discussion.insertUser!}
+                        warnings={
+                            discussion.warning &&
+                            showWarningStatus && (
+                                <ContentItemWarning
+                                    warning={discussion.warning}
+                                    recordName={discussion.name}
+                                    recordUrl={discussion.url}
+                                    moderatorNoteVisible={hasPermission("community.moderate")}
+                                />
+                            )
+                        }
+                        content={discussion.body!}
+                        userPhotoLocation={"header"}
+                        collapsed={currentPage > 1}
+                        reactions={discussion.reactions}
+                        categoryID={discussion.categoryID}
+                        options={props.titleType === "none" ? actions : undefined}
+                        additionalAuthorMeta={
+                            authorBadges?.display &&
+                            discussion.insertUser?.badges?.length && (
+                                <>
+                                    {discussion.insertUser.badges
+                                        .map((badge, index) => (
+                                            <ContributionItem
+                                                key={index}
+                                                name={badge.name}
+                                                url={badge.url}
+                                                photoUrl={badge.photoUrl}
+                                                themingVariables={reactionsVariables()}
+                                                className={ContentItemClasses().authorBadgesMeta}
+                                            />
+                                        ))
+                                        .slice(0, authorBadges.limit ?? 5)}
+                                </>
+                            )
+                        }
+                        isHidden={isDiscussionHidden}
+                        visibilityHandlerComponent={
+                            discussionIsFromIgnoredUser && (
+                                <ContentItemVisibilityRenderer
+                                    onVisibilityChange={setIsDiscussionHidden}
+                                    contentText={t("Content from Ignored User.")}
+                                    isPostHidden={isDiscussionHidden}
+                                />
+                            )
+                        }
+                        {...replyProps}
+                    />
 
-                <CreateOriginalPostReply replyTo={discussion.insertUser?.name} />
-            </ContentItemContextProvider>
-        </HomeWidgetContainer>
+                    <CreateOriginalPostReply replyTo={discussion.insertUser?.name} />
+                </ContentItemContextProvider>
+            </HomeWidgetContainer>
+        </LayoutWidget>
     );
 }
-export default OriginalPostAsset;

@@ -6,6 +6,9 @@
 
 import * as Reach from "@reach/accordion";
 import React from "react";
+import * as Polymorphic from "../polymorphic";
 
-export const AccordionButton: React.ComponentType<{ children?: React.ReactNode; className?: string }> =
-    Reach.AccordionButton;
+export const AccordionButton: Polymorphic.ForwardRefComponent<
+    "button",
+    { children?: React.ReactNode; className?: string }
+> = Reach.AccordionButton as any;

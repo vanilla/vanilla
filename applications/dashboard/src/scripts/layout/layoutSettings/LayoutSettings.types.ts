@@ -5,7 +5,8 @@
 
 import { ILoadable, Loadable, LoadStatus } from "@library/@types/api/core";
 import { IUserFragment } from "@library/@types/api/users";
-import { IHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.types";
+import { IHydratedLayoutWidget, type IHydratedLayoutFragmentImpl } from "@library/features/Layout/LayoutRenderer.types";
+import type { ITitleBarParams } from "@library/headers/TitleBar.ParamContext";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 import { RecordID } from "@vanilla/utils";
@@ -126,6 +127,7 @@ export type LayoutViewFragment = Pick<ILayoutView, "recordID" | "recordType">;
 export interface IEditableLayoutWidget {
     $middleware?: Record<string, any>;
     $hydrate: string;
+    $fragmentImpls?: Record<string, Partial<IHydratedLayoutFragmentImpl>>;
     // Any props for the widget.
     [key: string]: any;
 }
@@ -133,23 +135,29 @@ export interface IEditableLayoutWidget {
 export interface IEditableLayoutSpec {
     layoutViewType: LayoutViewType;
     layout: IEditableLayoutWidget[];
+    titleBar: IEditableLayoutWidget & ITitleBarParams;
 }
 
-export interface ILayoutEditorPath {
+export interface ILayoutEditorSectionPath {
     sectionIndex: number; // 0
     sectionRegion?: string; // rightTop
     sectionRegionIndex?: number; // 4
 }
 
-export interface ILayoutEditorSectionPath extends ILayoutEditorPath {}
-
-export interface ILayoutEditorDestinationPath extends ILayoutEditorPath {
+export interface ILayoutEditorDestinationPath extends ILayoutEditorSectionPath {
     sectionRegion: string; // rightTop
 }
 
+export type ILayoutEditorSpecialWidgetPath = "TitleBar";
 export interface ILayoutEditorWidgetPath extends ILayoutEditorDestinationPath {
     sectionRegionIndex: number; // 4
 }
+
+export type ILayoutEditorPath =
+    | ILayoutEditorDestinationPath
+    | ILayoutEditorWidgetPath
+    | ILayoutEditorSectionPath
+    | ILayoutEditorSpecialWidgetPath;
 
 export interface IHydratedEditableWidgetProps {
     $hydrate: string;
@@ -157,10 +165,17 @@ export interface IHydratedEditableWidgetProps {
     $editorPath: ILayoutEditorPath;
 }
 
+export interface IHydratedEditableSectionProps {
+    $hydrate: string;
+    $componentName: string;
+    $editorPath: ILayoutEditorSectionPath;
+}
+
 export interface IHydratedEditableLayoutWidget extends IHydratedLayoutWidget<IHydratedEditableWidgetProps> {}
 
 export interface IHydratedEditableLayoutSpec {
     layout: IHydratedEditableLayoutWidget[];
+    titleBar: IEditableLayoutSpec["titleBar"];
 }
 
 type ISchemaCatalog = Record<
@@ -179,6 +194,16 @@ export type IWidgetCatalog = Record<
         iconUrl?: string;
         name: string;
         isRequired?: boolean;
+        fragmentTypes?: string[];
+        widgetGroup: string;
+    }
+>;
+
+export type IFragmentCatalog = Record<
+    string,
+    {
+        fragmentType: string;
+        schema: JsonSchema;
     }
 >;
 
@@ -200,4 +225,5 @@ export interface ILayoutCatalog {
     sections: IWidgetCatalog;
     /** A mapping of middlewareType to middleware schema for all available middleware. */
     middlewares: ISchemaCatalog;
+    fragments: IFragmentCatalog;
 }

@@ -70,7 +70,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
         return Schema::parse([
             "discussionID:i",
             "commentID:i?",
-            "page:i" => ["default" => 1],
+            "page:i|s" => ["default" => 1],
             "sort:s?" => [
                 "enum" => ["-dateInserted", "dateInserted", "-score", "-" . ModelUtils::SORT_TRENDING, ""],
             ],
@@ -86,13 +86,14 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
             ->get("/discussions/{$discussionID}?expand={$commaSeparatedExpands}")
             ->asData();
 
-        $this->discussionModel->tryRedirectFromDiscussion($discussion->getData());
+        $this->discussionModel->tryRedirectFromDiscussion($discussion->getData(), throw: true);
 
         $discussionTags = $discussion["tags"] ?? [];
 
         // Filter to only user tags.
 
         $discussionData = $discussion->getData();
+        $discussionData["format"] = "html";
 
         // Ensure we're in a valid site section, otherwise this will perform a redirect.
         $canonicalUrl = isset($paramInput["page"])
@@ -170,7 +171,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getContexts(array $resolvedParams): array
     {
@@ -258,7 +259,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -266,7 +267,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -274,7 +275,7 @@ class DiscussionLayoutView extends AbstractCustomLayoutView implements LegacyLay
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLegacyType(): string
     {

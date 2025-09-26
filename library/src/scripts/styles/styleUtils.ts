@@ -4,15 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { css } from "@emotion/css";
 import merge from "lodash-es/merge";
 import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
-import { logDebug, logWarning, logError, notEmpty, flattenObject, unflattenObject } from "@vanilla/utils";
+import { logDebug, logWarning, logError } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { GlobalVariableMapping, LocalVariableMapping } from "@library/styles/VariableMapping";
-import set from "lodash/set";
 
 // Re-export for compatibility.
 export { useThemeCache } from "@library/styles/themeCache";
@@ -109,12 +108,12 @@ export function variableFactory(
     componentNames: string | string[],
     themeVars?: IThemeVariables,
     mappings?: VariableMapping | VariableMapping[],
-    mergeWithGlobals = false,
 ) {
-    if (!themeVars) {
-        themeVars = getThemeVariables();
-    } else if (mergeWithGlobals) {
-        themeVars = merge(getThemeVariables(), themeVars);
+    if (window.__THEME_OVERRIDE_CONTEXT__?.overridesVariables) {
+        const contextOverrides = window.__THEME_OVERRIDE_CONTEXT__.overridesVariables as any;
+        themeVars = themeVars ? merge({}, contextOverrides, stripUndefinedKeys(themeVars)) : contextOverrides;
+    } else {
+        themeVars = merge(getThemeVariables(), stripUndefinedKeys(themeVars));
     }
 
     componentNames = typeof componentNames === "string" ? [componentNames] : componentNames;
@@ -217,8 +216,13 @@ const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
  * - Strings starting with `#` get wrapped in `color()`;
  */
 export function normalizeVariables(customVariable: any, defaultVariable: any) {
-    const customVariableType: string = Array.isArray(customVariable) === false ? typeof customVariable : "array";
     const defaultVariableType: string = Array.isArray(defaultVariable) === false ? typeof defaultVariable : "array";
+    let customVariableType: string = Array.isArray(customVariable) === false ? typeof customVariable : "array";
+    if (defaultVariableType === "object" && defaultVariable != null && customVariableType === "array") {
+        // PHP sucks at differentiating an empty array from an empty object which can cause objects to appear as arrays with properties.
+        customVariable = { ...customVariable };
+        customVariableType = "object";
+    }
     const argumentTypes = [...new Set([customVariableType, defaultVariableType])];
     try {
         if (Array.isArray(customVariable) && Array.isArray(defaultVariable)) {

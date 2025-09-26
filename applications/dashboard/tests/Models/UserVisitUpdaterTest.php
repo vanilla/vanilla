@@ -42,7 +42,7 @@ class UserVisitUpdaterTest extends AbstractAPIv2Test
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

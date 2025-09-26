@@ -11,6 +11,8 @@ import { singleBorder } from "@library/styles/styleHelpers";
 import { viewHeight } from "csx";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { bodyStyleMixin } from "@library/layout/bodyStyles";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const widgetSettingsClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -61,11 +63,11 @@ export const widgetSettingsClasses = useThemeCache(() => {
     });
 
     const previewBody = css({
+        ...bodyStyleMixin(),
         position: "sticky",
         overflow: "auto",
         ...Mixins.margin({
             vertical: globalVars.spacer.panelComponent,
-            horizontal: globalVars.spacer.panelComponent,
         }),
         ...Mixins.border({
             radius: 6,
@@ -80,10 +82,22 @@ export const widgetSettingsClasses = useThemeCache(() => {
             border: "none",
             margin: 0,
         },
+
+        "&.titleBar": {
+            position: "relative",
+            minHeight: 200,
+        },
+    });
+
+    const previewContainer = css({
+        ...Mixins.margin({ horizontal: globalVars.spacer.panelComponent }),
     });
 
     const previewContent = css({
         padding: 16,
+        ".titleBar &": {
+            padding: 0,
+        },
         ...Mixins.margin({ vertical: 0 }),
         "& > div": {
             ...Mixins.margin({ vertical: 0 }),
@@ -130,12 +144,6 @@ export const widgetSettingsClasses = useThemeCache(() => {
     });
 
     const autocompleteContainer = css({
-        borderColor: ColorsUtils.colorOut(globalVars.border.color),
-
-        "&:focus, &:hover, &:active, &.focus-visible": {
-            borderColor: ColorsUtils.colorOut(globalVars.elementaryColors.primary),
-        },
-
         "& > input::placeholder": {
             color: "#aaadb1",
         },
@@ -158,6 +166,22 @@ export const widgetSettingsClasses = useThemeCache(() => {
         preview,
         previewHeader,
         previewBody,
+        previewContainer,
+        previewColorSwatch: css({
+            border: singleBorder(),
+            borderRadius: 6,
+            height: 24,
+        }),
+        previewColorLabel: css({
+            display: "inline-flex",
+            alignItems: "center",
+            margin: 0,
+            gap: 4,
+
+            "& strong": {
+                fontWeight: 600,
+            },
+        }),
         previewContent,
         settings,
         settingsHeader,

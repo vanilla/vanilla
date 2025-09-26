@@ -21,7 +21,7 @@ class MissedSpamTest extends SiteTestCase
     use UsersAndRolesApiTestTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -44,7 +44,7 @@ class MissedSpamTest extends SiteTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getAddons(): array
     {

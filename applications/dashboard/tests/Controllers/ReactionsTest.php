@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Dashboard\Controllers;
 
+use Gdn;
+use Gdn_UserException;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -23,11 +25,13 @@ class ReactionsTest extends SiteTestCase
     public static $addons = ["dashboard", "vanilla"];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
         parent::setUp();
+        $this->resetTable("Activity");
+        $this->resetTable("UserTag");
     }
 
     /**
@@ -191,5 +195,174 @@ class ReactionsTest extends SiteTestCase
         ]);
 
         $this->assertEmpty($log);
+    }
+
+    /**
+     * Test reacting to a wall comment works normally with the profiles.view permission.
+     */
+    public function testPostOnPublicProfileWall(): void
+    {
+        $comment = "Hello from the wall!";
+        $response = $this->bessy()->post("/activity/post", [
+            "Comment" => $comment,
+            "Format" => "Text",
+            "TransientKey" => Gdn::session()->transientKey(),
+        ]);
+
+        $activities = $response->Data["Activities"];
+        $this->assertCount(1, $activities);
+        $activity = $activities[0];
+        $reactingUser = $this->createUser();
+
+        $this->runWithUser(function () use ($activity) {
+            // React to the activity
+            $this->bessy()->post("react/activity/like?id={$activity["ActivityID"]}", [
+                "DeliveryType" => DELIVERY_TYPE_VIEW,
+                "DeliveryMethod" => DELIVERY_METHOD_JSON,
+                "TransientKey" => Gdn::session()->transientKey(),
+            ]);
+            $updatedActivity = Gdn::getContainer()
+                ->get(\ActivityModel::class)
+                ->getID($activity["ActivityID"]);
+            $this->assertSame(1, $updatedActivity["Data"]["React"]["Like"]);
+        }, $reactingUser);
+    }
+
+    /**
+     * Test that reacting to a public profile wall comment without profiles.view permission is denied.
+     */
+    public function testPostOnPublicProfileWithoutPermission(): void
+    {
+        $targetUser = $this->createUser();
+
+        // Make the target user's profile private
+        $userModel = Gdn::getContainer()->get(\UserModel::class);
+        $userModel->saveAttribute($targetUser["userID"], "Private", 0);
+
+        $this->resetTable("Activity");
+
+        $this->runWithUser(function () {
+            $comment = "Hello from the wall!";
+            $response = $this->bessy()->post("/activity/post", [
+                "Comment" => $comment,
+                "Format" => "Text",
+                "TransientKey" => Gdn::session()->transientKey(),
+            ]);
+
+            $activities = $response->Data["Activities"];
+            $this->assertCount(1, $activities);
+        }, $targetUser);
+
+        $activities = Gdn::getContainer()
+            ->get(\ActivityModel::class)
+            ->get()
+            ->resultArray();
+        $activity = $activities[0];
+
+        // Try to post on the private profile wall without personalInfo.view permission
+        $this->expectException(Gdn_UserException::class);
+        $this->expectExceptionMessage('You don\'t have permission to do that.');
+        $this->runWithPermissions(
+            function () use ($activity) {
+                $this->bessy()->post("react/activity/like?id={$activity["ActivityID"]}", [
+                    "DeliveryType" => DELIVERY_TYPE_VIEW,
+                    "DeliveryMethod" => DELIVERY_METHOD_JSON,
+                    "TransientKey" => Gdn::session()->transientKey(),
+                ]);
+            },
+            ["profiles.view" => false, "reactions.positive.add" => true]
+        );
+    }
+
+    /**
+     * Test that reacting to a private profile wall comment without personalInfo.view permission is denied.
+     */
+    public function testPostOnPrivateProfileWallWithoutPermission(): void
+    {
+        $reactingUser = $this->createUser();
+        $targetUser = $this->createUser();
+
+        $userModel = Gdn::getContainer()->get(\UserModel::class);
+        $userModel->saveAttribute($targetUser["userID"], "Private", 1);
+
+        $this->resetTable("Activity");
+
+        $this->runWithUser(function () {
+            $comment = "Hello from the wall!";
+            $response = $this->bessy()->post("/activity/post", [
+                "Comment" => $comment,
+                "Format" => "Text",
+                "TransientKey" => Gdn::session()->transientKey(),
+            ]);
+
+            $activities = $response->Data["Activities"];
+            $this->assertCount(1, $activities);
+        }, $targetUser);
+
+        $activities = Gdn::getContainer()
+            ->get(\ActivityModel::class)
+            ->get()
+            ->resultArray();
+        $activity = $activities[0];
+
+        // Try to post on the private profile wall without personalInfo.view permission
+        $this->expectException(Gdn_UserException::class);
+        $this->expectExceptionMessage('You don\'t have permission to do that.');
+
+        $this->runWithUser(function () use ($activity) {
+            $this->bessy()->post("react/activity/like?id={$activity["ActivityID"]}", [
+                "DeliveryType" => DELIVERY_TYPE_VIEW,
+                "DeliveryMethod" => DELIVERY_METHOD_JSON,
+                "TransientKey" => Gdn::session()->transientKey(),
+            ]);
+        }, $reactingUser);
+    }
+
+    /**
+     * Test that reacting to a private profile wall comment with personalInfo.view permission is allowed.
+     */
+    public function testPostOnPrivateProfileWallWithPermission(): void
+    {
+        $targetUser = $this->createUser();
+
+        // Make the target user's profile private
+        $userModel = Gdn::getContainer()->get(\UserModel::class);
+        $userModel->saveAttribute($targetUser["userID"], "Private", 1);
+
+        $this->resetTable("Activity");
+
+        $this->runWithUser(function () {
+            $comment = "Hello from the wall!";
+            $response = $this->bessy()->post("/activity/post", [
+                "Comment" => $comment,
+                "Format" => "Text",
+                "TransientKey" => Gdn::session()->transientKey(),
+            ]);
+
+            $activities = $response->Data["Activities"];
+            $this->assertCount(1, $activities);
+        }, $targetUser);
+
+        $activities = Gdn::getContainer()
+            ->get(\ActivityModel::class)
+            ->get()
+            ->resultArray();
+        $activity = $activities[0];
+
+        $this->runWithPermissions(
+            function () use ($activity) {
+                $this->bessy()->post("react/activity/like?id={$activity["ActivityID"]}", [
+                    "DeliveryType" => DELIVERY_TYPE_VIEW,
+                    "DeliveryMethod" => DELIVERY_METHOD_JSON,
+                    "TransientKey" => Gdn::session()->transientKey(),
+                ]);
+
+                $updatedActivity = Gdn::getContainer()
+                    ->get(\ActivityModel::class)
+                    ->getID($activity["ActivityID"]);
+                $this->assertSame(1, $updatedActivity["Data"]["React"]["Like"]);
+            },
+            ["personalInfo.view" => true, "reactions.positive.add" => true]
+        );
     }
 }

@@ -17,7 +17,7 @@ import { important, percent } from "csx";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { IRadioInputAsButtonClasses } from "@library/forms/radioAsButtons/RadioInputAsButton";
 import { formElementsVariables } from "@library/forms/formElementStyles";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 
 export const radioInputAsTabVariables = useThemeCache(() => {
     const globalVars = globalVariables();

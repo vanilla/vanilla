@@ -12,6 +12,7 @@ import { PermissionsFixtures } from "@library/features/users/Permissions.fixture
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/posts/__fixtures__/Discussion.Fixture";
+import { setMeta } from "@library/utility/appUtils";
 
 const renderInProvider = async (permissions?: string[]) => {
     const queryClient = new QueryClient({
@@ -58,7 +59,14 @@ const renderInProvider = async (permissions?: string[]) => {
                 >
                     <PermissionsFixtures.SpecificPermissions
                         permissions={[
-                            ...["discussions.moderate", "community.moderate", "discussions.manage", "community.manage"],
+                            ...[
+                                "discussions.moderate",
+                                "community.moderate",
+                                "discussions.edit",
+                                "discussions.delete",
+                                "site.manage",
+                                "community.manage",
+                            ],
                             ...(permissions ?? []),
                         ]}
                     >
@@ -71,6 +79,9 @@ const renderInProvider = async (permissions?: string[]) => {
 };
 
 describe("Discussion List Options Menu", () => {
+    beforeEach(() => {
+        setMeta("tagging.enabled", true);
+    });
     it("Check some default options, each option will depend on permission", async () => {
         await renderInProvider();
         const button = await screen.findByRole("button", { name: "Discussion Options" });
@@ -79,12 +90,12 @@ describe("Discussion List Options Menu", () => {
         fireEvent.click(button);
 
         const editOption = await screen.findByText("Edit");
-        const moveOption = await screen.findByText("Move");
-        const changePostTypeOption = await screen.findByText("Change Post Type");
+        const moveOption = await screen.findByText("Move Post");
+
         const announceOption = await screen.findByText("Announce");
         const deleteOption = await screen.findByText("Delete");
         const sinkOption = await screen.findByText("Sink");
-        [editOption, moveOption, changePostTypeOption, announceOption, deleteOption, sinkOption].forEach((option) => {
+        [editOption, moveOption, announceOption, deleteOption, sinkOption].forEach((option) => {
             expect(option).toBeInTheDocument();
         });
     });
@@ -116,21 +127,40 @@ describe("Discussion List Options Menu", () => {
         expect(createArticleOption).toBeInTheDocument();
     });
 
+    it("Move and Change post type are available with discussions.edit", async () => {
+        await renderInProvider(["discussions.edit"]);
+        const button = await screen.getByRole("button", { name: "Discussion Options" });
+        expect(button).toBeInTheDocument();
+
+        fireEvent.click(button);
+
+        const dropdownItems = document.querySelector(".dropDownItems");
+
+        let options: string[] = [];
+
+        dropdownItems?.childNodes.forEach((item) => {
+            if (item.textContent && item.textContent !== "Loading" && item.textContent !== "") {
+                options.push(item.textContent);
+            }
+        });
+        expect(screen.getByText("Move Post")).toBeInTheDocument();
+        expect(screen.getByText("Change Post Type")).toBeInTheDocument();
+    });
+
     it("Check dropdown options order", async () => {
         const expectedItemsByGroups = [
             "Edit",
             "Second Option In First Group",
             "Dismissoff", // "off" is added to the end of the name, in reality its visually hidden
-            "Move",
-            "Fifth Option In First Group",
             "Delete",
+            "Fifth Option In First Group",
+            "Move Post",
             "Change Post Type",
             "Tag",
             "Announce",
             "Change Author",
-            "Change Type",
-            "Option In Moderation Group",
             "Add to Collection",
+            "Option In Moderation Group",
             "Bump",
             "Sinkoff", // "off" is added to the end of the name, in reality its visually hidden
             "Option In Status Group",
@@ -138,7 +168,6 @@ describe("Discussion List Options Menu", () => {
             "Revision History",
             "Deleted Comments",
             "Check Analytics Data",
-            "Report",
         ];
         addDiscussionOption({
             permission: {
@@ -195,7 +224,7 @@ describe("Discussion List Options Menu", () => {
             }
         });
         options.forEach((option, index) => {
-            expect(index).toBe(expectedItemsByGroups.indexOf(option));
+            expect(index, `Expected ${option} to be at index ${index}`).toBe(expectedItemsByGroups.indexOf(option));
         });
     });
 });

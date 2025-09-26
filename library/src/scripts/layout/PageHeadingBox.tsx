@@ -17,7 +17,7 @@ import {
 import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import React, { useRef } from "react";
 
-interface IProps {
+interface IHeadingBoxProps {
     title: React.ReactNode;
     description?: React.ReactNode;
     subtitle?: React.ReactNode;
@@ -30,11 +30,11 @@ interface IProps {
     pageHeadingClasses?: string;
 }
 
-export function PageHeadingBox(props: IProps) {
+export function PageHeadingBox(props: IHeadingBoxProps) {
     const { title, description, subtitle, actions, includeBackLink, titleCount, classNames, pageHeadingClasses } =
         props;
-    const options = pageHeadingBoxVariables(props.options).options;
-    const classes = pageHeadingBoxClasses(props.options);
+    const options = pageHeadingBoxVariables.useAsHook(props.options).options;
+    const classes = pageHeadingBoxClasses.useAsHook(props.options);
     const { subtitleType } = options;
     const contextClasses = useWidgetSectionClasses();
 

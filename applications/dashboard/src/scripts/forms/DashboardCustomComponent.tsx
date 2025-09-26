@@ -6,10 +6,29 @@
 import React from "react";
 import { IControlProps, ICustomControl } from "@vanilla/json-schema-forms/src/types";
 import { DashboardInputWrap } from "@dashboard/forms/DashboardInputWrap";
+import { getComponent } from "@library/utility/componentRegistry";
+import ErrorMessages from "@library/forms/ErrorMessages";
 
 export function DashboardCustomComponent(props: IControlProps<ICustomControl>) {
     const { control, instance, onChange, errors } = props;
-    const CustomComponent = control.component;
+    let CustomComponent: any = control.component;
+
+    if (typeof CustomComponent === "string") {
+        const foundComponent = getComponent(CustomComponent);
+        if (foundComponent) {
+            CustomComponent = foundComponent.Component;
+        } else {
+            return (
+                <ErrorMessages
+                    errors={[
+                        {
+                            message: `Custom component ${CustomComponent} not found.`,
+                        },
+                    ]}
+                />
+            );
+        }
+    }
 
     return (
         <DashboardInputWrap>

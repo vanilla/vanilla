@@ -18,6 +18,13 @@ export const carouselClasses = useThemeCache(() => {
 
     const sectionWrapper = style("sectionWrapper", {
         position: "relative",
+        opacity: 1,
+        transition: "opacity 0.1s ease-in-out",
+
+        "&.visuallyHidden": {
+            // We are still measuring the carousel.
+            opacity: 0,
+        },
     });
 
     const skipCarousel = style("skipCarousel", {

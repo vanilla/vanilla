@@ -41,7 +41,7 @@ use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeFeatures;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
-use Vanilla\Web\Middleware\ChunkingMiddleware;
+use Vanilla\Web\Middleware\TextFragmentationMiddleware;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
 use Vanilla\Web\Page;
 
@@ -85,6 +85,11 @@ class Bootstrap
             ->setConstructorArgs([null, null])
 
             ->rule(LayoutHydrator::class)
+            ->setShared(true)
+            ->addCall("addLayoutView", [new Reference(Vanilla\Layout\View\CustomPageLayoutView::class)])
+
+            ->rule(Vanilla\Widgets\React\FragmentMeta::class)
+            ->setInherit(true)
             ->setShared(true);
 
         // Tracking
@@ -117,6 +122,17 @@ class Bootstrap
         $container->rule(Vanilla\Web\BotDetector::class)->setShared(true);
         $container->rule(TraceCollector::class)->setShared(true);
 
+        $container
+            ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
+            ->setClass(\Vanilla\Site\ApplicationProvider::class)
+            ->addCall("add", [
+                new Reference(\Vanilla\Site\Application::class, [
+                    "garden",
+                    ["api", "entry", "sso", "utility", "robots.txt", "robots"],
+                ]),
+            ])
+            ->setShared(true);
+
         // Image Srcset
         $container
             ->rule(ImageSrcSetService::class)
@@ -131,6 +147,8 @@ class Bootstrap
             ->addAlias("AddonManager")
             ->addCall("registerAutoloader");
 
+        $container->rule(Vanilla\Feature\FeatureService::class)->setShared(true);
+
         // Attachements
         $container->rule(Vanilla\Dashboard\Models\AttachmentService::class)->setShared(true);
 
@@ -141,7 +159,7 @@ class Bootstrap
             ->addAlias(\Vanilla\Contracts\Analytics\ClientInterface::class)
 
             ->rule(Page::class)
-            ->addCall("registerReduxActionProvider", ["provider" => new Reference(AnalyticsActionsProvider::class)]);
+            ->addCall("registerPreloader", ["provider" => new Reference(AnalyticsActionsProvider::class)]);
 
         // Models
         $container
@@ -196,6 +214,12 @@ class Bootstrap
 
             ->rule(\Gdn_Validation::class)
             ->addCall("addRule", ["plainTextLength", new Reference(PlainTextLengthValidator::class)])
+
+            ->rule(\Gdn_Validation::class)
+            ->addCall("addRule", [
+                "nonformattedPlainTextLength",
+                new Reference(NonformattedPlainTextLengthValidator::class),
+            ])
 
             ->rule(self::CACHE_FAST)
             ->setShared(true)
@@ -265,7 +289,7 @@ class Bootstrap
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
-            ->addCall("addMiddleware", [new Reference(ChunkingMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(TextFragmentationMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ApiSelectMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(Vanilla\Web\ApiExtensionMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\ValidateUTF8Middleware::class)])
@@ -333,6 +357,7 @@ class Bootstrap
             ->setShared(true)
             ->addCall("addLayoutRecordProvider", [new Reference(GlobalLayoutRecordProvider::class)])
             ->addCall("addLayoutRecordProvider", [new Reference(Vanilla\Layout\SiteSectionLayoutRecordProvider::class)])
+            ->addCall("addLayoutRecordProvider", [new Reference(Vanilla\Layout\CustomPageLayoutRecordProvider::class)])
 
             ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
             ->setShared(true)

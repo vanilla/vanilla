@@ -5,7 +5,7 @@
  */
 
 import { ISuggestedContentProps, SuggestedContent } from "./SuggestedContent";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { ISuggestedFollowsProps, SuggestedFollows } from "./SuggestedFollows";

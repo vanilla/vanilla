@@ -9,7 +9,7 @@ namespace Vanilla\Forum\Widgets;
 use Gdn;
 use Garden\Schema\Schema;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\WidgetSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
@@ -18,12 +18,17 @@ use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
 /**
  * Class GuestCallToActionWidget
  */
-class GuestCallToActionWidget extends AbstractReactModule implements CombinedPropsWidgetInterface
+class GuestCallToActionWidget extends LegacyReactModule implements CombinedPropsWidgetInterface
 {
     use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
     use WidgetSchemaTrait;
     use CallToActionWidgetTrait;
+
+    public static function getFragmentTypes(): array
+    {
+        return ["CallToActionFragment"];
+    }
 
     /**
      * @inheritdoc
@@ -39,6 +44,14 @@ class GuestCallToActionWidget extends AbstractReactModule implements CombinedPro
     public static function getWidgetName(): string
     {
         return "Guest Sign In";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Call to Action";
     }
 
     /**
@@ -94,7 +107,7 @@ class GuestCallToActionWidget extends AbstractReactModule implements CombinedPro
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

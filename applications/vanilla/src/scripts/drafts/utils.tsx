@@ -4,8 +4,7 @@
  * @license Proprietary
  */
 
-import { ITag } from "@library/features/tags/TagsReducer";
-import { safelyParseJSON, safelySerializeJSON } from "@library/utility/appUtils";
+import { safelyParseJSON, safelySerializeJSON, getSiteSection } from "@library/utility/appUtils";
 import { MyValue } from "@library/vanilla-editor/typescript";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
 import { CommentEditor } from "@vanilla/addon-vanilla/comments/CommentEditor";
@@ -14,14 +13,19 @@ import {
     CommentDraftMeta,
     CreatePostParams,
     DraftAttributes,
+    DraftRecordType,
     EditExistingPostParams,
+    IDraft,
     IDraftProps,
+    ILegacyDraft,
+    LegacyDraftAttributes,
     PostDraftMeta,
     PostPageParams,
 } from "@vanilla/addon-vanilla/drafts/types";
 import { ICreatePostForm } from "@vanilla/addon-vanilla/createPost/CreatePostFormAsset.hooks";
 import { logError, RecordID } from "@vanilla/utils";
 import { ComponentProps } from "react";
+import { getJSLocaleKey } from "@vanilla/i18n";
 
 export const EMPTY_DRAFT: MyValue = [{ type: "p", children: [{ text: "" }] }];
 
@@ -34,9 +38,13 @@ export const EMPTY_DRAFT: MyValue = [{ type: "p", children: [{ text: "" }] }];
  * - /post/editdiscussion/:discussionID?/:draftID?
  */
 export const getParamsFromPath = (path: string, search: string): CreatePostParams | EditExistingPostParams | null => {
-    const urlParts = path.split("/").filter((part) => part.length > 0);
-    const isPost = urlParts?.[0].includes("post");
-    const isEdit = urlParts?.[1].includes("editdiscussion");
+    const siteSection = getSiteSection();
+
+    const pathWithoutSiteSection = siteSection?.basePath ? path.replace(siteSection.basePath, "") : path;
+    const urlParts = pathWithoutSiteSection.split("/").filter((part) => part.length > 0);
+
+    const isPost = urlParts?.[0]?.includes("post");
+    const isEdit = urlParts?.[1]?.includes("editdiscussion");
 
     let params: any = {};
     if (isPost) {
@@ -104,10 +112,24 @@ export function isPostPageParams(
     return (hasDiscussionID || hasCommentID) && !hasType;
 }
 
-export function isPostDraftMeta(
-    meta: Partial<PostDraftMeta> | Partial<CommentDraftMeta>,
-): meta is Partial<PostDraftMeta> {
-    const potentialFields = ["title", "postMeta", "tags", "pinLocation"];
+//DELETE ME
+const isLegacyPostDraftAttributes = (attributes: any): attributes is LegacyDraftAttributes => {
+    return attributes && typeof attributes === "object" && "type" in attributes && attributes["type"] === "Discussion";
+};
+
+export const isLegacyDraft = (draft: IDraft | ILegacyDraft | DraftsApi.PostParams): draft is ILegacyDraft => {
+    const { attributes } = draft;
+    return (
+        !!attributes && typeof attributes === "object" && "type" in attributes && attributes["type"] === "Discussion"
+    );
+};
+
+export const isNotLegacyDraft = (draft: IDraft | ILegacyDraft | DraftsApi.PostParams): draft is IDraft => {
+    return !isLegacyDraft(draft);
+};
+
+function isPostDraftMeta(meta: Partial<PostDraftMeta> | Partial<CommentDraftMeta>): meta is Partial<PostDraftMeta> {
+    const potentialFields = ["name", "postMeta", "tags", "tagIDs", "pinLocation"];
     return potentialFields.some((field) => field in meta);
 }
 
@@ -116,33 +138,38 @@ export function isCommentDraftMeta(meta: Partial<PostDraftMeta> | Partial<Commen
     return potentialFields.every((field) => field in meta);
 }
 
-export interface MakePostDraftParams {
-    body: string | MyValue;
-    format: string | null;
-    name: string;
-    postMeta?: Record<string, any>;
-    tags?: Array<ITag["tagID"]>;
-    pinLocation?: ICreatePostForm["pinLocation"];
-    categoryID?: ICreatePostForm["categoryID"];
-    postTypeID?: ICreatePostForm["postTypeID"];
+export interface MakePostDraftParams
+    extends Pick<
+            ICreatePostForm,
+            "body" | "format" | "name" | "tagIDs" | "newTagNames" | "pinLocation" | "pinned" | "categoryID"
+        >,
+        Partial<Pick<ICreatePostForm, "postMeta" | "postTypeID">>,
+        Partial<Pick<IDraft, "dateScheduled" | "draftStatus">> {
     /** Used if we are to create drafts for edited posts */
-    discussionID?: RecordID;
+    recordID?: RecordID;
     groupID?: RecordID;
 }
 
 export const makePostDraft = (params: Partial<MakePostDraftParams>): DraftsApi.PostParams => {
-    const { body, format, name, postMeta, tags, pinLocation, discussionID, categoryID, postTypeID, groupID } =
+    const { body, format, name, postMeta, tagIDs, newTagNames, pinLocation, categoryID, postTypeID, groupID } =
         params ?? {};
     // Always serialize the body if it's rich2
     const serializedBody = format?.toLowerCase() === "rich2" || isMyValue(body) ? safelySerializeJSON(body) : body;
 
+    const shouldIncludePinnedParams = !!pinLocation;
+    const pinned = pinLocation !== "none";
+
     const draftMeta: Partial<PostDraftMeta> = {
         name,
         postMeta,
-        tags: tags ?? [],
-        pinLocation: pinLocation ?? "none",
+        tagIDs,
+        newTagNames,
         categoryID,
         postTypeID,
+        ...(shouldIncludePinnedParams && {
+            pinLocation,
+            pinned,
+        }),
     };
 
     const attributes: DraftAttributes = {
@@ -156,51 +183,131 @@ export const makePostDraft = (params: Partial<MakePostDraftParams>): DraftsApi.P
         ...(name && { name }),
     };
 
-    const payload: DraftsApi.PostParams = {
-        recordType: "discussion",
+    const payload = {
+        recordType: DraftRecordType.DISCUSSION,
         attributes,
         ...(categoryID ? { parentRecordID: categoryID, parentRecordType: "category" } : {}),
+        ...(params.draftStatus && { draftStatus: params.draftStatus, dateScheduled: params.dateScheduled }),
+        ...(params.recordID && { recordID: params.recordID }),
     };
 
     return payload;
 };
 
+export function groupDraftsByDateScheduled(
+    drafts: IDraft[],
+    localeKey?: string, // test purposes
+    options?: any, // test purposes
+): Record<string, IDraft[]> {
+    const dateFormat = {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+    } as Intl.DateTimeFormatOptions;
+
+    const today = new Date().toLocaleString(getJSLocaleKey(), dateFormat);
+
+    const draftsByScheduledDate = drafts.reduce((groups, draft) => {
+        if (!draft.dateScheduled) {
+            return groups;
+        }
+
+        let dateScheduledLocalDate = new Date(draft.dateScheduled ?? "").toLocaleString(
+            localeKey ?? getJSLocaleKey(),
+            options ?? dateFormat,
+        );
+
+        if (dateScheduledLocalDate === today) {
+            dateScheduledLocalDate = new Date(draft.dateScheduled ?? "").toLocaleString(
+                localeKey ?? getJSLocaleKey(),
+                options ?? { ...dateFormat, hour: "numeric", minute: "numeric" },
+            );
+        }
+
+        if (!groups[dateScheduledLocalDate]) {
+            groups[dateScheduledLocalDate] = [];
+        }
+        groups[dateScheduledLocalDate].push(draft);
+        return groups;
+    }, {});
+    return Object.keys(draftsByScheduledDate).length ? draftsByScheduledDate : {};
+}
 /**
  * Converts a draft to a new post body values
  */
-export const makePostFormValues = (draft: DraftsApi.PostParams): Partial<ICreatePostForm> | undefined => {
-    const { attributes } = draft;
-    const { body, format, draftMeta, groupID } = attributes;
+export const mapDraftToPostFormValues = (draft: DraftsApi.PostParams): Partial<ICreatePostForm> | undefined => {
+    if (isLegacyDraft(draft)) {
+        return convertLegacyPostDraft(draft);
+    }
 
-    if (draftMeta && isPostDraftMeta(draftMeta)) {
+    if (isNotLegacyDraft(draft)) {
+        const { attributes } = draft;
+        const { body, format, draftMeta, groupID } = attributes ?? {};
+
+        if (draftMeta && isPostDraftMeta(draftMeta)) {
+            let safeBody: MyValue | undefined = EMPTY_DRAFT;
+            if (body && format === "rich2") {
+                const parsed: MyValue = safelyParseJSON(body);
+                safeBody = parsed ?? body;
+            } else if (isMyValue(body)) {
+                safeBody = body;
+            }
+
+            return {
+                name: draftMeta?.name,
+                body: safeBody,
+                format,
+                postMeta: draftMeta?.postMeta,
+                tagIDs:
+                    !!draftMeta.tags || !!draftMeta.tagIDs
+                        ? // some drafts may still have the `tags` property -- if present, combine them with tagIDs
+                          Array.from(new Set((draftMeta.tags ?? []).concat(draftMeta?.tagIDs ?? [])))
+                        : undefined,
+                newTagNames: draftMeta?.newTagNames,
+                pinLocation: draftMeta?.pinLocation ?? "none",
+                pinned: draftMeta?.pinned ?? false,
+                categoryID: draftMeta?.categoryID,
+                postTypeID: draftMeta?.postTypeID,
+                groupID: groupID,
+            };
+        } else {
+            logError("Invalid draft meta", draft);
+        }
+    }
+};
+
+function convertLegacyPostDraft(draft: any): Partial<ICreatePostForm> | undefined {
+    if (!isLegacyDraft(draft)) {
+        logError("Draft attributes contain unknown structure", draft);
+        return undefined;
+    }
+
+    if (isLegacyDraft(draft)) {
+        const attributes = draft?.attributes;
+
+        const { body, format, name, announce } = attributes;
+
         let safeBody: MyValue | undefined = EMPTY_DRAFT;
-        if (body && format === "rich2") {
+        if (body && format?.toLowerCase() === "rich2") {
             const parsed: MyValue = safelyParseJSON(body);
             safeBody = parsed ?? body;
         } else if (isMyValue(body)) {
             safeBody = body;
         }
 
-        if (body && format === "rich2") {
-            const parsed: MyValue = safelyParseJSON(body);
-            safeBody = parsed ?? body;
-        }
+        const pinLocation = announce === "0" ? "none" : announce === "1" ? "category" : "recent";
 
         return {
-            name: draftMeta?.name,
+            name,
             body: safeBody,
-            format,
-            postMeta: draftMeta?.postMeta,
-            tags: draftMeta?.tags,
-            pinLocation: draftMeta?.pinLocation ?? "none",
-            categoryID: draftMeta?.categoryID,
-            postTypeID: draftMeta?.postTypeID,
-            groupID: groupID,
+            format: format?.toLowerCase(),
+            pinLocation,
+            pinned: false,
+            categoryID: draft.parentRecordID,
+            postTypeID: draft.recordType,
         };
-    } else {
-        logError("Invalid draft meta", draftMeta);
     }
-};
+}
 
 export interface MakeCommentDraftParams extends Omit<CommentDraftMeta, "body" | "commentParentID" | "commentPath"> {
     parentRecordID: RecordID;
@@ -236,8 +343,8 @@ export const makeCommentDraft = (params: MakeCommentDraftParams): DraftsApi.Post
         lastSaved: new Date().toISOString(),
     };
 
-    const payload: DraftsApi.PostParams = {
-        recordType: "comment",
+    const payload = {
+        recordType: DraftRecordType.COMMENT,
         attributes,
         ...(parentRecordType && { parentRecordType }),
         ...(parentRecordID && { parentRecordID }),
@@ -248,11 +355,16 @@ export const makeCommentDraft = (params: MakeCommentDraftParams): DraftsApi.Post
 
 export interface CommentEditorDraftProps
     extends Pick<ComponentProps<typeof CommentEditor>, "draft" | "draftLastSaved"> {}
+
 export const makeCommentDraftProps = (
     draftID: RecordID | null,
     draft: DraftsApi.PostParams,
 ): IDraftProps | undefined => {
-    if (draftID && draft && isCommentDraftMeta(draft?.attributes?.draftMeta ?? {})) {
+    if (isLegacyPostDraftAttributes(draft.attributes)) {
+        return undefined;
+    }
+
+    if (draftID && draft && isCommentDraftMeta(draft.attributes ?? {})) {
         return {
             draft: {
                 draftID,

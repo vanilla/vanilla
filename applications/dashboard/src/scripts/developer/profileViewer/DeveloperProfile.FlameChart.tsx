@@ -19,7 +19,7 @@ import { DataList } from "@library/dataLists/DataList";
 import { toolTipClasses } from "@library/toolTip/toolTipStyles";
 import { useMeasure } from "@vanilla/react-utils";
 import { notEmpty } from "@vanilla/utils";
-import { FlameChartNode } from "flame-chart-js/dist/types";
+import { FlameChartNode } from "flame-chart-js";
 import React, { useMemo, useRef, useState } from "react";
 import { DeveloperProfileSpanDetails } from "@dashboard/developer/profileViewer/DeveloperProfile.SpanDetails";
 
@@ -73,9 +73,9 @@ export function DeveloperProfileFlameChart(props: IProps) {
     const [mousePosition, setMousePosition] = useState<IMousePosition | null>(null);
     const tooltipSpan = tooltipUuid ? profile.spans[tooltipUuid] ?? null : null;
     const containerRef = useRef<HTMLDivElement | null>(null);
-    const containerMeasure = useMeasure(containerRef, false, true);
+    const containerMeasure = useMeasure(containerRef, { watchRef: true });
     const tooltipContentRef = useRef<HTMLDivElement | null>(null);
-    const tooltipContentMeasure = useMeasure(tooltipContentRef, false, true);
+    const tooltipContentMeasure = useMeasure(tooltipContentRef, { watchRef: true });
 
     const flameClass = useMemo(() => {
         const flameClass = css({

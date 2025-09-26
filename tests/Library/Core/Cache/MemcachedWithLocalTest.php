@@ -14,7 +14,7 @@ use Psr\SimpleCache\CacheInterface;
  */
 class MemcachedWithLocalTest extends MemcachedTest {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function __construct($name = null, array $data = [], $dataName = '') {
         parent::__construct($name, $data, $dataName);
@@ -22,7 +22,7 @@ class MemcachedWithLocalTest extends MemcachedTest {
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();

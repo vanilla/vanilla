@@ -14,6 +14,7 @@ use Garden\Web\Exception\NotFoundException;
 use Gdn;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Events\LayoutEvent;
+use Vanilla\Dashboard\Models\FragmentView;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
@@ -24,6 +25,8 @@ use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
+use Vanilla\Models\ModelCache;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 
 /**
@@ -54,7 +57,7 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
         $dateFieldProcessor->camelCase();
         $this->addPipelineProcessor($dateFieldProcessor);
 
-        $jsonFieldProcessor->setFields(["layout"]);
+        $jsonFieldProcessor->setFields(["layout", "titleBar"]);
         $this->addPipelineProcessor($jsonFieldProcessor);
 
         $this->resourceEventProcessor->setResourceEventClass(LayoutEvent::class);
@@ -80,6 +83,7 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
             ->column("name", "varchar(100)", false)
             ->column("layoutViewType", "varchar(40)", false)
             ->column("layout", "mediumtext", false)
+            ->column("titleBar", "mediumtext", true)
             ->column("insertUserID", "int", false)
             ->column("dateInserted", "datetime", false)
             ->column("updateUserID", "int", null)
@@ -103,6 +107,11 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
     public function normalizeRow(array $row, $expand = false): array
     {
         // File-based layouts are set as defaults, which have string IDs
+        if (empty($row["titleBar"])) {
+            $row["titleBar"] = [
+                "\$hydrate" => "react.titleBar",
+            ];
+        }
         $row["isDefault"] = !is_numeric($row["layoutID"]);
         if (ModelUtils::isExpandOption("layoutViews", $expand)) {
             $allLayoutViewsForLayoutViewType = $this->layoutViewModel->normalizeRows(
@@ -263,6 +272,7 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
             "layoutViewType:s",
             "isDefault:b",
             "layout:a",
+            "titleBar" => $this->getTitleBarSchema(),
             "seo:o",
             "contexts:a?",
         ]);
@@ -275,7 +285,20 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      */
     public function getFullSchema(): Schema
     {
-        return $this->getMetadataSchema()->merge(Schema::parse(["layout:a"]));
+        return $this->getMetadataSchema()->merge(Schema::parse(["layout:a", "titleBar" => $this->getTitleBarSchema()]));
+    }
+
+    /**
+     * @return Schema
+     */
+    public function getTitleBarSchema(): Schema
+    {
+        return new Schema([
+            "type" => "object",
+            "default" => [
+                "\$hydrate" => "react.titleBar",
+            ],
+        ]);
     }
 
     /**
@@ -285,7 +308,12 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      */
     public function getEditSchema(): Schema
     {
-        return Schema::parse(["layoutID:i|s", "name:s" => ["maxLength" => 100], "layout:a"]);
+        return Schema::parse([
+            "layoutID:i|s",
+            "name:s" => ["maxLength" => 100],
+            "layout:a",
+            "titleBar" => $this->getTitleBarSchema(),
+        ]);
     }
 
     /**
@@ -298,6 +326,7 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
         return Schema::parse([
             "name:s?" => ["maxLength" => 100],
             "layout:a?",
+            "titleBar?" => $this->getTitleBarSchema(),
         ]);
     }
 
@@ -314,6 +343,7 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
             "name:s" => ["maxLength" => 100],
             "layoutViewType:s" => ["enum" => $viewTypes],
             "layout:a",
+            "titleBar?" => $this->getTitleBarSchema(),
         ]);
     }
     //endregion
@@ -407,6 +437,62 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
         }
         return $row;
     }
+
+    /**
+     * Get fragment UUIDs that are applied to any layout.
+     *
+     * @return array<FragmentView>
+     */
+    public function getFragmentViews(): array
+    {
+        return $this->modelCache->getCachedOrHydrate(
+            ["layoutFragmentViews"],
+            function () {
+                $iterator = $this->database
+                    ->createSql()
+                    ->select("layoutID")
+                    ->select("layout")
+                    ->select("name")
+                    ->select("layoutViewType")
+                    ->from("layout")
+                    ->chunkByID("layoutID");
+
+                $fragmentViews = [];
+                foreach ($iterator as $row) {
+                    $layout = json_decode($row["layout"], true);
+                    $layoutID = $row["layoutID"];
+                    $layoutName = $row["name"];
+                    $layoutViewType = $row["layoutViewType"];
+                    ArrayUtils::walkRecursiveArray($layout, function (array &$values) use (
+                        $layoutID,
+                        &$fragmentViews,
+                        $layoutName,
+                        $layoutViewType
+                    ) {
+                        $impls = $values["\$fragmentImpls"] ?? [];
+                        foreach ($impls as $fragmentImpl) {
+                            $fragmentUUID = $fragmentImpl["fragmentUUID"] ?? null;
+                            if ($fragmentUUID === null) {
+                                continue;
+                            }
+                            $slug = slugify($layoutName);
+                            $fragmentViews[] = new FragmentView(
+                                $fragmentUUID,
+                                recordType: "layout",
+                                recordID: $layoutID,
+                                recordName: $layoutName,
+                                recordUrl: url("/appearance/layouts/$layoutViewType/{$layoutID}-{$slug}", true)
+                            );
+                        }
+                    });
+                }
+
+                return $fragmentViews;
+            },
+            cacheOptions: [ModelCache::OPT_TTL => 60 * 60]
+        );
+    }
+
     //endregion
     //endregion
 

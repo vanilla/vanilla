@@ -74,7 +74,7 @@ const carouselSlice = createSlice({
     },
 });
 
-export function useCarousel(countSlides: number, sliderWidth: number, options: CarouselOptions = {}) {
+export function useCarousel(countSlides: number, options: CarouselOptions = {}) {
     const { toShow = 1, childWidth = 0, sliderWrapper } = options;
     const [state, dispatch] = useReducer(carouselSlice.reducer, initCarouselState);
     let sliderPosition: number = toShow === 1 ? -20 : 0;
@@ -142,9 +142,6 @@ export function useCarousel(countSlides: number, sliderWidth: number, options: C
         trackTouch: true,
         preventDefaultTouchmoveEvent: true,
     });
-
-    //Update Carousel
-    useEffect(() => {}, [state.desiredIndex]);
 
     //Update sliderPosition
     if (state.desiredIndex > state.activeIndex) {

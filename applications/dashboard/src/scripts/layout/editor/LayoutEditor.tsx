@@ -17,6 +17,7 @@ import {
     LayoutEditorSelectionState,
 } from "@dashboard/layout/editor/LayoutEditorSelection";
 import { LayoutEditorWidgetWrapper } from "@dashboard/layout/editor/LayoutEditorWidgetContext";
+import { LayoutEditorWidgetMeta } from "@dashboard/layout/editor/LayoutEditorWidgetMeta";
 import LayoutSectionsThumbnails from "@dashboard/layout/editor/thumbnails/LayoutSectionsThumbnails";
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import {
@@ -25,16 +26,33 @@ import {
     ILayoutDraft,
     LayoutSectionID,
     LayoutViewType,
+    type ILayoutEditorWidgetPath,
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { FauxWidget } from "@dashboard/layout/overview/LayoutOverview";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
+import { useEditorRolePreviewContext } from "@dashboard/roles/EditorRolePreviewContext";
+import {
+    DndContext,
+    DragOverlay,
+    KeyboardSensor,
+    MouseSensor,
+    pointerWithin,
+    rectIntersection,
+    TouchSensor,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
+import { snapCenterToCursor } from "@dnd-kit/modifiers";
 import { LayoutLookupContext, LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
-import { extractSchemaDefaults } from "@library/json-schema-forms";
-import Container, { ContainerContextReset, ContainerWidthContextProvider } from "@library/layout/components/Container";
+import Container, { ContainerContextReset } from "@library/layout/components/Container";
 import { DeviceProvider } from "@library/layout/DeviceContext";
-import { LinkContext, LINK_CONTEXT_DEFAULTS } from "@library/routing/links/LinkContextProvider";
+import { StickyContextProvider, useStickyContext } from "@library/modal/StickyContext";
+import { LINK_CONTEXT_DEFAULTS, LinkContext } from "@library/routing/links/LinkContextProvider";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+import { singleBorder } from "@library/styles/styleHelpersBorders";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import { useUniqueID } from "@library/utility/idUtils";
+import { Icon } from "@vanilla/icons";
 import { useFocusWatcher } from "@vanilla/react-utils";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 
@@ -42,6 +60,9 @@ const EditorContext = React.createContext<{
     layoutViewType: LayoutViewType;
     editorContents: LayoutEditorContents;
     editorSelection: LayoutEditorSelection;
+    draggingWidgetPath: ILayoutEditorWidgetPath | null;
+    setDraggingWidgetPath: (path: ILayoutEditorWidgetPath | null) => void;
+    debugDroppables?: boolean;
 }>({} as any);
 
 export function useLayoutEditor() {
@@ -65,9 +86,26 @@ export function LayoutEditor(props: IProps) {
 function LayoutEditorImpl(props: IProps) {
     const { catalog } = props;
     const ref = useRef<HTMLDivElement | null>(null);
+    const stickyPortalRef = useRef<HTMLDivElement | null>(null);
 
-    const { editorContents, editorSelection } = useLayoutEditor();
+    const { editorContents, editorSelection, draggingWidgetPath, setDraggingWidgetPath } = useLayoutEditor();
     const [initialSectionID, setInitialSectionID] = useState<LayoutSectionID | null>(null);
+
+    const sensors = useSensors(
+        useSensor(MouseSensor, {
+            activationConstraint: {
+                delay: 100,
+                tolerance: 5,
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                delay: 100,
+                tolerance: 5,
+            },
+        }),
+        useSensor(KeyboardSensor),
+    );
 
     useEffect(() => {
         // We need to pre-hydrate a section with required assets
@@ -89,7 +127,7 @@ function LayoutEditorImpl(props: IProps) {
     }, [catalog.assets, catalog.layoutViewType]);
 
     useFocusWatcher(ref, (hasFocus, elementFocused) => {
-        const focusIsInLayoutEditorModal = elementFocused?.closest("[data-layout-editor-modal]");
+        const focusIsInLayoutEditorModal = elementFocused?.closest("[data-layout-editor-focus-container]");
         if (elementFocused && !hasFocus && !focusIsInLayoutEditorModal) {
             editorSelection.stashState();
         } else if (hasFocus && elementFocused === ref.current) {
@@ -101,6 +139,10 @@ function LayoutEditorImpl(props: IProps) {
      * Keyboard handler for arrow up and arrow down.
      */
     function onKeyDown(e: React.KeyboardEvent) {
+        if (draggingWidgetPath !== null) {
+            // we are using drag shortcuts.
+            return;
+        }
         if (e.target === ref.current) {
             // Focus is currently on ourself.
             if (e.key === "Enter") {
@@ -150,14 +192,16 @@ function LayoutEditorImpl(props: IProps) {
                 }
                 break;
             case "Escape":
+                const path = editorSelection.getPath();
                 if (
                     editorSelection.getMode() === LayoutEditorSelectionMode.WIDGET &&
-                    editorSelection.getPath() !== null
+                    path !== null &&
+                    !LayoutEditorPath.isSpecialWidgetPath(path)
                 ) {
                     e.preventDefault();
                     e.stopPropagation();
                     editorSelection.moveSelectionTo(
-                        LayoutEditorPath.section(editorSelection.getPath().sectionIndex),
+                        LayoutEditorPath.section(path.sectionIndex),
                         LayoutEditorSelectionMode.SECTION,
                     );
                 } else if (
@@ -174,6 +218,8 @@ function LayoutEditorImpl(props: IProps) {
     const descriptionID = useUniqueID("description");
 
     const propEnhancer = useEditorSchemaDefaultsEnhancer(catalog);
+    const classes = layoutEditorClasses.useAsHook();
+    const editorRolePreviewContext = useEditorRolePreviewContext();
 
     if (editorContents.getSectionCount() === 0 && editorContents.validate().isValid) {
         // We are empty. Use the contents.
@@ -211,7 +257,10 @@ function LayoutEditorImpl(props: IProps) {
         );
     }
 
-    const classes = layoutEditorClasses();
+    const hydratedContent = editorContents.hydrate({
+        roleIDs:
+            editorRolePreviewContext.selectedRoleIDs.length > 0 ? editorRolePreviewContext.selectedRoleIDs : undefined,
+    });
 
     return (
         <>
@@ -230,12 +279,8 @@ function LayoutEditorImpl(props: IProps) {
             >
                 <LinkContext.Provider value={{ ...LINK_CONTEXT_DEFAULTS, areLinksDisabled: true }}>
                     <DeviceProvider>
-                        <ContainerWidthContextProvider
-                            // Kludge until we can render the client theme and the dashboard theme in different
-                            // parts of the same page.
-                            maxWidth={1264}
-                        >
-                            <ContainerContextReset>
+                        <ContainerContextReset>
+                            <StickyContextProvider portalLocation={stickyPortalRef.current}>
                                 <LayoutLookupContext.Provider
                                     value={{
                                         fallbackWidget: FauxWidget,
@@ -244,18 +289,110 @@ function LayoutEditorImpl(props: IProps) {
                                         propEnhancer,
                                     }}
                                 >
-                                    <LayoutRenderer<IHydratedEditableWidgetProps>
+                                    <LayoutRenderer
                                         allowInternalProps
-                                        layout={editorContents.hydrate().layout}
+                                        layout={[
+                                            {
+                                                $reactComponent: "TitleBar",
+                                                $reactProps: {
+                                                    ...hydratedContent.titleBar,
+                                                    $editorPath: "TitleBar",
+                                                },
+                                                $fragmentImpls: hydratedContent.titleBar.$fragmentImpls as any,
+                                            },
+                                        ]}
                                     />
+                                    <DndContext
+                                        collisionDetection={customCollisionDetectionAlgorithm}
+                                        onDragStart={(e) => {
+                                            const widgetPath = e.active.data.current?.$editorPath;
+                                            if (widgetPath) {
+                                                setDraggingWidgetPath(widgetPath);
+                                                editorSelection.moveSelectionTo(
+                                                    widgetPath,
+                                                    LayoutEditorSelectionMode.WIDGET,
+                                                );
+                                            }
+                                        }}
+                                        onDragEnd={(e) => {
+                                            setDraggingWidgetPath(null);
+                                            const sourcePath = e.active.data.current?.$editorPath;
+                                            const destinationPath = e.over?.data?.current?.$editorPath;
+                                            if (sourcePath && destinationPath) {
+                                                editorContents.moveWidget(sourcePath, destinationPath);
+                                                editorSelection.moveSelectionTo(
+                                                    destinationPath,
+                                                    LayoutEditorSelectionMode.WIDGET,
+                                                );
+                                            }
+                                        }}
+                                        onDragAbort={() => {
+                                            setDraggingWidgetPath(null);
+                                        }}
+                                        onDragCancel={() => {
+                                            setDraggingWidgetPath(null);
+                                        }}
+                                        sensors={sensors}
+                                    >
+                                        <LayoutRenderer<IHydratedEditableWidgetProps>
+                                            allowInternalProps
+                                            layout={hydratedContent.layout}
+                                        />
+                                        <CustomDragOverlay />
+                                    </DndContext>
                                 </LayoutLookupContext.Provider>
-                            </ContainerContextReset>
-                        </ContainerWidthContextProvider>
+                            </StickyContextProvider>
+                        </ContainerContextReset>
                     </DeviceProvider>
                 </LinkContext.Provider>
+                <div ref={stickyPortalRef}></div>
             </div>
         </>
     );
+}
+
+function CustomDragOverlay() {
+    const { draggingWidgetPath } = useLayoutEditor();
+    const stickyContext = useStickyContext();
+
+    return stickyContext.mountStickyPortal(
+        <DragOverlay
+            style={{ height: 60, width: "auto" }}
+            // Drop animations look super janky because our droppables are not the same size as the widgets.
+            dropAnimation={null}
+            modifiers={[snapCenterToCursor]}
+        >
+            {draggingWidgetPath && (
+                <div
+                    style={{
+                        background: "#fff",
+                        border: singleBorder(),
+                        ...shadowHelper().toolbar(),
+                        padding: "4px 12px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: 12,
+                        borderRadius: 6,
+                    }}
+                >
+                    <LayoutEditorWidgetMeta widgetPath={draggingWidgetPath} />
+                    <Icon icon={"move-drag"} />
+                </div>
+            )}
+        </DragOverlay>,
+    );
+}
+
+function customCollisionDetectionAlgorithm(args) {
+    // Bail out if keyboard activated
+    if (!args.pointerCoordinates) {
+        return rectIntersection(args);
+    }
+    // First, let's see if there are any collisions with the pointer
+    const pointerCollisions = pointerWithin(args);
+
+    return pointerCollisions;
 }
 
 function LayoutEditorContextProvider(props: React.PropsWithChildren<IProps>) {
@@ -263,6 +400,8 @@ function LayoutEditorContextProvider(props: React.PropsWithChildren<IProps>) {
     const { layoutViewType } = draft;
 
     const catalog = useLayoutCatalog(layoutViewType);
+
+    const [draggingWidgetPath, setDraggingWidgetPath] = useState<ILayoutEditorWidgetPath | null>(null);
 
     // Effect to load the initial
     const [selectionState, setSelectionState] = useState<LayoutEditorSelectionState | null>(null);
@@ -291,7 +430,7 @@ function LayoutEditorContextProvider(props: React.PropsWithChildren<IProps>) {
             (contents) =>
                 onDraftChange({
                     ...draft,
-                    layout: contents.getLayout(),
+                    ...contents.getEditSpec(),
                 }),
         );
     }, [catalog, draft, onDraftChange]);
@@ -311,9 +450,13 @@ function LayoutEditorContextProvider(props: React.PropsWithChildren<IProps>) {
     return (
         <EditorContext.Provider
             value={{
+                debugDroppables: false,
                 layoutViewType: draft.layoutViewType,
                 editorContents: contents,
                 editorSelection: selection,
+                draggingWidgetPath:
+                    selection.getMode() === LayoutEditorSelectionMode.WIDGET ? draggingWidgetPath : null,
+                setDraggingWidgetPath,
             }}
         >
             {children}

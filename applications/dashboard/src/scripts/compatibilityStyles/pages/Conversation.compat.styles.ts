@@ -25,7 +25,7 @@ export const conversationCompatCSS = () => {
                 marginTop: 0,
             },
         },
-        ".Section-Conversation .ConversationMessage": {
+        ".Section-Conversation .ConversationMessage.ConversationMessage": {
             display: "flex",
             padding: 0,
 
@@ -36,6 +36,7 @@ export const conversationCompatCSS = () => {
 
             "& .Message": {
                 marginTop: 4,
+                paddingLeft: 0,
             },
 
             "& .ConversationMessage-content": {

@@ -8,16 +8,14 @@ import * as React from "react";
 import classNames from "classnames";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
-interface IProps {
+interface IDropDownSeparatorProps {
     className?: string;
 }
 
 /**
  * Implements line separator type of item for DropDownMenu
  */
-export default class DropDownItemSeparator extends React.Component<IProps> {
-    public render() {
-        const classes = dropDownClasses();
-        return <li role="separator" className={classNames(this.props.className, classes.separator)} />;
-    }
+export default function DropDownItemSeparator(props: IDropDownSeparatorProps) {
+    const classes = dropDownClasses.useAsHook();
+    return <li role="separator" className={classNames(props.className, classes.separator)} />;
 }

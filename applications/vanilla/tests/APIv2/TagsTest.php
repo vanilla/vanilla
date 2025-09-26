@@ -37,7 +37,7 @@ class TagsTest extends AbstractResourceTest
     private const TYPE = "someType";
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

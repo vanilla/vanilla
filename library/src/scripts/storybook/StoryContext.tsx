@@ -5,7 +5,7 @@
 
 import { LoadStatus } from "@library/@types/api/core";
 import { bannerVariables } from "@library/banner/Banner.variables";
-import { CallToAction } from "@library/callToAction/CallToAction";
+import { CallToAction } from "@library/widgets/CallToAction";
 import { userContentVariables } from "@library/content/UserContent.variables";
 import { tileVariables } from "@library/features/tiles/Tile.variables";
 import { tilesVariables } from "@library/features/tiles/Tiles.variables";
@@ -36,6 +36,15 @@ import { MemoryRouter } from "react-router";
 import { DeepPartial } from "redux";
 import "../../scss/_base.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useMockedApi } from "@library/__tests__/utility";
+import { DashboardMenusApiFixture } from "@dashboard/DashboardMenusApi.fixture";
+import SiteNavProvider from "@library/navigation/SiteNavContext";
+import { CurrentUserContextProvider } from "@library/features/users/userHooks";
+import type { IMe } from "@library/@types/api/users";
+import { UserFixture } from "@library/features/__fixtures__/User.fixture";
+import type MockAdapter from "axios-mock-adapter";
+import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
+import { setMeta } from "@library/utility/appUtils";
 
 const errorMessage = "There was an error fetching the theme.";
 
@@ -83,6 +92,53 @@ export function useStoryConfig(value: Partial<IContext>) {
     return context.refreshKey;
 }
 
+export function useAdminPageMocks() {
+    useMockedApi((mock) => {
+        mock.onGet("/dashboard/menus").reply(200, DashboardMenusApiFixture.mockMenus());
+    });
+}
+
+export function AdminPageStory(props: { children: React.ReactNode; apiMock?: (mock: MockAdapter) => void }) {
+    useStoryConfig({
+        useWrappers: false,
+    });
+    useMockedApi((mock) => {
+        mock.onGet("/dashboard/menus").reply(200, DashboardMenusApiFixture.mockMenus());
+        props.apiMock?.(mock);
+    });
+
+    setMeta("siteSection", {
+        basePath: "",
+        contentLocale: "en",
+        sectionGroup: "vanilla",
+        sectionID: "0",
+        name: "Test Site",
+        apps: { forum: true },
+        attributes: {},
+    });
+    setMeta("defaultSiteSection", {
+        basePath: "",
+        contentLocale: "en",
+        sectionGroup: "vanilla",
+        sectionID: "0",
+        name: "Test Site",
+        apps: { forum: true },
+        attributes: {},
+    });
+
+    return (
+        <SiteNavProvider categoryRecordType="panelMenu">
+            <CurrentUserContextProvider
+                currentUser={UserFixture.createMockUser({
+                    name: "Story Admin",
+                })}
+            >
+                <PermissionsFixtures.AllPermissions>{props.children}</PermissionsFixtures.AllPermissions>
+            </CurrentUserContextProvider>
+        </SiteNavProvider>
+    );
+}
+
 export function storyWithConfig(config: Partial<IContext>, Component: React.ComponentType): any {
     const HookWrapper = () => {
         const refreshKey = useStoryConfig(config);
@@ -116,6 +172,7 @@ const defaultState = createRootReducer()(INITIAL_STORY_STATE, { type: "initial" 
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
+            refetchOnMount: true,
             retry: false,
         },
         mutations: {

@@ -108,7 +108,7 @@ class CommonLayoutView extends AbstractCustomLayoutView
             // Make sure requests are constructed with the site section slug.
             $this->request->setRoot(trim("$webroot{$siteSection->getBasePath()}", "/"));
         }
-        $result["locale"] = $siteSection->getContentLocale();
+        $result["locale"] = $paramInput["locale"] ?? $siteSection->getContentLocale();
         $result["siteSection"] = SiteSectionSchema::toArray($siteSection);
 
         $categoryID = $paramInput["categoryID"] ?? $siteSection->getCategoryID();
@@ -119,8 +119,6 @@ class CommonLayoutView extends AbstractCustomLayoutView
         $category = $this->categoryModel->getFragmentByID($categoryID);
         if ($category) {
             $result["category"] = $category;
-        } else {
-            throw new NotFoundException("Category", ["categoryID" => $category]);
         }
 
         $pageHead->setSeoTitle(

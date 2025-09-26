@@ -6,7 +6,7 @@
 
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { titleBarClasses } from "@library/headers/TitleBar.classes";
 import { t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";

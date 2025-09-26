@@ -10,11 +10,13 @@ import { MenuBarSubMenuContainer, MenuBarSubMenuContext } from "@library/MenuBar
 import { cx } from "@library/styles/styleShim";
 import { useFocusWatcher, useMeasure } from "@vanilla/react-utils";
 import React, { useImperativeHandle, useRef } from "react";
+import Popover, { positionDefault } from "@reach/popover";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     children: MenuBarContextChildren;
     className?: string;
     rootRef?: React.RefObject<HTMLDivElement>;
+    asPopover?: boolean;
 }
 
 /**
@@ -25,8 +27,8 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
  *
  */
 export const MenuBar = React.forwardRef(function MenuBar(props: IProps, ref: React.Ref<IMenuBarContext | null>) {
-    const { className, children, rootRef: _rootRef, ...restProps } = props;
-    const classes = menuBarClasses();
+    const { className, children, rootRef: _rootRef, asPopover, ...restProps } = props;
+    const classes = menuBarClasses.useAsHook();
     const ownRef = useRef<HTMLDivElement>(null);
     const rootRef = _rootRef ?? ownRef;
     const contextRef = useRef<IMenuBarContext>(null);
@@ -47,18 +49,57 @@ export const MenuBar = React.forwardRef(function MenuBar(props: IProps, ref: Rea
             contextRef.current?.setSubMenuOpen(false);
         }
     });
+
+    const content = (
+        <>
+            <div ref={itemContainerRef} className={classes.menuItemsList} role="menubar">
+                <MenuBarContext ref={contextRef} initialItemIndex={0}>
+                    {props.children}
+                </MenuBarContext>
+            </div>
+            <div
+                style={{ width: itemContainerMeasure.width ? itemContainerMeasure.width : undefined }}
+                className={classes.subMenuContainer}
+            >
+                <MenuBarSubMenuContainer />
+            </div>
+        </>
+    );
     return (
         <MenuBarSubMenuContext>
-            <div {...restProps} ref={rootRef} className={cx(classes.root, className)}>
-                <div ref={itemContainerRef} className={classes.menuItemsList} role="menubar">
-                    <MenuBarContext ref={contextRef} initialItemIndex={0}>
-                        {props.children}
-                    </MenuBarContext>
+            {asPopover && props.rootRef ? (
+                <Popover targetRef={rootRef} className={cx(classes.root, className)} position={centeredTopPosition}>
+                    {content}
+                </Popover>
+            ) : (
+                <div {...restProps} ref={rootRef} className={cx(classes.root, className)}>
+                    {content}
                 </div>
-                <div style={{ width: itemContainerMeasure.width }} className={classes.subMenuContainer}>
-                    <MenuBarSubMenuContainer />
-                </div>
-            </div>
+            )}
         </MenuBarSubMenuContext>
     );
 });
+
+/**
+ * Centered top position for the popover, default is below left and reposition to top if there is collision
+ * So we center it and stick it on top even if there is collision when scrolling
+ */
+function centeredTopPosition(targetRect?: DOMRect | null, popoverRect?: DOMRect | null): React.CSSProperties {
+    const position = positionDefault(targetRect, popoverRect);
+
+    const isAlreadyOnTop = (parseFloat(position.top as string) ?? 0) < (targetRect?.top ?? 0) + window.scrollY;
+    const adjustValueForTop = isAlreadyOnTop || !targetRect?.height ? -(popoverRect?.height ?? 0) : targetRect?.height;
+
+    const adjustedTop =
+        targetRect && targetRect.height ? (parseFloat(position.top as string) ?? 0) - adjustValueForTop : position.top;
+    const adjustedLeft =
+        targetRect && targetRect.width && popoverRect && popoverRect.width
+            ? (parseFloat(position.left as string) ?? 0) + targetRect.width / 2
+            : position.left;
+
+    return {
+        ...position,
+        top: adjustedTop,
+        left: adjustedLeft,
+    };
+}

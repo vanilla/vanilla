@@ -52,3 +52,12 @@ async function convertImgurEmbeds() {
         }
     }
 }
+
+declare global {
+    interface Window {
+        imgurEmbed: {
+            createIframe: () => void;
+            tasks: number;
+        };
+    }
+}

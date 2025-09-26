@@ -8,7 +8,8 @@
 export enum OS {
     IOS = "ios",
     ANDROID = "android",
-    UNKNOWN = "unkwown",
+    MAC = "mac",
+    UNKNOWN = "unknown",
 }
 
 /**
@@ -18,7 +19,7 @@ export enum OS {
  * OS specific input elements for things like datetimes.
  */
 export function guessOperatingSystem(): OS {
-    const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+    const userAgent: string = navigator.userAgent || navigator.vendor || (window as any).opera;
 
     if (/android/i.test(userAgent)) {
         return OS.ANDROID;
@@ -27,6 +28,10 @@ export function guessOperatingSystem(): OS {
     // iOS detection from: http://stackoverflow.com/a/9039885/177710
     if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
         return OS.IOS;
+    }
+
+    if (userAgent.includes("Mac")) {
+        return OS.MAC;
     }
 
     return OS.UNKNOWN;

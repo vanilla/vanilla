@@ -167,6 +167,26 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
              */
             borders: tableInit.borders,
         },
+        /**
+         * @varGroup userContent.tables.header
+         * @title UserContent - Tables - Header
+         */
+        header: {
+            /**
+             * @var userContent.tables.header.bgColor
+             * @title Background
+             * @type string
+             * @format hex-color
+             */
+            bgColor: undefined,
+            /**
+             * @var userContent.tables.header.fgColor
+             * @title Text Color
+             * @type string
+             * @format hex-color
+             */
+            fgColor: undefined,
+        },
     });
 
     const blocks = makeThemeVars("blocks", {

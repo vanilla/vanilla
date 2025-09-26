@@ -12,6 +12,7 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { url } from "csx";
 import { DeepPartial } from "redux";
+import { ColorVar } from "@library/styles/CssVar";
 
 export const userSpotlightClasses = useThemeCache(
     (shouldWrap: boolean, options?: DeepPartial<IUserSpotlightOptions>) => {
@@ -96,33 +97,39 @@ export const userSpotlightClasses = useThemeCache(
         const title = css(
             {
                 ...Mixins.font(vars.title.font),
+                color: ColorsUtils.varOverride(ColorVar.Foreground, vars.title.font.color),
                 ...Mixins.padding(vars.title.spacing),
             },
             mediaQueries.mobile({
                 ...Mixins.font(vars.title.fontMobile),
+                color: ColorsUtils.varOverride(ColorVar.Foreground, vars.title.font.color),
             }),
         );
 
         const description = css({
             ...Mixins.font(vars.description.font),
+            color: ColorsUtils.varOverride(ColorVar.Foreground, vars.title.font.color),
             ...Mixins.padding(vars.description.spacing),
         });
 
         const userText = css(
             {
                 ...Mixins.font(vars.userText.font),
+                color: ColorsUtils.varOverride(ColorVar.Foreground, vars.title.font.color),
                 ...Mixins.padding(vars.userText.padding),
                 ...Mixins.margin(vars.userText.margin),
                 alignSelf: vars.options.userTextAlignment === "right" ? "flex-end" : undefined,
             },
             mediaQueries.mobile({
                 ...Mixins.font(vars.userText.fontMobile),
+                color: ColorsUtils.varOverride(ColorVar.Foreground, vars.title.font.color),
             }),
         );
 
         const userName = css(
             {
                 ...Mixins.font(vars.userName.font),
+                color: ColorsUtils.varOverride(ColorVar.Foreground, vars.title.font.color),
             },
             mediaQueries.mobile({
                 ...Mixins.font(vars.userName.fontMobile),
@@ -131,6 +138,7 @@ export const userSpotlightClasses = useThemeCache(
 
         const userTitle = css({
             ...Mixins.font(vars.userTitle.font),
+            color: ColorsUtils.varOverride(ColorVar.Foreground, vars.title.font.color),
         });
 
         return {

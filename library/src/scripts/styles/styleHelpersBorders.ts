@@ -19,16 +19,19 @@ import {
     ISimpleBorderStyle,
 } from "@library/styles/cssUtilsTypes";
 import { t } from "@vanilla/i18n";
+import { ColorVar } from "@library/styles/CssVar";
 
-export enum BorderType {
-    BORDER = "border",
-    SEPARATOR = "separator",
-    SEPARATOR_BETWEEN = "separator_between",
-    NONE = "none",
-    SHADOW = "shadow",
-    SHADOW_AS_BORDER = "shadow_as_border", // Note that is applied on a different element
-    NAV_LINKS = "navLinks",
-}
+export const BorderType = {
+    BORDER: "border",
+    SEPARATOR: "separator",
+    SEPARATOR_BETWEEN: "separator_between",
+    NONE: "none",
+    SHADOW: "shadow",
+    SHADOW_AS_BORDER: "shadow_as_border", // Note that is applied on a different element
+    NAV_LINKS: "navLinks",
+} as const;
+
+export type BorderType = (typeof BorderType)[keyof typeof BorderType];
 
 export function borderTypeToLabel(type: BorderType): string {
     switch (type) {
@@ -253,6 +256,8 @@ export const singleBorder = (styles?: ISimpleBorderStyle) => {
     const vars = globalVariables();
     const borderStyles = styles !== undefined ? styles : {};
     return `${borderStyles.style ? borderStyles.style : vars.border.style} ${
-        borderStyles.color ? ColorsUtils.colorOut(borderStyles.color) : ColorsUtils.colorOut(vars.border.color)
+        borderStyles.color
+            ? ColorsUtils.colorOut(borderStyles.color)
+            : ColorsUtils.varOverride(ColorVar.Border, vars.border.color)
     } ${borderStyles.width ? styleUnit(borderStyles.width) : styleUnit(vars.border.width)}` as any;
 };

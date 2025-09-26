@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import TextEditor, { TextEditorContextProvider } from "@library/textEditor/TextEditor";
+import MonacoEditor, { TextEditorContextProvider } from "@library/textEditor/MonacoEditor";
 import { t } from "@vanilla/i18n";
 import { Tabs } from "@library/sectioning/Tabs";
 import { htmlWidgetEditorClasses } from "@library/htmlWidget/HtmlWidgetEditor.classes";
@@ -22,7 +22,7 @@ export function HtmlWidgetCodeEditor(props: {
         {
             label: t("HTML"),
             contents: (
-                <TextEditor
+                <MonacoEditor
                     minimal
                     className={classes.editor}
                     language={"html"}
@@ -39,7 +39,7 @@ export function HtmlWidgetCodeEditor(props: {
         {
             label: t("CSS"),
             contents: (
-                <TextEditor
+                <MonacoEditor
                     minimal
                     className={classes.editor}
                     language={"css"}
@@ -56,7 +56,7 @@ export function HtmlWidgetCodeEditor(props: {
         {
             label: t("JS"),
             contents: (
-                <TextEditor
+                <MonacoEditor
                     minimal
                     className={classes.editor}
                     language={"javascript"}

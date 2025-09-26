@@ -7,14 +7,12 @@
     "dependencies": {
         "@reach/accordion": "^0.15.3",
         "@reach/combobox": "0.16.2",
-        "@vanilla/react-utils": "*"
+        "@vanilla/react-utils": "workspace:^"
     },
     "peerDependencies": {
-        "react": "*",
-        "react-dom": "*"
-    },
-    "devDependencies": {
-        "@vanilla/tsconfig": "^3.0.1"
+        "lodash-es": "*",
+        "react": ">=17.0.2",
+        "react-dom": ">=17.0.2"
     },
     "publishConfig": {
         "access": "public"

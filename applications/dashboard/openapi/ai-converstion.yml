@@ -1,0 +1,302 @@
+openapi: 3.0.3
+info:
+paths:
+    /ai-conversations:
+        x-hidden: true
+        x-key: Feature.ragSearch.Enabled
+        get:
+            summary: List the conversations of a user.
+            tags:
+                - AI Conversations
+            parameters:
+                - name: limit
+                  in: query
+                  description: Desired number of items per page.
+                  schema:
+                      type: integer
+                      default: 30
+                      maximum: 30
+                      minimum: 1
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Offset"
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AiConversation"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+        post:
+            summary: Start a new conversation.
+            tags:
+                - AI Conversations
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                body:
+                                    type: string
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AiConversation"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /ai-conversations/{conversationID}:
+        x-hidden: true
+        x-key: Feature.ragSearch.Enabled
+        get:
+            parameters:
+                - in: path
+                  name: conversationID
+                  required: true
+                  schema:
+                      type: integer
+            summary: Get a specific conversation.
+            tags:
+                - AI Conversations
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AiConversation"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /ai-conversations/{conversationID}/reply:
+        x-hidden: true
+        x-key: Feature.ragSearch.Enabled
+        post:
+            summary: Reply to a conversation.
+            tags:
+                - AI Conversations
+            parameters:
+                - in: path
+                  name: conversationID
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                body:
+                                    type: string
+                            required:
+                                - body
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AiConversation"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /ai-conversations/{conversationID}/copied:
+        x-hidden: true
+        x-key: Feature.ragSearch.Enabled
+        post:
+            summary: Notify that a message has been copied.
+            tags:
+                - AI Conversations
+            parameters:
+                - in: path
+                  name: conversationID
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                messageID:
+                                    type: string
+                            required:
+                                - messageID
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ClientResponse"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /ai-conversations/{conversationID}/feedback:
+        x-hidden: true
+        x-key: Feature.ragSearch.Enabled
+        put:
+            summary: Add feedback to a conversation message.
+            tags:
+                - AI Conversations
+            parameters:
+                - in: path
+                  name: conversationID
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                messageID:
+                                    type: string
+                                body:
+                                    type: string
+                            required:
+                                - messageID
+                                - body
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ClientResponse"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /ai-conversations/{conversationID}/react:
+        x-hidden: true
+        x-key: Feature.ragSearch.Enabled
+        put:
+            summary: React to a conversation message.
+            tags:
+                - AI Conversations
+            parameters:
+                - in: path
+                  name: conversationID
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                messageID:
+                                    type: string
+                                reaction:
+                                    type: string
+                                    enum:
+                                        - like
+                                        - dislike
+                                        - NULL
+                            required:
+                                - messageID
+                                - reaction
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ClientResponse"
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+    /ai-conversations/{conversationID}/ask-community:
+        x-hidden: true
+        x-key: Feature.ragSearch.Enabled
+        post:
+            summary: Generate a post asking the community for help based on an ai-conversation.
+            tags:
+                - AI Conversations
+            parameters:
+                - in: path
+                  name: conversationID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                properties:
+                                    name:
+                                        type: string
+                                    body:
+                                        type: string
+                                    format:
+                                        type: string
+                                    summary:
+                                        type: string
+                                    categoryID:
+                                        type: integer
+                                    postType:
+                                        type: string
+                                required:
+                                    - name
+                                    - body
+                                    - format
+                                    - summary
+                                    - categoryID
+                                    - postType
+                    description: Success
+                "403":
+                    $ref: "responses.yml#/components/responses/PermissionError"
+components:
+    schemas:
+        AiConversation:
+            type: object
+            properties:
+                conversationID:
+                    type: integer
+                foreignID:
+                    type: string
+                source:
+                    type: string
+                insertUserID:
+                    type: integer
+                dateInserted:
+                    type: string
+                    format: "date-time"
+                lastMessageID:
+                    type: string
+                lastMessageBody:
+                    type: string
+                dateLastMessage:
+                    type: string
+                    format: "date-time"
+                messages:
+                    properties:
+                        messageID:
+                            type: string
+                        body:
+                            type: string
+                        feedback:
+                            type: string
+                        confidence:
+                            type: string
+                        user:
+                            type: string
+                        reaction:
+                            type: string
+                            enum:
+                                - like
+                                - dislike
+            required:
+                - conversationID
+                - foreignID
+                - source
+                - insertUserID
+                - dateInserted
+        ClientResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean

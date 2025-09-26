@@ -64,7 +64,6 @@ export function AutomationRulesPreviewCommentsContent(props: IProps) {
                                 showNextButton: false,
                             }}
                             onChange={(page: number) => setCurrentQuery({ ...currentQuery, page: page })}
-                            isMobile={false}
                         />
                     </div>
                     <ul>

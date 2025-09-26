@@ -56,13 +56,15 @@ class LocalesApiController extends Controller
         } else {
             $enabled = $this->localeModel->getEnabledLocales();
             $this->localeModel->expandDisplayNames($enabled, array_column($enabled, "localeKey"));
-            $locales = $this->getEventManager()->fireFilter("localesApiController_getOutput", $enabled, false);
-            $dbLocales = $this->localeModel->getLanguageSetting();
-            $localeIDs = array_column($dbLocales, "localeID");
+            $dbLocales = $this->getEventManager()->fireFilter("localesApiController_getOutput", $enabled, false);
+            // Get Entries saved in config.
+            $Locales = $this->localeModel->getLanguageSetting();
+            $localeIDs = array_column($Locales, "localeID");
+            // Combine the locales from the database with the locales from the config.
             $locales = array_merge(
                 $dbLocales,
-                array_filter($locales, function ($locale) use ($localeIDs) {
-                    return !in_array($locale["localeID"], $localeIDs);
+                array_filter($Locales, function ($Locales) use ($localeIDs) {
+                    return !in_array($Locales["localeID"], $localeIDs);
                 })
             );
             $locales = array_values($locales);
@@ -228,7 +230,7 @@ class LocalesApiController extends Controller
      * @param \Garden\Schema\ValidationField $validationField
      * @return bool
      */
-    public function validateLocale(string $locale, \Garden\Schema\ValidationField $validationField): bool
+    public function validateLocale(string $locale): bool
     {
         $locales = $this->localeModel->getEnabledLocales();
         foreach ($locales as $localePack) {
@@ -250,13 +252,27 @@ class LocalesApiController extends Controller
      * @param array|null $enabledLocales
      * @throws \Garden\Web\Exception\NotFoundException Throws an exception if the locale isn't found.
      */
-    private function checkLocaleExists(string $id, ?array $enabledLocales = null): void
+    public function checkLocaleExists(string $id, ?array $enabledLocales = null): void
     {
         if (is_null($enabledLocales)) {
             $enabledLocales = $this->localeModel->getEnabledLocales();
         }
 
         if (!in_array($id, array_keys(array_column($enabledLocales, null, "localeID")))) {
+            throw new \Garden\Web\Exception\NotFoundException("Locale");
+        }
+    }
+
+    /**
+     * Check that the given locale key corresponds to an enabled locale.
+     *
+     * @param string $key
+     * @throws \Garden\Web\Exception\NotFoundException Throws an exception if the locale key isn't found.
+     */
+    public function checkLocaleKeyExists(string $key): void
+    {
+        $validate = $this->validateLocale($key);
+        if (!$validate) {
             throw new \Garden\Web\Exception\NotFoundException("Locale");
         }
     }

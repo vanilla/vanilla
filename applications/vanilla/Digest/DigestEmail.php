@@ -9,6 +9,7 @@ namespace Vanilla\Forum\Digest;
 
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Logging\ErrorLogger;
 
@@ -35,9 +36,12 @@ class DigestEmail extends \Gdn_Email implements LoggerAwareInterface
 
     /**
      * @param \ActivityModel $activityModel
+     * @param UserNotificationPreferencesModel $userNotificationPreferencesModel
      */
-    public function __construct(\ActivityModel $activityModel)
-    {
+    public function __construct(
+        \ActivityModel $activityModel,
+        private UserNotificationPreferencesModel $userNotificationPreferencesModel
+    ) {
         $this->activityModel = $activityModel;
         parent::__construct();
     }
@@ -122,16 +126,31 @@ class DigestEmail extends \Gdn_Email implements LoggerAwareInterface
     }
 
     /**
-     * Merge Digest unsubscribe link to the email template
+     * Merge Digest unsubscribe info to the email template
      *
      * @param array $user
      * @return void
      */
     public function mergeDigestUnsubscribe(array $user): void
     {
-        $mergeCode = "*/digest_unsubscribe/*";
+        $userPref = $this->userNotificationPreferencesModel->getUserPrefs($user["UserID"]);
+        $subscribeReason =
+            $userPref["Email.DigestEnabled"] === 3
+                ? "You are receiving this email because you were opted in to receive email digests."
+                : "You are receiving this email because you opted in to receive email digests.";
+        $reasonMergeCode = "*/digest_subscribe_reason/*";
+        $html = str_replace($reasonMergeCode, $subscribeReason, $this->getHtmlContent());
+        $this->setHtmlContent($html);
+        $text = str_replace($reasonMergeCode, $subscribeReason, $this->getTextContent());
+        $this->setTextContent($text);
+
+        $linkMergeCode = "*/digest_unsubscribe/*";
         $unsubscribeTextLink = $this->activityModel->getUnsubscribeDigestLink($user);
-        $this->setUnSubscribeMergeCodes($mergeCode, $unsubscribeTextLink);
+        $html = str_replace($linkMergeCode, $unsubscribeTextLink, $this->getHtmlContent());
+        $this->setHtmlContent($html);
+        $text = str_replace($linkMergeCode, $unsubscribeTextLink, $this->getTextContent());
+        $this->setTextContent($text);
+        $this->setUnSubscribeMergeCodes($linkMergeCode, $unsubscribeTextLink);
     }
 
     /**
@@ -150,7 +169,7 @@ class DigestEmail extends \Gdn_Email implements LoggerAwareInterface
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getFooterContent(string $content = null): string
     {

@@ -34,7 +34,7 @@ final class LongRunnerNextArgs implements \JsonSerializable
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function jsonSerialize(): array
     {

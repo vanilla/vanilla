@@ -158,8 +158,8 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
                 }
 
                 $expand = $query->getQueryParameter("expand") ?? [];
-                if (DocumentModel::isEnabled() && in_array("vectors", $expand) && isset($record["chunkText"])) {
-                    $resultItemForKey->setVectorizedData($record["chunkText"], $expand);
+                if (DocumentModel::isEnabled() && in_array("vectors", $expand) && isset($record["documentFragment"])) {
+                    $resultItemForKey->setVectorizedData($record["documentFragment"], $expand);
                 }
 
                 $resultItemForKey->setSearchScore($record[SearchResultItem::FIELD_SCORE] ?? null);

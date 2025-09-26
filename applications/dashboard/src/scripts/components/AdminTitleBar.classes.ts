@@ -20,7 +20,7 @@ export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperti
         borderBottom: "1px solid #dddee0",
         position: "sticky",
         top: titleBarVariables().fullHeight,
-        zIndex: zIndex ?? 1,
+        zIndex: zIndex ?? 1051, // Just above the app titlebar.
     });
 
     const container = useThemeCache((useTwoColumnContainer?: boolean, hasActions?: boolean) => {
@@ -148,7 +148,7 @@ export const adminEditTitleBarClasses = useThemeCache(() => {
     const editingContainerWrapper = css({
         ...sticky(),
         top: 0,
-        zIndex: 3,
+        zIndex: 1060,
         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
         marginBottom: 1,
         background: "#fff",

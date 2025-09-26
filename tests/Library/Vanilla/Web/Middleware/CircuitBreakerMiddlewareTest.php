@@ -7,12 +7,12 @@
 
 namespace VanillaTests\Library\Vanilla\Web\Middleware;
 
+use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\ServerException;
 use Gdn_Cache;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Web\Middleware\CircuitBreakerMiddleware;
-use VanillaTests\Fixtures\Request;
 use VanillaTests\SiteTestCase;
 
 /**
@@ -27,7 +27,7 @@ class CircuitBreakerMiddlewareTest extends SiteTestCase
     protected CircuitBreakerMiddleware $circuitBreakerMiddleware;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -44,7 +44,7 @@ class CircuitBreakerMiddlewareTest extends SiteTestCase
     public function testCircuitBreakerOnBeforeNextAttempt(): void
     {
         $this->expectException(ServerException::class);
-        $request = new Request();
+        $request = new HttpRequest();
         $cacheKey = CircuitBreakerMiddleware::getCacheKey($request);
         $this->setFailedAttemptCache($cacheKey, 6);
 
@@ -61,7 +61,7 @@ class CircuitBreakerMiddlewareTest extends SiteTestCase
      */
     public function testCircuitBreakerOnAfterNextAttemptRequestSuccessful(): void
     {
-        $request = new Request();
+        $request = new HttpRequest();
         $cacheKey = CircuitBreakerMiddleware::getCacheKey($request);
         $this->setFailedAttemptCache($cacheKey, 6);
 
@@ -80,7 +80,7 @@ class CircuitBreakerMiddlewareTest extends SiteTestCase
      */
     public function testCircuitBreakerOnSuccessfulRequest(): void
     {
-        $request = new Request();
+        $request = new HttpRequest();
         $cacheKey = CircuitBreakerMiddleware::getCacheKey($request);
         $response = $this->invokeCircuitBreaker($request);
         $this->assertEquals(200, $response->getStatusCode());
@@ -97,7 +97,7 @@ class CircuitBreakerMiddlewareTest extends SiteTestCase
      */
     public function testCircuitBreakerOnAfterNextAttemptRequestFails(?int $failedAttempts, bool $circuitOn): void
     {
-        $request = new Request();
+        $request = new HttpRequest();
         $cacheKey = CircuitBreakerMiddleware::getCacheKey($request);
         $this->setFailedAttemptCache($cacheKey, $failedAttempts);
 
@@ -140,11 +140,11 @@ class CircuitBreakerMiddlewareTest extends SiteTestCase
     /**
      * Invoke the CircuitBreakerMiddle ware.
      *
-     * @param Request $request
+     * @param HttpRequest $request
      * @param int $responseCode
      * @return HttpResponse
      */
-    protected function invokeCircuitBreaker(Request $request, int $responseCode = 200): HttpResponse
+    protected function invokeCircuitBreaker(HttpRequest $request, int $responseCode = 200): HttpResponse
     {
         $circuitBreakerMiddleware = new CircuitBreakerMiddleware($this->cache);
         $response = $circuitBreakerMiddleware($request, function () use ($responseCode) {

@@ -30,7 +30,8 @@ import { MenuBarSubMenuItemGroup } from "@library/MenuBar/MenuBarSubMenuItemGrou
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { getSelectedBlockBoundingClientRect } from "@library/vanilla-editor/queries/getSelectedBlockBoundingClientRect";
-import { MyEditor, useMyPlateEditorState } from "@library/vanilla-editor/typescript";
+import { MyEditor } from "@library/vanilla-editor/typescript";
+import { useMyPlateEditorState } from "../getMyEditor";
 import { vanillaEditorClasses } from "@library/vanilla-editor/VanillaEditor.classes";
 import { useVanillaEditorBounds } from "@library/vanilla-editor/VanillaEditorBoundsContext";
 import { VanillaEditorFormatter } from "@library/vanilla-editor/VanillaEditorFormatter";
@@ -46,14 +47,14 @@ interface IElementToolbarProps {
 }
 
 export function ElementToolbar(props: IElementToolbarProps) {
-    const classes = vanillaEditorClasses();
+    const classes = vanillaEditorClasses.useAsHook();
     const id = useUniqueID("elementToolbar");
     const contentID = useUniqueID("elementToolbar-content");
     const [ownIsVisible, setOwnIsVisible] = useState(props.isVisible ?? false);
 
     const isEdgeCase = useIsElementToolbarEdgeCase();
 
-    const classesMenuBar = menuBarClasses();
+    const classesMenuBar = menuBarClasses.useAsHook();
 
     return (
         <FlyoutToggle

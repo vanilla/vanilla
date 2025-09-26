@@ -14,38 +14,27 @@ use Webmozart\PathUtil\Path;
  */
 class VanillaSearchService extends AbstractLaravelService
 {
-    const SERVICE_NAME = "search";
+    const SERVICE_ID = "search";
 
-    function getName(): string
+    /**
+     * Constructor.
+     */
+    public function __construct()
     {
-        return "vanilla-search-service";
+        parent::__construct(
+            new LaravelServiceDescriptor(
+                serviceID: self::SERVICE_ID,
+                label: "Search Service",
+                containerName: "vanilla-search",
+                url: "https://search.vanilla.local",
+                gitUrl: "git@github.com:vanilla/vanilla-search-service.git"
+            )
+        );
     }
 
-    function getTargetDirectory(): string
-    {
-        return Path::canonicalize(PATH_ROOT . "/../vanilla-search-service");
-    }
-
-    function getGitUrl(): string
-    {
-        return "git@github.com:vanilla/vanilla-search-service.git";
-    }
-
-    function getInstallConfig(): string
-    {
-        return "docker.wasSearchCloned";
-    }
-
-    function getHostname(): string
-    {
-        return "search.vanilla.local";
-    }
-
-    function getContainerName(): string
-    {
-        return "vanilla-search";
-    }
-
+    /**
+     * @inheritdoc
+     */
     public function getVanillaConfigDefaults(): array
     {
         return [

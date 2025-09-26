@@ -84,7 +84,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/LayoutMetadata"
+                                $ref: "#/components/schemas/LayoutSchema"
                     description: Success
                 "403":
                     $ref: "responses.yml#/components/responses/PermissionError"
@@ -618,6 +618,9 @@ components:
                     description: User-friendly name.
                 layout:
                     $ref: "#/components/schemas/LayoutDefinition"
+                titleBar:
+                    type: object
+                    description: Title bar properties
                 isDefault:
                     type: boolean
                     description: Indicates whether this is the default layout for the resource type specified in layoutType

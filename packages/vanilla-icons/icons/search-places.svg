@@ -1,11 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15.122 16.416">
-    <defs>
-        <filter id="2etungn3ea">
-            <feColorMatrix in="SourceGraphic" values="currentColor" />
-        </filter>
-    </defs>
     <g fill="none" fill-rule="evenodd">
-        <g filter="url(#2etungn3ea)" transform="translate(-120 -263)">
+        <g transform="translate(-120 -263)">
             <g>
                 <g stroke="currentColor" stroke-width=".667px">
                     <path

@@ -49,7 +49,7 @@ class EmailTest extends SiteTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

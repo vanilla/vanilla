@@ -90,11 +90,10 @@ class DiscussionExpandSchema
      */
     public function commonExpand(array &$rows, $expandOption)
     {
+        $this->tagModel->expandTags($rows);
+
         if (ModelUtils::isExpandOption("category", $expandOption)) {
             $this->categoryModel->expandCategories($rows);
-        }
-        if (ModelUtils::isExpandOption("tagIDs", $expandOption)) {
-            $this->tagModel->expandTagIDs($rows);
         }
         if (ModelUtils::isExpandOption("status", $expandOption)) {
             $this->recordStatusModel->expandStatuses($rows);
@@ -125,6 +124,9 @@ class DiscussionExpandSchema
 
         if (ModelUtils::isExpandOption("postMeta", $expandOption)) {
             $this->postMetaModel->joinPostMeta($rows);
+            if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expandOption)) {
+                $this->postMetaModel->updateBodyPlainText($rows);
+            }
         }
 
         if (ModelUtils::isExpandOption("permissions", $expandOption)) {

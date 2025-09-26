@@ -21,10 +21,13 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Controllers\CustomPageController;
 use Vanilla\Dashboard\Events\AccessDeniedEvent;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Http\InternalRequest;
 use Vanilla\Logger;
 use Vanilla\Logging\ErrorLogger;
+use Vanilla\Models\CustomPageModel;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
 use Vanilla\ReflectionHelper;
@@ -63,6 +66,8 @@ class Dispatcher implements LoggerAwareInterface
 
     private Timers $timers;
 
+    private CustomPageModel $customPageModel;
+
     /**
      * Constructor
      */
@@ -70,7 +75,8 @@ class Dispatcher implements LoggerAwareInterface
         LocaleInterface $locale = null,
         ContainerInterface $container = null,
         EventManager $eventManager = null,
-        Timers $timers = null
+        Timers $timers = null,
+        CustomPageModel $customPageModel = null
     ) {
         $this->middleware = function (RequestInterface $request): Data {
             return $this->dispatchInternal($request);
@@ -79,6 +85,7 @@ class Dispatcher implements LoggerAwareInterface
         $this->container = $container;
         $this->eventManager = $eventManager ?? new EventManager();
         $this->timers = $timers ?? new Timers();
+        $this->customPageModel = $customPageModel ?? Gdn::getContainer()->get(CustomPageModel::class);
     }
 
     /**
@@ -166,100 +173,78 @@ class Dispatcher implements LoggerAwareInterface
         if ($request instanceof InternalRequest && !empty($request->getMetaArray())) {
             Gdn::request()->setMetaArray($request->getMetaArray());
         }
-        foreach ($this->routes as $route) {
-            try {
-                $action = $route->match($request);
-                if ($action instanceof \Exception) {
-                    // Hold the action in case another route succeeds.
-                    $ex = $action;
-                } elseif ($action !== null) {
-                    // KLUDGE: Check for CSRF here because we can only do a global check for new dispatches.
-                    // Once we can test properly then a route can be added that checks for CSRF on all requests.
-                    if ($request->getMethod() === "POST" && $request instanceof \Gdn_Request) {
-                        /* @var \Gdn_Request $request */
-                        try {
-                            $request->isAuthenticatedPostBack(true);
-                        } catch (\Exception $ex) {
-                            Gdn::session()
-                                ->getPermissions()
-                                ->addBan(Permissions::BAN_CSRF, [
-                                    "msg" => $this->locale->translate(
-                                        "Invalid CSRF token.",
-                                        "Invalid CSRF token. Please try again."
-                                    ),
-                                    "code" => 403,
-                                ]);
-                        }
-                    }
 
-                    $fn = function (RequestInterface $request) use ($route, $action): Data {
-                        if (is_object($action) && method_exists($action, "replaceRequest")) {
-                            $action->replaceRequest($request);
-                        }
-
-                        try {
-                            if ($action instanceof Action) {
-                                $this->eventManager->dispatch(
-                                    new ControllerDispatchedEvent($action->getCallback(), $request)
-                                );
+        if (
+            FeatureFlagHelper::featureEnabled(CustomPageModel::FEATURE_FLAG) &&
+            ($customPage = $this->customPageModel->lookupByRequest($request))
+        ) {
+            $response = $this->dispatchCustomPage($customPage);
+        } else {
+            foreach ($this->routes as $route) {
+                try {
+                    $action = $route->match($request);
+                    if ($action instanceof \Exception) {
+                        // Hold the action in case another route succeeds.
+                        $ex = $action;
+                    } elseif ($action !== null) {
+                        // KLUDGE: Check for CSRF here because we can only do a global check for new dispatches.
+                        // Once we can test properly then a route can be added that checks for CSRF on all requests.
+                        if ($request->getMethod() === "POST" && $request instanceof \Gdn_Request) {
+                            /* @var \Gdn_Request $request */
+                            try {
+                                $request->isAuthenticatedPostBack(true);
+                            } catch (\Exception $ex) {
+                                Gdn::session()
+                                    ->getPermissions()
+                                    ->addBan(Permissions::BAN_CSRF, [
+                                        "msg" => $this->locale->translate(
+                                            "Invalid CSRF token.",
+                                            "Invalid CSRF token. Please try again."
+                                        ),
+                                        "code" => 403,
+                                    ]);
                             }
-                            ob_start();
-                            $actionResponse = $action();
-                        } finally {
-                            $ob = ob_get_clean();
                         }
-                        $response = $this->makeResponse($actionResponse, $ob);
-                        if (is_object($action) && method_exists($action, "getMetaArray")) {
-                            $this->mergeMeta($response, $action->getMetaArray());
-                        }
-                        $this->mergeMeta($response, $route->getMetaArray());
 
-                        return $response;
-                    };
+                        $fn = function (RequestInterface $request) use ($route, $action): Data {
+                            if (is_object($action) && method_exists($action, "replaceRequest")) {
+                                $action->replaceRequest($request);
+                            }
 
-                    $response = static::callMiddlewares($request, $route->getMiddlewares(), $fn);
+                            try {
+                                if ($action instanceof Action) {
+                                    $this->eventManager->dispatch(
+                                        new ControllerDispatchedEvent($action->getCallback(), $request)
+                                    );
+                                }
+                                ob_start();
+                                $actionResponse = $action();
+                            } finally {
+                                $ob = ob_get_clean();
+                            }
+                            $response = $this->makeResponse($actionResponse, $ob);
+                            if (is_object($action) && method_exists($action, "getMetaArray")) {
+                                $this->mergeMeta($response, $action->getMetaArray());
+                            }
+                            $this->mergeMeta($response, $route->getMetaArray());
 
+                            return $response;
+                        };
+
+                        $response = static::callMiddlewares($request, $route->getMiddlewares(), $fn);
+
+                        break;
+                    }
+                } catch (Pass $pass) {
+                    // Pass to the next route.
+                    continue;
+                } catch (\Throwable $dispatchEx) {
+                    $controller =
+                        isset($action) && $action instanceof Action ? $action->getCallback()[0] ?? null : null;
+                    $response = $this->handleDispatchException($dispatchEx, $controller);
+                    $this->mergeMeta($response, $route->getMetaArray());
                     break;
                 }
-            } catch (Pass $pass) {
-                // Pass to the next route.
-                continue;
-            } catch (\Throwable $dispatchEx) {
-                // Expected Exception when user tries to access private community while not logged in.  No need to log it.
-                if (
-                    $dispatchEx instanceof ForbiddenException &&
-                    ($dispatchEx->getContext()["type"] ?? "") == "!private"
-                ) {
-                } elseif ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
-                    $this->logger->notice($dispatchEx->getMessage(), [
-                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                        Logger::FIELD_TAGS => ["api_error", "dispatcher-caught"],
-                        "responseCode" => $dispatchEx->getCode(),
-                    ]);
-                } else {
-                    ErrorLogger::error(
-                        $dispatchEx,
-                        ["api_error", "dispatcher-caught"],
-                        ["responseCode" => $dispatchEx->getCode()]
-                    );
-                }
-
-                AccessDeniedEvent::tryLog($dispatchEx);
-
-                $response = null;
-                if (is_object($action ?? null) && $action instanceof Action) {
-                    $obj = $action->getCallback()[0] ?? false;
-                    if ($obj instanceof CustomExceptionHandler) {
-                        if ($obj->hasExceptionHandler($dispatchEx)) {
-                            $response = $obj->handleException($dispatchEx);
-                        }
-                    }
-                }
-                if (empty($response)) {
-                    $response = $this->makeResponse($dispatchEx);
-                }
-                $this->mergeMeta($response, $route->getMetaArray());
-                break;
             }
         }
 
@@ -291,6 +276,65 @@ class Dispatcher implements LoggerAwareInterface
 
         $this->addAccessControl($response, $request);
 
+        return $response;
+    }
+
+    /**
+     * Dispatch to CustomPageController and return response.
+     *
+     * @param array $customPage
+     * @return Data|null
+     */
+    private function dispatchCustomPage(array $customPage): ?Data
+    {
+        $customPageController = $this->container->get(CustomPageController::class);
+
+        try {
+            $response = $customPageController($customPage["customPageID"]);
+        } catch (\Throwable $e) {
+            $response = $this->handleDispatchException($e, $customPageController);
+        }
+        return $response->setMeta("CONTENT_TYPE", "text/html; charset=utf-8");
+    }
+
+    /**
+     * Common exception handler for exceptions in `dispatchInternal()`.
+     *
+     * @param \Throwable $dispatchEx
+     * @param mixed $controller
+     * @return Data|null
+     */
+    private function handleDispatchException(\Throwable $dispatchEx, mixed $controller): ?Data
+    {
+        if ($dispatchEx instanceof ForbiddenException && ($dispatchEx->getContext()["type"] ?? "") == "!private") {
+            // Expected Exception when user tries to access private community while not logged in.  No need to log it.
+        } elseif ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
+            $this->logger->notice($dispatchEx->getMessage(), [
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+                Logger::FIELD_TAGS => ["api_error", "dispatcher-caught"],
+                "responseCode" => $dispatchEx->getCode(),
+            ]);
+        } else {
+            ErrorLogger::error(
+                $dispatchEx,
+                ["api_error", "dispatcher-caught"],
+                ["responseCode" => $dispatchEx->getCode()]
+            );
+        }
+
+        AccessDeniedEvent::tryLog($dispatchEx);
+
+        $response = null;
+
+        if ($controller instanceof CustomExceptionHandler) {
+            if ($controller->hasExceptionHandler($dispatchEx)) {
+                $response = $controller->handleException($dispatchEx);
+            }
+        }
+
+        if (empty($response)) {
+            $response = $this->makeResponse($dispatchEx);
+        }
         return $response;
     }
 
@@ -411,12 +455,12 @@ class Dispatcher implements LoggerAwareInterface
             if ($request->hasHeader("Access-Control-Request-Method")) {
                 $response->setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
             }
-            if ($request->hasHeader("Access-Control-Request-Headers")) {
-                $response->setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
-            }
-
             $response->setHeader("Access-Control-Max-Age", strtotime("1 hour"));
         }
+        $response->setHeader(
+            "Access-Control-Expose-Headers",
+            "Authorization, Content-Type, x-app-page-current, x-app-page-first-url, x-app-page-last-url, x-app-page-limit, x-app-page-next-url, x-app-page-prev-url, x-app-page-result-count"
+        );
     }
 
     /**

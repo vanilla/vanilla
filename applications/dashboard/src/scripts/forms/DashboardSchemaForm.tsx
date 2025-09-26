@@ -10,11 +10,11 @@ import { DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl
 import { DashboardFormStyleContext, IDashboardFormStyle } from "@dashboard/forms/DashboardFormStyleContext";
 import { JsonSchemaForm, type IJsonSchemaFormHandle } from "@vanilla/json-schema-forms";
 
-type IProps = Omit<React.ComponentProps<typeof JsonSchemaForm>, "FormControl" | "FormControlGroup"> &
+type IDashboardFormSchemaProps = Omit<React.ComponentProps<typeof JsonSchemaForm>, "FormControl" | "FormControlGroup"> &
     IDashboardFormStyle;
 
 export const DashboardSchemaForm = React.forwardRef(function DashboardSchemaForm(
-    props: IProps,
+    props: IDashboardFormSchemaProps,
     ref?: React.Ref<IJsonSchemaFormHandle>,
 ) {
     return (

@@ -16,15 +16,8 @@ export default useThemeCache(() => {
 
     const expandColapseButton = style("expandColapseButton", {
         display: "flex",
+        gap: 4,
         alignItems: "center",
-        height: 36,
-        marginLeft: -8,
-        marginRight: 16,
-        ...{
-            "& span": {
-                marginLeft: 6,
-            },
-        },
     });
 
     const newLinkButton = style("newLinkButton", {

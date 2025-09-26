@@ -105,3 +105,9 @@ async function renderPanoptoEmbed(element: HTMLElement) {
         iframe.classList.add("embedVideo-iframe");
     }
 }
+
+declare global {
+    interface Window {
+        EmbedApi: any;
+    }
+}

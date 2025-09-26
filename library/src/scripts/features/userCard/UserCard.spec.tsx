@@ -16,7 +16,7 @@ describe("UserCard", () => {
         expect(screen.queryByText(/Banned/)).toBeInTheDocument();
     });
     it("Displays label if only label is provided", () => {
-        const user = UserFixture.createMockUser({ label: "Test Label" });
+        const user = UserFixture.createMockUser({ labelHtml: "Test Label" });
         render(<UserCardView user={user} />);
         expect(screen.queryByText(/Test Label/)).toBeInTheDocument();
     });
@@ -26,13 +26,13 @@ describe("UserCard", () => {
         expect(screen.queryByText(/Test Title/)).toBeInTheDocument();
     });
     it("Displays title if both label and title is provided", () => {
-        const user = UserFixture.createMockUser({ label: "Test Label", title: "Test Title" });
+        const user = UserFixture.createMockUser({ labelHtml: "Test Label", title: "Test Title" });
         render(<UserCardView user={user} />);
         expect(screen.queryByText(/Test Title/)).toBeInTheDocument();
     });
     it("Special characters in label is not converted to html entities ", () => {
         const user = UserFixture.createMockUser({
-            label: `<img data-testid="testImage" src="none" onerror="alert('xss')"/>`,
+            labelHtml: `<img data-testid="testImage" src="none" onerror="alert('xss')"/>`,
         });
         render(<UserCardView user={user} />);
         const image = screen.queryByTestId("testImage");

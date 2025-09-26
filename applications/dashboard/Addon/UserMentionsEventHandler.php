@@ -47,7 +47,7 @@ class UserMentionsEventHandler implements PsrEventHandlersInterface
     }
 
     /**
-     * {@inheritDoc}.
+     * {@inheritdoc}.
      */
     public static function getPsrEventHandlerMethods(): array
     {

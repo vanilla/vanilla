@@ -5,7 +5,7 @@
 
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "./DashboardLabelType";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";

@@ -26,7 +26,7 @@ export function VanillaSpecTest() {
         <QueryClientProvider client={queryClient}>
             <OpenApiViewer
                 tryItEnabled={false}
-                spec={spec}
+                spec={spec as any}
                 initialFocusedRoute={{
                     method: "get",
                     path: "/comments",
@@ -41,7 +41,7 @@ export function VanillaSpecTryIt() {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <OpenApiContextProvider spec={spec}>
+            <OpenApiContextProvider spec={spec as any}>
                 <TryItContextProvider
                     value={{
                         enabled: true,

@@ -1,12 +1,12 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
 import { render, act, fireEvent, RenderResult, within } from "@testing-library/react";
-import { CategoryFollowDropDownWithCategoryNotificationsContext } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
+import { CategoryFollowDropdownImpl } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { mockAPI } from "@library/__tests__/utility";
 import { CategoryPreferencesFixture } from "@dashboard/userPreferences/__fixtures__/CategoryNotificationPreferences.Fixture";
@@ -51,16 +51,14 @@ beforeEach(() => {
     });
 });
 
-function renderInProvider(
-    props?: Partial<React.ComponentProps<typeof CategoryFollowDropDownWithCategoryNotificationsContext>>,
-) {
+function renderInProvider(props?: Partial<React.ComponentProps<typeof CategoryFollowDropdownImpl>>) {
     return render(
         <QueryClientProvider client={queryClient}>
             <NotificationPreferencesContextProvider userID={MOCK_USER_ID} api={mockNotificationPreferencesApi!}>
-                <CategoryFollowDropDownWithCategoryNotificationsContext
+                <CategoryFollowDropdownImpl
                     userID={MOCK_USER_ID}
-                    categoryID={MOCK_CATEGORY_ID}
-                    categoryName="Test Category"
+                    recordID={MOCK_CATEGORY_ID}
+                    name="Test Category"
                     emailDigestEnabled
                     isOpen
                     {...props}

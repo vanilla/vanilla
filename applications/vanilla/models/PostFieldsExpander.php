@@ -24,7 +24,7 @@ class PostFieldsExpander extends AbstractApiExpander
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFullKey(): string
     {
@@ -32,16 +32,21 @@ class PostFieldsExpander extends AbstractApiExpander
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveFragments(array $recordIDs): array
     {
-        $postFields = $this->postFieldModel->getWhere(["postTypeID" => $recordIDs]);
-        return ArrayUtils::arrayColumnArrays($postFields, null, "postTypeID");
+        $postFields = $this->postFieldModel->getPostFieldsByPostTypes(["ptpf.postTypeID" => $recordIDs]);
+        $postFields = ArrayUtils::arrayColumnArrays($postFields, null, "postTypeID");
+        foreach ($postFields as &$group) {
+            // Make sure post fields are sorted in each group.
+            usort($group, fn($field1, $field2) => $field1["sort"] <=> $field2["sort"]);
+        }
+        return $postFields;
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getPermission(): ?string
     {

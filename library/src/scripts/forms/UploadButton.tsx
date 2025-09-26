@@ -11,7 +11,7 @@ import { useRef, useState } from "react";
 
 type IProps = Omit<React.ComponentProps<typeof Button>, "onClick"> & {
     accessibleTitle: string;
-    acceptedMimeTypes: "files" | "images" | React.InputHTMLAttributes<any>["accept"];
+    acceptedMimeTypes?: "files" | "images" | React.InputHTMLAttributes<any>["accept"];
 } & (
         | {
               multiple: true;
@@ -61,19 +61,20 @@ export function UploadButton(props: IProps) {
 }
 
 function resolveAccept(value: IProps["acceptedMimeTypes"]): React.InputHTMLAttributes<any>["accept"] {
-    const allowedMimeTypes: string[] = getMeta("upload.allowedExtensions", []);
+    const allowedExtensions: string[] = getMeta("upload.allowedExtensions", []);
 
     switch (value) {
         case "files": {
-            const types = allowedMimeTypes.filter((type) => !isMimeTypeImage(type));
+            const types = allowedExtensions.filter((type) => !isExtensionImage(type)).map((type) => `.${type}`);
             return types.join(", ");
         }
-        case "images": {
-            const types = allowedMimeTypes.filter(isMimeTypeImage);
+        case "images":
+        case "image": {
+            const types = allowedExtensions.filter(isExtensionImage).map((type) => `.${type}`);
             return types.join(",");
         }
         default:
-            return value;
+            return allowedExtensions.join(", ");
     }
 }
 
@@ -82,4 +83,5 @@ const classes = {};
 /**
  * Determine if a particular mime type is an image mimeType.
  */
-const isMimeTypeImage = (mimeType: string) => mimeType.startsWith("image/");
+const isExtensionImage = (fileExtension: string) =>
+    ["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp", "heic", "heif", "tiff", "tif", "ico"].includes(fileExtension);

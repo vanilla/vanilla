@@ -102,35 +102,45 @@ export const messagesClasses = useThemeCache(() => {
     const mediaQueries = oneColumnVariables().mediaQueries();
     const shadows = shadowHelper();
 
-    const wrap = css({
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        flexWrap: "nowrap",
-        minHeight: styleUnit(vars.sizing.minHeight),
-        width: percent(100),
-        margin: "auto",
-        color: ColorsUtils.colorOut(vars.colors.fg),
-        ...Mixins.padding({
-            vertical: vars.spacing.padding.vertical,
-            left: vars.spacing.padding.withoutIcon * 1.5,
-            right: vars.spacing.padding.withoutIcon,
+    const wrap = css(
+        {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            flexWrap: "nowrap",
+            minHeight: styleUnit(vars.sizing.minHeight),
+            width: percent(100),
+            margin: "auto",
+            color: ColorsUtils.colorOut(vars.colors.fg),
+            ...Mixins.padding({
+                vertical: vars.spacing.padding.vertical,
+                left: vars.spacing.padding.withoutIcon * 1.5,
+                right: vars.spacing.padding.withoutIcon,
+            }),
+        },
+        mediaQueries.xs({
+            flexWrap: "wrap",
         }),
-    });
+    );
 
     const wrapWithIcon = css({
         paddingLeft: vars.spacing.padding.withIcon,
     });
 
-    const message = css({
-        ...Mixins.font(vars.text.font),
-        width: percent(100),
-        flex: 1,
-        position: "relative",
-        ...Mixins.padding({
-            vertical: 6,
+    const message = css(
+        {
+            ...Mixins.font(vars.text.font),
+            width: percent(100),
+            flex: 1,
+            position: "relative",
+            ...Mixins.padding({
+                vertical: 6,
+            }),
+        },
+        mediaQueries.xs({
+            flex: "initial",
         }),
-    });
+    );
 
     // Fixed wrapper
     const fixed = css(
@@ -226,6 +236,10 @@ export const messagesClasses = useThemeCache(() => {
             [`&.${actionButtonPrimary}`]: {
                 fontWeight: globalVars.fonts.weights.bold,
             },
+            ...mediaQueries.xs({
+                marginLeft: 0,
+                paddingLeft: 0,
+            }),
         },
     });
 

@@ -34,12 +34,7 @@ echo $form->errors();
     <?php
     $checkboxDesc =
         "Checkboxes allow admins to perform batch actions on a number of posts or comments at the same time.";
-    echo $form->toggle(
-        "Vanilla.AdminCheckboxes.Use",
-        "Enable checkboxes on posts and comments",
-        [],
-        $checkboxDesc
-    );
+    echo $form->toggle("Vanilla.AdminCheckboxes.Use", "Enable checkboxes on posts and comments", [], $checkboxDesc);
     ?>
 </div>
 
@@ -295,6 +290,17 @@ echo $form->errors();
     </div>
     <div class="input-wrap">
         <?php echo $form->textBox("Vanilla.Comment.MinLength", ["class" => "InputBox SmallInput"]); ?>
+    </div>
+</div>
+<div class="form-group">
+    <div class="label-wrap">
+        <?php echo $form->label("Max Post Title Length", "Vanilla.Discussion.Title.MaxLength"); ?>
+        <div class="info"><?php echo t(
+            "You can specify a maximum post title length. Minimum is 50 and Maximum is 250."
+        ); ?></div>
+    </div>
+    <div class="input-wrap">
+        <?php echo $form->textBox("Vanilla.Discussion.Title.MaxLength", ["class" => "InputBox SmallInput"]); ?>
     </div>
 </div>
 <?php echo $form->close("Save"); ?>

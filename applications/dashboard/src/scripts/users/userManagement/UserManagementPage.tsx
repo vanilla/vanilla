@@ -48,7 +48,7 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { useLocalStorage } from "@vanilla/react-utils";
 import { spaceshipCompare } from "@vanilla/utils";
-import qs from "qs";
+import * as qs from "qs-esm";
 import React, { ComponentType, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { useUsersExport } from "./UserManagementExport";
@@ -287,7 +287,6 @@ export function UserManagementImpl() {
                                     showNextButton: false,
                                 }}
                                 onChange={(page: number) => updateQuery({ ...query, page: page })}
-                                isMobile={false}
                             />
                         )}
                     </div>

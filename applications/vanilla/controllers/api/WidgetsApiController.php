@@ -9,23 +9,23 @@ namespace Vanilla\Controllers\Api;
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Vanilla\Utility\InstanceValidatorSchema;
-use Vanilla\Widgets\WidgetFactory;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetFactory;
+use Vanilla\Widgets\LegacyWidgetService;
 
 /**
  * API Controller for the `/widgets`.
  */
 class WidgetsApiController extends \AbstractApiController
 {
-    /** @var WidgetService */
+    /** @var LegacyWidgetService */
     private $widgetService;
 
     /**
      * WidgetsApiController constructor.
      *
-     * @param WidgetService $widgetService
+     * @param LegacyWidgetService $widgetService
      */
-    public function __construct(WidgetService $widgetService)
+    public function __construct(LegacyWidgetService $widgetService)
     {
         $this->widgetService = $widgetService;
     }
@@ -37,7 +37,7 @@ class WidgetsApiController extends \AbstractApiController
      */
     protected function widgetSchema()
     {
-        return new InstanceValidatorSchema(WidgetFactory::class);
+        return new InstanceValidatorSchema(LegacyWidgetFactory::class);
     }
 
     /**

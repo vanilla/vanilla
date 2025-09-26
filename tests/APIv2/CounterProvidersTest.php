@@ -8,6 +8,7 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\Forum\Menu\ForumCounterProvider;
 use Vanilla\Menu\Counter;
+use Vanilla\Models\ContentDraftModel;
 
 /**
  * Test the CounterProviders
@@ -55,8 +56,8 @@ class CounterProvidersTest extends AbstractAPIv2Test
     public function testUserCounterProvider()
     {
         $session = self::container()->get(\Gdn_Session::class);
-
-        $provider = new ForumCounterProvider($session);
+        $contentDraftModel = self::container()->get(ContentDraftModel::class);
+        $provider = new ForumCounterProvider($session, $contentDraftModel);
 
         $counters = $provider->getMenuCounters();
 

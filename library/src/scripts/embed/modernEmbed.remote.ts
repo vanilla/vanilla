@@ -30,7 +30,7 @@ export class VanillaEmbedElement extends HTMLElement {
     public scrollOffseter: HTMLDivElement;
 
     /** The JSConnect SSO string so that users are seamlessly authenticated. */
-    public ssoString: string;
+    public ssoString: string | null;
 
     /**
      * Get the IFrame source
@@ -306,3 +306,9 @@ export class VanillaEmbedElement extends HTMLElement {
 
 // Register our custom element.
 customElements.define("vanilla-embed", VanillaEmbedElement);
+
+declare global {
+    interface Window {
+        vanilla_sso?: string | null;
+    }
+}

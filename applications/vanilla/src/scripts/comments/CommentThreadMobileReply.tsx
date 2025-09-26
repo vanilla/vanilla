@@ -21,7 +21,7 @@ import { useNestedCommentContext } from "@vanilla/addon-vanilla/comments/NestedC
 import { ICommentEditorRefHandle } from "@vanilla/addon-vanilla/comments/CommentEditor";
 import { CommentReply } from "@vanilla/addon-vanilla/comments/CommentReply";
 import type { IThreadItem } from "@vanilla/addon-vanilla/comments/NestedCommentTypes";
-import { t } from "@vanilla/i18n/";
+import { t } from "@vanilla/i18n";
 import { useEffect, useRef } from "react";
 
 interface IProps {

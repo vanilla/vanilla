@@ -4,8 +4,9 @@
  * @license GPL-2.0-only
  */
 
-import React, { Children } from "react";
+import React, { Children, useEffect, useState } from "react";
 import { carouselClasses } from "@library/carousel/Carousel.style";
+import { useLastValue } from "@vanilla/react-utils";
 
 /**
  *
@@ -24,8 +25,8 @@ interface IProps {
     enableSwipe: boolean;
     enableMouseSwipe: boolean;
     preventDefaultTouchmoveEvent: boolean;
-
     handlers: any;
+    isReady?: boolean;
 }
 
 const springConfig = {
@@ -49,16 +50,16 @@ export function CarouselSlider(props: IProps) {
         numberOfSlidesToShow,
         slideDesiredIndex,
         sliderPosition,
+        isReady,
     } = props;
 
     const minVisibleItem = slideDesiredIndex;
     const maxVisibleItem = slideDesiredIndex + numberOfSlidesToShow;
 
-    let transition = createTransition("transform", springConfig);
-    let WebkitTransition = createTransition("-webkit-transform", springConfig);
+    const wasReady = useLastValue(isReady);
+    let transition = wasReady ? createTransition("transform", springConfig) : "none";
 
     const sliderStyle: React.CSSProperties = {
-        WebkitTransition,
         transition,
         transform: `translate(${sliderPosition}px, 0px)`,
     };
@@ -76,7 +77,11 @@ export function CarouselSlider(props: IProps) {
         const childToRender = React.cloneElement(child, {
             tabIndex: isVisible ? 0 : -1,
         });
-        return <li style={{ width: childWidth }}>{childToRender}</li>;
+        return (
+            <li style={{ width: childWidth }} key={child.key ?? idx}>
+                {childToRender}
+            </li>
+        );
     });
 
     return (

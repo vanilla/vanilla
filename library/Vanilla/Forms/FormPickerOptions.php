@@ -56,7 +56,17 @@ class FormPickerOptions implements FormChoicesInterface
     }
 
     /**
-     * @inheritDoc
+     * @return array
+     */
+    public function getOptionsData(): array
+    {
+        return [
+            "options" => $this->getOptions(),
+        ];
+    }
+
+    /**
+     * @inheritdoc
      */
     public function getChoices(): array
     {

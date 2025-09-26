@@ -9,6 +9,7 @@ namespace VanillaTests\Controllers;
 
 use Garden\Events\ResourceEvent;
 use Gdn;
+use Gdn_UserException;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\EventSpyTestTrait;
@@ -41,7 +42,7 @@ class LogControllerTest extends SiteTestCase
     private $discussionModel;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -57,7 +58,7 @@ class LogControllerTest extends SiteTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function setupBeforeClass(): void
     {
@@ -260,7 +261,7 @@ class LogControllerTest extends SiteTestCase
      */
     public function testSpamCommentRestore(): void
     {
-        $user = $this->createUser();
+        $user = $this->createUser(["roleID" => [\RoleModel::MEMBER_ID]]);
         $discussion = $this->createDiscussion();
         $preCommentCount = $this->commentModel->getCount();
         $logData = [
@@ -382,11 +383,67 @@ class LogControllerTest extends SiteTestCase
     }
 
     /**
+     * Test moderation queue count through the count() function.
+     */
+    public function testModerationQueueCount(): void
+    {
+        // Create a user
+        $memberUser = $this->createUser();
+        // Create a discussion
+        $discussionA = $this->runWithUser(function () {
+            return $this->createDiscussion();
+        }, $memberUser);
+
+        // Create a `Pending` log record
+        $logData = [
+            "Name" => __FUNCTION__,
+            "Body" => __FUNCTION__ . "test restore discussion",
+            "CategoryID" => 1,
+            "InsertUserID" => $memberUser["userID"],
+            "DateInserted" => "2020-01-01 00:00:00",
+            "DiscussionID" => $discussionA["discussionID"],
+            "Format" => $discussionA["format"],
+        ];
+        $this->logModel->insert("Pending", "Discussion", $logData);
+
+        // Create another discussion
+        $discussionB = $this->runWithUser(function () {
+            return $this->createDiscussion();
+        }, $memberUser);
+
+        // Create another `Moderate` log record
+        $logData = [
+            "Name" => __FUNCTION__,
+            "Body" => __FUNCTION__ . "test restore discussion",
+            "CategoryID" => 1,
+            "InsertUserID" => $memberUser["userID"],
+            "DateInserted" => "2020-01-01 00:00:00",
+            "DiscussionID" => $discussionB["discussionID"],
+            "Format" => $discussionB["format"],
+        ];
+        $this->logModel->insert("Moderate", "Discussion", $logData);
+
+        // SQL count of the moderation queue.
+        $sqlCount = Gdn::sql()
+            ->select("l.LogID", "count", "CountLogID")
+            ->from("Log l")
+            ->whereIn("Operation", ["Moderate", "Pending"])
+            ->get()
+            ->value("CountLogID", 0);
+
+        // Get the count of the moderation queue (The count() function echoes the count, so we need to capture the output).
+        ob_start();
+        $this->controller->count("moderate");
+        $output = ob_get_clean();
+        $this->assertEquals('<span class="Alert">' . $sqlCount . "</span>", $output);
+    }
+
+    /**
      * Create user using UserModel. Api method interferes with global request object used in above tests.
      *
      * @param string $name Unique name used for name and email.
      * @return int UserID
-     * @throws \Gdn_UserException
+     * @throws Gdn_UserException
      */
     protected function createUserByModel(string $name): int
     {
@@ -418,7 +475,7 @@ class LogControllerTest extends SiteTestCase
      */
     public function testAutomationRulesPageThrowsExceptionWhenNoDispatchISProvided(): void
     {
-        $this->expectException(\Gdn_UserException::class);
+        $this->expectException(Gdn_UserException::class);
         $this->expectExceptionMessage("Page Not Found");
         $this->bessy()->get("/log/automationrules/");
     }

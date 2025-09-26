@@ -12,16 +12,27 @@ use Vanilla\OpenAI\OpenAIPrompt;
 
 class MockOpenAIClient extends OpenAIClient
 {
-    protected array $mockResponses;
+    protected array $mockResponses = [];
 
     /**
      * Return mocked responses from OpenAI.
      *
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function prompt(string $model, $prompt, $responseSchema)
+    public function prompt(string $model, $prompt, $responseSchema, $promptOverrides = []): array
     {
         return $this->lookupMockResponse($prompt);
+    }
+
+    /**
+     * Return mocked responses from OpenAI.
+     *
+     * {@inheritdoc}
+     */
+    protected function promptEmbeddingInternal(string $model, array $body): array
+    {
+        $message = json_encode($body);
+        return $this->lookupEmbedMockResponse($message);
     }
 
     /**
@@ -34,6 +45,22 @@ class MockOpenAIClient extends OpenAIClient
     public function addMockResponse(string $pattern, array $mockResponse)
     {
         $this->mockResponses[$pattern] = $mockResponse;
+    }
+
+    /**
+     * Return mocked response.
+     *
+     * @param string $message
+     * @return array
+     */
+    private function lookupEmbedMockResponse(string $message): array
+    {
+        foreach ($this->mockResponses as $pattern => $response) {
+            if (preg_match($pattern, $message)) {
+                return $response;
+            }
+        }
+        return [];
     }
 
     /**

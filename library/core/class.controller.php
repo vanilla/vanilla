@@ -2206,7 +2206,9 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             if ($this->SyndicationMethod == SYNDICATION_NONE && is_object($this->Head)) {
                 $cssAnchors = LegacyAssetModel::getAnchors();
                 $assetProvider = \Gdn::getContainer()->get(ViteAssetProvider::class);
-                $inlineScript = $assetProvider->getBootstrapInlineScript();
+                $inlineScript = $assetProvider->getBootstrapInlineScript(
+                    $this->MasterView === "admin" ? "admin" : "forum"
+                );
                 $isMinificationEnabled = Gdn::config("minify.scripts", true);
                 if ($isMinificationEnabled) {
                     $jsMinifier = new MatthiasMullie\Minify\JS($inlineScript);
@@ -2512,11 +2514,18 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             $themeProvider->setForcedThemeKey("theme-dashboard");
         }
 
-        $this->registerReduxActionProvider($themeProvider);
+        $this->registerPreloader($themeProvider);
         $themeScript = $themeProvider->getThemeScript();
         if ($themeScript !== null) {
             $this->Head->addScript($themeScript->getWebPath(), "text/javascript", true, [
                 "static" => $themeScript->isStatic(),
+            ]);
+        }
+
+        foreach ($themeProvider->getPreloadFragmentScriptUrls() as $preloadFragmentScriptUrl) {
+            $this->Head->addTag("link", [
+                "rel" => "modulepreload",
+                "href" => $preloadFragmentScriptUrl,
             ]);
         }
     }
@@ -2548,6 +2557,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         // Noscript stylesheet
         $noScriptStyleAsset = \Gdn::getContainer()->get(NoScriptStylesAsset::class);
         $this->Head->addTag("noscript", [], "<link rel='stylesheet' href='{$noScriptStyleAsset->getWebPath()}'>");
+
+        // Locale debugging script
+        $scriptContents = \Gdn::locale()->getMissingTranslationsScriptContents();
+        $this->Head->addScript("", "module", false, ["content" => $scriptContents]);
     }
 
     /**
@@ -2557,7 +2570,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     {
         if ($this->MasterView === "admin") {
             $dashboardProvider = \Gdn::getContainer()->get(DashboardPreloadProvider::class);
-            $this->registerReduxActionProvider($dashboardProvider);
+            $this->registerPreloader($dashboardProvider);
         }
     }
 

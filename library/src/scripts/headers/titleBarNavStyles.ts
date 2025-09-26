@@ -4,32 +4,33 @@
  * @license GPL-2.0-only
  */
 
-import { percent, px, calc, quote, rgba } from "csx";
-import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { calc, percent, px, quote } from "csx";
 import { flexHelper, negative, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { styleUnit } from "@library/styles/styleUnit";
-import { variableFactory } from "@library/styles/styleUtils";
-import { useThemeCache } from "@library/styles/themeCache";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { formElementsVariables } from "@library/forms/formElementStyles";
+import type { IThemeVariables } from "@library/theming/themeReducer";
+import { LocalVariableMapping } from "@library/styles/VariableMapping";
 import { LogoAlignment } from "@library/headers/LogoAlignment";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
-import { LocalVariableMapping } from "@library/styles/VariableMapping";
 import { css } from "@emotion/css";
+import { formElementsVariables } from "@library/forms/formElementStyles";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { styleUnit } from "@library/styles/styleUnit";
+import { titleBarVariables } from "@library/headers/TitleBar.variables";
+import { useThemeCache } from "@library/styles/themeCache";
+import { variableFactory } from "@library/styles/styleUtils";
 
-export const titleBarNavigationVariables = useThemeCache(() => {
+export const titleBarNavigationVariables = useThemeCache((varOverrides?: IThemeVariables) => {
     const makeThemeVars = variableFactory(
         "titleBarNavigation",
-        undefined,
+        varOverrides,
         new LocalVariableMapping({
             "navLinks.font.size": "navLinks.fontSize",
         }),
     );
-    const globalVars = globalVariables();
-    const varsFormElements = formElementsVariables();
-    const titleBarVars = titleBarVariables();
+    const globalVars = globalVariables(varOverrides);
+    const varsFormElements = formElementsVariables(varOverrides);
+    const titleBarVars = titleBarVariables(varOverrides);
 
     const border = makeThemeVars("border", {
         verticalWidth: 3,
@@ -91,10 +92,10 @@ export const titleBarNavigationVariables = useThemeCache(() => {
     };
 });
 
-const titleBarNavClasses = useThemeCache(() => {
-    const globalVars = globalVariables();
-    const titleBarVars = titleBarVariables();
-    const vars = titleBarNavigationVariables();
+const titleBarNavClasses = useThemeCache((varOverrides?: IThemeVariables) => {
+    const globalVars = globalVariables(varOverrides);
+    const titleBarVars = titleBarVariables(varOverrides);
+    const vars = titleBarNavigationVariables(varOverrides);
 
     const mediaQueries = titleBarVars.mediaQueries();
     const flex = flexHelper();
@@ -128,7 +129,7 @@ const titleBarNavClasses = useThemeCache(() => {
     const items = css(
         {
             ...flex.middleLeft(),
-            height: styleUnit(titleBarVars.sizing.height),
+            minHeight: styleUnit(titleBarVars.sizing.height),
             ...Mixins.padding(vars.padding),
         },
         mediaQueries.compact({

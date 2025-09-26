@@ -61,7 +61,7 @@ class SubscriptionChangeEvent extends ResourceEvent implements LoggableEventInte
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLogEntry(): LogEntry
     {
@@ -77,7 +77,7 @@ class SubscriptionChangeEvent extends ResourceEvent implements LoggableEventInte
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getTrackableCollection(): ?string
     {

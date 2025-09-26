@@ -13,12 +13,12 @@ export const IconSize = {
     compact: 16,
 };
 
-interface IProps extends React.SVGAttributes<HTMLOrSVGElement> {
+export interface IIconProps extends React.SVGAttributes<HTMLOrSVGElement> {
     icon: IconType;
     size?: keyof typeof IconSize;
 }
 
-export function Icon(_props: IProps) {
+export function Icon(_props: IIconProps) {
     const { icon, size = "default", ...props } = _props;
     const FoundIcon = iconRegistry.getIcon(icon);
     const coreIcon = (window as any).__VANILLA_ICON_ATTRS__?.[icon] ?? coreIconsData[icon] ?? null;

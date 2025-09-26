@@ -36,7 +36,8 @@ class UsersExpander extends AbstractApiExpander
             ->addExpandField("inviteUser", "inviteUserID")
             ->addExpandField("user", "userID")
             ->addExpandField("recordUser", "recordUserID")
-            ->addExpandField("assignedUser", "assignedUserID");
+            ->addExpandField("assignedUser", "assignedUserID")
+            ->addExpandField("revisionInsertUser", "revisionInsertUserID");
     }
 
     /**

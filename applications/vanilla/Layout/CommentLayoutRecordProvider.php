@@ -62,7 +62,7 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveLayoutQuery(LayoutQuery $query): LayoutQuery
     {
@@ -78,7 +78,7 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function resolveParentLayoutQuery(LayoutQuery $query): LayoutQuery
     {
@@ -86,14 +86,15 @@ class CommentLayoutRecordProvider implements LayoutViewRecordProviderInterface
         if (!$comment) {
             throw new NotFoundException("Comment");
         }
-        $this->commentModel->orderBy("c.DateInserted asc");
+
         // Skip loading Comment Pages number to avoid infinite loop.
         $skipPageCalculation = $query->getParams()["skipPageCalculation"] ?? false;
+
         $newQuery = $query
             ->withRecordType($comment["parentRecordType"])
             ->withRecordID($comment["parentRecordID"])
             ->withAdditionalParams([
-                "page" => $skipPageCalculation ? 1 : $this->commentModel->getCommentThreadPage($comment),
+                "page" => $skipPageCalculation ? 1 : "lookupSort",
                 "parentRecordType" => $comment["parentRecordType"],
                 "parentRecordID" => $comment["parentRecordID"],
                 "commentID" => $query->recordID,

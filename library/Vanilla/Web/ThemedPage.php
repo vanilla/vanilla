@@ -8,6 +8,7 @@ namespace Vanilla\Web;
 
 use Vanilla\Models\SiteMeta;
 use Vanilla\Theme\ThemePreloadProvider;
+use Vanilla\Web\Asset\WebAsset;
 
 /**
  * A Web\Page that makes use of custom theme data from the theming API.
@@ -64,7 +65,7 @@ abstract class ThemedPage extends Page
     protected function initAssets()
     {
         // Preload for frontend
-        $this->registerReduxActionProvider($this->themeProvider);
+        $this->registerPreloader($this->themeProvider);
 
         // HTML handling
         $this->headerHtml = $this->themeProvider->getThemeHeaderHtml();
@@ -74,6 +75,13 @@ abstract class ThemedPage extends Page
         $script = $this->themeProvider->getThemeScript();
         if ($script !== null) {
             $this->addScript($script);
+        }
+
+        foreach ($this->themeProvider->getPreloadFragmentScriptUrls() as $scriptUrl) {
+            $this->addLinkTag([
+                "rel" => "modulepreload",
+                "href" => $scriptUrl,
+            ]);
         }
     }
 }

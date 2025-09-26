@@ -35,12 +35,6 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
     const { setTopOffset } = useScrollOffset();
     const { cacheID } = useThemeCacheID();
 
-    const [ownThemeKey, setThemeKey] = useState({});
-    // Trigger a state re-render when the theme key changes
-    useEffect(() => {
-        setThemeKey(themeKey);
-    }, [themeKey, setThemeKey]);
-
     useEffect(() => {
         if (disabled) {
             return;

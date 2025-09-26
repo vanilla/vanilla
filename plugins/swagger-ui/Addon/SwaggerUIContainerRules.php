@@ -12,7 +12,7 @@ use Vanilla\SwaggerUI\Controllers\ApiDocsPageController;
 class SwaggerUIContainerRules extends AddonContainerRules
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function configureContainer(ContainerConfigurationInterface $container): void
     {

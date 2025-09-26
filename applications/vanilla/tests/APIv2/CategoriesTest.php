@@ -95,7 +95,7 @@ class CategoriesTest extends AbstractResourceTest
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function triggerDirtyRecords()
     {

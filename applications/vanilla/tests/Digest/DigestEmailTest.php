@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Vanilla\Forum\Digest;
 
+use Vanilla\Dashboard\Models\UserNotificationPreferencesModel;
 use Vanilla\Forum\Digest\DigestEmail;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
@@ -19,9 +20,11 @@ class DigestEmailTest extends SiteTestCase
 
     protected $digestEmail;
 
+    protected UserNotificationPreferencesModel $userNotificationPreferencesModel;
     public function setUp(): void
     {
         parent::setUp();
+        $this->userNotificationPreferencesModel = $this->container()->get(UserNotificationPreferencesModel::class);
         $this->digestEmail = $this->container()->get(DigestEmail::class);
     }
     /**
@@ -53,6 +56,61 @@ class DigestEmailTest extends SiteTestCase
 
         $mergedTextContent = $this->digestEmail->getTextContent();
         $this->assertStringNotContainsString("*/unsubscribe_{$category["categoryID"]}/*", $mergedTextContent);
+    }
+
+    /**
+     * Test that the subscribe reason respects the user's `Email.DigestEnabled` preference.
+     *
+     * @return void
+     */
+    public function testSubscribeReason(): void
+    {
+        $autoSubscribedUser = $this->createUser();
+        $autoSubscribedUserFromModel = $this->userModel->getID($autoSubscribedUser["userID"], DATASET_TYPE_ARRAY);
+
+        $this->userNotificationPreferencesModel->save($autoSubscribedUser["userID"], ["Email.DigestEnabled" => 3]);
+
+        $this->digestEmail->setFormat("html");
+
+        $htmlContent = "<html><head><title> TestSubscribeReason </title></head>
+                        <body>
+                        <h1>SubscribeReason</h1>
+                        <p>
+                        '*/digest_subscribe_reason/*'
+                        </p>
+                        </body>";
+
+        $textContent = "SubscribeReason \n\n '*/digest_subscribe_reason/*'";
+
+        $this->digestEmail->setHtmlContent($htmlContent);
+        $this->digestEmail->setTextContent($textContent);
+
+        $this->digestEmail->mergeDigestUnsubscribe($autoSubscribedUserFromModel);
+
+        $html = $this->digestEmail->getHtmlContent();
+
+        // The reason should reflect that the user was auto-subscribed.
+        $this->assertStringContainsString(
+            "You are receiving this email because you were opted in to receive email digests.",
+            $html
+        );
+
+        $optInUser = $this->createUser();
+        $this->userNotificationPreferencesModel->save($optInUser["userID"], ["Email.DigestEnabled" => 1]);
+        $optInUserFromModel = $this->userModel->getID($optInUser["userID"], DATASET_TYPE_ARRAY);
+
+        $this->digestEmail->setHtmlContent($htmlContent);
+        $this->digestEmail->setTextContent($textContent);
+
+        $this->digestEmail->mergeDigestUnsubscribe($optInUserFromModel);
+
+        $html = $this->digestEmail->getHtmlContent();
+
+        // The reason should reflect that the user opted in.
+        $this->assertStringContainsString(
+            "You are receiving this email because you opted in to receive email digests.",
+            $html
+        );
     }
 
     /**

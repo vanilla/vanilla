@@ -69,6 +69,7 @@ export const pageHeadingClasses = useThemeCache(() => {
     const actions = css({
         display: "flex",
         alignItems: "center",
+        flexShrink: 0,
 
         "& > *": {
             marginLeft: globalVars.gutter.size,

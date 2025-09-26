@@ -199,6 +199,8 @@ class UtilityController extends DashboardController
     {
         $this->permission("Garden.Settings.Manage");
 
+        Gdn_Theme::section("VanillaStaff");
+
         if (!$this->Form->authenticatedPostBack()) {
             // The form requires a postback to do anything.
             $step = "start";

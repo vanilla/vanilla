@@ -8,6 +8,7 @@
 namespace VanillaTests\Forum;
 
 use PermissionNotificationGenerator;
+use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Models\CommunityNotificationGenerator;
 use Vanilla\Scheduler\LongRunnerAction;
 use VanillaTests\DatabaseTestTrait;
@@ -36,6 +37,7 @@ class CommentNotificationsTest extends SiteTestCase
     use DatabaseTestTrait;
 
     public static $addons = ["vanilla"];
+    private CommunityNotificationGenerator $communityNotificationGenerator;
 
     public static function setupBeforeClass(): void
     {
@@ -44,6 +46,12 @@ class CommentNotificationsTest extends SiteTestCase
         $configuration = static::container()->get("Config");
         $configuration->set("Preferences.Popup.ParticipateComment", "1");
         $configuration->set(CategoryModel::CONF_CATEGORY_FOLLOWING, true);
+    }
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->communityNotificationGenerator = Gdn::getContainer()->get(CommunityNotificationGenerator::class);
     }
 
     /**
@@ -111,14 +119,13 @@ class CommentNotificationsTest extends SiteTestCase
             ->getWhere("Comment", ["CommentID" => $comment["commentID"]])
             ->resultArray()[0];
 
-        $notificationGenerator = Gdn::getContainer()->get(CommunityNotificationGenerator::class);
         // Make sure we have 2 mentions to pass to the longrunner job.
         $twoMentions = Gdn::formatService()->parseMentions(
             "@{$user1["name"]} and @{$user2["name"]}",
             $commentFromDB["Format"]
         );
         $activity = $this->getCommentActivity($category["name"], $comment, $discussion);
-        $longRunnerAction = $notificationGenerator->processMentionNotifications(
+        $longRunnerAction = $this->communityNotificationGenerator->processMentionNotifications(
             $activity,
             $discussionFromDB,
             $twoMentions
@@ -172,12 +179,10 @@ class CommentNotificationsTest extends SiteTestCase
         $comment1 = $this->runWithUser([$this, "createComment"], $firstCommentUser);
         $comment2 = $this->runWithUser([$this, "createComment"], $secondCommentUser);
 
-        $notificationGenerator = Gdn::getContainer()->get(CommunityNotificationGenerator::class);
-
         $commentActivity = $this->getCommentActivity($category["name"], $comment2, $discussion);
 
         // Process the activity.
-        $longRunnerAction = $notificationGenerator->processParticipatedNotifications(
+        $longRunnerAction = $this->communityNotificationGenerator->processParticipatedNotifications(
             $commentActivity,
             $discussionFromDB
         );
@@ -689,5 +694,28 @@ class CommentNotificationsTest extends SiteTestCase
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Test user doesn't get mention notifications when mentions are disabled globally.
+     *
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws \Garden\Schema\ValidationException
+     */
+    public function testCommentIsNotParsedWhenMentionsAreDisabledGlobally()
+    {
+        $this->setConfig(UserMentionsModel::MENTION_KEY, false);
+        $mentionedUser1 = $this->createUser();
+        $mentionedUser2 = $this->createUser();
+        $this->createDiscussion();
+        $this->createComment([
+            "body" => "@{$mentionedUser1["name"]} @{$mentionedUser1["name"]} @{$mentionedUser2["name"]}  comment1",
+        ]);
+        // The user should not receive any notifications because mentions are disabled
+        $this->assertUserHasNoNotifications($mentionedUser1);
+        $this->assertUserHasNoNotifications($mentionedUser2);
+        $this->setConfig(UserMentionsModel::MENTION_KEY, true);
     }
 }

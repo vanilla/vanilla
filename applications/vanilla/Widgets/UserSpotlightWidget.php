@@ -9,27 +9,20 @@ namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
 use Vanilla\InjectableInterface;
-use Vanilla\Layout\Section\SectionFullWidth;
-use Vanilla\Layout\Section\SectionOneColumn;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
-use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
-use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
-use Vanilla\Widgets\React\DefaultSectionTrait;
-use Vanilla\Widgets\React\ReactWidgetInterface;
+use Vanilla\Widgets\React\ReactWidget;
 
 /**
  * Widget to spotlight a user.
  */
-class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, InjectableInterface
+class UserSpotlightWidget extends ReactWidget implements InjectableInterface
 {
     use HomeWidgetContainerSchemaTrait;
-    use CombinedPropsWidgetTrait;
     use UserSpotlightWidgetTrait;
-    use DefaultSectionTrait;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -37,7 +30,7 @@ class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetIn
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -45,11 +38,19 @@ class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetIn
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
         return "UserSpotlightWidget";
+    }
+
+    /**
+     * @return string
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Members";
     }
 
     /**
@@ -61,7 +62,7 @@ class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetIn
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {

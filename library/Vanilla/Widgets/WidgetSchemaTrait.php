@@ -24,11 +24,13 @@ trait WidgetSchemaTrait
      *
      * @param string $fieldName
      * @param Schema|null $additionalOptions
+     * @param array|null $conditions
      * @return Schema
      */
     public static function itemOptionsSchema(
         string $fieldName = "itemOptions",
-        Schema $additionalOptions = null
+        Schema $additionalOptions = null,
+        array $conditions = null
     ): Schema {
         $schema = Schema::parse([
             "imagePlacement:s?" => [
@@ -106,10 +108,16 @@ trait WidgetSchemaTrait
             $schema = $schema->merge($additionalOptions);
         }
 
+        $section = SchemaForm::section(new FormOptions("Item Options"));
+
+        if ($conditions) {
+            $section["conditions"] = $conditions;
+        }
+
         return Schema::parse([
             "$fieldName?" => $schema
                 ->setDescription("Configure various widget item options")
-                ->setField("x-control", SchemaForm::section(new FormOptions("Item Options"))),
+                ->setField("x-control", $section),
         ]);
     }
 

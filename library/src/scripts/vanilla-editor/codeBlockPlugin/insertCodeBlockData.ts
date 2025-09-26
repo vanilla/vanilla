@@ -1,6 +1,6 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2025 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -9,7 +9,7 @@ import { getNode, insertFragment } from "@udecode/plate-common";
 import { MyEditor, MyElement } from "../typescript";
 
 export function insertCodeBlockData(editor: MyEditor, data: DataTransfer) {
-    const { insertData, point } = editor;
+    const { point } = editor;
     const text = data.getData("text/plain");
     const path = editor.selection ? [editor.selection.anchor.path[0]] : [0];
     const rootNode = getNode(editor, path) as MyElement;
@@ -22,7 +22,5 @@ export function insertCodeBlockData(editor: MyEditor, data: DataTransfer) {
         }));
         // insert the converted nodes at the current location
         insertFragment(editor, nodes, { at: point(path) });
-    } else {
-        insertData(data);
     }
 }

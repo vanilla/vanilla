@@ -10,8 +10,8 @@
         <ul>
             <li>
                 <?php
-                echo $this->Form->label($this->data('RecoverPasswordLabelCode', 'Enter your email to continue.'), 'Email');
-                echo $this->Form->textBox('Email', ['autofocus' => 'autofocus']);
+                echo $this->Form->label($this->data('RecoverPasswordLabelCode', 'Enter your email to continue.'), 'Email', ['required' => true]);
+                echo $this->Form->textBox('Email', ['autofocus' => 'autofocus', 'required' => true]);
                 ?>
             </li>
             <?php Captcha::render($this); ?>

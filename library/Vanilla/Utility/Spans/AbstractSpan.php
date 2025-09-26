@@ -124,7 +124,7 @@ abstract class AbstractSpan implements \JsonSerializable
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function jsonSerialize(): array
     {

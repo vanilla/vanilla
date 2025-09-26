@@ -8,6 +8,8 @@
 namespace Vanilla\Community\Events;
 
 use Garden\Events\TrackingEventInterface;
+use Gdn;
+use UserDiscussionModel;
 use Vanilla\Analytics\TrackableCommunityModel;
 
 /**
@@ -51,7 +53,7 @@ class PageViewEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTrackableCollection(): ?string
     {
@@ -59,7 +61,7 @@ class PageViewEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAction(): string
     {
@@ -67,7 +69,7 @@ class PageViewEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getPayload(): ?array
     {
@@ -107,7 +109,7 @@ class PageViewEvent implements TrackingEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSiteSectionID(): ?string
     {

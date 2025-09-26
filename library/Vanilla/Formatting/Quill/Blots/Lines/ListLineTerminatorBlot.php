@@ -175,7 +175,7 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupOpeningTag(): string
     {
@@ -190,7 +190,7 @@ class ListLineTerminatorBlot extends AbstractLineTerminatorBlot implements Nesti
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getGroupClosingTag(): string
     {

@@ -11,7 +11,7 @@ export default defineConfig({
         react({
             plugins: [
                 [
-                    "@vanilla/plugin-emotion",
+                    "@swc/plugin-emotion",
                     {
                         sourceMap: false,
                         autoLabel: "always",
@@ -19,13 +19,6 @@ export default defineConfig({
                     },
                 ],
             ],
-        }),
-        dts({
-            exclude: ["**/*.stories.tsx", "**/*.spec.ts*", resolve(__dirname, "dist/**/*")],
-            rollupTypes: true,
-            tsconfigPath: resolve(__dirname, "../../tsconfig.json"),
-            copyDtsFiles: true,
-            root: __dirname,
         }),
     ],
     root: "../../",
@@ -38,14 +31,16 @@ export default defineConfig({
             formats: ["es"],
         },
         rollupOptions: {
-            external: ["react", "react-dom", "react/jsx-runtime", "@tanstack/react-query"],
-            output: {
-                globals: {
-                    react: "React",
-                    "react-dom": "React-dom",
-                    "react/jsx-runtime": "react/jsx-runtime",
-                },
-            },
+            external: [
+                "react",
+                "@vanilla/utils",
+                "@vanilla/dom-utils",
+                "@vanilla/react-utils",
+                "@vanilla/icons",
+                "react-dom",
+                "react/jsx-runtime",
+                "@tanstack/react-query",
+            ],
         },
     },
     resolve: {

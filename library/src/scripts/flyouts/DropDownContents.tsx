@@ -11,6 +11,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { TabHandler } from "@vanilla/dom-utils";
 import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
 import { StackingContextProvider } from "@vanilla/react-utils";
+import { cx } from "@emotion/css";
 
 export interface IProps {
     id: string;
@@ -37,68 +38,65 @@ export enum DropDownContentSize {
  * The contents of the flyouts (not the wrapper and not the button to toggle it).
  * Note that it renders an empty, hidden div when closed so that the aria-labelledby points to an element in the DOM.
  */
-export default class DropDownContents extends React.Component<IProps> {
-    public render() {
-        const classes = dropDownClasses();
-        const asDropDownClasses = !this.props.openAsModal
-            ? classNames("dropDown-contents", classes.contents, {
-                  isMedium: this.props.size === DropDownContentSize.MEDIUM,
-              })
-            : undefined;
-        const asModalClasses = this.props.openAsModal ? classNames("dropDown-asModal", classes.asModal) : undefined;
-        if (this.props.openAsModal) {
-            return this.props.children;
-        }
+export default function DropDownContents(props: IProps) {
+    const classes = dropDownClasses.useAsHook();
+    const asDropDownClasses = !props.openAsModal
+        ? classNames("dropDown-contents", classes.contents, {
+              isMedium: props.size === DropDownContentSize.MEDIUM,
+          })
+        : undefined;
+    const asModalClasses = props.openAsModal ? classNames("dropDown-asModal", classes.asModal) : undefined;
 
-        return (
-            <StackingContextProvider>
-                <PageBoxDepthContextProvider depth={3}>
-                    <div
-                        ref={this.props.contentRef}
-                        id={this.props.id}
-                        className={classNames(asDropDownClasses, asModalClasses, this.props.className, {
-                            [classes.verticalPadding]: !this.props.selfPadded,
-                            [classes.contentOffsetCenter]: this.props.renderCenter,
-                            [classes.contentOffsetLeft]: this.props.horizontalOffset && this.props.renderLeft,
-                            [classes.contentOffsetRight]: this.props.horizontalOffset && !this.props.renderLeft,
-                        })}
-                        style={flyoutPosition(
-                            this.props.renderAbove,
-                            this.props.renderLeft,
-                            !!this.props.legacyMode,
-                            this.props.renderCenter,
-                        )}
-                        onClick={this.doNothing}
-                        tabIndex={-1}
-                        onMouseDown={this.forceTryFocus}
-                    >
-                        {this.props.children}
-                    </div>
-                </PageBoxDepthContextProvider>
-            </StackingContextProvider>
-        );
+    if (props.openAsModal) {
+        return <>{props.children}</>;
     }
 
-    /**
-     * Our focus watcher has an exclusion for moving away focus when focus is moved to the body.
-     * This is standard behaviour on mousedown, if a non-focusable element is clicked.
-     *
-     * Unfortunately if this is rendered inside of a `content-editable`,
-     * the content editable will be focused instead of the body. This simple handler ensures that focus goes to the body
-     * if a non-focusable element is clicked inside a dropdown inside a content-editable.
-     */
-    private forceTryFocus = (e: React.MouseEvent) => {
-        if (e.target instanceof HTMLElement) {
-            if (!TabHandler.isTabbable(e.target)) {
-                // this.doNothing(e);
-                // this.selfRef.current && this.selfRef.current.focus();
-            }
-        }
-    };
-
-    private doNothing = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.nativeEvent.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation();
-    };
+    return (
+        <StackingContextProvider>
+            <PageBoxDepthContextProvider depth={3}>
+                <div
+                    ref={props.contentRef}
+                    id={props.id}
+                    className={cx(
+                        asDropDownClasses,
+                        asModalClasses,
+                        {
+                            [classes.verticalPadding]: !props.selfPadded,
+                            [classes.contentOffsetCenter]: props.renderCenter,
+                            [classes.contentOffsetLeft]: props.horizontalOffset && props.renderLeft,
+                            [classes.contentOffsetRight]: props.horizontalOffset && !props.renderLeft,
+                        },
+                        props.className,
+                    )}
+                    style={flyoutPosition(props.renderAbove, props.renderLeft, !!props.legacyMode, props.renderCenter)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.nativeEvent.stopPropagation();
+                        e.nativeEvent.stopImmediatePropagation();
+                    }}
+                    tabIndex={-1}
+                    onMouseDown={
+                        /**
+                         * Our focus watcher has an exclusion for moving away focus when focus is moved to the body.
+                         * This is standard behaviour on mousedown, if a non-focusable element is clicked.
+                         *
+                         * Unfortunately if this is rendered inside of a `content-editable`,
+                         * the content editable will be focused instead of the body. This simple handler ensures that focus goes to the body
+                         * if a non-focusable element is clicked inside a dropdown inside a content-editable.
+                         */
+                        (e: React.MouseEvent) => {
+                            if (e.target instanceof HTMLElement) {
+                                if (!TabHandler.isTabbable(e.target)) {
+                                    // this.doNothing(e);
+                                    // this.selfRef.current && this.selfRef.current.focus();
+                                }
+                            }
+                        }
+                    }
+                >
+                    {props.children}
+                </div>
+            </PageBoxDepthContextProvider>
+        </StackingContextProvider>
+    );
 }

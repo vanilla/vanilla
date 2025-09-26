@@ -41,7 +41,7 @@ export const FormGroupContext = React.createContext<IFormGroupContext>({
  * The only required property is for, which will be used to provide a valid id to the label and it's input.
  * It is possible to customize the component used to render this label with the `as` property.
  */
-export const FormGroup = React.forwardRef(function FormGroupImpl(props, forwardedRef) {
+export const FormGroup = React.forwardRef(function FormGroupImpl(props, forwardedRef: React.Ref<HTMLDivElement>) {
     const { as: Comp = "div", inputID: propsInputID, children, sideBySide, compact, ...otherProps } = props;
     const inputID = useMemo(() => propsInputID || uuidv4(), [propsInputID]);
     const [label, setLabel] = useState<string | undefined>();

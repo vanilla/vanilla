@@ -190,13 +190,13 @@ class ReportsApiController extends \AbstractApiController
     {
         $this->permission("flag.add");
 
-        $availableReasonIDs = $this->reportReasonModel->getPermissionAvailableReasonIDs();
+        $includeSystemReason = ((bool) ($body["automation"] ?? false));
+        $availableReasonIDs = $this->reportReasonModel->getPermissionAvailableReasonIDs($includeSystemReason);
         if (empty($availableReasonIDs)) {
             throw new ClientException("No report reasons available.", 403);
         }
 
-        $includeSystemReason = $body["automation"] ?? false;
-        $in = $this->postSchema((bool) $includeSystemReason);
+        $in = $this->postSchema($includeSystemReason);
 
         $body = $in->validate($body);
         $record = $this->communityManagementRecordModel->getRecord($body["recordType"], $body["recordID"]);

@@ -33,7 +33,7 @@ class ProfileControllerTest extends SiteTestCase
     const OPT_USER_ID = "userID";
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

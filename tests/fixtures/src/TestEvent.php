@@ -37,7 +37,7 @@ class TestEvent implements StoppableEventInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function isPropagationStopped(): bool
     {

@@ -60,7 +60,7 @@ final class BlotGroupTextFragment implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getInnerContent(): string
     {
@@ -69,7 +69,7 @@ final class BlotGroupTextFragment implements TextFragmentInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setInnerContent(string $text)
     {
@@ -81,7 +81,7 @@ final class BlotGroupTextFragment implements TextFragmentInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFragmentType(): string
     {

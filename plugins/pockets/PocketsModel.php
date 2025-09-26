@@ -13,7 +13,7 @@ use Vanilla\ApiUtils;
 use Vanilla\BodyFormatValidator;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetService;
 
 /**
  * Model for pockets.
@@ -38,7 +38,7 @@ class PocketsModel extends \Gdn_Model
     /** @var CacheInterface */
     private $cache;
 
-    /** @var WidgetService */
+    /** @var LegacyWidgetService */
     private $widgetService;
 
     /** @var array  */
@@ -59,7 +59,7 @@ class PocketsModel extends \Gdn_Model
     {
         parent::__construct("Pocket");
         $this->cache = \Gdn::getContainer()->get(CacheInterface::class);
-        $this->widgetService = \Gdn::getContainer()->get(WidgetService::class);
+        $this->widgetService = \Gdn::getContainer()->get(LegacyWidgetService::class);
     }
 
     /**

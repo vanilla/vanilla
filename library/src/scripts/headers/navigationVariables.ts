@@ -12,6 +12,7 @@ import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { uuidv4 } from "@vanilla/utils";
 import { DeepPartial } from "redux";
 import { INavigationItemBadge } from "@library/@types/api/core";
+import type { IRole } from "@dashboard/roles/roleTypes";
 export interface INavigationVariableItem {
     id: string;
     name: string;
@@ -22,6 +23,7 @@ export interface INavigationVariableItem {
     isHidden?: boolean;
     react?: boolean;
     badge?: INavigationItemBadge;
+    roleIDs?: number[];
 }
 
 type INavItemGenerator = () => INavigationVariableItem;

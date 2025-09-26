@@ -6,7 +6,7 @@
 
 import { Property } from "csstype";
 import { important, percent, px, quote, url, viewHeight, viewWidth } from "csx";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { assetUrl, themeAsset } from "@library/utility/appUtils";
 import { styleFactory } from "@library/styles/styleUtils";
 

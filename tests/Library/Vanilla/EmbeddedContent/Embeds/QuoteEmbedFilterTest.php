@@ -65,7 +65,7 @@ class QuoteEmbedFilterTest extends MinimalContainerTestCase
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

@@ -23,7 +23,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction
 {
     public string $affectedRecordType = "CollectionRecord";
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -31,7 +31,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -39,7 +39,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -47,7 +47,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getSchema(): Schema
     {
@@ -71,7 +71,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggers(): array
     {
@@ -79,7 +79,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -95,7 +95,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function executeLongRunner(array $actionValue, array $object): bool
     {
@@ -153,7 +153,7 @@ class RemoveDiscussionFromCollectionAction extends AutomationAction
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function expandLogData(array $logData): string
     {

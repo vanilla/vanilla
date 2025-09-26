@@ -16,12 +16,12 @@ use Vanilla\AutomationRules\Trigger\TimedAutomationTrigger;
 use Vanilla\Dashboard\AutomationRules\Models\UserRuleDataType;
 
 /**
- * Class StaleDiscussionTrigger
+ * Class TimeSinceUserRegistrationTrigger
  */
 class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getType(): string
     {
@@ -29,7 +29,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getName(): string
     {
@@ -37,7 +37,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getContentType(): string
     {
@@ -45,7 +45,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getActions(): array
     {
@@ -53,7 +53,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getPostPatchSchema(Schema &$schema): void
     {
@@ -64,7 +64,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getPrimaryKey(): string
     {
@@ -72,7 +72,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     private function getObjectModel(): \Gdn_Model
     {
@@ -80,7 +80,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getWhereArray(array $triggerValue, ?DateTimeImmutable $lastRunDate = null): array
     {
@@ -93,7 +93,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordsToProcess($lastRecordId, array $where): iterable
     {
@@ -110,7 +110,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function getRecordCountsToProcess(array $where): int
     {
@@ -118,7 +118,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     static function getSchema(): Schema
     {
@@ -128,7 +128,7 @@ class TimeSinceUserRegistrationTrigger extends TimedAutomationTrigger
     }
 
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public static function getTriggerValueSchema(): Schema
     {

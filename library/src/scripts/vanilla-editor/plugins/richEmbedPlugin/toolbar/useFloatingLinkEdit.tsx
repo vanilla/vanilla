@@ -12,7 +12,8 @@ import {
     ELEMENT_RICH_EMBED_CARD,
     ELEMENT_RICH_EMBED_INLINE,
 } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
-import { MyEditor, MyValue, useMyEditorRef } from "@library/vanilla-editor/typescript";
+import { MyEditor, MyValue } from "@library/vanilla-editor/typescript";
+import { useMyEditorRef } from "@library/vanilla-editor/getMyEditor";
 import {
     getEndPoint,
     getPluginOptions,

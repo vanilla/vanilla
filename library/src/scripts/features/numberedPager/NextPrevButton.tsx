@@ -20,25 +20,27 @@ interface IProps extends IButtonProps {
 
 export function NextPrevButton(props: IProps) {
     const { disabled = false, direction, tooltip, ...btnProps } = props;
-    const vars = numberedPagerVariables();
-    const classes = numberedPagerClasses();
+    const vars = numberedPagerVariables.useAsHook();
+    const classes = numberedPagerClasses.useAsHook();
 
     const Icon = useMemo(() => (direction === "prev" ? LeftChevronSmallIcon : RightChevronSmallIcon), [direction]);
 
     return (
-        <ConditionalWrap condition={!!disabled} component={ToolTip} componentProps={{ label: tooltip }}>
-            <span>
-                <Button
-                    {...btnProps}
-                    ariaLabel={tooltip}
-                    className={classes.iconButton}
-                    disabled={disabled}
-                    buttonType={vars.buttons.iconButton.name as ButtonTypes}
-                >
-                    <Icon />
-                </Button>
-            </span>
-        </ConditionalWrap>
+        <span className={props.className}>
+            <ConditionalWrap condition={!!disabled} component={ToolTip} componentProps={{ label: tooltip }}>
+                <span>
+                    <Button
+                        {...btnProps}
+                        ariaLabel={tooltip}
+                        className={classes.iconButton}
+                        disabled={disabled}
+                        buttonType={vars.buttons.iconButton.name as ButtonTypes}
+                    >
+                        <Icon />
+                    </Button>
+                </span>
+            </ConditionalWrap>
+        </span>
     );
 }
 

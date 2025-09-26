@@ -43,7 +43,6 @@ abstract class MockThemeTestCase extends SiteTestCase
             ->setInstance(\Gdn_Cache::class, new \Gdn_Dirtycache());
 
         self::container()->get(MockThemeProvider::class);
-        self::container()->setInstance(ThemeService::class, null);
         $this->mockThemeProvider = self::container()->get(MockThemeProvider::class);
 
         $themeService = self::container()->get(ThemeService::class);

@@ -11,7 +11,6 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { PageBox } from "@library/layout/PageBox";
 import { ListItem } from "@library/lists/ListItem";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { useQuery } from "@tanstack/react-query";
 import { t } from "@vanilla/i18n";
@@ -110,7 +109,7 @@ export function ReportFilters(props: IProps) {
                                             c0={
                                                 reportRecordQuery.data?.insertUser ? (
                                                     <ProfileLink
-                                                        className={metasClasses().metaLink}
+                                                        asMeta
                                                         userFragment={reportRecordQuery.data?.insertUser}
                                                     />
                                                 ) : (
@@ -119,10 +118,7 @@ export function ReportFilters(props: IProps) {
                                             }
                                             c1={
                                                 reportRecordQuery.data?.category ? (
-                                                    <SmartLink
-                                                        to={reportRecordQuery.data.category.url}
-                                                        className={metasClasses().metaLink}
-                                                    >
+                                                    <SmartLink to={reportRecordQuery.data.category.url} asMeta>
                                                         {reportRecordQuery.data.category.name}
                                                     </SmartLink>
                                                 ) : (

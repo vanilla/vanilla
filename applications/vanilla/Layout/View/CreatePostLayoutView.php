@@ -8,7 +8,7 @@
 namespace Vanilla\Forum\Layout\View;
 
 use Garden\Schema\Schema;
-use Vanilla\Addon;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Forum\Widgets\CreatePostFormAsset;
 use Vanilla\Http\InternalClient;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
@@ -18,31 +18,11 @@ use Vanilla\Web\PageHeadInterface;
 
 class CreatePostLayoutView extends AbstractCustomLayoutView
 {
-    private \DiscussionModel $discussionModel;
-    private InternalClient $internalClient;
-    private BreadcrumbModel $breadcrumbModel;
-    private \Gdn_Request $request;
-    private SiteSectionModel $siteSectionModel;
-
     /**
      * @param InternalClient $internalClient
-     * @param \DiscussionModel $discussionModel
-     * @param BreadcrumbModel $breadcrumbModel
-     * @param \Gdn_Request $request
-     * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(
-        InternalClient $internalClient,
-        \DiscussionModel $discussionModel,
-        BreadcrumbModel $breadcrumbModel,
-        \Gdn_Request $request,
-        SiteSectionModel $siteSectionModel
-    ) {
-        $this->internalClient = $internalClient;
-        $this->discussionModel = $discussionModel;
-        $this->breadcrumbModel = $breadcrumbModel;
-        $this->request = $request;
-        $this->siteSectionModel = $siteSectionModel;
+    public function __construct(private InternalClient $internalClient)
+    {
         $this->registerAssetClass(CreatePostFormAsset::class);
     }
 
@@ -70,20 +50,26 @@ class CreatePostLayoutView extends AbstractCustomLayoutView
 
         if (!empty($paramInput["recordID"])) {
             $record = $this->internalClient->get("/discussions/{$paramInput["recordID"]}/edit")->getBody();
+
+            if (strtolower($record["format"]) !== Rich2Format::FORMAT_KEY) {
+                // Get the formatted body
+                $renderedRecord = $this->internalClient->get("/discussions/{$paramInput["recordID"]}")->getBody();
+                $record["body"] = $renderedRecord["body"];
+            }
         }
 
         $resolved = [
             "postType" => $paramInput["postType"] ?? "discussion",
             "recordID" => $paramInput["recordID"],
             "record" => $record,
-            "parentRecordType" => "category",
+            "parentRecordType" => $paramInput["parentRecordType"] ?? "category",
         ];
 
         return array_merge($paramInput, $resolved);
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getContexts(array $resolvedParams): array
     {
@@ -124,7 +110,7 @@ class CreatePostLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getName(): string
     {
@@ -132,7 +118,7 @@ class CreatePostLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getType(): string
     {
@@ -140,7 +126,7 @@ class CreatePostLayoutView extends AbstractCustomLayoutView
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getLegacyType(): string
     {

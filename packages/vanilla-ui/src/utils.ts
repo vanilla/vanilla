@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 
 export function srOnlyMixin(): CSSObject {
     return {

@@ -110,8 +110,8 @@ if (!$hasUserID) {
                 <?php if ($this->Form->getFormValue("EmailVisible")): ?>
                 <li>
                     <?php
-                    echo $this->Form->label("Email", "Email");
-                    echo $this->Form->textBox("Email");
+                    echo $this->Form->label("Email", "Email", ["required" => true]);
+                    echo $this->Form->textBox("Email", ['required' => true]);
                     ?>
                 </li>
         <?php endif; ?>
@@ -139,7 +139,7 @@ if (!$hasUserID) {
                     }
 
                     if (count($existingUsers) >= 1 && !$noConnectName) {
-                        echo $this->Form->label("Username", "ConnectName");
+                        echo $this->Form->label("Username", "ConnectName", ['required' => true]);
                         echo \Gdn::translate(
                             "ConnectWithExistingUser",
                             "One or more users with your name already exist, would you like to connect as them?"
@@ -169,13 +169,13 @@ if (!$hasUserID) {
 
                     if (count($existingUsers) === 0 && !$noConnectName) {
                         if (!$userName || $usernameNotValid) {
-                            echo $this->Form->label("Username", "ConnectName");
+                            echo $this->Form->label("Username", "ConnectName", ['required' => true]);
                             echo wrap(
                                 \Gdn::translate("ConnectChooseName", "Choose a name to identify yourself on the site."),
                                 "div",
                                 ["class" => "FinePrint"]
                             );
-                            echo $this->Form->textbox("ConnectName", ["aria-label" => t("Username")]);
+                            echo $this->Form->textbox("ConnectName", ["aria-label" => t("Username"), 'required' => true]);
                         }
                     }
                     ?>
@@ -203,10 +203,10 @@ if (!$hasUserID) {
 
                 <?php if (!$this->data("HidePassword")) {
                     echo '<li id="ConnectPassword">';
-                    echo $this->Form->label("Password", "ConnectPassword");
+                    echo $this->Form->label("Password", "ConnectPassword", ['required' => true]);
                     $PasswordMessage = t("ConnectExistingPassword", "Enter your existing account password.");
                     echo wrap($PasswordMessage, "div", ["class" => "FinePrint"]);
-                    echo $this->Form->input("ConnectPassword", "password");
+                    echo $this->Form->input("ConnectPassword", "password", ['required' => true]);
                     echo "</li>";
                 } ?>
             </ul>

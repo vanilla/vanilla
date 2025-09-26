@@ -19,6 +19,8 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Gdn;
 use Vanilla\Addon;
+use Vanilla\Dashboard\Models\FragmentModel;
+use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Layout\Resolvers\TranslateResolver;
 use Vanilla\Layout\Resolvers\ApiResolver;
 use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
@@ -34,18 +36,23 @@ use Vanilla\Layout\Section\SectionTwoColumnsEven;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Layout\View\CommonLayoutView;
 use Vanilla\Layout\View\HomeLayoutView;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Asset\ViteAssetProvider;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Web\PageHead;
 use Vanilla\Web\PageHeadAwareInterface;
 use Vanilla\Web\PageHeadInterface;
 use Vanilla\Widgets\DynamicContainerSchemaOptions;
 use Vanilla\Widgets\React\BannerFullWidget;
 use Vanilla\Widgets\React\BannerContentWidget;
+use Vanilla\Widgets\React\CustomFragmentWidget;
+use Vanilla\Widgets\React\FragmentMeta;
 use Vanilla\Widgets\React\HtmlReactWidget;
 use Vanilla\Widgets\React\LeaderboardWidget;
 use Vanilla\Widgets\React\QuickLinksWidget;
+use Vanilla\Widgets\React\ReactWidgetInterface;
 use Vanilla\Widgets\Schema\ReactSingleChildSchema;
+use Vanilla\Widgets\TitleBarWidget;
 use Vanilla\Widgets\ToggledWidgetInterface;
 
 /**
@@ -59,12 +66,6 @@ final class LayoutHydrator
     /** @var string */
     public const PARAM_PAGE_HEAD = "_pageHead";
 
-    /** @var Container */
-    private $container;
-
-    /** @var CommonLayoutView */
-    private $commonLayout;
-
     /** @var array{string, AbstractCustomLayoutView} */
     private $layoutViews = [];
 
@@ -74,34 +75,17 @@ final class LayoutHydrator
     /** @var PageHead */
     private $pageHead;
 
-    /** @var DynamicContainerSchemaOptions */
-    private DynamicContainerSchemaOptions $dynamicSchemaOptions;
-
-    private ViteAssetProvider $viteAssetProvider;
-
     /**
      * DI.
-     *
-     * @param Container $container
-     * @param CommonLayoutView $commonLayout
-     * @param ReactLayoutExceptionHandler $reactExceptionHandler
-     * @param DynamicContainerSchemaOptions $dynamicSchemaOptions
-     * @param ViteAssetProvider $viteAssetProvider
-     *
-     * @throws ContainerException
-     * @throws \Garden\Container\NotFoundException
      */
     public function __construct(
-        Container $container,
-        CommonLayoutView $commonLayout,
+        private Container $container,
+        private CommonLayoutView $commonLayout,
         ReactLayoutExceptionHandler $reactExceptionHandler,
-        DynamicContainerSchemaOptions $dynamicSchemaOptions,
-        ViteAssetProvider $viteAssetProvider
+        private DynamicContainerSchemaOptions $dynamicSchemaOptions,
+        private ViteAssetProvider $viteAssetProvider,
+        private FragmentModel $fragmentModel
     ) {
-        $this->dynamicSchemaOptions = $dynamicSchemaOptions;
-        $this->container = $container;
-        $this->commonLayout = $commonLayout;
-        $this->viteAssetProvider = $viteAssetProvider;
         $this->dataHydrator = new DataHydrator();
         $this->dataHydrator->setExceptionHandler($reactExceptionHandler);
         $this->pageHead = $container->get(PageHead::class);
@@ -112,6 +96,7 @@ final class LayoutHydrator
 
         // Register core react widget resolvers.
         $this->addReactResolver(HtmlReactWidget::class)
+            ->addReactResolver(TitleBarWidget::class)
             ->addReactResolver(SectionOneColumn::class)
             ->addReactResolver(SectionFullWidth::class)
             ->addReactResolver(SectionTwoColumns::class)
@@ -122,6 +107,10 @@ final class LayoutHydrator
             ->addReactResolver(LeaderboardWidget::class)
             ->addReactResolver(BannerFullWidget::class)
             ->addReactResolver(BannerContentWidget::class);
+
+        foreach ($this->fragmentModel->getResolvers($this->container) as $resolver) {
+            $this->addResolver($resolver);
+        }
 
         $this->addLayoutView($container->get(HomeLayoutView::class));
         $this->addMiddleware($container->get(LayoutPermissionFilterMiddleware::class));
@@ -149,6 +138,14 @@ final class LayoutHydrator
     public function getLayoutViewTypes(): array
     {
         return array_keys($this->layoutViews);
+    }
+
+    /**
+     * @return array{string, AbstractCustomLayoutView}
+     */
+    public function getAllLayoutViews(): array
+    {
+        return $this->layoutViews;
     }
 
     /**
@@ -180,7 +177,7 @@ final class LayoutHydrator
     /**
      * Add a resolver for a react widget.
      *
-     * @param class-string<AbstractReactModule> $reactModuleClass
+     * @param class-string<LegacyReactModule> $reactModuleClass
      */
     public function addReactResolver(string $reactModuleClass): LayoutHydrator
     {
@@ -296,6 +293,14 @@ final class LayoutHydrator
         $params = $this->resolveParams($layoutViewType, $params, $cleanPageHead);
 
         $hydrator = $this->getHydrator($layoutViewType, $cleanPageHead, false, $params);
+
+        // For layouts that didn't have a titlebar.
+        if (isset($layout["layout"]) && empty($layout["titleBar"])) {
+            $layout["titleBar"] = $layout["titleBar"] ?? [
+                '$hydrate' => "react.titleBar",
+            ];
+        }
+
         $result = $hydrator->resolve($layout, $params);
         $seoContents = array_column($result["layout"] ?? [], '$seoContent');
         $seoContent = implode("", $seoContents);
@@ -317,6 +322,8 @@ final class LayoutHydrator
         if (!empty($contexts)) {
             $result["contexts"] = $contexts;
         }
+        $this->fragmentModel->hydrateFragments($result);
+
         return $result;
     }
 
@@ -348,6 +355,27 @@ final class LayoutHydrator
                 $widgetNames = array_merge($widgetNames, $resolverWidgets);
             }
         }
+
+        $fragmentUUIDs = [];
+        ArrayUtils::walkRecursiveArray($layout, function ($value) use (&$fragmentUUIDs) {
+            $fragmentImpls = $value['$fragmentImpls'] ?? [];
+            foreach ($fragmentImpls as $fragmentImpl) {
+                $uuid = $fragmentImpl["fragmentUUID"];
+                if (in_array(needle: $uuid, haystack: ["system", "styleguide"], strict: true)) {
+                    // No need to system/styleguide fragments.
+                    // Styleguide fragments are loaded on their own.
+                    // System fragments are included in the main bundle.
+                    continue;
+                }
+
+                $fragmentUUIDs[] = $uuid;
+            }
+        });
+        $fragmentImpls = $this->fragmentModel->selectFragmentImpls($fragmentUUIDs);
+        foreach ($fragmentImpls as $fragmentImpl) {
+            $result["js"][] = $fragmentImpl["jsUrl"];
+        }
+
         $assets = $this->viteAssetProvider->getAssetsByNames("layouts", $widgetNames);
         foreach ($assets as $asset) {
             if ($asset->isScript()) {
@@ -369,7 +397,7 @@ final class LayoutHydrator
      *
      * @return array
      *
-     * @throws ValidationException If the params are invalid.
+     * @throws ValidationException|NotFoundException If the params are invalid.
      */
     public function resolveParams(
         ?string $layoutViewType,
@@ -573,5 +601,96 @@ final class LayoutHydrator
             ]);
         }
         return $layoutView;
+    }
+
+    /**
+     * Get all react widget resolvers.
+     *
+     * @param string|null $layoutViewType A layout view type or "all".
+     *
+     * @return ReactResolver[]
+     */
+    public function getReactWidgetResolvers(?string $layoutViewType): array
+    {
+        $hydrator = $this->getHydrator($layoutViewType === "all" ? null : $layoutViewType);
+        $resolvers = $hydrator->getResolvers();
+        /** @var ReactResolver[] $reactResolvers */
+        $reactResolvers = [];
+        foreach ($resolvers as $resolver) {
+            if ($resolver instanceof ReactResolver) {
+                if (is_a($resolver->getReactWidgetClass(), AbstractLayoutAsset::class, true)) {
+                    /**
+                     * Handled separately in {@link self::getReactAssetResolvers()}
+                     */
+                    continue;
+                }
+
+                $reactResolvers[] = $resolver;
+            }
+        }
+
+        if ($layoutViewType === "all") {
+            $reactResolvers[] = new ReactResolver(TitleBarWidget::class, $this->container);
+        }
+
+        return $reactResolvers;
+    }
+
+    /**
+     * Get all react asset resolvers for a given layout type.
+     *
+     * @param string|null $layoutViewType A layout view type or "all".
+     *
+     * @return ReactResolver[]
+     */
+    public function getReactAssetResolvers(?string $layoutViewType): array
+    {
+        if ($layoutViewType === "all") {
+            $layoutViews = $this->getAllLayoutViews();
+        } elseif ($layoutViewType) {
+            $layoutViews = [$this->getLayoutViewType($layoutViewType)];
+        } else {
+            $layoutViews = [];
+        }
+
+        /** @var ReactResolver[] $reactResolvers */
+        $reactResolvers = [];
+        foreach ($layoutViews as $layoutView) {
+            /**
+             * @var class-string<AbstractLayoutAsset> $assetClass
+             */
+            foreach ($layoutView->getAssetClasses() as $assetClass) {
+                $resolver = new ReactResolver($assetClass, \Gdn::getContainer());
+                $reactResolvers[] = $resolver;
+            }
+        }
+
+        return $reactResolvers;
+    }
+
+    /**
+     * @return array<FragmentMeta>
+     */
+    public function getFragmentMetas(?string $layoutViewType): array
+    {
+        /** @var array<class-string<FragmentMeta>> $fragmentClasses */
+        $fragmentClasses = [];
+        foreach ($this->getReactWidgetResolvers($layoutViewType) as $resolver) {
+            $fragmentClasses = array_merge($fragmentClasses, $resolver->getReactWidgetClass()::getFragmentClasses());
+        }
+
+        foreach ($this->getReactAssetResolvers($layoutViewType) as $resolver) {
+            $fragmentClasses = array_merge($fragmentClasses, $resolver->getReactWidgetClass()::getFragmentClasses());
+        }
+
+        $fragmentClasses = array_values(array_unique($fragmentClasses));
+
+        $fragmentMetas = [];
+        foreach ($fragmentClasses as $fragmentClass) {
+            /** @var FragmentMeta $meta */
+            $meta = $this->container->get($fragmentClass);
+            $fragmentMetas[$meta->getFragmentType()] = $meta;
+        }
+        return $fragmentMetas;
     }
 }

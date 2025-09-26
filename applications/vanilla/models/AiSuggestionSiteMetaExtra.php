@@ -29,7 +29,7 @@ class AiSuggestionSiteMetaExtra extends \Vanilla\Models\SiteMetaExtra
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getValue(): array
     {

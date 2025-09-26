@@ -12,15 +12,17 @@ import { UserIcon, UserIconTypes } from "@library/icons/titleBar";
 import { accessibleLabel, t } from "@library/utility/appUtils";
 import { LoadingCircle } from "@library/loaders/LoadingRectangle";
 
-export enum UserPhotoSize {
-    XSMALL = "xsmall",
-    SMALL = "small",
-    MEDIUM = "medium",
-    LARGE = "large",
-    XLARGE = "xlarge",
-}
+export const UserPhotoSize = {
+    XSMALL: "xsmall",
+    SMALL: "small",
+    MEDIUM: "medium",
+    LARGE: "large",
+    XLARGE: "xlarge",
+} as const;
 
-interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+export type UserPhotoSize = (typeof UserPhotoSize)[keyof typeof UserPhotoSize];
+
+interface IUserPhotoProps extends React.HTMLAttributes<HTMLDivElement> {
     className?: string;
     size?: UserPhotoSize;
     styleType?: UserIconTypes;
@@ -30,7 +32,7 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
 /**
  * Implements User Photo Component
  */
-export function UserPhoto(props: IProps) {
+export function UserPhoto(props: IUserPhotoProps) {
     const { className, userInfo = {}, size, styleType, ...spreadProps } = props;
     const { name = t("Unknown"), photoUrl } = userInfo;
     const classes = userPhotoClasses();

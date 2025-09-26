@@ -15,7 +15,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { percent, viewHeight, calc, quote, color } from "csx";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";

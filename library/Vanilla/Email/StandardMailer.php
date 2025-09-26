@@ -32,7 +32,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function addHeader(string $name, ?string $value = null): void
     {
@@ -40,7 +40,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function addTo(string $recipientMail, ?string $recipientName = null): void
     {
@@ -48,7 +48,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function addCC(string $recipientMail, ?string $recipientName = null): void
     {
@@ -56,7 +56,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function addBCC(string $recipientMail, ?string $recipientName = null): void
     {
@@ -64,7 +64,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setFrom(string $senderEmail, ?string $senderName = null): void
     {
@@ -72,7 +72,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function send(): bool
     {
@@ -120,7 +120,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFromAddress(): string
     {
@@ -128,7 +128,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getFromName(): string
     {
@@ -136,7 +136,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getToAddresses(): array
     {
@@ -149,7 +149,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCcAddresses(): array
     {
@@ -162,7 +162,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getBccAddresses(): array
     {
@@ -175,7 +175,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSubject(): string
     {
@@ -183,7 +183,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getContentType(): string
     {
@@ -191,7 +191,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setContentType(string $type): void
     {
@@ -199,7 +199,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getCharSet(): ?string
     {
@@ -207,7 +207,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setSubject(string $subject, bool $encode = true): void
     {
@@ -218,7 +218,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function isSingleTo(): bool
     {
@@ -226,7 +226,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function clearRecipients(): void
     {
@@ -234,7 +234,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function clearContent(): void
     {
@@ -243,7 +243,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setTextContent(string $content = ""): void
     {
@@ -251,7 +251,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTextContent(): ?string
     {
@@ -259,7 +259,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setHtmlContent(string $content = ""): void
     {
@@ -267,7 +267,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setTextOnlyContent(string $content = ""): void
     {
@@ -275,7 +275,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getTextOnlyContent(): ?string
     {
@@ -283,7 +283,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getSender(): ?string
     {
@@ -291,7 +291,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setSender(string $senderEmail): void
     {
@@ -299,7 +299,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getAllRecipients(): array
     {
@@ -307,7 +307,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setBodyContent(string $content = ""): void
     {
@@ -315,7 +315,7 @@ class StandardMailer implements MailerInterface
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function getBodyContent(): ?string
     {

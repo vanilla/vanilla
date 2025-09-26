@@ -19,13 +19,14 @@ import { Icon } from "@vanilla/icons";
 import { useFocusOnActivate } from "@vanilla/react-utils";
 import React, { useRef, useState } from "react";
 import { extractSchemaDefaults } from "@vanilla/json-schema-forms";
+import { ClearThemeOverrideContext } from "@library/theming/ThemeOverrideContext";
 
 interface IProps {
     path: ILayoutEditorDestinationPath;
 }
 
 export function LayoutEditorAddWidget(props: IProps) {
-    const classes = layoutEditorClasses();
+    const classes = layoutEditorClasses.useAsHook();
     const { editorContents, editorSelection, layoutViewType } = useLayoutEditor();
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const catalog = useLayoutCatalog(layoutViewType);
@@ -85,45 +86,46 @@ export function LayoutEditorAddWidget(props: IProps) {
                     <Icon icon={"add"} />
                 </div>
             </Button>
-            <LayoutThumbnailsModal
-                title="Choose your Widget"
-                exitHandler={() => {
-                    setWidgetSettingsModalOpen(false);
-                    setWidgetSelectionModalOpen(false);
-                    editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
-                }}
-                sections={allowedWidgetCatalog}
-                onAddSection={(widgetID) => {
-                    setWidgetSettingsModalOpen(true);
-                    setSelectedWidgetID(widgetID);
-                }}
-                isVisible={widgetSelectionModalOpen}
-                itemType="widgets"
-            />
-            {!!widgetSchema && (
-                <WidgetSettingsModal
-                    key={selectedWidgetID!}
+            <ClearThemeOverrideContext>
+                <LayoutThumbnailsModal
+                    title="Choose your Widget"
                     exitHandler={() => {
                         setWidgetSettingsModalOpen(false);
-                    }}
-                    onSave={(settings) => {
-                        editorContents.insertWidget(props.path, {
-                            $hydrate: selectedWidgetID,
-                            ...settings,
-                        });
-                        editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
                         setWidgetSelectionModalOpen(false);
-                        setSelectedWidgetID(undefined);
+                        editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
                     }}
-                    isVisible={widgetSettingsModalOpen}
-                    schema={widgetSchema}
-                    name={widgetName!}
-                    initialValues={extractSchemaDefaults(widgetSchema)}
-                    widgetID={selectedWidgetID!}
-                    widgetCatalog={allowedWidgetCatalog ?? {}}
-                    middlewaresCatalog={catalog?.middlewares ?? {}}
+                    sections={allowedWidgetCatalog}
+                    onAddSection={(widgetID) => {
+                        setWidgetSettingsModalOpen(true);
+                        setSelectedWidgetID(widgetID);
+                    }}
+                    isVisible={widgetSelectionModalOpen}
+                    itemType="widgets"
                 />
-            )}
+                {!!widgetSchema && (
+                    <WidgetSettingsModal
+                        key={selectedWidgetID!}
+                        exitHandler={() => {
+                            setWidgetSettingsModalOpen(false);
+                        }}
+                        onSave={(settings) => {
+                            editorContents.insertWidget(props.path, {
+                                $hydrate: selectedWidgetID,
+                                ...settings,
+                            });
+                            editorSelection.moveSelectionTo(props.path, LayoutEditorSelectionMode.WIDGET);
+                            setWidgetSelectionModalOpen(false);
+                            setSelectedWidgetID(undefined);
+                        }}
+                        isVisible={widgetSettingsModalOpen}
+                        schema={widgetSchema}
+                        name={widgetName!}
+                        initialValues={extractSchemaDefaults(widgetSchema)}
+                        widgetID={selectedWidgetID!}
+                        layoutCatalog={catalog}
+                    />
+                )}
+            </ClearThemeOverrideContext>
         </>
     );
 }

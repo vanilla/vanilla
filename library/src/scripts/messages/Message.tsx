@@ -74,7 +74,7 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
     const isError: boolean = "error" in props || (!!props.type && props.type === "error");
     let icon = props.icon;
     if (!icon && isError) {
-        icon = <ErrorIcon />;
+        icon = <Icon icon="status-alert" />;
     } else if (!icon && props.type === "warning") {
         icon = <Icon icon="status-alert" />;
     }

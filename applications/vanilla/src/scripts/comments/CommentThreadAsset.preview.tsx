@@ -5,7 +5,7 @@
  */
 
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CommentThreadAsset from "@vanilla/addon-vanilla/comments/CommentThreadAsset";
 import React, { useMemo } from "react";
@@ -60,7 +60,7 @@ export function CommentThreadAssetPreview(props: IProps) {
     const key = `${maxDepth}-${collapseChildDepth}`;
 
     return (
-        <Widget>
+        <LayoutWidget>
             <QueryClientProvider client={queryClient}>
                 <WidgetPreviewNoPointerEventsWrapper>
                     <CommentThreadAsset
@@ -90,6 +90,6 @@ export function CommentThreadAssetPreview(props: IProps) {
                     />
                 </WidgetPreviewNoPointerEventsWrapper>
             </QueryClientProvider>
-        </Widget>
+        </LayoutWidget>
     );
 }

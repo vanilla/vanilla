@@ -7,10 +7,11 @@
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import MessagesContents from "@library/headers/mebox/pieces/MessagesContents";
 import MessagesCount from "@library/headers/mebox/pieces/MessagesCount";
-import { titleBarClasses } from "@library/headers/titleBarStyles";
+import { useTitleBarParamVarOverrides } from "@library/headers/TitleBar.ParamContext";
+import { titleBarClasses } from "@library/headers/TitleBar.classes";
 import { getMeta } from "@library/utility/appUtils";
-import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import React from "react";
+import { uniqueIDFromPrefix, useUniqueID } from "@library/utility/idUtils";
+import React, { useState } from "react";
 import { sprintf } from "sprintf-js";
 
 interface IProps {
@@ -29,50 +30,31 @@ interface IState {
 /**
  * Implements Messages Drop down for header
  */
-export default class MessagesDropDown extends React.Component<IProps, IState> {
-    private id = uniqueIDFromPrefix("messagesDropDown");
+export default function MessagesDropDown(props: IProps) {
+    const conversations = getMeta("context.conversationsEnabled", false);
+    const varOverrides = useTitleBarParamVarOverrides();
+    const classesHeader = titleBarClasses.useAsHook(varOverrides);
+    const [open, setOpen] = useState(false);
+    const id = useUniqueID();
 
-    public state: IState = {
-        open: false,
-    };
-
-    /**
-     * Get the React component to added to the page.
-     *
-     * @returns A DropDown component, configured to display notifications.
-     */
-    public render() {
-        const conversations = getMeta("context.conversationsEnabled", false);
-        const classesHeader = titleBarClasses();
-
-        if (!conversations) return null;
-
-        return (
-            <DropDown
-                contentID={this.id + "-content"}
-                handleID={this.id + "-handle"}
-                name={sprintf("Messages: %s", this.props.count)}
-                renderLeft={!getMeta("ui.isDirectionRTL", false)}
-                buttonClassName={classesHeader.button}
-                contentsClassName={classesHeader.dropDownContents}
-                buttonContents={<MessagesCount open={this.state.open} compact={false} />}
-                onVisibilityChange={this.setOpen}
-                flyoutType={FlyoutType.FRAME}
-                onHover={MessagesContents.preload}
-            >
-                <MessagesContents countClass={this.props.countClass} />
-            </DropDown>
-        );
+    if (!conversations) {
+        return <></>;
     }
 
-    /**
-     * Assign the open (visible) state of this component.
-     *
-     * @param open Is this menu open and visible?
-     */
-    private setOpen = (open) => {
-        this.setState({
-            open,
-        });
-    };
+    return (
+        <DropDown
+            contentID={id + "-content"}
+            handleID={id + "-handle"}
+            name={sprintf("Messages: %s", props.count)}
+            renderLeft={!getMeta("ui.isDirectionRTL", false)}
+            buttonClassName={classesHeader.button}
+            contentsClassName={classesHeader.dropDownContents}
+            buttonContents={<MessagesCount open={open} compact={false} />}
+            onVisibilityChange={setOpen}
+            flyoutType={FlyoutType.FRAME}
+            onHover={MessagesContents.preload}
+        >
+            <MessagesContents countClass={props.countClass} />
+        </DropDown>
+    );
 }

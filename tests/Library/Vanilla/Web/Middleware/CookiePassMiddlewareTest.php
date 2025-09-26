@@ -29,7 +29,7 @@ class CookiePassMiddlewareTest extends MinimalContainerTestCase
     protected $request;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

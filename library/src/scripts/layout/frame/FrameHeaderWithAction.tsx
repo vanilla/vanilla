@@ -17,18 +17,11 @@ interface IProps extends ICommonHeadingProps {
 /**
  * Generic header for frame with action
  */
-export default class FrameHeaderWithAction extends React.PureComponent<IFrameHeaderProps> {
-    public render() {
-        const classes = frameHeaderClasses();
-        return (
-            <FrameHeader
-                {...this.props}
-                className={classNames(this.props.className, "frameHeaderWithAction", classes.root)}
-            >
-                <span className={classNames("frameHeaderWithAction-action", classes.action)}>
-                    {this.props.children}
-                </span>
-            </FrameHeader>
-        );
-    }
+export default function FrameHeaderWithAction(props: IFrameHeaderProps) {
+    const classes = frameHeaderClasses.useAsHook();
+    return (
+        <FrameHeader {...props} className={classNames(props.className, "frameHeaderWithAction", classes.root)}>
+            <span className={classNames("frameHeaderWithAction-action", classes.action)}>{props.children}</span>
+        </FrameHeader>
+    );
 }

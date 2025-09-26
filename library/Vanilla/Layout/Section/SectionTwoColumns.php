@@ -17,7 +17,7 @@ use Vanilla\Widgets\Schema\ReactChildrenSchema;
 class SectionTwoColumns extends AbstractLayoutSection
 {
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

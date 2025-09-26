@@ -11,6 +11,7 @@ import classNames from "classnames";
 import { LocationDescriptor } from "history";
 import React from "react";
 import { CheckCompactIcon } from "@library/icons/common";
+import { cx } from "@emotion/css";
 
 export interface IDropDownItemLink {
     to: LocationDescriptor;
@@ -26,34 +27,29 @@ export interface IDropDownItemLink {
 /**
  * Implements link type of item for DropDownMenu
  */
-export default class DropDownItemLink extends React.Component<IDropDownItemLink> {
-    public render() {
-        const { children, name, className, to, isBasicLink } = this.props;
-        const linkContents = children ? children : name;
-        const classes = dropDownClasses();
+export default function DropDownItemLink(props: IDropDownItemLink) {
+    const { children, name, className, to, isBasicLink } = props;
+    const linkContents = children ? children : name;
+    const classes = dropDownClasses.useAsHook();
 
-        return (
-            <DropDownItem className={classNames(className, classes.item)}>
-                {isBasicLink ? (
-                    <a
-                        href={to as string}
-                        className={classNames(classes.action, this.props.isActive && classes.actionActive)}
-                    >
-                        {linkContents}
-                        {this.props.isChecked && <CheckCompactIcon className={classes.check} aria-hidden={true} />}
-                    </a>
-                ) : (
-                    <SmartLink
-                        to={to}
-                        title={name}
-                        lang={this.props.lang}
-                        className={classNames(classes.action, this.props.isActive && classes.actionActive)}
-                    >
-                        {linkContents}
-                        {this.props.isChecked && <CheckCompactIcon className={classes.check} aria-hidden={true} />}
-                    </SmartLink>
-                )}
-            </DropDownItem>
-        );
-    }
+    return (
+        <DropDownItem className={cx(className, classes.item)}>
+            {isBasicLink ? (
+                <a href={to as string} className={cx(classes.action, props.isActive && classes.actionActive)}>
+                    {linkContents}
+                    {props.isChecked && <CheckCompactIcon className={classes.check} aria-hidden={true} />}
+                </a>
+            ) : (
+                <SmartLink
+                    to={to}
+                    title={name}
+                    lang={props.lang}
+                    className={cx(classes.action, props.isActive && classes.actionActive)}
+                >
+                    {linkContents}
+                    {props.isChecked && <CheckCompactIcon className={classes.check} aria-hidden={true} />}
+                </SmartLink>
+            )}
+        </DropDownItem>
+    );
 }

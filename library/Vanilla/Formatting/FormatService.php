@@ -12,6 +12,7 @@ use Garden\Container\NotFoundException;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Contracts\Formatting\FormatParsedInterface;
 use Vanilla\Contracts\Formatting\Heading;
+use Vanilla\Dashboard\Models\UserMentionsModel;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Formats\NotFoundFormat;
@@ -317,6 +318,10 @@ class FormatService
      */
     public function parseMentions($content, ?string $format, bool $skipTaggedContent = true): array
     {
+        $canParseMentions = UserMentionsModel::canParseMentions();
+        if (!$canParseMentions) {
+            return [];
+        }
         if ($content instanceof FormatParsedInterface) {
             $format = $content->getFormatKey();
         }
@@ -448,6 +453,10 @@ class FormatService
      */
     public function parseAllMentions($body, ?string $format): array
     {
+        $canParseMentions = UserMentionsModel::canParseMentions();
+        if (!$canParseMentions) {
+            return [];
+        }
         if ($body instanceof FormatParsedInterface) {
             $format = $body->getFormatKey();
         }

@@ -29,7 +29,7 @@ export async function highlightCodeBlocks(domNode: HTMLElement = document.body) 
     blocks.forEach((node: HTMLElement) => {
         // Check if the highlighted state is set on the node before trying to highlight
         if (!node.dataset[highlightStateIndicator]) {
-            node.setAttribute(`data-${highlightStateIndicator}`, true);
+            node.setAttribute(`data-${highlightStateIndicator}`, "true");
             hljs.highlightBlock(node);
         }
     });

@@ -11,11 +11,13 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\DiscussionTypeHandler;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Forum\Menu\CommunityManagementCounterProvider;
 use Vanilla\Forum\Models\PostTypeModel;
+use Vanilla\Models\ContentDraftModel;
 use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Theme\ThemeSectionModel;
+use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Forum\Menu\CommunityManagementCounterProvider;
 
 /**
  * Vanilla's event handlers.
@@ -961,6 +963,7 @@ class VanillaHooks extends Gdn_Plugin
         $sender->addGroup(t("Favorites"), "favorites", "", 3);
 
         if (Gdn::session()->isValid()) {
+            $contentDraftModel = GDN::getContainer()->get(ContentDraftModel::class);
             $sender->addLink(
                 t("My Bookmarks"),
                 "/discussions/bookmarked",
@@ -983,7 +986,10 @@ class VanillaHooks extends Gdn_Plugin
                 "favorites.drafts",
                 "",
                 [],
-                ["icon" => "compose", "badge" => Gdn::session()->User->CountDrafts]
+                [
+                    "icon" => "compose",
+                    "badge" => $contentDraftModel->draftsWhereCountByUser(),
+                ]
             );
         }
 
@@ -1453,13 +1459,30 @@ class VanillaHooks extends Gdn_Plugin
         } elseif (strtolower($RecordType) === "comment") {
             $comment = CommentModel::instance()->getID((int) $ID);
             $discussion = DiscussionModel::instance()->getID($comment->DiscussionID);
+        } elseif (strtolower($RecordType) === "activity") {
+            $activity = Gdn::getContainer()
+                ->get(ActivityModel::class)
+                ->getID((int) $ID, DATASET_TYPE_ARRAY);
         }
 
-        if ($discussion) {
+        if ($discussion ?? false) {
             $eventManager = Gdn::eventManager();
             $eventManager->fire("reactionModel_beforeReact", $discussion);
             $category = CategoryModel::categories($discussion->CategoryID);
             $Sender->permission("Vanilla.Discussions.View", true, "Category", $category["PermissionCategoryID"]);
+        }
+
+        if ($activity ?? false) {
+            $activityUserID = $activity["ActivityUserID"];
+            $user = Gdn::getContainer()
+                ->get(UserModel::class)
+                ->getID($activityUserID, DATASET_TYPE_ARRAY);
+            $isPrivate = $user["Attributes"]["Private"] ?? ($user["Private"] ?? 0);
+            if ($isPrivate) {
+                $Sender->permission("personalInfo.view");
+            } else {
+                $Sender->permission("profiles.view");
+            }
         }
 
         $ReactionModel = new ReactionModel();
@@ -1751,5 +1774,112 @@ class VanillaHooks extends Gdn_Plugin
             writeProfileCounts();
             echo "</div>";
         }
+    }
+
+    /**
+     * normalize draft data for display
+     * @param array $draft
+     * @param bool $expand
+     */
+    public function normalizeDraft_handler(array $draft, $expand = false): array
+    {
+        $breadcrumbModel = Gdn::getContainer()->get(BreadcrumbModel::class);
+        $discussionModel = DiscussionModel::instance();
+        $groupID = $draft["attributes"]["groupID"] ?? null;
+        // if the record Types are not type discussion or comment, we don't process it here.
+        if (!in_array(strtolower($draft["recordType"]), ["discussion", "comment"])) {
+            return $draft;
+        }
+        if (
+            strtolower($draft["recordType"]) === "comment" &&
+            !empty($draft["parentRecordType"]) &&
+            strtolower($draft["parentRecordType"]) !== "discussion"
+        ) {
+            return $draft;
+        }
+
+        foreach (["editUrl", "breadCrumbs", "permaLink"] as $key) {
+            if (!array_key_exists($key, $draft)) {
+                $draft[$key] = null;
+            }
+        }
+        if ($draft["recordType"] == "discussion") {
+            $categoryID = $draft["parentRecordID"] ?? ($draft["attributes"]["draftMeta"]["categoryID"] ?? null);
+            if ($expand) {
+                $draft["name"] = $draft["attributes"]["name"] ?? ($draft["attributes"]["draftMeta"]["name"] ?? "");
+                $draft["excerpt"] = $this->processExcerpt(
+                    (string) $draft["attributes"]["body"] ?? "",
+                    (string) $draft["attributes"]["format"] ?? "text"
+                );
+            }
+            if ($categoryID && empty($groupID)) {
+                CategoryModel::categories($categoryID);
+                $draft["breadCrumbs"] = $breadcrumbModel->getForRecord(new ForumCategoryRecordType($categoryID));
+            }
+            $recordID = $draft["recordID"] ?? 0;
+            $draft["editUrl"] = url("/post/editdiscussion/0/" . $draft["draftID"], true);
+            if ($draft["recordID"]) {
+                $discussionRecord = $discussionModel->getID($draft["recordID"]);
+                if ($discussionRecord) {
+                    $draft["permaLink"] = DiscussionModel::discussionUrl($discussionRecord);
+                    $draft["editUrl"] = url("/post/editdiscussion/$recordID/" . $draft["draftID"], true);
+                } else {
+                    $draft["permaLink"] = url("/discussion/$recordID", true);
+                }
+            }
+        }
+        if ($draft["recordType"] == "comment") {
+            $discussionRecord = $discussionModel->getID($draft["parentRecordID"], DATASET_TYPE_ARRAY);
+            if ($expand) {
+                $draft["name"] = $draft["attributes"]["name"] ?? wrap(t("(Untitled)"), "");
+                $draft["excerpt"] = $this->processExcerpt(
+                    (string) $draft["attributes"]["body"] ?? "",
+                    (string) $draft["attributes"]["format"] ?? "text"
+                );
+            }
+            $urlPath = "";
+            if (isset($draft["attributes"]["draftMeta"])) {
+                $draftMeta = $draft["attributes"]["draftMeta"];
+                if (isset($draftMeta["commentParentID"])) {
+                    $urlPath =
+                        "/discussion/comment/" .
+                        $draftMeta["commentParentID"] .
+                        "?hasDraft=true#Comment_" .
+                        $draftMeta["commentParentID"];
+                } else {
+                    $urlPath = "/discussion/" . $draft["parentRecordID"] . "?hasDraft=true#create-comment";
+                }
+            }
+
+            if (empty($urlPath)) {
+                $urlPath = "/discussion/" . $draft["parentRecordID"] . "/0/#Form_Comment";
+            }
+            $draft["editUrl"] = url($urlPath, true);
+            if (!empty($discussionRecord)) {
+                $discussionUrl = DiscussionModel::discussionUrl($discussionRecord);
+                $draft["permaLink"] = $discussionUrl;
+                $draft["breadCrumbs"] = !empty($discussionRecord["CategoryID"])
+                    ? $breadcrumbModel->getForRecord(new ForumCategoryRecordType($discussionRecord["CategoryID"]))
+                    : null;
+            }
+        }
+
+        return $draft;
+    }
+
+    /**
+     * Generate excerpt from draft body
+     *
+     * @param string $body
+     * @param string $format
+     * @return string
+     * @throws \Vanilla\Formatting\Exception\FormatterNotFoundException
+     */
+    private function processExcerpt(string $body, string $format): string
+    {
+        if (!empty($body)) {
+            return \Gdn_Format::reduceWhiteSpaces(Gdn::formatService()->renderExcerpt($body, $format));
+        }
+        return wrap(t("No Body"), "");
     }
 }

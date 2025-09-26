@@ -15,7 +15,7 @@ import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { useIsMounted } from "@vanilla/react-utils";
 import { CustomRadioGroup, CustomRadioInput } from "@vanilla/ui";
-import { spaceshipCompare } from "@vanilla/utils";
+import { notEmpty, spaceshipCompare } from "@vanilla/utils";
 import debounce from "lodash-es/debounce";
 import * as React from "react";
 import { useCallback, useRef, useState } from "react";
@@ -25,6 +25,8 @@ interface IProps {
     value?: string;
     onChange?: (section: string) => any;
     widgets: ILayoutCatalog["widgets"];
+    description?: React.ReactNode;
+    disableGrouping?: boolean; // Optional prop to disable grouping for widgets
 }
 
 export default function LayoutWidgetsThumbnails(props: IProps) {
@@ -35,6 +37,16 @@ export default function LayoutWidgetsThumbnails(props: IProps) {
 
     //sort widgetIDs by name and exclude disabled widgets
     const [visibleWidgetIDs, updateVisibleWidgetIDs] = useState(Object.keys(widgets));
+    const groupedVisibleWidgetIDs = visibleWidgetIDs.reduce((acc, widgetID) => {
+        const widget = widgets[widgetID];
+        if (!widget) {
+            return acc;
+        }
+        const group = props.disableGrouping ? "Widgets" : widget.widgetGroup ?? "Widgets";
+        acc[group] = acc[group] || [];
+        acc[group].push(widgetID);
+        return acc;
+    }, {} as Record<string, typeof visibleWidgetIDs>);
 
     const [ownValue, ownOnChange] = useState(Object.keys(widgets)[0] as string);
     const [currentSearchInputValue, setCurrentSearchInputValue] = useState("");
@@ -78,12 +90,11 @@ export default function LayoutWidgetsThumbnails(props: IProps) {
 
     return (
         <div className={classes.container}>
-            <div className={cx(userContentClasses().root, classes.description)} id={descriptionID}>
-                <Translate
-                    source="Get started selecting the best widget for your Homepage. Find out more in the <1>documentation.</1>"
-                    c1={(text) => <SmartLink to="https://success.vanillaforums.com/kb/articles/548">{text}</SmartLink>}
-                />
-            </div>
+            {props.description && (
+                <div className={cx(userContentClasses().root, classes.description)} id={descriptionID}>
+                    {props.description}
+                </div>
+            )}
             <div className={cx(searchClasses.content, classes.searchContent)}>
                 <span className={searchClasses.iconContainer(false)}>
                     <Icon size="compact" icon="search" />
@@ -128,37 +139,58 @@ export default function LayoutWidgetsThumbnails(props: IProps) {
                 value={value}
                 className={cx(classes.thumbnails, classes.smallerThumbnails)}
             >
-                {visibleWidgetIDs
-                    .sort((widgetIDA, widgetIDB) => {
-                        const widgetAName = widgets[widgetIDA]?.name ?? "";
-                        const widgetBName = widgets[widgetIDB]?.name ?? "";
-                        return spaceshipCompare(widgetAName, widgetBName);
+                {Object.entries(groupedVisibleWidgetIDs)
+                    .sort(([groupA], [groupB]) => {
+                        if (groupA === "Custom") {
+                            return 1;
+                        }
+                        if (groupB === "Custom") {
+                            return -1;
+                        }
+                        return spaceshipCompare(groupA, groupB);
                     })
-                    .map((widgetID: string) => {
-                        const label = t(widgets[widgetID].name);
+                    .map(([group, widgetIDs]) => {
                         return (
-                            <CustomRadioInput value={widgetID} key={widgetID} className={classes.thumbnailWrapper}>
-                                {({ isSelected, isFocused }) => (
-                                    <>
-                                        <span
-                                            role="decoration"
-                                            className={cx(classes.thumbnail, {
-                                                isSelected,
-                                                "focus-visible": isFocused,
-                                            })}
-                                        >
-                                            <img
-                                                width="120"
-                                                height="100"
-                                                className={classes.thumbnailImage}
-                                                alt={label}
-                                                src={widgets[widgetID].iconUrl}
-                                            />
-                                        </span>
-                                        <div className={classes.labelContainer}>{t(label)}</div>
-                                    </>
-                                )}
-                            </CustomRadioInput>
+                            <React.Fragment key={group}>
+                                {!props.disableGrouping && <h2 className={classes.groupHeading}>{t(group)}</h2>}
+                                {widgetIDs
+                                    .sort((widgetIDA, widgetIDB) => {
+                                        const widgetAName = widgets[widgetIDA]?.name ?? "";
+                                        const widgetBName = widgets[widgetIDB]?.name ?? "";
+                                        return spaceshipCompare(widgetAName, widgetBName);
+                                    })
+                                    .map((widgetID: string) => {
+                                        const label = t(widgets[widgetID].name);
+                                        return (
+                                            <CustomRadioInput
+                                                value={widgetID}
+                                                key={widgetID}
+                                                className={classes.thumbnailWrapper}
+                                            >
+                                                {({ isSelected, isFocused }) => (
+                                                    <>
+                                                        <span
+                                                            role="decoration"
+                                                            className={cx(classes.thumbnail, {
+                                                                isSelected,
+                                                                "focus-visible": isFocused,
+                                                            })}
+                                                        >
+                                                            <img
+                                                                width="120"
+                                                                height="100"
+                                                                className={classes.thumbnailImage}
+                                                                alt={label}
+                                                                src={widgets[widgetID].iconUrl}
+                                                            />
+                                                        </span>
+                                                        <div className={classes.labelContainer}>{t(label)}</div>
+                                                    </>
+                                                )}
+                                            </CustomRadioInput>
+                                        );
+                                    })}
+                            </React.Fragment>
                         );
                     })}
             </CustomRadioGroup>

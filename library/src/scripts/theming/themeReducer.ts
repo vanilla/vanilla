@@ -22,7 +22,7 @@ export interface ITheme {
     features: Record<string, boolean>;
     supportedSections?: string[];
     preview: IThemePreview;
-    themeID: RecordID;
+    themeID: string;
     name: string;
     type: ThemeType;
     parentTheme?: string;

@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import sinon from "sinon";
 import { delegateEvent, removeAllDelegatedEvents, removeDelegatedEvent } from "./index";
 
 describe("delegateEvent()", () => {
@@ -25,23 +24,23 @@ describe("delegateEvent()", () => {
     });
 
     it("A event can be registered successfully", () => {
-        const callback = sinon.spy();
+        const callback = vitest.fn();
         delegateEvent("click", "", callback);
 
         const button = document.querySelector(".filterSelector") as HTMLElement;
         button.click();
-        sinon.assert.calledOnce(callback);
+        expect(callback).toHaveBeenCalledTimes(1);
     });
 
     it("identical events will not be registered twice", () => {
-        const callback = sinon.spy();
+        const callback = vitest.fn();
         const hash1 = delegateEvent("click", "", callback);
         const hash2 = delegateEvent("click", "", callback);
         const hash3 = delegateEvent("click", "", callback);
 
         const button = document.querySelector(".filterSelector") as HTMLElement;
         button.click();
-        sinon.assert.calledOnce(callback);
+        expect(callback).toHaveBeenCalledTimes(1);
 
         // Hashes should all be for the same handler.
         expect(hash1).eq(hash2);
@@ -49,7 +48,7 @@ describe("delegateEvent()", () => {
     });
 
     describe("delegation filtering works()", () => {
-        const callback = sinon.spy();
+        const callback = vitest.fn();
 
         beforeEach(() => {
             delegateEvent("click", ".filterSelector", callback);
@@ -59,22 +58,22 @@ describe("delegateEvent()", () => {
             document.querySelectorAll(".filterSelector").forEach((button: HTMLElement) => {
                 button.click();
             });
-            sinon.assert.calledTwice(callback);
+            expect(callback).toHaveBeenCalledTimes(2);
         });
 
         it("delegated events only match their filterSelector", () => {
-            callback.resetHistory();
+            callback.mockReset();
 
             document.querySelectorAll(".altFilterSelector").forEach((button: HTMLElement) => {
                 button.click();
             });
 
-            sinon.assert.notCalled(callback);
+            expect(callback).not.toHaveBeenCalled();
         });
     });
 
     describe("delegation scoping works", () => {
-        const callback = sinon.spy();
+        const callback = vitest.fn();
 
         beforeEach(() => {
             delegateEvent("click", "", callback, ".scope1");
@@ -84,30 +83,30 @@ describe("delegateEvent()", () => {
             document.querySelectorAll(".scope1 button").forEach((button: HTMLElement) => {
                 button.click();
             });
-            sinon.assert.calledTwice(callback);
+            expect(callback).toHaveBeenCalledTimes(2);
         });
 
         it("delegated events only match their scopeSelector", () => {
-            callback.resetHistory();
+            callback.mockReset();
 
             document.querySelectorAll(".scope2 button").forEach((button: HTMLElement) => {
                 button.click();
             });
 
-            sinon.assert.notCalled(callback);
+            expect(callback).not.toHaveBeenCalled();
         });
     });
 });
 
 describe("removeDelegatedEvent() && removeAllDelegatedEvents()", () => {
-    const callback1 = sinon.spy();
-    const callback2 = sinon.spy();
+    const callback1 = vitest.fn();
+    const callback2 = vitest.fn();
     let eventHandler1;
     let eventHandler2;
 
     beforeEach(() => {
-        callback1.resetHistory();
-        callback2.resetHistory();
+        callback1.mockReset();
+        callback2.mockReset();
         eventHandler1 = delegateEvent("click", "", callback1);
         eventHandler2 = delegateEvent("click", ".scope1", callback2, ".filterSelector");
     });
@@ -116,15 +115,15 @@ describe("removeDelegatedEvent() && removeAllDelegatedEvents()", () => {
         removeDelegatedEvent(eventHandler1);
         (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
-        sinon.assert.notCalled(callback1);
-        sinon.assert.calledOnce(callback2);
+        expect(callback1).not.toHaveBeenCalled();
+        expect(callback2).toHaveBeenCalledTimes(1);
     });
 
     it("can remove all events", () => {
         removeAllDelegatedEvents();
         (document.querySelector(".scope1 .filterSelector") as HTMLElement).click();
 
-        sinon.assert.notCalled(callback1);
-        sinon.assert.notCalled(callback2);
+        expect(callback1).not.toHaveBeenCalled();
+        expect(callback2).not.toHaveBeenCalled();
     });
 });

@@ -9,7 +9,7 @@ import React from "react";
 import { t, getMeta, siteUrl } from "@library/utility/appUtils";
 import { indexArrayByKey, notEmpty } from "@vanilla/utils";
 import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from "axios";
-import qs from "qs";
+import * as qs from "qs-esm";
 import { sprintf } from "sprintf-js";
 import { humanFileSize } from "@library/utility/fileUtils";
 import { IApiError, IFieldError, IServerError } from "@library/@types/api/core";

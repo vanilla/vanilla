@@ -7,7 +7,7 @@
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addons\Pockets\PocketsModel;
-use Vanilla\Widgets\WidgetService;
+use Vanilla\Widgets\LegacyWidgetService;
 
 /**
  * Class Pocket
@@ -86,13 +86,13 @@ class Pocket implements LoggerAwareInterface
     /** @var array */
     private $widgetParameters = [];
 
-    /** @var WidgetService */
+    /** @var LegacyWidgetService */
     private $widgetService;
 
     /**
      * Pocket constructor.
      */
-    public function __construct(WidgetService $widgetService)
+    public function __construct(LegacyWidgetService $widgetService)
     {
         $this->widgetService = $widgetService;
         $this->setLogger(Logger::getLogger());

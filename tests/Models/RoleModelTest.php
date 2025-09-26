@@ -21,7 +21,7 @@ class RoleModelTest extends SiteTestCase
     private $cache;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

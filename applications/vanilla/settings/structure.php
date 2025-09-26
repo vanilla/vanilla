@@ -14,6 +14,7 @@ use Vanilla\Forum\Models\PostTypeModel;
 use Vanilla\Models\KeywordSentimentModel;
 use Vanilla\Models\KeywordsModel;
 use Vanilla\Premoderation\ApprovalPremoderator;
+use Vanilla\Models\ScheduledDraftModel;
 
 if (!defined("APPLICATION")) {
     exit();
@@ -195,7 +196,7 @@ $Construct
     ->column("UpdateUserID", "int", true)
     ->column("FirstCommentID", "int", true)
     ->column("LastCommentID", "int", true)
-    ->column("Name", "varchar(100)", false, "fulltext")
+    ->column("Name", "varchar(" . DiscussionModel::MAX_TITLE_LENGTH_UPPER_LIMIT . ")", false, "fulltext")
     ->column("Body", "mediumtext", false, "fulltext")
     ->column("Format", "varchar(20)", true)
     ->column("Tags", "text", null)
@@ -801,6 +802,10 @@ if (!$config->configKeyExists("Garden.Unsubscribe.Salt")) {
     $config->set("Garden.Unsubscribe.Salt", betterRandomString(32, "Aa0"));
 }
 
+// The size of the discussion name column was increased to 250 bytes,
+// but we want to maintain the original max length using a config setting.
+$config->touch("Vanilla.Discussion.Title.MaxLength", 100);
+
 DigestModel::structure($Construct);
 DigestContentModel::structure($Construct);
 UserDigestModel::structure($Construct);
@@ -813,3 +818,4 @@ GroupStructureModel::structure($Construct);
 EventStructureModel::structure($Construct);
 KeywordsModel::structure(Gdn::database());
 KeywordSentimentModel::structure(Gdn::database());
+ScheduledDraftModel::structure($Construct);

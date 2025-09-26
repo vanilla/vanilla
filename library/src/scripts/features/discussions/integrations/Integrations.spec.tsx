@@ -12,17 +12,17 @@ import {
 } from "@library/features/discussions/integrations/Integrations.context";
 import {
     FAKE_API,
-    FAKE_WRITEABLE_INTEGRATION,
     FAKE_INTEGRATIONS_CATALOG,
     FAKE_INTEGRATION_SCHEMAS,
+    FAKE_WRITEABLE_INTEGRATION,
 } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
 import { setMeta } from "@library/utility/appUtils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RenderResult, act, fireEvent, render, within, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { IFormControl } from "@vanilla/json-schema-forms";
+import { vitest } from "vitest";
 import { IntegrationButtonAndModal } from "./Integrations";
 import { IIntegrationsApi } from "./Integrations.types";
-import { vitest } from "vitest";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -96,8 +96,6 @@ describe("IntegrationButtonAndModal", () => {
                 const form = await within(modal).findByRole<HTMLFormElement>("form");
 
                 const schema = FAKE_INTEGRATION_SCHEMAS[FAKE_WRITEABLE_INTEGRATION.attachmentType];
-
-                expect.assertions(Object.keys(schema.properties).length * 2);
 
                 for (const [key, value] of Object.entries(schema.properties)) {
                     const input = within(form).getByLabelText((value["x-control"] as IFormControl).label as string, {

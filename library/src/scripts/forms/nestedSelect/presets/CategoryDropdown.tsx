@@ -17,7 +17,7 @@ export function CategoryDropdown(_props: INestedSelectProps) {
     const optionsLookup: Select.LookupApi = {
         searchUrl: "/categories/search?query=%s",
         singleUrl: "/categories/%s",
-        defaultListUrl: "/categories?outputFormat=flat&limit=50",
+        defaultListUrl: `/categories?outputFormat=flat&limit=500`,
         labelKey: "name",
         valueKey: "categoryID",
         processOptions: inputValue.length ? getFilteredNestedOptions : getDefaultNestedOptions,

@@ -26,21 +26,15 @@ use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
 use Vanilla\Widgets\React\DefaultSectionTrait;
+use Vanilla\Widgets\React\ReactWidget;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
  * New Post Button Widget
  */
-class NewPostWidget implements
-    ReactWidgetInterface,
-    CombinedPropsWidgetInterface,
-    InjectableInterface,
-    HydrateAwareInterface
+class NewPostWidget extends ReactWidget implements InjectableInterface
 {
     use HomeWidgetContainerSchemaTrait;
-    use CombinedPropsWidgetTrait;
-    use DefaultSectionTrait;
-    use HydrateAwareTrait;
 
     /** @var CategoryModel */
     private CategoryModel $categoryModel;
@@ -56,7 +50,7 @@ class NewPostWidget implements
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetName(): string
     {
@@ -64,7 +58,15 @@ class NewPostWidget implements
     }
 
     /**
-     * @inheritDoc
+     * @return string
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
+    }
+
+    /**
+     * @inheritdoc
      */
     public static function getWidgetID(): string
     {
@@ -72,7 +74,7 @@ class NewPostWidget implements
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getComponentName(): string
     {
@@ -326,7 +328,7 @@ class NewPostWidget implements
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function getWidgetSchema(): Schema
     {
@@ -334,7 +336,7 @@ class NewPostWidget implements
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {

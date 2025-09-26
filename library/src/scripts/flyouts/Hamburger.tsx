@@ -32,6 +32,7 @@ interface IProps {
     showCloseIcon?: boolean;
     navigationItems?: INavigationVariableItem[];
     forceHamburgerOpen?: boolean;
+    side?: "left" | "right";
 }
 
 const extraNavGroups: React.ComponentType[] = [];
@@ -44,6 +45,7 @@ export function addHamburgerNavGroup(node: React.ComponentType) {
  * Creates a hamburger menu.
  */
 export default function Hamburger(props: IProps) {
+    const { side = "left" } = props;
     const [isOpen, setIsOpen] = useState(props.forceHamburgerOpen || false);
     const classes = hamburgerClasses();
 
@@ -86,7 +88,12 @@ export default function Hamburger(props: IProps) {
                     <ScreenReaderContent>{t("Menu")}</ScreenReaderContent>
                 </>
             </Button>
-            <Modal scrollable isVisible={isOpen} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT} exitHandler={closeDrawer}>
+            <Modal
+                scrollable
+                isVisible={isOpen}
+                size={side === "left" ? ModalSizes.MODAL_AS_SIDE_PANEL_LEFT : ModalSizes.MODAL_AS_SIDE_PANEL_RIGHT}
+                exitHandler={closeDrawer}
+            >
                 {showCloseIcon && (
                     <Button
                         className={classes.closeButton}

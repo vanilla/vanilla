@@ -26,9 +26,11 @@ export function UserSpotlight(props: IUserSpotlightProps) {
     const { title, subtitle, description, options, userInfo } = props;
     const rootRef = useRef<HTMLDivElement | null>(null);
     const rootMeasure = useMeasure(rootRef);
-    const shouldWrap = rootMeasure.width > 0 && rootMeasure.width < twoColumnVariables().panel.paddedWidth;
-    const vars = userSpotlightVariables(options);
-    const classes = userSpotlightClasses(shouldWrap, options);
+    const twoColumnPanelWidth = twoColumnVariables.useAsHook().panel.paddedWidth;
+    const shouldWrap = rootMeasure.width > 0 && rootMeasure.width < twoColumnPanelWidth;
+    const vars = userSpotlightVariables.useAsHook(options);
+    const classes = userSpotlightClasses.useAsHook(shouldWrap, options);
+    const classesHeading = pageHeadingBoxClasses.useAsHook();
 
     return (
         <div ref={rootRef} className={classes.root}>
@@ -38,7 +40,7 @@ export function UserSpotlight(props: IUserSpotlightProps) {
                 </ProfileLink>
             </div>
             <div className={classes.textContainer}>
-                {subtitle && <div className={pageHeadingBoxClasses().subtitle}>{subtitle}</div>}
+                {subtitle && <div className={classesHeading.subtitle}>{subtitle}</div>}
                 {title && <div className={classes.title}>{title}</div>}
                 {description && <div className={classes.description}>{description}</div>}
                 <div className={classes.userText}>

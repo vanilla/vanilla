@@ -9,7 +9,7 @@ namespace VanillaTests\Fixtures\MockWidgets;
 use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\Widgets\AbstractWidgetModule;
+use Vanilla\Widgets\LegacyWidgetModule;
 
 /**
  * Class MockWidget2

@@ -1,24 +1,33 @@
 {
     "name": "@vanilla/ui-library",
     "description": "Portable UI components for Higher Logic Vanilla applications.",
-    "version": "1.0.0",
     "license": "GPL-2.0-only",
+    "version": "4.0.2",
     "main": "dist/index.mjs",
-    "module": "dist/index.mjs",
+    "type": "module",
     "types": "dist/index.d.ts",
     "files": [
         "dist"
     ],
-    "peerDependencies": {
-        "@tanstack/react-query": "*",
-        "react": "*",
-        "react-dom": "*"
-    },
     "author": {
         "name": "Adam (charrondev) Charron",
         "email": "acharron@higherlogic.com"
     },
     "publishConfig": {
         "access": "public"
+    },
+    "peerDependencies": {
+        "@emotion/css": "*",
+        "@tanstack/react-query": "*",
+        "lodash-es": "*",
+        "react": ">=17.0.2",
+        "react-dom": ">=17.0.2"
+    },
+    "dependencies": {
+        "@vanilla/dom-utils": ">=4.0.2",
+        "@vanilla/i18n": ">=4.0.2",
+        "@vanilla/icons": ">=4.0.2",
+        "@vanilla/react-utils": ">=4.0.2",
+        "@vanilla/utils": ">=4.0.2"
     }
 }

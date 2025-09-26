@@ -7,7 +7,6 @@
 namespace Vanilla\Community;
 
 use CategoryModel;
-use DiscussionsApiController;
 use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
@@ -18,14 +17,13 @@ use Gdn_Session;
 use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Widgets\DiscussionsWidgetSchemaTrait;
 use Vanilla\Http\InternalClient;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Web\JsInterpop\LegacyReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\LimitableWidgetInterface;
 use Vanilla\Widgets\WidgetSchemaTrait;
@@ -35,7 +33,7 @@ use Vanilla\Widgets\WidgetSchemaTrait;
  *
  * @package Vanilla\Community
  */
-class BaseDiscussionWidgetModule extends AbstractReactModule implements LimitableWidgetInterface, HydrateAwareInterface
+class BaseDiscussionWidgetModule extends LegacyReactModule implements LimitableWidgetInterface, HydrateAwareInterface
 {
     use HomeWidgetContainerSchemaTrait;
     use WidgetSchemaTrait;
@@ -366,7 +364,15 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
      */
     public static function getWidgetName(): string
     {
-        return "Discussions List";
+        return "Post List";
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getWidgetGroup(): string
+    {
+        return "Community";
     }
 
     ///
@@ -479,11 +485,11 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function renderSeoHtml(array $props): ?string
     {
-        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["discussions"]));
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["discussions"] ?? []));
         return $result;
     }
 

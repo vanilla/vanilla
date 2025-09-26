@@ -781,18 +781,18 @@ class DiscussionModelTest extends SiteTestCase
         $this->assertNull($discussion->CountCommentWatch, "Initial comment watch status not null.");
 
         // Create a comment watch status.
-        $this->discussionModel->setWatch($discussion, 10, 0, $discussion->CountComments);
-        $discussionFirstVisit = $this->discussionModel->getID($discussionID);
+        $this->userDiscussionModel->setWatch($discussionID, true);
+        $discussionFirstVisit = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
         $this->assertSame(
-            $discussionFirstVisit->CountComments,
-            $discussionFirstVisit->CountCommentWatch,
+            $discussionFirstVisit["CountComments"],
+            $discussionFirstVisit["CountCommentWatch"],
             "Creating new comment watch status failed."
         );
 
         // Update an existing comment watch status.
         $updatedCountComments = $countComments + 1;
         $this->discussionModel->setField($discussionID, "CountComments", $updatedCountComments);
-        $this->discussionModel->setWatch($discussionFirstVisit, 10, 0, $updatedCountComments);
+        $this->userDiscussionModel->setWatch($discussionID, true);
         $discussionSecondVisit = $this->discussionModel->getID($discussionID);
         $this->assertSame(
             $discussionSecondVisit->CountComments,
@@ -1491,6 +1491,28 @@ class DiscussionModelTest extends SiteTestCase
             $this->expectException(ClientException::class);
             $this->expectExceptionMessage("Name is 1 characters too long.");
             $this->createDiscussion(["name" => "12345678901"]);
+        });
+    }
+
+    /**
+     * Test {@link DiscussionModel::getPagingCount()} behaviour with respect to page/count configurations.
+     *
+     * @related https://higherlogic.atlassian.net/browse/VNLA-9719
+     *
+     * @return void
+     */
+    public function testGetPagingCount(): void
+    {
+        $this->runWithConfig(["Vanilla.Discussions.PerPage" => 1, "Vanilla.APIv2.MaxCount" => 2], function () {
+            $category = $this->createCategory();
+            $this->createDiscussion();
+            $this->createDiscussion();
+            $this->createDiscussion();
+
+            $result = $this->discussionModel->getPagingCount([
+                "d.CategoryID" => $category["categoryID"],
+            ]);
+            $this->assertEquals(2, $result);
         });
     }
 }

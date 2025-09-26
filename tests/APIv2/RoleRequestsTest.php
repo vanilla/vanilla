@@ -49,7 +49,7 @@ class RoleRequestsTest extends AbstractAPIv2Test
     private $application;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {
@@ -131,7 +131,7 @@ class RoleRequestsTest extends AbstractAPIv2Test
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function tearDown(): void
     {

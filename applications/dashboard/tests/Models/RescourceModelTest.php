@@ -18,7 +18,7 @@ use VanillaTests\SiteTestCase;
 class RescourceModelTest extends SiteTestCase
 {
     /**
-     * @inheridoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

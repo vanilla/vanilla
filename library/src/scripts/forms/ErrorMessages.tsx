@@ -25,7 +25,7 @@ export default function ErrorMessages(props: IProps) {
     const ownID = useUniqueID("errorMessages");
     const id = props.id ?? ownID;
     const { errors, padded } = props;
-    const classesInputBlock = inputBlockClasses();
+    const classesInputBlock = inputBlockClasses.useAsHook();
     if (errors && errors.length > 0) {
         const componentClasses = classNames(
             classesInputBlock.errors,

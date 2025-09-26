@@ -26,8 +26,8 @@ export const filterBlockClasses = () => {
         fontWeight: globalVariables().fonts.weights.semiBold,
     });
     const checkbox = css({
-        padding: 0,
-        margin: "8px 0 0 0!important",
+        padding: "0px!important",
+        margin: "9px 0!important",
     });
     const spacingContainer = css({
         ...Mixins.margin({

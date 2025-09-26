@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { Widget } from "@library/layout/Widget";
+import { LayoutWidget } from "@library/layout/LayoutWidget";
 import React, { useMemo } from "react";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { QnAStatus } from "@dashboard/@types/api/comment";
@@ -66,7 +66,7 @@ export default function AnswerThreadAssetPreview(props: IProps) {
     const allComments = [...acceptedAnswers, ...rejectedAnswers, ...otherComments];
 
     return (
-        <Widget>
+        <LayoutWidget>
             <QueryClientProvider client={queryClient}>
                 <AnswerThreadAsset
                     key={key}
@@ -105,6 +105,6 @@ export default function AnswerThreadAssetPreview(props: IProps) {
                     }}
                 />
             </QueryClientProvider>
-        </Widget>
+        </LayoutWidget>
     );
 }

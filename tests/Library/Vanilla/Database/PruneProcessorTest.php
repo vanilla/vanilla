@@ -34,7 +34,7 @@ class PruneProcessorTest extends TestCase
     private $pruneCall;
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setUp(): void
     {

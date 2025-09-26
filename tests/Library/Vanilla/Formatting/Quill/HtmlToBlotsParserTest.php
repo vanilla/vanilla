@@ -28,7 +28,7 @@ class HtmlToBlotsParserTest extends VanillaTestCase
     private $parser;
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public function setUp(): void
     {

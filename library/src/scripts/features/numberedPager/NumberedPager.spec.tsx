@@ -11,32 +11,20 @@ import { NumberedPager } from "@library/features/numberedPager/NumberedPager";
 const TOTAL_RESULTS = 12345;
 const PAGE_LIMIT = 30;
 
-const renderDefault = async (props: React.ComponentProps<typeof NumberedPager> = {}) => {
-    await act(async () => {
-        render(
-            <NumberedPager
-                totalResults={TOTAL_RESULTS}
-                pageLimit={PAGE_LIMIT}
-                currentPage={1}
-                isMobile={false}
-                {...props}
-            />,
-        );
-    });
+const renderDefault = (props: React.ComponentProps<typeof NumberedPager> = {}) => {
+    render(<NumberedPager totalResults={TOTAL_RESULTS} pageLimit={PAGE_LIMIT} currentPage={1} {...props} />);
 };
 
 describe("NumberedPager", () => {
-    it("Default Properties", async () => {
-        await act(async () => {
-            render(<NumberedPager />);
-        });
+    it("Default Properties", () => {
+        render(<NumberedPager />);
         expect(screen.getByText("Next Page")).toBeInTheDocument();
         expect(screen.getByText("0 - 0 of 0")).toBeInTheDocument();
         expect(screen.getByLabelText("Jump to a specific page")).toBeInTheDocument();
     });
 
-    it("Display range only", async () => {
-        await renderDefault({ rangeOnly: true });
+    it("Display range only", () => {
+        renderDefault({ rangeOnly: true });
 
         expect(screen.getByText("1 - 30 of 12.3k")).toBeInTheDocument();
         expect(screen.queryByText("Next Page")).not.toBeInTheDocument();
@@ -45,27 +33,16 @@ describe("NumberedPager", () => {
         expect(screen.queryByText("Jump to a specific page")).not.toBeInTheDocument();
     });
 
-    it("Render mobile view", async () => {
-        await renderDefault({ isMobile: true });
-
-        expect(screen.getByText("Next Page")).toBeInTheDocument();
-        expect(screen.getByLabelText("Jump to a specific page")).toBeInTheDocument();
-
-        expect(screen.getByText("1 - 30 of 12.3k")).toBeInTheDocument();
-        expect(screen.queryByLabelText("Next Page")).not.toBeInTheDocument();
-        expect(screen.queryByLabelText("Previous Page")).not.toBeInTheDocument();
-    });
-
-    it("Pass in total results count and page limit", async () => {
-        await renderDefault();
+    it("Pass in total results count and page limit", () => {
+        renderDefault();
 
         expect(screen.getByText("1 - 30 of 12.3k")).toBeInTheDocument();
     });
 
-    it("Toggle the page jumper", async () => {
-        await renderDefault();
+    it("Toggle the page jumper", () => {
+        renderDefault();
 
-        await act(async () => {
+        act(() => {
             fireEvent.click(screen.getByLabelText("Jump to a specific page"));
         });
 
@@ -77,7 +54,7 @@ describe("NumberedPager", () => {
         expect(screen.getByText("Go")).toBeInTheDocument();
         expect(screen.getByLabelText("Back to post count")).toBeInTheDocument();
 
-        await act(async () => {
+        act(() => {
             fireEvent.click(screen.getByLabelText("Back to post count"));
         });
 
@@ -89,10 +66,10 @@ describe("NumberedPager", () => {
         expect(screen.queryByLabelText("Back to post count")).not.toBeInTheDocument();
     });
 
-    it("Navigate to next page using 'Next Page' button", async () => {
-        await renderDefault();
+    it("Navigate to next page using 'Next Page' button", () => {
+        renderDefault();
 
-        await act(async () => {
+        act(() => {
             fireEvent.click(screen.getByText("Next Page"));
         });
 
@@ -100,10 +77,10 @@ describe("NumberedPager", () => {
         expect(screen.queryByText("1 - 30 of 12.3k")).not.toBeInTheDocument();
     });
 
-    it("Navigate to page using page jumper", async () => {
-        await renderDefault();
+    it("Navigate to page using page jumper", () => {
+        renderDefault();
 
-        await act(async () => {
+        act(() => {
             fireEvent.click(screen.getByLabelText("Jump to a specific page"));
         });
 
@@ -114,28 +91,30 @@ describe("NumberedPager", () => {
         expect(screen.getByLabelText("Jump to page")).toBeInTheDocument();
         expect(screen.getByText("Go")).toBeInTheDocument();
 
-        await act(async () => {
+        act(() => {
             fireEvent.input(screen.getByLabelText("Jump to page"), { target: { value: "3" } });
         });
 
-        await act(async () => {
+        act(() => {
             fireEvent.click(screen.getByText("Go"));
         });
 
-        expect(screen.getByLabelText("Jump to a specific page")).toBeInTheDocument();
+        const jumper = screen.getByLabelText("Jump to a specific page");
+
+        expect(jumper).toBeInTheDocument();
         expect(screen.getByText("61 - 90 of 12.3k")).toBeInTheDocument();
         expect(screen.queryByText("Jump to page")).not.toBeInTheDocument();
         expect(screen.queryByLabelText("Jump to page")).not.toBeInTheDocument();
         expect(screen.queryByText("Go")).not.toBeInTheDocument();
     });
 
-    it("Navigate beyond page 100", async () => {
-        await renderDefault({ currentPage: 100 });
+    it("Navigate beyond page 100", () => {
+        renderDefault({ currentPage: 100 });
 
         expect(screen.getByText("2,971 - 3,000 of 12.3k")).toBeInTheDocument();
         expect(screen.getByText("100")).toBeInTheDocument();
 
-        await act(async () => {
+        act(() => {
             fireEvent.click(screen.getByText("Next Page"));
         });
 
@@ -143,8 +122,8 @@ describe("NumberedPager", () => {
         expect(screen.getByText("101")).toBeInTheDocument();
     });
 
-    it("Actual pages are more than total results, APIs normally have limit for total", async () => {
-        await renderDefault({ hasMorePages: true });
+    it("Actual pages are more than total results, APIs normally have limit for total", () => {
+        renderDefault({ hasMorePages: true });
 
         expect(screen.getByText("1 - 30 of 12.3k+")).toBeInTheDocument();
     });

@@ -252,7 +252,7 @@ EOT;
             private bool $allowRevalidate;
 
             /**
-             *  {@inheritDoc}
+             *  {@inheritdoc}
              */
             public function __construct(
                 $schema,
@@ -267,7 +267,7 @@ EOT;
             }
 
             /**
-             * {@inheritDoc}
+             * {@inheritdoc}
              */
             public function validate($data, $sparse = false)
             {

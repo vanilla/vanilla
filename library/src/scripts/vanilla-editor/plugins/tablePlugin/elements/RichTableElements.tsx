@@ -1,0 +1,349 @@
+/**
+ * @copyright 2009-2025 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
+import { userContentClasses } from "@library/content/UserContent.styles";
+import { findNodePath, PlateRenderElementProps, setNodes, toDOMNode, withoutNormalizing } from "@udecode/plate-common";
+import {
+    getTableAbove,
+    TableCellElement as PlateTableCellElement,
+    TableElement as PlateTableElement,
+    TableRowElement as PlateTableRowElement,
+    TTableElement,
+    useTableCellElementState,
+    useTableElementState,
+} from "@udecode/plate-table";
+import { cx } from "@emotion/css";
+import { richTableElementsClasses } from "@library/vanilla-editor/plugins/tablePlugin/elements/RichTableElements.classes";
+import { useVanillaEditorTable } from "@library/vanilla-editor/VanillaEditorTableContext";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import debounce from "lodash-es/debounce";
+import { useLastValue } from "@vanilla/react-utils";
+import { getCellPosition } from "@library/vanilla-editor/plugins/tablePlugin/tableUtils";
+import { MyEditor, MyTableCellElement, MyTableElement, MyTableRowElement } from "@library/vanilla-editor/typescript";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { Path } from "slate";
+import { MyTableHighlightArea, MyTableMeasures } from "@library/vanilla-editor/typescript";
+
+export const RichTableElement = (props: PlateRenderElementProps<any, MyTableElement>) => {
+    const classes = userContentClasses();
+
+    const { children, ...rootProps } = props;
+    const { editor, element } = rootProps;
+
+    const { colSizes, minColumnWidth, marginLeft, isSelectingCell } = useTableElementState();
+
+    const tableRef = useRef<HTMLTableElement>(null);
+
+    const tableID = element.id;
+
+    const { tablesByID, updateTableState } = useVanillaEditorTable();
+
+    const { tableHighlightedArea, rowSizesByIndex, contentAlignment } = tablesByID[tableID] ?? {};
+
+    // sometimes colsize can be smaller than minColumnWidth (which is not correct), so we need to manually adjust it
+    const actualColSizes = colSizes.map((width) => (width < minColumnWidth ? minColumnWidth : width));
+
+    const tableWidth = actualColSizes.reduce((acc, width, index) => {
+        if (index < colSizes.length - 1) {
+            return acc + width;
+        }
+        return acc;
+    }, 0);
+
+    const previousTableID = useLastValue(tableID);
+    const previousTableWidth = useLastValue(tableWidth);
+    const lastMarginLeft = useLastValue(marginLeft);
+
+    const rowSizesLength = Object.keys(rowSizesByIndex ?? {}).length;
+    const shouldResetRowSizes = !rowSizesLength || element.children.length !== rowSizesLength;
+
+    // we should set initial content alignment if there is one (normally when first editing a table)
+    useEffect(() => {
+        if (!contentAlignment && element.contentAlignment) {
+            updateTableState(tableID, {
+                contentAlignment: element.contentAlignment,
+            });
+        }
+    }, [tableID, element.contentAlignment, contentAlignment]);
+
+    useEffect(() => {
+        if (shouldResetRowSizes) {
+            const initialRowSizesByIndex = Object.fromEntries(
+                element.children.map((row, index) => {
+                    // element.size has some mismatch with actual height and even can be negative when we reducing row size,
+                    // so let's rely on rowRect.height rather
+                    const rowNode = toDOMNode(editor, row);
+                    const rowRect = rowNode?.getBoundingClientRect();
+                    return [index, rowRect?.height ?? (element.size as number)];
+                }),
+            );
+            updateTableState(tableID, { rowSizesByIndex: initialRowSizesByIndex });
+        }
+        // clean up if table is gone
+        return () => {
+            rowSizesLength && updateTableState(tableID, { rowSizesByIndex: {} });
+        };
+    }, [shouldResetRowSizes]);
+
+    const debouncedTableWidth = useCallback(
+        debounce((measures: MyTableMeasures) => {
+            updateTableState(tableID, { tableMeasures: measures });
+        }, 250),
+        [],
+    );
+
+    useEffect(() => {
+        if (tableID !== previousTableID || tableWidth !== previousTableWidth || marginLeft !== lastMarginLeft) {
+            debouncedTableWidth({
+                actualWidth: tableWidth,
+                marginLeft,
+            });
+        }
+    }, [tableID, tableWidth, marginLeft]);
+
+    useEffect(() => {
+        updateTableState(tableID, { multipleCellsSelected: isSelectingCell });
+    }, [isSelectingCell]);
+
+    return (
+        <>
+            <PlateTableElement.Wrapper
+                style={{ paddingLeft: marginLeft }}
+                className={cx(classes.tableWrapper, richTableElementsClasses().tableWrapper, "customized")}
+            >
+                <PlateTableElement.Root
+                    {...rootProps}
+                    className={cx(richTableElementsClasses().table, rootProps.className)}
+                    ref={tableRef}
+                    id={rootProps?.element?.id as string}
+                >
+                    <PlateTableElement.ColGroup>
+                        {actualColSizes.map((width, index) => (
+                            <PlateTableElement.Col
+                                key={index}
+                                style={{
+                                    minWidth: minColumnWidth,
+                                    width: width || undefined,
+                                }}
+                            />
+                        ))}
+                    </PlateTableElement.ColGroup>
+
+                    <PlateTableElement.TBody>{children}</PlateTableElement.TBody>
+                </PlateTableElement.Root>
+                <TableHighlightOverlay
+                    editor={editor}
+                    highlightArea={tableHighlightedArea}
+                    tableMeasures={{ actualWidth: tableWidth, marginLeft }}
+                    colSizes={actualColSizes}
+                    rowSizesByIndex={rowSizesByIndex}
+                    isSelectingCell={isSelectingCell}
+                />
+            </PlateTableElement.Wrapper>
+        </>
+    );
+};
+
+export const RichTableRowElement = (props: PlateRenderElementProps<any, MyTableRowElement>) => {
+    const { children, ...rootProps } = props;
+
+    const { editor, element } = rootProps;
+
+    const currentRowPath = findNodePath(editor, element) as Path;
+    const tableEntry = getTableAbove(editor, { at: currentRowPath });
+    const tableNode = tableEntry?.[0] as MyTableElement;
+
+    const tableID = tableNode?.id;
+
+    const { tablesByID, updateTableState } = useVanillaEditorTable();
+
+    const rowSizesByIndex = tablesByID[tableID]?.rowSizesByIndex;
+
+    const currentRowIndex = currentRowPath?.[currentRowPath.length - 1];
+
+    const rowNode = toDOMNode(editor, element);
+    const rowRect = rowNode?.getBoundingClientRect();
+
+    const rowSizesLength = Object.keys(rowSizesByIndex ?? {}).length;
+    const isCurrentRowSizeChanged =
+        currentRowIndex !== undefined && rowSizesByIndex?.[currentRowIndex] !== rowRect?.height;
+
+    useEffect(() => {
+        if (isCurrentRowSizeChanged && rowSizesLength) {
+            const rowSizes = {
+                ...rowSizesByIndex,
+                [currentRowIndex]: rowRect?.height ?? (element.size as number),
+            };
+            updateTableState(tableID, {
+                rowSizesByIndex: rowSizes,
+            });
+            // update so the BE can get the new row size for HTML
+            withoutNormalizing(editor, () => {
+                setNodes<TTableElement>(editor, { actualHeight: rowSizes[currentRowIndex] }, { at: currentRowPath });
+            });
+        }
+    }, [isCurrentRowSizeChanged, rowSizesLength]);
+
+    return (
+        <PlateTableRowElement.Root {...rootProps} className={cx(richTableElementsClasses().row, rootProps.className)}>
+            {children}
+        </PlateTableRowElement.Root>
+    );
+};
+
+export const RichTableHeaderCellElement = (props: PlateRenderElementProps<any, MyTableCellElement>) => {
+    return <RichTableCellElement {...props} isHeader={true} />;
+};
+
+export const RichTableCellElement = (
+    props: PlateRenderElementProps<any, MyTableCellElement> & { isHeader?: boolean },
+) => {
+    const { children, isHeader, ...rootProps } = props;
+
+    const { editor, element } = rootProps;
+
+    const currentCellPath = findNodePath(editor, element) as Path;
+    const tableEntry = getTableAbove(editor, { at: currentCellPath });
+    const tableNode = tableEntry?.[0] as MyTableElement;
+
+    const tableID = tableNode?.id;
+
+    const { colIndex, rowIndex, readOnly, borders, rowSize } = useTableCellElementState();
+
+    const { tablesByID } = useVanillaEditorTable();
+    const contentAlignment = tablesByID[tableID]?.contentAlignment;
+
+    const alignment = useMemo(() => {
+        const currentColumnPath = currentCellPath && currentCellPath.slice(0, 3);
+        const currentRowPath = currentCellPath && currentCellPath.slice(0, 2);
+        const currentColumnIndex = currentColumnPath?.[currentColumnPath.length - 1] ?? -1;
+        const currentRowIndex = currentRowPath?.[currentRowPath.length - 1] ?? -1;
+        const columnAlignment = contentAlignment?.columns?.[currentColumnIndex];
+        const rowAlignment = contentAlignment?.rows?.[currentRowIndex];
+        const hasColumnAndRowAlignmentApplied = columnAlignment && rowAlignment;
+        if (hasColumnAndRowAlignmentApplied) {
+            return columnAlignment?.appliedTimestamp > rowAlignment?.appliedTimestamp
+                ? columnAlignment?.alignment
+                : rowAlignment?.alignment;
+        } else if (columnAlignment) {
+            return columnAlignment?.alignment;
+        } else if (rowAlignment) {
+            return rowAlignment?.alignment;
+        }
+    }, [contentAlignment, currentCellPath]);
+
+    // this bit is for BE to assign alignment per cell
+    useEffect(() => {
+        if (alignment && alignment !== "start" && alignment !== element.alignment) {
+            withoutNormalizing(editor, () => {
+                setNodes<TTableElement>(
+                    editor,
+                    { attributes: { style: `text-align:${alignment}` } },
+                    { at: currentCellPath },
+                );
+            });
+        }
+    }, [alignment]);
+
+    return (
+        <PlateTableCellElement.Root
+            asAlias={isHeader ? "th" : "td"}
+            {...rootProps}
+            className={cx(richTableElementsClasses(borders).cell, rootProps.className)}
+            id={rootProps?.element?.id as string | undefined}
+        >
+            <PlateTableCellElement.Content
+                className={richTableElementsClasses().cellContent}
+                style={{
+                    minHeight: rowSize,
+                    textAlign: alignment,
+                }}
+            >
+                {children}
+            </PlateTableCellElement.Content>
+
+            <PlateTableCellElement.ResizableWrapper
+                className={cx(richTableElementsClasses().cellResizableWrapper, "group")}
+            >
+                <PlateTableCellElement.Resizable colIndex={colIndex} rowIndex={rowIndex} readOnly={readOnly} />
+            </PlateTableCellElement.ResizableWrapper>
+        </PlateTableCellElement.Root>
+    );
+};
+
+interface TableOverlayProps {
+    editor: MyEditor;
+    tableMeasures: MyTableMeasures;
+    colSizes: number[];
+    highlightArea?: MyTableHighlightArea;
+    rowSizesByIndex?: Record<number, number>;
+    isSelectingCell?: boolean;
+}
+
+const TableHighlightOverlay = (props: TableOverlayProps) => {
+    const { editor, tableMeasures, highlightArea, colSizes, rowSizesByIndex, isSelectingCell } = props;
+    const [overlayStyle, setOverlayStyle] = useState({});
+
+    const initialStyle = {
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        border: `2px solid ${ColorsUtils.colorOut(globalVariables().mainColors.primary)}`,
+        pointerEvents: "none",
+        zIndex: 1,
+    };
+    const { row: rowIndex, col: colIndex } = getCellPosition(editor);
+
+    useEffect(() => {
+        if (colIndex !== undefined && rowIndex !== undefined) {
+            const tableHeight = Object.values(rowSizesByIndex ?? {}).reduce((acc, rowHeight) => acc + rowHeight, 0);
+            let highlight = {};
+
+            switch (highlightArea) {
+                case "table":
+                    highlight = {
+                        left: tableMeasures.marginLeft ?? 0,
+                        width: tableMeasures.actualWidth + 1,
+                        height: tableHeight + 1,
+                    };
+                    break;
+                case "column":
+                    const leftPosition =
+                        (tableMeasures.marginLeft ?? 0) +
+                        colSizes.slice(0, colIndex).reduce((acc, width) => acc + width, 0);
+                    highlight = {
+                        top: 1,
+                        left: colIndex === 0 ? leftPosition : leftPosition - 1,
+                        width: colSizes[colIndex] + 1,
+                        height: tableHeight,
+                    };
+                    break;
+                case "row":
+                    const topPosition = Object.values(rowSizesByIndex ?? {})
+                        .slice(0, rowIndex)
+                        .reduce((acc, height) => acc + height, 0);
+                    highlight = {
+                        left: tableMeasures?.marginLeft ?? 0,
+                        top: topPosition,
+                        width: tableMeasures.actualWidth,
+                        height: (rowSizesByIndex?.[rowIndex] ?? 0) + 2,
+                    };
+                    break;
+            }
+
+            setOverlayStyle({
+                ...initialStyle,
+                ...highlight,
+            });
+        }
+    }, [editor.selection, highlightArea, rowSizesByIndex, colSizes]);
+
+    if (!highlightArea || isSelectingCell) {
+        return null;
+    }
+
+    return <div className="highlight-overlay" style={overlayStyle} />;
+};

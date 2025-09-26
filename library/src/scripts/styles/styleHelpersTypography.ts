@@ -6,7 +6,7 @@
 
 import { ColorHelper, important, percent, px } from "csx";
 import { styleUnit } from "@library/styles/styleUnit";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { TLength } from "@library/styles/styleShim";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { formElementsVariables } from "@library/forms/formElementStyles";

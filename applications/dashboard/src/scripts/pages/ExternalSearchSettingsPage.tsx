@@ -4,7 +4,7 @@
  */
 
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
-import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
+import { DashboardLabelType } from "@dashboard/forms/DashboardLabelType";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { LoadStatus } from "@library/@types/api/core";

@@ -25,7 +25,7 @@ class DiscussionListPageControllerTest extends SiteTestCase
     public static $addons = ["vanilla", "QnA"];
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     public static function setupBeforeClass(): void
     {

@@ -33,9 +33,15 @@ export function useCurrentUserContext(): ICurrentUserContextValue {
     return useContext(CurrentUserContext);
 }
 
-export function useCurrentUser(): ICurrentUserContextValue["currentUser"] {
+/**
+ * Get the current sessioned user. If the user is a guest, a guest fragment will be returned.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
+ */
+export function useCurrentUser(): IMe {
     const context = useCurrentUserContext();
-    return context.currentUser;
+    return context.currentUser!;
 }
 
 export function useCurrentUserID(): IUser["userID"] | undefined {
@@ -43,12 +49,18 @@ export function useCurrentUserID(): IUser["userID"] | undefined {
     return currentUser?.userID;
 }
 
+/**
+ * Return if the current user is a signed in.
+ *
+ * @public
+ * @package @vanilla/injectables/Utils
+ */
 export function useCurrentUserSignedIn(): boolean {
     const currentUser = useCurrentUser();
     return currentUser?.userID !== GUEST_USER_ID;
 }
 
-export function CurrentUserContextProvider(props: { currentUser?: IMe | IUserFragment; children: React.ReactNode }) {
+export function CurrentUserContextProvider(props: { currentUser?: IMe; children: React.ReactNode }) {
     const { currentUser, children } = props;
     const user: IMe | undefined = currentUser
         ? {

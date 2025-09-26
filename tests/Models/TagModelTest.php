@@ -465,10 +465,9 @@ class TagModelTest extends \VanillaTests\SiteTestCase
      */
     public function testAddCustomTagTypesThroughDashboardWithputPermission(): void
     {
-        $this->getSession()->start($this->adminID);
+        $this->getSession()->start($this->moderatorID);
 
-        $this->assertContains("Garden.Community.Manage", $this->getSession()->getPermissionsArray());
-        // By default Admin permissions do not include "Vanilla.Tagging.Add" permission
+        // By default Moderator permissions do not include "Vanilla.Tagging.Add" permission
         $this->assertNotContains("Vanilla.Tagging.Add", $this->getSession()->getPermissionsArray());
         // We set ourselves tagging permissions.
         $this->expectExceptionMessage("You don't have permission to do that.");

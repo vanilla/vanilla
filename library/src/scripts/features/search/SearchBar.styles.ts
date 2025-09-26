@@ -28,7 +28,7 @@ import { oneColumnVariables } from "@library/layout/Section.variables";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { css } from "@emotion/css";
-import { CSSObject } from "@emotion/css/types/create-instance";
+import { CSSObject } from "@emotion/serialize";
 import { inputVariables } from "@library/forms/inputStyles";
 import { suggestedTextStyleHelper } from "@library/features/search/suggestedTextStyles";
 import { searchResultsVariables } from "@library/features/search/searchResultsStyles";
@@ -617,7 +617,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         },
     });
 
-    const { selectBoxDropdown, buttonIcon } = selectBoxClasses();
+    const { buttonIcon } = selectBoxClasses();
 
     const scopeSelect = css({
         display: "flex",
@@ -626,7 +626,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         justifyContent: "center",
         alignItems: "stretch",
         ...{
-            [`.${selectBoxDropdown}`]: {
+            [`.selectBoxDropdown`]: {
                 position: "relative",
                 padding: isInsetBordered ? styleUnit(vars.border.width) : undefined,
                 width: percent(100),

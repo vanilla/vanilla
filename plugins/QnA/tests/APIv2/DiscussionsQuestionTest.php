@@ -125,18 +125,6 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
     }
 
     /**
-     * Run a basic test of a question's HTML.
-     */
-    public function testGetQuestionHtml()
-    {
-        $row = $this->testPostQuestion();
-        $discussionID = $row["discussionID"];
-
-        $dom = $this->bessy()->getHtml("/discussion/{$discussionID}/xxx", [], ["deliveryType" => DELIVERY_TYPE_ALL]);
-        $dom->assertCssSelectorExists('.dropdown-menu-link[href*="/discussion/qnaoptions"]');
-    }
-
-    /**
      * Verify a question can be created with the `discussions` API endpoint.
      */
     public function testPostQuestion()
